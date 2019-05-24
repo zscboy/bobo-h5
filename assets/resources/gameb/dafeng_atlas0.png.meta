@@ -1,0 +1,32 @@
+{
+  "ver": "2.3.0",
+  "uuid": "23692e6d-d7d0-44a7-bea1-33d1721756be",
+  "type": "sprite",
+  "wrapMode": "clamp",
+  "filterMode": "bilinear",
+  "premultiplyAlpha": false,
+  "platformSettings": {},
+  "subMetas": {
+    "dafeng_atlas0": {
+      "ver": "1.0.4",
+      "uuid": "59a3a309-35d5-4c34-9938-eacb41034c72",
+      "rawTextureUuid": "23692e6d-d7d0-44a7-bea1-33d1721756be",
+      "trimType": "auto",
+      "trimThreshold": 1,
+      "rotated": false,
+      "offsetX": -1,
+      "offsetY": 1,
+      "trimX": 0,
+      "trimY": 0,
+      "width": 2046,
+      "height": 2046,
+      "rawWidth": 2048,
+      "rawHeight": 2048,
+      "borderTop": 0,
+      "borderBottom": 0,
+      "borderLeft": 0,
+      "borderRight": 0,
+      "subMetas": {}
+    }
+  }
+}

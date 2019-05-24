@@ -15,6 +15,8 @@ interface GameModule {
 export class LobbyView extends cc.Component {
     private view: fgui.GComponent;
     private diamondText: fgui.GObject;
+
+    // 用于挂载子游戏模块的节点，在离开子游戏模块并回到大厅后销毁
     private gameNode: cc.Node;
 
     public returnFromGame(): void {
@@ -144,6 +146,7 @@ export class LobbyView extends cc.Component {
     }
 
     private switchToGame(params: GameModuleLaunchArgs, moduleName: string): void {
+        // 任何时刻只有一个子游戏
         if (this.gameNode !== undefined) {
             Logger.error("switch to game failed, there is a game running:", this.gameNode.name);
         }
@@ -169,10 +172,12 @@ export class LobbyView extends cc.Component {
                 if (error == null) {
                     switch (moduleName) {
                         case "gameb":
+                            // 新建节点，然后挂载游戏组件
                             const gameNode = new cc.Node(moduleName);
                             this.node.addChild(gameNode);
                             this.gameNode = gameNode;
                             const gm = <GameModule>(this.gameNode.addComponent(GameB)); // tslint:disable-line:no-any
+                            // 启动游戏流程
                             gm.launch(params);
                             break;
                         // case "gamea":

@@ -1,13 +1,17 @@
 // tslint:disable-next-line:max-line-length
 import {
     DataStore, Dialog, GameModule, GameModuleLaunchArgs,
-    LEnv, LobbyModule, Logger, RoomInfo, UserInfo
+    LEnv, LobbyModule, Logger, MsgQueue, MsgType,
+    RoomInfo, UserInfo, WS
 } from "../lobby/lcore/LCoreExports";
 import { Loader } from "./Loader";
-import { MsgQueue, MsgType } from "./MsgQueue";
 import { proto } from "./proto/gameb";
 import { Room } from "./Room";
-import { WS } from "./WS";
+
+const mc = proto.mahjong.MessageCode;
+const priorityMap: { [key: number]: number } = {
+    [mc.OPDisbandRequest]: 1, [mc.OPDisbandNotify]: 1, [mc.OPDisbandAnswer]: 1
+};
 
 /**
  * 子游戏入口
@@ -140,13 +144,31 @@ export class Game extends cc.Component implements GameModule {
         // 显示于界面的等待信息
         const showProgressTips = "正在进入房间";
 
-        const hub = {
+        // host 结构
+        const host = {
             comp: this,
-            destroyListener: this.eventTarget
+            destroyListener: this.eventTarget,
+            startPing: true,
+            pingFrequency: 3, // 3秒
+            pingPacketProvider: (pingData: ByteBuffer) => {
+                const msg = {
+                    Ops: proto.mahjong.MessageCode.OPPing,
+                    Data: pingData
+                };
+
+                return proto.mahjong.GameMessage.encode(msg).toArrayBuffer();
+            }
+        };
+        // ping pong 结构
+        const pp = {
+            pingCmd: mc.OPPing,
+            pongCmd: mc.OPPong,
+            decode: proto.mahjong.GameMessage.decode,
+            encode: proto.mahjong.GameMessage.encode
         };
 
-        const mq = new MsgQueue();
-        const ws = new WS(url, mq, hub);
+        const mq = new MsgQueue(priorityMap);
+        const ws = new WS(url, mq, host, pp);
         this.mq = mq;
         this.ws = ws;
 

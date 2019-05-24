@@ -1,14 +1,22 @@
-import { Deferred, Logger } from "../lobby/lcore/LCoreExports";
-import { proto } from "./proto/gameb";
+import { Logger } from "./Logger";
+import { Deferred } from "./PromiseDeferred";
+
+/**
+ *
+ */
+export interface GameMessageView {
+    Ops: number;
+    Data: ByteBuffer;
+}
 
 /**
  * 消息
  */
 export class Message {
     public readonly mt: MsgType;
-    public readonly data: string | Blob | proto.mahjong.GameMessage;
+    public readonly data: string | Blob | GameMessageView;
 
-    public constructor(mt: MsgType, data?: string | Blob | proto.mahjong.GameMessage) {
+    public constructor(mt: MsgType, data?: string | Blob | GameMessageView) {
         this.mt = mt;
         this.data = data;
     }
@@ -21,11 +29,6 @@ export enum MsgType {
     wsOpen = 1, wsClosed = 2, wsError = 3, wsData = 4, quit = 5, replay = 6
 }
 
-const mc = proto.mahjong.MessageCode;
-const priorityMap: { [key: number]: number } = {
-    [mc.OPDisbandRequest]: 1, [mc.OPDisbandNotify]: 1, [mc.OPDisbandAnswer]: 1
-};
-
 /**
  * 消息队列
  */
@@ -37,6 +40,12 @@ export class MsgQueue {
     private blockedMessages: Message[] = [];
 
     private waiting: Deferred<Message> = null;
+
+    private readonly priorityMap: { [key: number]: number };
+
+    public constructor(priorityMap: { [key: number]: number }) {
+        this.priorityMap = priorityMap;
+    }
 
     public async waitMsg(): Promise<Message> {
         if (this.waiting !== null) {
@@ -56,7 +65,7 @@ export class MsgQueue {
         this.pushMessage(msg);
     }
 
-    public pushWebsocketBinaryEvent(gmsg: proto.mahjong.GameMessage): void {
+    public pushWebsocketBinaryEvent(gmsg: GameMessageView): void {
         Logger.debug("pushWebsocketBinaryEvent:", gmsg);
         const msg = new Message(MsgType.wsData, gmsg);
         this.pushMessage(msg);
@@ -76,8 +85,8 @@ export class MsgQueue {
             this.messages.forEach((msg) => {
                 let isBlocked = true;
                 if (msg.mt === MsgType.wsData) {
-                    const ops = (<proto.mahjong.GameMessage>msg.data).Ops;
-                    const p = priorityMap[ops];
+                    const ops = (<GameMessageView>msg.data).Ops;
+                    const p = this.priorityMap[ops];
                     if (p !== undefined && p >= this.priority) {
                         isBlocked = false;
                     }
@@ -114,8 +123,8 @@ export class MsgQueue {
             isBlocked = true;
 
             if (msg.mt === MsgType.wsData) {
-                const ops = (<proto.mahjong.GameMessage>msg.data).Ops;
-                const p = priorityMap[ops];
+                const ops = (<GameMessageView>msg.data).Ops;
+                const p = this.priorityMap[ops];
                 if (p !== undefined && p >= this.priority) {
                     isBlocked = false;
                 }

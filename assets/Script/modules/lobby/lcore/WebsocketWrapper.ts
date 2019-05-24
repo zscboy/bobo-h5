@@ -1,14 +1,12 @@
 import { Logger } from "./Logger";
 
 /**
- * websocket 封装
+ * WebsocketHost
  */
-export interface WebsocketHub {
+export interface WebsocketHost {
     destroyListener: cc.EventTarget;
     comp: cc.Component;
-}
 
-export interface WebsocketOptions {
     startPing: boolean;
 
     pingFrequency: number;
@@ -32,7 +30,7 @@ export class WebsocketWrapper {
     private rttsCount: number;
     private pingPacketProvider: Function;
 
-    public constructor(hub: WebsocketHub, url: string, options: WebsocketOptions = null) {
+    public constructor(host: WebsocketHost, url: string) {
         const ws = new WebSocket(url);
         this.ws = ws;
         this.rtts = 0;
@@ -42,9 +40,9 @@ export class WebsocketWrapper {
             ws.close();
         };
 
-        const hasPing = options !== null && options.startPing && options.pingPacketProvider !== undefined;
+        const hasPing = host.startPing && host.pingPacketProvider !== undefined;
 
-        const destroyListener = hub.destroyListener;
+        const destroyListener = host.destroyListener;
 
         const cbPing = () => {
             this.ping();
@@ -53,7 +51,7 @@ export class WebsocketWrapper {
         const die = () => {
             destroyListener.off("destroy", cb);
             if (hasPing) {
-                hub.comp.unschedule(cbPing);
+                host.comp.unschedule(cbPing);
                 this.pingPacketProvider = null;
             }
         };
@@ -81,14 +79,14 @@ export class WebsocketWrapper {
 
             if (hasPing) {
                 // 启动ping
-                hub.comp.schedule(
+                host.comp.schedule(
                     cbPing,
-                    options.pingFrequency,
+                    host.pingFrequency,
                     cc.macro.REPEAT_FOREVER,
-                    options.pingFrequency);
+                    host.pingFrequency);
 
-                this.pingPacketProvider = options.pingPacketProvider;
-                Logger.debug("WebsocketWrapper has ping:", options.pingFrequency);
+                this.pingPacketProvider = host.pingPacketProvider;
+                Logger.debug("WebsocketWrapper has ping:", host.pingFrequency);
             }
 
             this.onOpen(this);
@@ -123,7 +121,7 @@ export class WebsocketWrapper {
     public onPong(pong: ArrayBuffer): void {
         // Logger.debug("got pong:", pong);
 
-        // 数据是4字节的时间戳
+        // 数据是8字节的时间戳
         if (this.rttsCount > 9) {
             // 只保存最后10个，因此减去一个平均值，变成9个
             // 接着后面代码增加当前rtt后，再次变成10个
@@ -151,7 +149,7 @@ export class WebsocketWrapper {
      * 发送当前时间戳到服务器，服务器再原封不动返回来
      */
     private ping(): void {
-        // 4个字节的时间戳
+        // 8个字节的时间戳
         const n = Date.now();
         // Logger.debug("send ping, n:", n);
         const buffer = new ArrayBuffer(8);

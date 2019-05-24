@@ -9,10 +9,33 @@ export class Dialog {
     public view: fgui.GComponent;
     public win: fgui.Window;
 
+    public packageLoaded: boolean = false;
+
+    public static prompt = (msg: string): void => {
+        if (!Dialog.inst.packageLoaded) {
+            fgui.UIPackage.addPackage("lobby/fui_dialog/lobby_dialog");
+            Dialog.inst.packageLoaded = true;
+        }
+
+        const p = fgui.UIPackage.createObject("lobby_dialog", "prompt").asCom;
+        const label = p.getChild("text");
+        label.text = msg;
+        p.setPosition(1136 / 2, 640 / 2);
+        const trans = p.getTransition("t1");
+        trans.play(() => {
+            p.dispose();
+        });
+
+        fgui.GRoot.inst.addChild(p);
+    }
+
     public static showDialog = (msg: string, yesCb: Function = null, noCB: Function = null): void => {
         if (Dialog.inst.view === undefined) {
             Logger.debug("showDialog view is null, create new");
-            fgui.UIPackage.addPackage("lobby/fui_dialog/lobby_dialog");
+            if (!Dialog.inst.packageLoaded) {
+                fgui.UIPackage.addPackage("lobby/fui_dialog/lobby_dialog");
+                Dialog.inst.packageLoaded = true;
+            }
 
             const view = fgui.UIPackage.createObject("lobby_dialog", "dialog").asCom;
             const win = new fgui.Window();

@@ -9,3 +9,5 @@ export * from "./Logger";
 export * from "./WebsocketWrapper";
 export * from "./PromiseDeferred";
 export * from "./LDataType";
+export * from "./WS";
+export * from "./MsgQueue";

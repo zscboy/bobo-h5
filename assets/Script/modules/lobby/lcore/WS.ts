@@ -1,9 +1,23 @@
-import { Logger, WebsocketHub, WebsocketWrapper } from "../lobby/lcore/LCoreExports";
-import { Message, MsgQueue, MsgType } from "./MsgQueue";
-import { proto } from "./proto/gameb";
+import { Logger } from "./Logger";
+import { GameMessageView, Message, MsgQueue, MsgType } from "./MsgQueue";
+import { WebsocketHost, WebsocketWrapper } from "./WebsocketWrapper";
 
 /**
- * 游戏内使用的websocket
+ * ping pong
+ */
+export interface PingPong {
+    // ping 命令字
+    pingCmd: number;
+    // pong 命令字
+    pongCmd: number;
+    // 解码函数，返回一个GameMessageView等价的结构体
+    decode: Function;
+    // 编码函数，返回一个byte buffer
+    encode: Function;
+}
+
+/**
+ * Websocket 再封装一层，主要是处理ping，pong以及浏览器websocket返回的blob转换为array buffer
  */
 export class WS {
     public readonly mq: MsgQueue;
@@ -13,29 +27,14 @@ export class WS {
 
     private events: Message[] = [];
     private rolling: boolean = false;
+    private pp: PingPong;
 
-    public constructor(url: string, mq: MsgQueue, hub: WebsocketHub) {
+    public constructor(url: string, mq: MsgQueue, host: WebsocketHost, pp: PingPong) {
         this.mq = mq;
-        this.comp = hub.comp;
+        this.comp = host.comp;
+        this.pp = pp;
 
-        const pingPacketProvider = (pingData: ByteBuffer) => {
-            const msg = {
-                Ops: proto.mahjong.MessageCode.OPPing,
-                Data: pingData
-            };
-
-            return proto.mahjong.GameMessage.encode(msg).toArrayBuffer();
-        };
-
-        const options = {
-            startPing: true,
-
-            pingFrequency: 3,
-
-            pingPacketProvider: pingPacketProvider
-        };
-
-        this.ww = new WebsocketWrapper(hub, url, options);
+        this.ww = new WebsocketWrapper(host, url);
         this.ww.onEnd = () => {
             this.events.push(new Message(MsgType.wsClosed));
             this.roll();
@@ -80,19 +79,19 @@ export class WS {
             const blob = mx.data;
             // 由于需要异步转换为array buffer，因此需要阻塞其他事件，确保有序
             const fileReader = new FileReader();
-            fileReader.onload = () => {
+            fileReader.onloadend = () => {
                 try {
                     const arrayBuffer = <ArrayBuffer>fileReader.result;
-                    const gmsg = proto.mahjong.GameMessage.decode(new Uint8Array(arrayBuffer));
-                    if (gmsg.Ops === proto.mahjong.MessageCode.OPPing) {
+                    const gmsg = <GameMessageView>this.pp.decode(new Uint8Array(arrayBuffer));
+                    if (gmsg.Ops === this.pp.pingCmd) {
                         // ping
                         const msgEcho = {
-                            Ops: proto.mahjong.MessageCode.OPPong,
+                            Ops: this.pp.pongCmd,
                             Data: gmsg.Data
                         };
-                        const bufEcho = proto.mahjong.GameMessage.encode(msgEcho).toArrayBuffer();
+                        const bufEcho = (<ByteBuffer>this.pp.encode(msgEcho)).toArrayBuffer();
                         this.ww.onPing(bufEcho);
-                    } else if (gmsg.Ops === proto.mahjong.MessageCode.OPPong) {
+                    } else if (gmsg.Ops === this.pp.pongCmd) {
                         // pong
                         this.ww.onPong(gmsg.Data.toArrayBuffer());
                     } else {

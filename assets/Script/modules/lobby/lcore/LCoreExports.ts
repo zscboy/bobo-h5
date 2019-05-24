@@ -8,3 +8,4 @@ export * from "./LEnv";
 export * from "./Logger";
 export * from "./WebsocketWrapper";
 export * from "./PromiseDeferred";
+export * from "./LDataType";

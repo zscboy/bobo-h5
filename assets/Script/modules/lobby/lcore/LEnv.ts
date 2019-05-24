@@ -10,6 +10,7 @@ export namespace LEnv {
     export const gameWebsocketMonkey = "/game/%s/ws/monkey";
     export const gameWebsocketPlay = "/game/%s/ws/play";
     export const rootURL = "http://121.196.210.106:30002"; // tslint:disable-line:no-http-string
+    export const gameHost = "ws://localhost:3001"; // tslint:disable-line:no-http-string
     export const quicklyLogin = "/lobby/uuid/quicklyLogin";
     export const accountLogin = "/lobby/uuid/accountLogin";
     export const wxLogin = "/lobby/uuid/wxLogin";
@@ -34,4 +35,12 @@ export namespace LEnv {
     export const loadMyClubs = "/lobby/uuid/loadMyClubs";
     export const deleteClub = "/lobby/uuid/deleteClub";
 
+    export const cfmt = (str: string, ...args: any[]): string => { // tslint:disable-line:no-any
+        return str.replace(/{(\d+)}/g, (match, n) => {
+            return (typeof args[n]) !== "undefined"
+                ? args[n]  // tslint:disable-line:no-unsafe-any
+                : match
+                ;
+        });
+    };
 }

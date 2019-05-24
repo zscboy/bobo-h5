@@ -1,5 +1,5 @@
 import { Game as GameB } from "../../gameb/GamebExports";
-import { DataStore, Logger } from "../lcore/LCoreExports";
+import { DataStore, GameModuleLaunchArgs, Logger } from "../lcore/LCoreExports";
 
 const { ccclass } = cc._decorator;
 
@@ -15,7 +15,19 @@ interface GameModule {
 export class LobbyView extends cc.Component {
     private view: fgui.GComponent;
     private diamondText: fgui.GObject;
-    private gameModule: GameModule;
+    private gameNode: cc.Node;
+
+    public returnFromGame(): void {
+        this.gameNode.destroyAllChildren();
+        this.gameNode.destroy();
+
+        this.gameNode = undefined;
+        const num = fgui.GRoot.inst.numChildren;
+        if (num > 0) {
+            throw new Error(`returnFromGame failed, ui count should be 0, now:${num}`);
+        }
+        fgui.GRoot.inst.addChild(this.view);
+    }
 
     protected onLoad(): void {
         // 加载大厅界面
@@ -56,8 +68,15 @@ export class LobbyView extends cc.Component {
     }
 
     private onFriendClick(): void {
-        const params: { [key: string]: number | object | string } = {
-            gameType: 1
+        const myUser = { userID: "6" };
+        const roomInfo = { roomID: "monkey-room" };
+
+        const params: GameModuleLaunchArgs = {
+            jsonString: "",
+            lm: this,
+            userInfo: myUser,
+            roomInfo: roomInfo,
+            uuid: "uuid"
         };
 
         this.switchToGame(params, "gameb");
@@ -124,9 +143,9 @@ export class LobbyView extends cc.Component {
         // TODO:
     }
 
-    private switchToGame(params: { [key: string]: number | object | string }, moduleName: string): void {
-        if (this.gameModule !== undefined) {
-            Logger.error("switch to game failed, there is a game running:", this.gameModule.name);
+    private switchToGame(params: GameModuleLaunchArgs, moduleName: string): void {
+        if (this.gameNode !== undefined) {
+            Logger.error("switch to game failed, there is a game running:", this.gameNode.name);
         }
 
         // 隐藏大厅窗口
@@ -150,7 +169,11 @@ export class LobbyView extends cc.Component {
                 if (error == null) {
                     switch (moduleName) {
                         case "gameb":
-                            this.addComponent(GameB);
+                            const gameNode = new cc.Node(moduleName);
+                            this.node.addChild(gameNode);
+                            this.gameNode = gameNode;
+                            const gm = <GameModule>(this.gameNode.addComponent(GameB)); // tslint:disable-line:no-any
+                            gm.launch(params);
                             break;
                         // case "gamea":
                         //     this.addComponent(GameA);

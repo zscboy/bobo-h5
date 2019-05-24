@@ -7,8 +7,8 @@ export namespace LEnv {
     // updateQuery = "/lobby/upgrade/query",
     export const updateQuery: string = "/lobby/uuid/upgradeQuery";
     export const updateDownload = "http://localhost:8080"; // tslint:disable-line:no-http-string
-    export const gameWebsocketMonkey = "/game/%s/ws/monkey";
-    export const gameWebsocketPlay = "/game/%s/ws/play";
+    export const gameWebsocketMonkey = "/game/{0}/ws/monkey";
+    export const gameWebsocketPlay = "/game/{0}/ws/play";
     export const rootURL = "http://121.196.210.106:30002"; // tslint:disable-line:no-http-string
     export const gameHost = "ws://localhost:3001"; // tslint:disable-line:no-http-string
     export const quicklyLogin = "/lobby/uuid/quicklyLogin";

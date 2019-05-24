@@ -2017,6 +2017,14 @@
                         {
                             "name": "OPUpdatePropCfg",
                             "id": 23
+                        },
+                        {
+                            "name": "OPPing",
+                            "id": 100
+                        },
+                        {
+                            "name": "OPPong",
+                            "id": 101
                         }
                     ]
                 },

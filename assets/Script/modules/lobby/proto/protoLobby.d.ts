@@ -131,7 +131,7 @@ export namespace proto {
 
 		class LobbyMessage implements ILobbyMessage {
 			public Ops: number;
-			public Data: Uint8Array;
+			public Data: ByteBuffer;
 			constructor(properties?: lobby.ILobbyMessage);
 			public static encode(message: LobbyMessage): ByteBuffer;
 			public static decode(reader: Uint8Array | ByteBuffer): LobbyMessage;

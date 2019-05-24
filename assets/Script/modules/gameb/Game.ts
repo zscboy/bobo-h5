@@ -77,7 +77,7 @@ export class Game extends cc.Component implements GameModule {
         const uID = myUser.userID;
 
         const path = LEnv.cfmt(LEnv.gameWebsocketPlay, serverUUID);
-        url = `${host}${path}?userID=${uID}&roomID=${rID}&tk=${tk}`;
+        url = `${host}${path}?userID=${uID}&roomID=${rID}&tk=${tk}&web=1`;
 
         Logger.debug("tryEnterRoom, url:", url);
 

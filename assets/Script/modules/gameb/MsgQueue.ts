@@ -6,9 +6,9 @@ import { proto } from "./proto/gameb";
  */
 export class Message {
     public readonly mt: MsgType;
-    public readonly data: string | proto.mahjong.GameMessage;
+    public readonly data: string | Blob | proto.mahjong.GameMessage;
 
-    public constructor(mt: MsgType, data?: string | proto.mahjong.GameMessage) {
+    public constructor(mt: MsgType, data?: string | Blob | proto.mahjong.GameMessage) {
         this.mt = mt;
         this.data = data;
     }
@@ -52,30 +52,13 @@ export class MsgQueue {
         return this.waiting.promise;
     }
 
-    public pushWebsocketOpenEvent(): void {
-        const msg = new Message(MsgType.wsOpen);
+    public pushWebsocketEvent(msg: Message): void {
         this.pushMessage(msg);
     }
 
-    public pushWebsocketCloseEvent(): void {
-        const msg = new Message(MsgType.wsClosed);
-        this.pushMessage(msg);
-    }
-
-    public pushWebsocketErrorEvent(): void {
-        const msg = new Message(MsgType.wsError);
-        this.pushMessage(msg);
-    }
-
-    public pushWebsocketTextMessageEvent(text: string): void {
-        const msg = new Message(MsgType.wsData, text);
-        this.pushMessage(msg);
-    }
-
-    public pushWebsocketBinaryEvent(binary: Uint8Array): void {
-        const gmsg = proto.mahjong.GameMessage.decode(binary);
+    public pushWebsocketBinaryEvent(gmsg: proto.mahjong.GameMessage): void {
+        Logger.debug("pushWebsocketBinaryEvent:", gmsg);
         const msg = new Message(MsgType.wsData, gmsg);
-
         this.pushMessage(msg);
     }
 

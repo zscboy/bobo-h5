@@ -181,6 +181,8 @@ export namespace proto {
 			OPUpdateLocation = 21,
 			OP2Lobby = 22,
 			OPUpdatePropCfg = 23,
+			OPPing = 100,
+			OPPong = 101,
 		}
 
 		enum MeldType {
@@ -669,7 +671,7 @@ export namespace proto {
 
 		class GameMessage implements IGameMessage {
 			public Ops: number;
-			public Data: Uint8Array;
+			public Data: ByteBuffer;
 			constructor(properties?: mahjong.IGameMessage);
 			public static encode(message: GameMessage): ByteBuffer;
 			public static decode(reader: Uint8Array | ByteBuffer): GameMessage;

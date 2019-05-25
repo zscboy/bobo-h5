@@ -62,6 +62,11 @@ export class Game extends cc.Component implements GameModule {
 
     protected onDestroy(): void {
         this.eventTarget.emit("destroy");
+
+        fgui.GRoot.inst.removeChild(this.view);
+        this.view.dispose();
+
+        this.lm.returnFromGame();
     }
 
     private testProto(): void {
@@ -124,10 +129,7 @@ export class Game extends cc.Component implements GameModule {
     }
 
     private backToLobby(): void {
-        fgui.GRoot.inst.removeChild(this.view);
         this.destroy();
-
-        this.lm.returnFromGame();
     }
 
     private async doEnterRoom(

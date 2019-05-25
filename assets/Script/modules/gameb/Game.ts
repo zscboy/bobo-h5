@@ -38,6 +38,12 @@ export class Game extends cc.Component implements GameModule {
         await this.tryEnterRoom(args.uuid, args.userInfo, args.roomInfo);
     }
 
+    public quit(): void {
+        if (this.mq !== undefined && this.mq !== null) {
+            this.mq.pushQuit();
+        }
+    }
+
     protected onLoad(): void {
         this.eventTarget = new cc.EventTarget();
 
@@ -216,7 +222,7 @@ export class Game extends cc.Component implements GameModule {
         myUser: UserInfo,
         roomInfo: RoomInfo): void {
         //
-        this.room = new Room(myUser, roomInfo);
+        this.room = new Room(myUser, roomInfo, this);
     }
 
     private async waitConnect(showProgressTips: string): Promise<number> {

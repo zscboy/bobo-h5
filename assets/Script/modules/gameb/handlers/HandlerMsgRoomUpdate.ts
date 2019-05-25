@@ -1,9 +1,9 @@
 import { RoomInterface } from "./RoomInterfaces";
 
 /**
- * 发牌处理
+ * 响应服务器更新房间
  */
-export namespace HandlerMsgDeal {
+export namespace HandlerMsgRoomUpdate {
     export const onMsg = (msgData: ByteBuffer, room: RoomInterface): void => {
         // TODO:
     };

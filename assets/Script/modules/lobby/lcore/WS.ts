@@ -1,5 +1,5 @@
 import { Logger } from "./Logger";
-import { GameMessageView, Message, MsgQueue, MsgType } from "./MsgQueue";
+import { Message, MessageView, MsgQueue, MsgType } from "./MsgQueue";
 import { WebsocketHost, WebsocketWrapper } from "./WebsocketWrapper";
 
 /**
@@ -10,7 +10,7 @@ export interface PingPong {
     pingCmd: number;
     // pong 命令字
     pongCmd: number;
-    // 解码函数，返回一个GameMessageView等价的结构体
+    // 解码函数，返回一个MessageView等价的结构体
     decode: Function;
     // 编码函数，返回一个byte buffer
     encode: Function;
@@ -82,7 +82,7 @@ export class WS {
             fileReader.onloadend = () => {
                 try {
                     const arrayBuffer = <ArrayBuffer>fileReader.result;
-                    const gmsg = <GameMessageView>this.pp.decode(new Uint8Array(arrayBuffer));
+                    const gmsg = <MessageView>this.pp.decode(new Uint8Array(arrayBuffer));
                     if (gmsg.Ops === this.pp.pingCmd) {
                         // ping
                         const msgEcho = {

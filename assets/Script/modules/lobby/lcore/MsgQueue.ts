@@ -2,9 +2,9 @@ import { Logger } from "./Logger";
 import { Deferred } from "./PromiseDeferred";
 
 /**
- *
+ * 放于消息队列内的protobuf 消息基本结构约定
  */
-export interface GameMessageView {
+export interface MessageView {
     Ops: number;
     Data: ByteBuffer;
 }
@@ -14,9 +14,9 @@ export interface GameMessageView {
  */
 export class Message {
     public readonly mt: MsgType;
-    public readonly data: string | Blob | GameMessageView;
+    public readonly data: string | Blob | MessageView;
 
-    public constructor(mt: MsgType, data?: string | Blob | GameMessageView) {
+    public constructor(mt: MsgType, data?: string | Blob | MessageView) {
         this.mt = mt;
         this.data = data;
     }
@@ -65,7 +65,7 @@ export class MsgQueue {
         this.pushMessage(msg);
     }
 
-    public pushWebsocketBinaryEvent(gmsg: GameMessageView): void {
+    public pushWebsocketBinaryEvent(gmsg: MessageView): void {
         Logger.debug("pushWebsocketBinaryEvent:", gmsg);
         const msg = new Message(MsgType.wsData, gmsg);
         this.pushMessage(msg);
@@ -85,7 +85,7 @@ export class MsgQueue {
             this.messages.forEach((msg) => {
                 let isBlocked = true;
                 if (msg.mt === MsgType.wsData) {
-                    const ops = (<GameMessageView>msg.data).Ops;
+                    const ops = (<MessageView>msg.data).Ops;
                     const p = this.priorityMap[ops];
                     if (p !== undefined && p >= this.priority) {
                         isBlocked = false;
@@ -123,7 +123,7 @@ export class MsgQueue {
             isBlocked = true;
 
             if (msg.mt === MsgType.wsData) {
-                const ops = (<GameMessageView>msg.data).Ops;
+                const ops = (<MessageView>msg.data).Ops;
                 const p = this.priorityMap[ops];
                 if (p !== undefined && p >= this.priority) {
                     isBlocked = false;

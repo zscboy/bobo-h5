@@ -1,4 +1,4 @@
-import { proto } from "../proto/gameb";
+import { proto } from "../proto/protoGame";
 import { RoomInterface } from "./RoomInterfaces";
 
 /**

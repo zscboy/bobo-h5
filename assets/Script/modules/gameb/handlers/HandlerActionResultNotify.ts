@@ -1,5 +1,5 @@
 import { Logger } from "../../lobby/lcore/LCoreExports";
-import { proto } from "../proto/gameb";
+import { proto } from "../proto/protoGame";
 import { HandlerActionResultChow } from "./HandlerActionResultChow";
 import { HandlerActionResultDiscarded } from "./HandlerActionResultDiscarded";
 import { HandlerActionResultDraw } from "./HandlerActionResultDraw";

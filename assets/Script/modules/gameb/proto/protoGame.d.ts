@@ -246,7 +246,7 @@ export namespace proto {
 			public avatarID: number;
 			constructor(properties?: mahjong.IMsgReplayPlayerInfo);
 			public static encode(message: MsgReplayPlayerInfo): ByteBuffer;
-			public static decode(reader: Uint8Array | ByteBuffer): MsgReplayPlayerInfo;
+			public static decode(reader: Uint8Array|ByteBuffer): MsgReplayPlayerInfo;
 		}
 
 		interface IMsgReplayPlayerScoreSummary {
@@ -261,7 +261,7 @@ export namespace proto {
 			public winType: number;
 			constructor(properties?: mahjong.IMsgReplayPlayerScoreSummary);
 			public static encode(message: MsgReplayPlayerScoreSummary): ByteBuffer;
-			public static decode(reader: Uint8Array | ByteBuffer): MsgReplayPlayerScoreSummary;
+			public static decode(reader: Uint8Array|ByteBuffer): MsgReplayPlayerScoreSummary;
 		}
 
 		interface IMsgReplayRecordSummary {
@@ -280,7 +280,7 @@ export namespace proto {
 			public startTime: number;
 			constructor(properties?: mahjong.IMsgReplayRecordSummary);
 			public static encode(message: MsgReplayRecordSummary): ByteBuffer;
-			public static decode(reader: Uint8Array | ByteBuffer): MsgReplayRecordSummary;
+			public static decode(reader: Uint8Array|ByteBuffer): MsgReplayRecordSummary;
 		}
 
 		interface IMsgReplayRoom {
@@ -303,7 +303,7 @@ export namespace proto {
 			public ownerUserID: string;
 			constructor(properties?: mahjong.IMsgReplayRoom);
 			public static encode(message: MsgReplayRoom): ByteBuffer;
-			public static decode(reader: Uint8Array | ByteBuffer): MsgReplayRoom;
+			public static decode(reader: Uint8Array|ByteBuffer): MsgReplayRoom;
 		}
 
 		interface ISRMsgPlayerInfo {
@@ -324,7 +324,7 @@ export namespace proto {
 			public avatarID: number;
 			constructor(properties?: mahjong.ISRMsgPlayerInfo);
 			public static encode(message: SRMsgPlayerInfo): ByteBuffer;
-			public static decode(reader: Uint8Array | ByteBuffer): SRMsgPlayerInfo;
+			public static decode(reader: Uint8Array|ByteBuffer): SRMsgPlayerInfo;
 		}
 
 		interface ISRDealDetail {
@@ -339,7 +339,7 @@ export namespace proto {
 			public tilesFlower: number[];
 			constructor(properties?: mahjong.ISRDealDetail);
 			public static encode(message: SRDealDetail): ByteBuffer;
-			public static decode(reader: Uint8Array | ByteBuffer): SRDealDetail;
+			public static decode(reader: Uint8Array|ByteBuffer): SRDealDetail;
 		}
 
 		interface ISRAction {
@@ -360,7 +360,7 @@ export namespace proto {
 			public allowActions: number;
 			constructor(properties?: mahjong.ISRAction);
 			public static encode(message: SRAction): ByteBuffer;
-			public static decode(reader: Uint8Array | ByteBuffer): SRAction;
+			public static decode(reader: Uint8Array|ByteBuffer): SRAction;
 		}
 
 		interface ISRMsgHandRecorderExtra {
@@ -373,7 +373,7 @@ export namespace proto {
 			public ownerUserID: string;
 			constructor(properties?: mahjong.ISRMsgHandRecorderExtra);
 			public static encode(message: SRMsgHandRecorderExtra): ByteBuffer;
-			public static decode(reader: Uint8Array | ByteBuffer): SRMsgHandRecorderExtra;
+			public static decode(reader: Uint8Array|ByteBuffer): SRMsgHandRecorderExtra;
 		}
 
 		interface ISRMsgHandRecorder {
@@ -383,7 +383,7 @@ export namespace proto {
 			isHandOver: boolean;
 			deals?: mahjong.ISRDealDetail[];
 			actions?: mahjong.ISRAction[];
-			handScore?: Uint8Array;
+			handScore?: ByteBuffer;
 			roomConfigID?: string;
 			startTime?: number;
 			endTime?: number;
@@ -401,7 +401,7 @@ export namespace proto {
 			public isHandOver: boolean;
 			public deals: mahjong.ISRDealDetail[];
 			public actions: mahjong.ISRAction[];
-			public handScore: Uint8Array;
+			public handScore: ByteBuffer;
 			public roomConfigID: string;
 			public startTime: number;
 			public endTime: number;
@@ -412,7 +412,7 @@ export namespace proto {
 			public extra: mahjong.ISRMsgHandRecorderExtra;
 			constructor(properties?: mahjong.ISRMsgHandRecorder);
 			public static encode(message: SRMsgHandRecorder): ByteBuffer;
-			public static decode(reader: Uint8Array | ByteBuffer): SRMsgHandRecorder;
+			public static decode(reader: Uint8Array|ByteBuffer): SRMsgHandRecorder;
 		}
 
 		interface IMsgPlayerInfo {
@@ -451,7 +451,7 @@ export namespace proto {
 			public dan: number;
 			constructor(properties?: mahjong.IMsgPlayerInfo);
 			public static encode(message: MsgPlayerInfo): ByteBuffer;
-			public static decode(reader: Uint8Array | ByteBuffer): MsgPlayerInfo;
+			public static decode(reader: Uint8Array|ByteBuffer): MsgPlayerInfo;
 		}
 
 		interface IPlayerHandScoreRecord {
@@ -466,7 +466,7 @@ export namespace proto {
 			public score: number;
 			constructor(properties?: mahjong.IPlayerHandScoreRecord);
 			public static encode(message: PlayerHandScoreRecord): ByteBuffer;
-			public static decode(reader: Uint8Array | ByteBuffer): PlayerHandScoreRecord;
+			public static decode(reader: Uint8Array|ByteBuffer): PlayerHandScoreRecord;
 		}
 
 		interface IMsgRoomHandScoreRecord {
@@ -481,7 +481,7 @@ export namespace proto {
 			public playerRecords: mahjong.IPlayerHandScoreRecord[];
 			constructor(properties?: mahjong.IMsgRoomHandScoreRecord);
 			public static encode(message: MsgRoomHandScoreRecord): ByteBuffer;
-			public static decode(reader: Uint8Array | ByteBuffer): MsgRoomHandScoreRecord;
+			public static decode(reader: Uint8Array|ByteBuffer): MsgRoomHandScoreRecord;
 		}
 
 		interface IMsgRoomInfo {
@@ -504,7 +504,7 @@ export namespace proto {
 			public handFinished: number;
 			constructor(properties?: mahjong.IMsgRoomInfo);
 			public static encode(message: MsgRoomInfo): ByteBuffer;
-			public static decode(reader: Uint8Array | ByteBuffer): MsgRoomInfo;
+			public static decode(reader: Uint8Array|ByteBuffer): MsgRoomInfo;
 		}
 
 		interface IRoomScoreRecords {
@@ -515,7 +515,7 @@ export namespace proto {
 			public scoreRecords: mahjong.IMsgRoomHandScoreRecord[];
 			constructor(properties?: mahjong.IRoomScoreRecords);
 			public static encode(message: RoomScoreRecords): ByteBuffer;
-			public static decode(reader: Uint8Array | ByteBuffer): RoomScoreRecords;
+			public static decode(reader: Uint8Array|ByteBuffer): RoomScoreRecords;
 		}
 
 		interface IMsgDisbandAnswer {
@@ -526,7 +526,7 @@ export namespace proto {
 			public agree: boolean;
 			constructor(properties?: mahjong.IMsgDisbandAnswer);
 			public static encode(message: MsgDisbandAnswer): ByteBuffer;
-			public static decode(reader: Uint8Array | ByteBuffer): MsgDisbandAnswer;
+			public static decode(reader: Uint8Array|ByteBuffer): MsgDisbandAnswer;
 		}
 
 		interface IMsgDisbandNotify {
@@ -547,7 +547,7 @@ export namespace proto {
 			public countdown: number;
 			constructor(properties?: mahjong.IMsgDisbandNotify);
 			public static encode(message: MsgDisbandNotify): ByteBuffer;
-			public static decode(reader: Uint8Array | ByteBuffer): MsgDisbandNotify;
+			public static decode(reader: Uint8Array|ByteBuffer): MsgDisbandNotify;
 		}
 
 		interface IMsgGameOverPlayerStat {
@@ -570,7 +570,7 @@ export namespace proto {
 			public kongerCounter: number;
 			constructor(properties?: mahjong.IMsgGameOverPlayerStat);
 			public static encode(message: MsgGameOverPlayerStat): ByteBuffer;
-			public static decode(reader: Uint8Array | ByteBuffer): MsgGameOverPlayerStat;
+			public static decode(reader: Uint8Array|ByteBuffer): MsgGameOverPlayerStat;
 		}
 
 		interface IMsgGameOver {
@@ -581,7 +581,7 @@ export namespace proto {
 			public playerStats: mahjong.IMsgGameOverPlayerStat[];
 			constructor(properties?: mahjong.IMsgGameOver);
 			public static encode(message: MsgGameOver): ByteBuffer;
-			public static decode(reader: Uint8Array | ByteBuffer): MsgGameOver;
+			public static decode(reader: Uint8Array|ByteBuffer): MsgGameOver;
 		}
 
 		interface IMsgRoomShowTips {
@@ -594,7 +594,7 @@ export namespace proto {
 			public tipCode: number;
 			constructor(properties?: mahjong.IMsgRoomShowTips);
 			public static encode(message: MsgRoomShowTips): ByteBuffer;
-			public static decode(reader: Uint8Array | ByteBuffer): MsgRoomShowTips;
+			public static decode(reader: Uint8Array|ByteBuffer): MsgRoomShowTips;
 		}
 
 		interface IMsgRoomDelete {
@@ -605,7 +605,7 @@ export namespace proto {
 			public reason: number;
 			constructor(properties?: mahjong.IMsgRoomDelete);
 			public static encode(message: MsgRoomDelete): ByteBuffer;
-			public static decode(reader: Uint8Array | ByteBuffer): MsgRoomDelete;
+			public static decode(reader: Uint8Array|ByteBuffer): MsgRoomDelete;
 		}
 
 		interface IMsgKickout {
@@ -616,7 +616,7 @@ export namespace proto {
 			public victimUserID: string;
 			constructor(properties?: mahjong.IMsgKickout);
 			public static encode(message: MsgKickout): ByteBuffer;
-			public static decode(reader: Uint8Array | ByteBuffer): MsgKickout;
+			public static decode(reader: Uint8Array|ByteBuffer): MsgKickout;
 		}
 
 		interface IMsgKickoutResult {
@@ -635,7 +635,7 @@ export namespace proto {
 			public byWhoUserID: string;
 			constructor(properties?: mahjong.IMsgKickoutResult);
 			public static encode(message: MsgKickoutResult): ByteBuffer;
-			public static decode(reader: Uint8Array | ByteBuffer): MsgKickoutResult;
+			public static decode(reader: Uint8Array|ByteBuffer): MsgKickoutResult;
 		}
 
 		interface IMsgEnterRoomResult {
@@ -646,7 +646,7 @@ export namespace proto {
 			public status: number;
 			constructor(properties?: mahjong.IMsgEnterRoomResult);
 			public static encode(message: MsgEnterRoomResult): ByteBuffer;
-			public static decode(reader: Uint8Array | ByteBuffer): MsgEnterRoomResult;
+			public static decode(reader: Uint8Array|ByteBuffer): MsgEnterRoomResult;
 		}
 
 		interface IMsgDonate {
@@ -661,12 +661,12 @@ export namespace proto {
 			public fromChairID: number;
 			constructor(properties?: mahjong.IMsgDonate);
 			public static encode(message: MsgDonate): ByteBuffer;
-			public static decode(reader: Uint8Array | ByteBuffer): MsgDonate;
+			public static decode(reader: Uint8Array|ByteBuffer): MsgDonate;
 		}
 
 		interface IGameMessage {
 			Ops: number;
-			Data?: Uint8Array;
+			Data?: ByteBuffer;
 		}
 
 		class GameMessage implements IGameMessage {
@@ -674,7 +674,7 @@ export namespace proto {
 			public Data: ByteBuffer;
 			constructor(properties?: mahjong.IGameMessage);
 			public static encode(message: GameMessage): ByteBuffer;
-			public static decode(reader: Uint8Array | ByteBuffer): GameMessage;
+			public static decode(reader: Uint8Array|ByteBuffer): GameMessage;
 		}
 
 		interface IMsgMeldTile {
@@ -691,7 +691,7 @@ export namespace proto {
 			public chowTile: number;
 			constructor(properties?: mahjong.IMsgMeldTile);
 			public static encode(message: MsgMeldTile): ByteBuffer;
-			public static decode(reader: Uint8Array | ByteBuffer): MsgMeldTile;
+			public static decode(reader: Uint8Array|ByteBuffer): MsgMeldTile;
 		}
 
 		interface IMsgPlayerTileList {
@@ -712,7 +712,7 @@ export namespace proto {
 			public melds: mahjong.IMsgMeldTile[];
 			constructor(properties?: mahjong.IMsgPlayerTileList);
 			public static encode(message: MsgPlayerTileList): ByteBuffer;
-			public static decode(reader: Uint8Array | ByteBuffer): MsgPlayerTileList;
+			public static decode(reader: Uint8Array|ByteBuffer): MsgPlayerTileList;
 		}
 
 		interface IMsgDeal {
@@ -737,7 +737,7 @@ export namespace proto {
 			public markup: number;
 			constructor(properties?: mahjong.IMsgDeal);
 			public static encode(message: MsgDeal): ByteBuffer;
-			public static decode(reader: Uint8Array | ByteBuffer): MsgDeal;
+			public static decode(reader: Uint8Array|ByteBuffer): MsgDeal;
 		}
 
 		interface IMsgReadyHandTips {
@@ -750,7 +750,7 @@ export namespace proto {
 			public readyHandList: number[];
 			constructor(properties?: mahjong.IMsgReadyHandTips);
 			public static encode(message: MsgReadyHandTips): ByteBuffer;
-			public static decode(reader: Uint8Array | ByteBuffer): MsgReadyHandTips;
+			public static decode(reader: Uint8Array|ByteBuffer): MsgReadyHandTips;
 		}
 
 		interface IMsgAllowPlayerAction {
@@ -771,7 +771,7 @@ export namespace proto {
 			public meldsForAction: mahjong.IMsgMeldTile[];
 			constructor(properties?: mahjong.IMsgAllowPlayerAction);
 			public static encode(message: MsgAllowPlayerAction): ByteBuffer;
-			public static decode(reader: Uint8Array | ByteBuffer): MsgAllowPlayerAction;
+			public static decode(reader: Uint8Array|ByteBuffer): MsgAllowPlayerAction;
 		}
 
 		interface IMsgAllowPlayerReAction {
@@ -794,7 +794,7 @@ export namespace proto {
 			public victimChairID: number;
 			constructor(properties?: mahjong.IMsgAllowPlayerReAction);
 			public static encode(message: MsgAllowPlayerReAction): ByteBuffer;
-			public static decode(reader: Uint8Array | ByteBuffer): MsgAllowPlayerReAction;
+			public static decode(reader: Uint8Array|ByteBuffer): MsgAllowPlayerReAction;
 		}
 
 		interface IMsgPlayerAction {
@@ -815,7 +815,7 @@ export namespace proto {
 			public meldTile1: number;
 			constructor(properties?: mahjong.IMsgPlayerAction);
 			public static encode(message: MsgPlayerAction): ByteBuffer;
-			public static decode(reader: Uint8Array | ByteBuffer): MsgPlayerAction;
+			public static decode(reader: Uint8Array|ByteBuffer): MsgPlayerAction;
 		}
 
 		interface IMsgActionResultNotify {
@@ -838,7 +838,7 @@ export namespace proto {
 			public waitDiscardReAction: boolean;
 			constructor(properties?: mahjong.IMsgActionResultNotify);
 			public static encode(message: MsgActionResultNotify): ByteBuffer;
-			public static decode(reader: Uint8Array | ByteBuffer): MsgActionResultNotify;
+			public static decode(reader: Uint8Array|ByteBuffer): MsgActionResultNotify;
 		}
 
 		interface IMsgRestore {
@@ -848,7 +848,7 @@ export namespace proto {
 			isMeNewDraw?: boolean;
 			waitDiscardReAction?: boolean;
 			flyReadyHandChairs?: number[];
-			extra?: Uint8Array;
+			extra?: ByteBuffer;
 		}
 
 		class MsgRestore implements IMsgRestore {
@@ -858,10 +858,10 @@ export namespace proto {
 			public isMeNewDraw: boolean;
 			public waitDiscardReAction: boolean;
 			public flyReadyHandChairs: number[];
-			public extra: Uint8Array;
+			public extra: ByteBuffer;
 			constructor(properties?: mahjong.IMsgRestore);
 			public static encode(message: MsgRestore): ByteBuffer;
-			public static decode(reader: Uint8Array | ByteBuffer): MsgRestore;
+			public static decode(reader: Uint8Array|ByteBuffer): MsgRestore;
 		}
 
 		interface IMsgPlayerScoreGreatWin {
@@ -880,7 +880,7 @@ export namespace proto {
 			public continuousBankerExtra: number;
 			constructor(properties?: mahjong.IMsgPlayerScoreGreatWin);
 			public static encode(message: MsgPlayerScoreGreatWin): ByteBuffer;
-			public static decode(reader: Uint8Array | ByteBuffer): MsgPlayerScoreGreatWin;
+			public static decode(reader: Uint8Array|ByteBuffer): MsgPlayerScoreGreatWin;
 		}
 
 		interface IMsgPlayerScoreMiniWin {
@@ -901,7 +901,7 @@ export namespace proto {
 			public continuousBankerExtra: number;
 			constructor(properties?: mahjong.IMsgPlayerScoreMiniWin);
 			public static encode(message: MsgPlayerScoreMiniWin): ByteBuffer;
-			public static decode(reader: Uint8Array | ByteBuffer): MsgPlayerScoreMiniWin;
+			public static decode(reader: Uint8Array|ByteBuffer): MsgPlayerScoreMiniWin;
 		}
 
 		interface IMsgPlayerScore {
@@ -930,7 +930,7 @@ export namespace proto {
 			public continuousBankerMultiple: number;
 			constructor(properties?: mahjong.IMsgPlayerScore);
 			public static encode(message: MsgPlayerScore): ByteBuffer;
-			public static decode(reader: Uint8Array | ByteBuffer): MsgPlayerScore;
+			public static decode(reader: Uint8Array|ByteBuffer): MsgPlayerScore;
 		}
 
 		interface IMsgHandScore {
@@ -941,7 +941,7 @@ export namespace proto {
 			public playerScores: mahjong.IMsgPlayerScore[];
 			constructor(properties?: mahjong.IMsgHandScore);
 			public static encode(message: MsgHandScore): ByteBuffer;
-			public static decode(reader: Uint8Array | ByteBuffer): MsgHandScore;
+			public static decode(reader: Uint8Array|ByteBuffer): MsgHandScore;
 		}
 
 		interface IMsgHandOver {
@@ -958,7 +958,7 @@ export namespace proto {
 			public continueAble: boolean;
 			constructor(properties?: mahjong.IMsgHandOver);
 			public static encode(message: MsgHandOver): ByteBuffer;
-			public static decode(reader: Uint8Array | ByteBuffer): MsgHandOver;
+			public static decode(reader: Uint8Array|ByteBuffer): MsgHandOver;
 		}
 
 		interface IMsgUpdateLocation {
@@ -971,7 +971,7 @@ export namespace proto {
 			public location: string;
 			constructor(properties?: mahjong.IMsgUpdateLocation);
 			public static encode(message: MsgUpdateLocation): ByteBuffer;
-			public static decode(reader: Uint8Array | ByteBuffer): MsgUpdateLocation;
+			public static decode(reader: Uint8Array|ByteBuffer): MsgUpdateLocation;
 		}
 
 		interface IMsgUpdatePropCfg {
@@ -982,9 +982,8 @@ export namespace proto {
 			public propCfg: string;
 			constructor(properties?: mahjong.IMsgUpdatePropCfg);
 			public static encode(message: MsgUpdatePropCfg): ByteBuffer;
-			public static decode(reader: Uint8Array | ByteBuffer): MsgUpdatePropCfg;
+			public static decode(reader: Uint8Array|ByteBuffer): MsgUpdatePropCfg;
 		}
 
 	}
-
 }

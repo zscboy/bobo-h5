@@ -16,7 +16,7 @@ import { HandlerMsgShowTips } from "./handlers/HandlerMsgShowTips";
 import { HandlerMsgUpdateLocation } from "./handlers/HandlerMsgUpdateLocation";
 import { HandlerMsgUpdatePropCfg } from "./handlers/HandlerMsgUpdatePropCfg";
 import { RoomInterface } from "./handlers/RoomInterfaces";
-import { proto } from "./proto/gameb";
+import { proto } from "./proto/protoGame";
 
 /**
  * 定义一个接口，关联Game.ts到Room

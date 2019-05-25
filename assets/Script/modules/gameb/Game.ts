@@ -5,7 +5,7 @@ import {
     RoomInfo, UserInfo, WS
 } from "../lobby/lcore/LCoreExports";
 import { Loader } from "./Loader";
-import { proto } from "./proto/gameb";
+import { proto } from "./proto/protoGame";
 import { Room } from "./Room";
 
 const mc = proto.mahjong.MessageCode;

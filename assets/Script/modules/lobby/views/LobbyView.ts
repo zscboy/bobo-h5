@@ -1,6 +1,6 @@
 import { Game as GameB } from "../../gameb/GamebExports";
 import { DataStore, GameModuleLaunchArgs, Logger } from "../lcore/LCoreExports";
-
+import { NewRoomView } from "./NewRoomView";
 const { ccclass } = cc._decorator;
 
 interface GameModule {
@@ -105,7 +105,7 @@ export class LobbyView extends cc.Component {
     }
 
     private onCreateRoom(): void {
-        // TODO:
+        this.addComponent(NewRoomView);
     }
 
     private openUserInfoView(): void {

@@ -2926,7 +2926,49 @@ window.__extends = (this && this.__extends) || (function () {
             this.onConstruct();
         };
         GComponent.prototype.constructExtension = function (buffer) {};
-        GComponent.prototype.onConstruct = function () {};
+        GComponent.prototype.onConstruct = function () {
+            if (this.baseUserData === "textfield_fold") {
+                this.foldTextFields();
+            }
+        };
+        GComponent.prototype.foldTextFields = function () {
+            var textFields = [];
+            this.visit(this, function (v) {
+                var tf = v.asTextField;
+                if (tf) {
+                    textFields.push(tf);
+                }
+            });
+            if (textFields.length > 0) {
+                var tfParent_1 = new cc.Node("tfParent");
+                this.node.addChild(tfParent_1);
+                textFields.forEach(function (tf) {
+                    // if cacheMode set to 2 (CacheMode.CHAR)，then
+                    // all character texture will be render to a global 2048*2048 4M
+                    // texture, thus the drawcall count can be reduced to the same with
+                    // that use BMFont.
+                    // but there are some pitfalls with the global texture, e.g. it only
+                    // been release when sceen unloaded.
+                    // tf._label.cacheMode = 2;
+                    var n = tf.node;
+                    var wp = n.parent.convertToWorldSpaceAR(n.position);
+                    var np = tfParent_1.convertToNodeSpaceAR(wp);
+                    n.removeFromParent();
+                    tfParent_1.addChild(n);
+                    n.setPosition(np);
+                });
+            }
+        };
+        GComponent.prototype.visit = function (o, visitFn) {
+            var _this = this;
+            visitFn(o);
+            var comp = o.asCom;
+            if (comp) {
+                comp._children.forEach(function (child) {
+                    _this.visit(child, visitFn);
+                });
+            }
+        };
         GComponent.prototype.setup_afterAdd = function (buffer, beginPos) {
             _super.prototype.setup_afterAdd.call(this, buffer, beginPos);
             buffer.seek(beginPos, 4);
@@ -4352,10 +4394,18 @@ window.__extends = (this && this.__extends) || (function () {
             else if (this.packageItem.scaleByTile)
                 this._content.type = cc.Sprite.Type.TILED;
             this._content.spriteFrame = this.packageItem.asset;
-            //this._content.setState(this._grayed ? cc.Sprite.State.GRAY : cc.Sprite.State.NORMAL);
+            if (this._grayed) {
+                (this._content).setMaterial(0, cc.Material.getBuiltinMaterial('2d-gray-sprite'));
+            } else {
+                (this._content).setMaterial(0, cc.Material.getBuiltinMaterial('2d-sprite'));
+            }
         };
         GImage.prototype.handleGrayedChanged = function () {
-            this._content.setState(this._grayed ? cc.Sprite.State.GRAY : cc.Sprite.State.NORMAL);
+            if (this._grayed) {
+                (this._content).setMaterial(0, cc.Material.getBuiltinMaterial('2d-gray-sprite'));
+            } else {
+                (this._content).setMaterial(0, cc.Material.getBuiltinMaterial('2d-sprite'));
+            }
         };
         GImage.prototype.setup_beforeAdd = function (buffer, beginPos) {
             _super.prototype.setup_beforeAdd.call(this, buffer, beginPos);

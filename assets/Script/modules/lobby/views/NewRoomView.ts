@@ -24,44 +24,49 @@ export class NewRoomView extends cc.Component {
     public createRoom(ruleJson: string): void {
         Logger.debug("NewRoomView.createRoom, ruleJson:", ruleJson);
         const tk = DataStore.getString("token", "");
-        const url  = `${LEnv.rootURL}${LEnv.createRoom}?&tk=${tk}`;
+        const url = `${LEnv.rootURL}${LEnv.createRoom}?&tk=${tk}`;
         // local jsonString = rapidJson.encode(ruleJson)
         const createRoomReq = new proto.lobby.MsgCreateRoomReq();
         createRoomReq.config = ruleJson;
 
         const body = proto.lobby.MsgCreateRoomReq.encode(createRoomReq).toArrayBuffer();
 
-        HTTP.hPost(this.eventTarget, url, (xhr: XMLHttpRequest, err: string) => {
-            let errMsg = null;
-            if (err !== null) {
-                errMsg = `创建房间错误，错误码:${err}`;
-            } else {
-                errMsg = HTTP.hError(xhr);
-                if (errMsg === null) {
-                    const data = <Uint8Array>xhr.response;
-                    // proto 解码登录结果
-                    const msgCreateRoomRsp = proto.lobby.MsgCreateRoomRsp.decode(data);
-                    if (msgCreateRoomRsp.result === proto.lobby.MsgError.ErrSuccess) {
-                        this.enterGame(msgCreateRoomRsp.roomInfo);
-                    } else if (msgCreateRoomRsp.result === proto.lobby.MsgError.ErrUserInOtherRoom) {
-                        this.reEnterGame(msgCreateRoomRsp.roomInfo);
-                    } else {
-                        // TODO: show error msg
-                        Logger.error("Create room error:, code:", msgCreateRoomRsp.result);
-                        Dialog.showDialog(`创建房间失败，错误码:${msgCreateRoomRsp.result}`);
+        HTTP.hPost(
+            this.eventTarget,
+            url,
+            (xhr: XMLHttpRequest, err: string) => {
+                let errMsg = null;
+                if (err !== null) {
+                    errMsg = `创建房间错误，错误码:${err}`;
+                } else {
+                    errMsg = HTTP.hError(xhr);
+                    if (errMsg === null) {
+                        const data = <Uint8Array>xhr.response;
+                        // proto 解码登录结果
+                        const msgCreateRoomRsp = proto.lobby.MsgCreateRoomRsp.decode(data);
+                        if (msgCreateRoomRsp.result === proto.lobby.MsgError.ErrSuccess) {
+                            this.enterGame(msgCreateRoomRsp.roomInfo);
+                        } else if (msgCreateRoomRsp.result === proto.lobby.MsgError.ErrUserInOtherRoom) {
+                            this.reEnterGame(msgCreateRoomRsp.roomInfo);
+                        } else {
+                            // TODO: show error msg
+                            Logger.error("Create room error:, code:", msgCreateRoomRsp.result);
+                            Dialog.showDialog(`创建房间失败，错误码:${msgCreateRoomRsp.result}`);
 
+                        }
                     }
                 }
-            }
 
-            if (errMsg !== null) {
-                Logger.debug("NewRoomView.createRoom failed:", errMsg);
-                // 显示错误对话框
-                Dialog.showDialog(errMsg, () => {
-                    //
-                });
-            }
-        },         "arraybuffer",  body);
+                if (errMsg !== null) {
+                    Logger.debug("NewRoomView.createRoom failed:", errMsg);
+                    // 显示错误对话框
+                    Dialog.showDialog(errMsg, () => {
+                        //
+                    });
+                }
+            },
+            "arraybuffer",
+            body);
     }
 
     protected onLoad(): void {
@@ -87,6 +92,9 @@ export class NewRoomView extends cc.Component {
         this.runFastRuleView.destroy();
 
         this.eventTarget.emit("destroy");
+
+        this.win.hide();
+        this.win.dispose();
     }
 
     private initView(): void {
@@ -97,13 +105,10 @@ export class NewRoomView extends cc.Component {
 
         this.runFastRuleView = new RunFastRuleView();
         this.runFastRuleView.bindView(this);
-
     }
 
     private onCloseClick(): void {
-        this.win.hide();
-        this.win.dispose();
-
+        this.destroy();
     }
 
     private enterGame(roomInfo: proto.lobby.IRoomInfo): void {

@@ -1,6 +1,7 @@
 import { DataStore, Dialog, HTTP, LEnv, Logger } from "../lcore/LCoreExports";
 import { proto } from "../proto/protoLobby";
 import { RunFastRuleView } from "./RunFastRuleView";
+import { ViewInterface } from "./ViewInterface";
 
 const { ccclass } = cc._decorator;
 
@@ -15,17 +16,21 @@ export class NewRoomView extends cc.Component {
     private eventTarget: cc.EventTarget;
 
     private runFastRuleView: RunFastRuleView;
-    // private
+    private  viewInterface: ViewInterface;
 
     public getView(): fgui.GComponent {
         return this.view;
     }
 
+    public setViewInterface(viewInterface: ViewInterface): void {
+        this.viewInterface = viewInterface;
+    }
     public createRoom(ruleJson: string): void {
         Logger.debug("NewRoomView.createRoom, ruleJson:", ruleJson);
         const tk = DataStore.getString("token", "");
-        const url = `${LEnv.rootURL}${LEnv.createRoom}?&tk=${tk}`;
-        // local jsonString = rapidJson.encode(ruleJson)
+        const createRoomURL = `${LEnv.rootURL}${LEnv.createRoom}?&tk=${tk}`;
+
+        Logger.trace("createRoom, createRoomURL:", createRoomURL);
         const createRoomReq = new proto.lobby.MsgCreateRoomReq();
         createRoomReq.config = ruleJson;
 
@@ -33,7 +38,7 @@ export class NewRoomView extends cc.Component {
 
         HTTP.hPost(
             this.eventTarget,
-            url,
+            createRoomURL,
             (xhr: XMLHttpRequest, err: string) => {
                 let errMsg = null;
                 if (err !== null) {
@@ -114,18 +119,10 @@ export class NewRoomView extends cc.Component {
     private enterGame(roomInfo: proto.lobby.IRoomInfo): void {
         Logger.debug("enterGame");
 
-        // const myUser = { userID: "6" };
-        // const myRoomInfo = { roomID: roomInfo.roomID };
+        this.win.hide();
+        this.win.dispose();
 
-        // const params: GameModuleLaunchArgs = {
-        //     jsonString: "",
-        //     lm: this,
-        //     userInfo: myUser,
-        //     roomInfo: myRoomInfo,
-        //     uuid: "uuid"
-        // };
-
-        // this.switchToGame(params, "gameb");
+        this.viewInterface.enterGame(roomInfo);
     }
 
     private reEnterGame(roomInfo: proto.lobby.IRoomInfo): void {

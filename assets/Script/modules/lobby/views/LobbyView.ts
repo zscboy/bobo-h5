@@ -2,6 +2,7 @@ import { Game as GameB } from "../../gameb/GamebExports";
 import { DataStore, GameModuleLaunchArgs, Logger } from "../lcore/LCoreExports";
 import { proto } from "../proto/protoLobby";
 import { NewRoomView } from "./NewRoomView";
+import { ViewInterface } from "./ViewInterface";
 const { ccclass } = cc._decorator;
 
 interface GameModule {
@@ -13,7 +14,7 @@ interface GameModule {
  * 大厅视图
  */
 @ccclass
-export class LobbyView extends cc.Component {
+export class LobbyView extends cc.Component implements ViewInterface {
     private view: fgui.GComponent;
     private diamondText: fgui.GObject;
 
@@ -123,7 +124,8 @@ export class LobbyView extends cc.Component {
     }
 
     private onCreateRoom(): void {
-        this.addComponent(NewRoomView);
+       const newRoomView =  this.addComponent(NewRoomView);
+       newRoomView.setViewInterface(this);
 
     }
 

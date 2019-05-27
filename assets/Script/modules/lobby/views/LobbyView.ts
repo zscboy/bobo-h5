@@ -1,5 +1,6 @@
 import { Game as GameB } from "../../gameb/GamebExports";
 import { DataStore, GameModuleLaunchArgs, Logger } from "../lcore/LCoreExports";
+import { proto } from "../proto/protoLobby";
 import { NewRoomView } from "./NewRoomView";
 const { ccclass } = cc._decorator;
 
@@ -29,6 +30,23 @@ export class LobbyView extends cc.Component {
             throw new Error(`returnFromGame failed, ui count should be 0, now:${num}`);
         }
         fgui.GRoot.inst.addChild(this.view);
+    }
+
+    public enterGame(roomInfo: proto.lobby.IRoomInfo): void {
+       Logger.debug("enterGame");
+       const myUserID = DataStore.getString("userID", "");
+       const myUser = {userID : myUserID};
+       const myRoomInfo = { roomID: roomInfo.roomID };
+
+       const params: GameModuleLaunchArgs = {
+            jsonString: "",
+            lm: this,
+            userInfo: myUser,
+            roomInfo: myRoomInfo,
+            uuid: "uuid"
+        };
+
+       this.switchToGame(params, "gameb");
     }
 
     protected onLoad(): void {
@@ -106,6 +124,7 @@ export class LobbyView extends cc.Component {
 
     private onCreateRoom(): void {
         this.addComponent(NewRoomView);
+
     }
 
     private openUserInfoView(): void {

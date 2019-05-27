@@ -6,6 +6,9 @@ import { proto } from "../proto/protoLobby";
  */
 export class EmailView extends cc.Component {
 
+    private static instance: EmailView;
+    private emails: proto.lobby.IMsgMail[];
+    private selectedEmail: proto.lobby.IMsgMail;
     private view: fgui.GComponent;
     private win: fgui.Window;
 
@@ -13,13 +16,9 @@ export class EmailView extends cc.Component {
 
     private attachmentsList: fgui.GList;
 
-    private emails: proto.lobby.IMsgMail[];
-
     private emailContent: fgui.GObject;
 
     private emailTitle: fgui.GObject;
-
-    private selectedEmail: proto.lobby.IMsgMail;
 
     private eventTarget: cc.EventTarget;
 
@@ -38,6 +37,8 @@ export class EmailView extends cc.Component {
         this.win = win;
 
         this.win.show();
+
+        EmailView.instance = this;
 
         this.initView();
     }
@@ -84,15 +85,15 @@ export class EmailView extends cc.Component {
      */
     private updateList(emailRsp: proto.lobby.MsgLoadMail): void {
         //
-        this.emails = emailRsp.mails;
 
-        this.emailList.numItems = this.emails.length;
+        EmailView.instance.emails = emailRsp.mails;
+        this.emailList.numItems = EmailView.instance.emails.length;
 
         //默认选择第一个
-        if (this.emails.length > 1) {
+        if (EmailView.instance.emails.length > 1) {
             this.emailList.selectedIndex = 0;
 
-            const email = this.emails[0];
+            const email = EmailView.instance.emails[0];
             this.selectEmail(email, 0);
         }
 
@@ -100,7 +101,7 @@ export class EmailView extends cc.Component {
 
     private renderAttachmentListItem(index: number, obj: fgui.GObject): void {
         //
-        const email = this.selectedEmail;
+        const email = EmailView.instance.selectedEmail;
         const attachment = email.attachments;
 
         const count = obj.asCom.getChild("count");
@@ -114,17 +115,19 @@ export class EmailView extends cc.Component {
         } else {
             readController.selectedIndex = 1;
         }
-
-        obj.onClick = () => {
+        // 有bug， 会有多个点击事件
+        obj.onClick(() => {
             if (attachment.isReceive === false) {
-                this.takeAttachment(email);
+
+                EmailView.instance.takeAttachment(email);
             }
-        };
+            // tslint:disable-next-line:align
+        }, this);
     }
 
     private renderPhraseListItem(index: number, obj: fgui.GObject): void {
         //
-        const email = this.emails[index];
+        const email = EmailView.instance.emails[index];
 
         const readController = obj.asCom.getController("c1");
 
@@ -140,9 +143,10 @@ export class EmailView extends cc.Component {
 
         //空白按钮，为了点击列表，并且保留item被选择的效果
         const btn = obj.asCom.getChild("spaceBtn");
-        btn.onClick = () => {
-            this.selectEmail(email, index);
-        };
+        btn.onClick(() => {
+            EmailView.instance.selectEmail(email, index);
+            // tslint:disable-next-line:align
+        }, this);
 
     }
 
@@ -167,7 +171,6 @@ export class EmailView extends cc.Component {
                 if (errMsg === null) {
                     const data = <Uint8Array>xhr.response;
                     // proto 解码登录结果
-                    Logger.debug("emailRequest data = ", data);
                     const emails = proto.lobby.MsgLoadMail.decode(data);
                     this.updateList(emails);
                 }
@@ -190,7 +193,7 @@ export class EmailView extends cc.Component {
 
         //刷新附件
         const selectedEmail = email;
-        this.selectedEmail = selectedEmail;
+        EmailView.instance.selectedEmail = selectedEmail;
 
         if (selectedEmail !== null) {
             this.updateAttachmentsView();
@@ -280,6 +283,7 @@ export class EmailView extends cc.Component {
         Logger.debug("emailRequest url = ", url);
 
         HTTP.hGet(this.eventTarget, url, (xhr: XMLHttpRequest, err: string) => {
+            Dialog.hideDialog();
             cb(xhr, err);
         });
     }

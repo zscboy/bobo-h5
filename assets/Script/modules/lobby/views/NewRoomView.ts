@@ -1,9 +1,12 @@
 import { DataStore, Dialog, HTTP, LEnv, Logger } from "../lcore/LCoreExports";
 import { proto } from "../proto/protoLobby";
 import { RunFastRuleView } from "./RunFastRuleView";
-import { ViewInterface } from "./ViewInterface";
 
 const { ccclass } = cc._decorator;
+
+interface LobbyViewInterface {
+    enterGame: Function;
+}
 
 /**
  * LoginView 登录界面
@@ -16,14 +19,14 @@ export class NewRoomView extends cc.Component {
     private eventTarget: cc.EventTarget;
 
     private runFastRuleView: RunFastRuleView;
-    private  viewInterface: ViewInterface;
+    private  lobbyViewInterface: LobbyViewInterface;
 
     public getView(): fgui.GComponent {
         return this.view;
     }
 
-    public setViewInterface(viewInterface: ViewInterface): void {
-        this.viewInterface = viewInterface;
+    public setViewInterface(lobbyViewInterface: LobbyViewInterface): void {
+        this.lobbyViewInterface = lobbyViewInterface;
     }
     public createRoom(ruleJson: string): void {
         Logger.debug("NewRoomView.createRoom, ruleJson:", ruleJson);
@@ -122,7 +125,7 @@ export class NewRoomView extends cc.Component {
         this.win.hide();
         this.win.dispose();
 
-        this.viewInterface.enterGame(roomInfo);
+        this.lobbyViewInterface.enterGame(roomInfo);
     }
 
     private reEnterGame(roomInfo: proto.lobby.IRoomInfo): void {

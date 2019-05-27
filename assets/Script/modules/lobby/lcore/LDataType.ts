@@ -16,27 +16,37 @@ export class RoomInfo {
     public roomID: string;
 }
 
+export interface GResLoader {
+    fguiAddPackage(packageName: string): void;
+    loadResDir(dir: string, onCompleted: (error: Error) => void): void;
+
+}
+
 /**
  * 大厅模块
  */
-export interface LobbyModule {
+export interface LobbyModuleInterface {
+    loader: GResLoader;
     returnFromGame(): void;
+    switchToGame(args: GameModuleLaunchArgs, moduleName: string): void;
 }
 
 /**
  * 游戏启动参数
  */
 export interface GameModuleLaunchArgs {
-    lm: LobbyModule;
     userInfo: UserInfo;
     roomInfo: RoomInfo;
     uuid: string;
     jsonString: string;
+    loader?: GResLoader;
+    lm?: LobbyModuleInterface;
 }
 
 /**
  * 游戏模块
  */
-export interface GameModule extends cc.Component {
+export interface GameModuleInterface extends cc.Component {
+    resLoader: GResLoader;
     launch(args: GameModuleLaunchArgs): void;
 }

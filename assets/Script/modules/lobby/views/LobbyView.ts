@@ -1,12 +1,6 @@
-import { Game as GameB } from "../../gameb/GamebExports";
-import { DataStore, GameModuleLaunchArgs, Logger } from "../lcore/LCoreExports";
+import { DataStore, GameModuleLaunchArgs, LobbyModuleInterface } from "../lcore/LCoreExports";
 import { NewRoomView } from "./NewRoomView";
 const { ccclass } = cc._decorator;
-
-interface GameModule {
-    name: string;
-    launch: Function;
-}
 
 /**
  * 大厅视图
@@ -15,25 +9,15 @@ interface GameModule {
 export class LobbyView extends cc.Component {
     private view: fgui.GComponent;
     private diamondText: fgui.GObject;
-
-    // 用于挂载子游戏模块的节点，在离开子游戏模块并回到大厅后销毁
-    private gameNode: cc.Node;
-
-    public returnFromGame(): void {
-        this.gameNode.destroyAllChildren();
-        this.gameNode.destroy();
-
-        this.gameNode = undefined;
-        const num = fgui.GRoot.inst.numChildren;
-        if (num > 0) {
-            throw new Error(`returnFromGame failed, ui count should be 0, now:${num}`);
-        }
-        fgui.GRoot.inst.addChild(this.view);
-    }
+    private lm: LobbyModuleInterface;
 
     protected onLoad(): void {
         // 加载大厅界面
-        fgui.UIPackage.addPackage("lobby/fui/lobby_main");
+        const lm = <LobbyModuleInterface>this.getComponent("LobbyModule");
+        this.lm = lm;
+        const loader = lm.loader;
+
+        loader.fguiAddPackage("lobby/fui/lobby_main");
         const view = fgui.UIPackage.createObject("lobby_main", "Main").asCom;
         fgui.GRoot.inst.addChild(view);
         this.view = view;
@@ -75,13 +59,12 @@ export class LobbyView extends cc.Component {
 
         const params: GameModuleLaunchArgs = {
             jsonString: "",
-            lm: this,
             userInfo: myUser,
             roomInfo: roomInfo,
             uuid: "uuid"
         };
 
-        this.switchToGame(params, "gameb");
+        this.lm.switchToGame(params, "gameb");
     }
 
     private onCreateClick(): void {
@@ -143,50 +126,5 @@ export class LobbyView extends cc.Component {
 
     private registerDiamondChange(): void {
         // TODO:
-    }
-
-    private switchToGame(params: GameModuleLaunchArgs, moduleName: string): void {
-        // 任何时刻只有一个子游戏
-        if (this.gameNode !== undefined) {
-            Logger.error("switch to game failed, there is a game running:", this.gameNode.name);
-        }
-
-        // 隐藏大厅窗口
-        fgui.GRoot.inst.removeChild(this.view);
-
-        const childrenCount = fgui.GRoot.inst.numChildren;
-        if (childrenCount > 0) {
-            Logger.fatal("switch to game failed, GRoot numChildren not zero:", childrenCount);
-
-            return;
-        }
-
-        // 加载子游戏的所有资源，显示加载进度
-        cc.loader.loadResDir(
-            moduleName,
-            (completedCount, totalCount, _) => {
-                console.log(`gamea load progress:${completedCount}/${totalCount}`);
-            },
-            (error) => {
-                console.log(`gamea load, error:${error}`);
-                if (error == null) {
-                    switch (moduleName) {
-                        case "gameb":
-                            // 新建节点，然后挂载游戏组件
-                            const gameNode = new cc.Node(moduleName);
-                            this.node.addChild(gameNode);
-                            this.gameNode = gameNode;
-                            const gm = <GameModule>(this.gameNode.addComponent(GameB)); // tslint:disable-line:no-any
-                            // 启动游戏流程
-                            gm.launch(params);
-                            break;
-                        // case "gamea":
-                        //     this.addComponent(GameA);
-                        //     break;
-                        default:
-                    }
-                }
-            }
-        );
     }
 }

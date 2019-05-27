@@ -1,19 +1,34 @@
+import { GResLoader } from "./LDataType";
 import { Logger } from "./Logger";
 
 /**
  * 一些通用的对话框
  */
 export class Dialog {
-    public static inst: Dialog = new Dialog();
+    public static inst: Dialog;
+
+    public loader: GResLoader;
 
     public view: fgui.GComponent;
     public win: fgui.Window;
 
     public packageLoaded: boolean = false;
 
+    private constructor(loader: GResLoader) {
+        this.loader = loader;
+    }
+
+    public static initDialogs(loader: GResLoader): void {
+        if (this.inst !== undefined) {
+            throw Error("dialogs has been initialized");
+        }
+
+        this.inst = new Dialog(loader);
+    }
+
     public static prompt = (msg: string): void => {
         if (!Dialog.inst.packageLoaded) {
-            fgui.UIPackage.addPackage("lobby/fui_dialog/lobby_dialog");
+            Dialog.inst.loader.fguiAddPackage("lobby/fui_dialog/lobby_dialog");
             Dialog.inst.packageLoaded = true;
         }
 
@@ -33,7 +48,7 @@ export class Dialog {
         if (Dialog.inst.view === undefined) {
             Logger.debug("showDialog view is null, create new");
             if (!Dialog.inst.packageLoaded) {
-                fgui.UIPackage.addPackage("lobby/fui_dialog/lobby_dialog");
+                Dialog.inst.loader.fguiAddPackage("lobby/fui_dialog/lobby_dialog");
                 Dialog.inst.packageLoaded = true;
             }
 

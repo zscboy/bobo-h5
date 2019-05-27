@@ -97,6 +97,7 @@ export class NewRoomView extends cc.Component {
         this.initView();
 
         this.win.show();
+
     }
 
     protected onDestroy(): void {
@@ -120,6 +121,8 @@ export class NewRoomView extends cc.Component {
 
         this.dfRuleView = new DFRuleView();
         this.dfRuleView.bindView(this);
+
+        this.loadRoomPrice();
     }
 
     private onCloseClick(): void {
@@ -139,4 +142,34 @@ export class NewRoomView extends cc.Component {
         this.enterGame(roomInfo);
     }
 
+    private loadRoomPrice(): void {
+        const tk = DataStore.getString("token", "");
+        const loadRoomPriceCfgsURL = `${LEnv.rootURL}${LEnv.loadRoomPriceCfgs}?&tk=${tk}`;
+        HTTP.hGet(
+            this.eventTarget,
+            loadRoomPriceCfgsURL,
+            (xhr: XMLHttpRequest, err: string) => {
+                let errMsg = null;
+                if (err !== null) {
+                    errMsg = `拉取价格配置错误，错误码:${err}`;
+                } else {
+                    errMsg = HTTP.hError(xhr);
+                    if (errMsg === null) {
+                        const data = <Uint8Array>xhr.response;
+                        const dataString = new TextDecoder("utf-8").decode(data);
+                        const priceCfgs = <{[key: string]: object}>JSON.parse(dataString);
+                        this.dfRuleView.updatePriceCfg(priceCfgs);
+                        Logger.debug("price:", dataString);
+                    }
+                }
+
+                if (errMsg !== null) {
+                    Logger.debug("NewRoomView.createRoom failed:", errMsg);
+                    // 显示错误对话框
+                    Dialog.showDialog(errMsg, () => {
+                        //
+                    });
+                }
+            });
+    }
 }

@@ -33,6 +33,8 @@ export class DFRuleView {
     private toggleLZJF: fgui.GButton;
     private toggleJYZ: fgui.GButton;
 
+    private consumeText: fgui.GObject;
+    private priceCfg: object = null;
     private recordKey: string = "GZRule";
 
     private readonly rules: {[key: string]: string | number | boolean} = {
@@ -66,9 +68,20 @@ export class DFRuleView {
         createRoomBtn.onClick(this.onCreateRoomBtnClick, this);
     }
 
+    public updatePriceCfg(priceCfgs: {[key: string]: object}): void {
+        if (priceCfgs !== null) {
+            const roomType = this.rules[`roomType`];
+            this.priceCfg = priceCfgs[`${roomType}`];
+            Logger.debug(`DFRuleView.updateComsumer roomType:${roomType}, priceCfg:${JSON.stringify(this.priceCfg)}`);
+        }
+
+        this.updateComsumer();
+    }
+
     private initAllView(): void {
-        // const consume = this.view.getChild("consumeCom").asCom;
-        // this.consumeText = consume.getChild("consumeText");
+        const consume = this.view.getChild("consumeCom").asCom;
+        this.consumeText = consume.getChild("consumeText");
+        this.consumeText.text = '0';
 
         // 局数
         this.toggleRoundCounts[0] = this.view.getChild("round4Button").asButton;
@@ -132,21 +145,21 @@ export class DFRuleView {
         this.toggleLZJF.getChild("title").text = "连庄加分";
         this.toggleJYZ.getChild("title").text = "进园子";
 
-        // if (DataStore.hasKey(this.recordKey)) {
-        //     const jsonStr = DataStore.getString(this.recordKey);
-        //     Logger.debug("jsnoStr:", jsonStr);
-        // }
-
-        // if pp.HasKey(RecordKey) then
-        //     local jsonStr = pp.GetString(RecordKey)
-        //     if jsonStr and #jsonStr > 0 then
-        //         local key = rapidJson.decode(jsonStr)
-
-        //         self.toggleRoundCount[key[1]].selected = true
-        //         self.togglePay[key[2]].selected = true
-        //     end
-        // end
-
+        if (DataStore.hasKey(this.recordKey)) {
+            const jsonStr = DataStore.getString(this.recordKey, "");
+            Logger.debug("jsnoStr:", jsonStr);
+            if (jsonStr !== "") {
+                const config = <{[key: string]: boolean | number}>JSON.parse(jsonStr);
+                this.toggleRoundCounts[<number>config[1]].selected = true;
+                this.togglePays[<number>config[2]].selected = true;
+                this.togglePlayerNums[<number>config[3]].selected = true;
+                this.toggleFengDingTypes[<number>config[4]].selected = true;
+                this.toggleDunziPointTypes[<number>config[5]].selected = true;
+                this.toggleZMJF.selected = <boolean>config[6];
+                this.toggleLZJF.selected = <boolean> config[7];
+                this.toggleJYZ.selected = <boolean> config[8];
+            }
+        }
     }
 
     private getConfigTable(): {[key: string]: {[key: number]: number}} {
@@ -221,10 +234,38 @@ export class DFRuleView {
         rules[`doubleScoreWhenContinuousBanker`] = this.toggleLZJF.selected;
         rules[`doubleScoreWhenZuoYuanZi`] = this.toggleJYZ.selected;
 
-        const rulesJson = JSON.stringify(rules);
-        Logger.debug("rulesJson:", rulesJson);
+        return JSON.stringify(rules);
+    }
 
-        return rulesJson;
+    private getCost(payType: number, playerNum: number, handNum: number): number {
+        // Logger.debug("payType:"..payType..", playerNum:"..playerNum..", handNum"..handNum)
+        let key = `ownerPay:${playerNum}:${handNum}`;
+        if (payType === 1) {
+            key = `aaPay:${playerNum}:${handNum}`;
+        }
+
+        if (this.priceCfg === undefined) {
+            Logger.debug("this.priceCfg === undefine");
+
+            return 0;
+        }
+
+        Logger.debug(`key: ${key}`);
+
+        const priceCfg = <{[key: string]: object}>this.priceCfg;
+        const activityPriceCfg =  <{[key: string]: object}>priceCfg.activityPriceCfg;
+        if (activityPriceCfg !== null) {
+            const discountCfg = <{[key: string]: number}> activityPriceCfg.discountCfg;
+
+            return discountCfg[key];
+        }
+
+        const originalPriceCfg = <{[key: string]: number}> priceCfg.originalPriceCfg;
+        if (originalPriceCfg !== null) {
+            return originalPriceCfg[key];
+        }
+
+        return  0;
     }
 
     private onCreateRoomBtnClick(): void {
@@ -236,8 +277,6 @@ export class DFRuleView {
         for (let i = 0; i < len; i++) {
             const toggle = toggles[i];
             if (toggle.selected) {
-                Logger.debug("select i:", i);
-
                 return i;
             }
         }
@@ -246,44 +285,44 @@ export class DFRuleView {
     }
 
     private updateComsumer(): void {
-        //     if priceCfgs ~= nil then
-        //     self.priceCfg = priceCfgs[tostring(rules.roomType)]
-        // end
+        const configTable = this.getConfigTable();
 
-        // local payIndex = self:getToggleIndex(self.togglePay)
-        // local payType = configTable["payType"][payIndex]
+        const payIndex = this.getToggleIndex(this.togglePays);
+        const payType = configTable[`payType`][payIndex];
 
-        // local playCountIndex = self:getToggleIndex(self.toggleRoundCount)
-        // local handNum = configTable["handNum"][playCountIndex]
+        const roundIndex = this.getToggleIndex(this.toggleRoundCounts);
+        const handNum = configTable[`handNum`][roundIndex];
 
-        // -- 0 是不配置或者无限用户个数
-        // local playerNumAcquired = 0
+        const playerNumIndex = this.getToggleIndex(this.togglePlayerNums);
+        const playerNumAcquired = configTable[`playerNumAcquired`][playerNumIndex];
 
-        // local cost = self:getCost(payType, playerNumAcquired, handNum)
+        const cost = this.getCost(payType, playerNumAcquired, handNum);
+        this.consumeText.text = `${cost}`;
 
-        // if cost == nil then
-        //     logger.error(
-        //         "No price cfg found, payType:" .. payType .. ", playerNumAcquired:" .. playerNumAcquired .. ", handNum:"
-        //     )
-        // end
-
-        // logger.debug("cost:" .. cost)
-        // self.consumeText.text = cost
     }
 
     private saveRule(): void {
-        const key: { [key: number]: boolean | number | string } = {};
+        Logger.debug("DFRuleView.saveRule()");
+        const key: { [key: number]: boolean | number } = {};
         // 局数
         key[1] = this.getToggleIndex(this.toggleRoundCounts);
         // 支付
         key[2] = this.getToggleIndex(this.togglePays);
+        // 人数
+        key[3] = this.getToggleIndex(this.togglePlayerNums);
+        // 封顶
+        key[4] = this.getToggleIndex(this.toggleFengDingTypes);
+        // 墩子
+        key[5] = this.getToggleIndex(this.toggleDunziPointTypes);
+        // 自摸加分
+        key[6] = this.toggleZMJF.selected;
+        // 连庄加分
+        key[7] = this.toggleLZJF.selected;
+        // 进院子
+        key[8] = this.toggleJYZ.selected;
 
-        Logger.debug("RunFastRuleView:saveRule() ,key = ", key);
-        // local json = rapidJson.encode(key)
-        // local pp = CS.UnityEngine.PlayerPrefs
-        // pp.SetString(RecordKey, json)
-
-        DataStore.setItem(this.recordKey, key);
+        const jsonString = JSON.stringify(key);
+        DataStore.setItem(this.recordKey, jsonString);
     }
 
 }

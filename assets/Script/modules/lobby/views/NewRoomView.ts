@@ -1,5 +1,6 @@
 import { DataStore, Dialog, HTTP, LEnv, Logger } from "../lcore/LCoreExports";
 import { proto } from "../proto/protoLobby";
+import { DFRuleView } from "./DFRuleView";
 import { RunFastRuleView } from "./RunFastRuleView";
 
 const { ccclass } = cc._decorator;
@@ -19,6 +20,8 @@ export class NewRoomView extends cc.Component {
     private eventTarget: cc.EventTarget;
 
     private runFastRuleView: RunFastRuleView;
+
+    private dfRuleView: DFRuleView;
     private  lobbyViewInterface: LobbyViewInterface;
 
     public getView(): fgui.GComponent {
@@ -98,6 +101,7 @@ export class NewRoomView extends cc.Component {
 
     protected onDestroy(): void {
         this.runFastRuleView.destroy();
+        this.dfRuleView.destroy();
 
         this.eventTarget.emit("destroy");
 
@@ -113,6 +117,9 @@ export class NewRoomView extends cc.Component {
 
         this.runFastRuleView = new RunFastRuleView();
         this.runFastRuleView.bindView(this);
+
+        this.dfRuleView = new DFRuleView();
+        this.dfRuleView.bindView(this);
     }
 
     private onCloseClick(): void {

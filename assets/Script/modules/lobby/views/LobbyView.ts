@@ -125,7 +125,8 @@ export class LobbyView extends cc.Component {
     }
 
     private onCreateRoom(): void {
-        this.addComponent(NewRoomView);
+       const newRoomView =  this.addComponent(NewRoomView);
+       newRoomView.setViewInterface(this);
 
     }
 

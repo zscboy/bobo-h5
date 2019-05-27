@@ -1,6 +1,7 @@
 import { Game as GameB } from "../../gameb/GamebExports";
 import { DataStore, GameModuleLaunchArgs, Logger } from "../lcore/LCoreExports";
 import { proto } from "../proto/protoLobby";
+import { EmailView } from "./EmailView";
 import { NewRoomView } from "./NewRoomView";
 const { ccclass } = cc._decorator;
 
@@ -33,12 +34,12 @@ export class LobbyView extends cc.Component {
     }
 
     public enterGame(roomInfo: proto.lobby.IRoomInfo): void {
-       Logger.debug("enterGame");
-       const myUserID = DataStore.getString("userID", "");
-       const myUser = {userID : myUserID};
-       const myRoomInfo = { roomID: roomInfo.roomID };
+        Logger.debug("enterGame");
+        const myUserID = DataStore.getString("userID", "");
+        const myUser = { userID: myUserID };
+        const myRoomInfo = { roomID: roomInfo.roomID };
 
-       const params: GameModuleLaunchArgs = {
+        const params: GameModuleLaunchArgs = {
             jsonString: "",
             lm: this,
             userInfo: myUser,
@@ -46,7 +47,7 @@ export class LobbyView extends cc.Component {
             uuid: "uuid"
         };
 
-       this.switchToGame(params, "gameb");
+        this.switchToGame(params, "gameb");
     }
 
     protected onLoad(): void {
@@ -116,6 +117,7 @@ export class LobbyView extends cc.Component {
 
     private openEmailView(): void {
         // TODO:
+        this.addComponent(EmailView);
     }
 
     private onJoinRoom(): void {

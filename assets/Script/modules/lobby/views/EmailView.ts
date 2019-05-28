@@ -27,6 +27,7 @@ export class EmailView extends cc.Component {
 
     public onMessage(data: ByteBuffer): void {
         Logger.debug("EmailView.onMessage");
+
     }
 
     protected onLoad(): void {
@@ -60,12 +61,10 @@ export class EmailView extends cc.Component {
     }
 
     private onCloseClick(): void {
-        //
         this.destroy();
     }
 
     private initView(): void {
-        //body
         const closeBtn = this.view.getChild("closeBtn");
         closeBtn.onClick(this.onCloseClick, this);
 
@@ -93,13 +92,11 @@ export class EmailView extends cc.Component {
      * @param emailRsp 拉取的邮件
      */
     private updateList(emailRsp: proto.lobby.MsgLoadMail): void {
-        //
-
         EmailView.instance.emails = emailRsp.mails;
         this.emailList.numItems = EmailView.instance.emails.length;
 
         //默认选择第一个
-        if (EmailView.instance.emails.length > 1) {
+        if (EmailView.instance.emails.length >= 1) {
             this.emailList.selectedIndex = 0;
 
             const email = EmailView.instance.emails[0];
@@ -114,7 +111,7 @@ export class EmailView extends cc.Component {
      * @param obj 该UI对象
      */
     private renderAttachmentListItem(index: number, obj: fgui.GObject): void {
-        //
+
         const email = EmailView.instance.selectedEmail;
         const attachment = email.attachments;
 
@@ -147,7 +144,7 @@ export class EmailView extends cc.Component {
      * @param obj 该UI对象
      */
     private renderPhraseListItem(index: number, obj: fgui.GObject): void {
-        //
+
         const email = EmailView.instance.emails[index];
 
         const readController = obj.asCom.getController("c1");
@@ -181,7 +178,7 @@ export class EmailView extends cc.Component {
         const msg = "正在拉取邮件......";
 
         const cb = (xhr: XMLHttpRequest, err: string) => {
-            //
+
             let errMsg;
             if (err !== null) {
                 errMsg = `错误码:${err}`;
@@ -237,12 +234,12 @@ export class EmailView extends cc.Component {
      * @param listIndex 邮件处于列表index
      */
     private setRead(email: proto.lobby.IMsgMail, listIndex: number): void {
-        //
+
         const tk = DataStore.getString("token", "");
         const setReadEmailUrl = `${LEnv.rootURL}${LEnv.setMailRead}?&tk=${tk}&mailID=${email.id}`;
 
         const cb = (xhr: XMLHttpRequest, err: string) => {
-            //
+
             let errMsg;
             if (err !== null) {
                 errMsg = `错误码:${err}`;
@@ -252,7 +249,7 @@ export class EmailView extends cc.Component {
                 errMsg = HTTP.hError(xhr);
 
                 if (errMsg === null) {
-                    //
+
                     email.isRead = true;
                     const obj = this.emailList.getChildAt(listIndex);
                     const readController = obj.asCom.getController("c1");
@@ -274,7 +271,7 @@ export class EmailView extends cc.Component {
         const setReadEmailUrl = `${LEnv.rootURL}${LEnv.receiveAttachment}?&tk=${tk}&mailID=${email.id}`;
 
         const cb = (xhr: XMLHttpRequest, err: string) => {
-            //
+
             let errMsg;
             if (err !== null) {
                 errMsg = `错误码:${err}`;
@@ -284,7 +281,7 @@ export class EmailView extends cc.Component {
                 errMsg = HTTP.hError(xhr);
 
                 if (errMsg === null) {
-                    //
+
                     const obj = this.attachmentsList.getChildAt(0);
                     const readController = obj.asCom.getController("c3");
                     readController.selectedIndex = 0;
@@ -303,7 +300,6 @@ export class EmailView extends cc.Component {
      * @param cb 回调
      */
     private emailRequest(url: string, msg: string, cb: Function): void {
-        //
         if (url === null) {
             return null;
         }

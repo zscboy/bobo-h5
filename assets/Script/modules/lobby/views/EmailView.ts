@@ -6,8 +6,11 @@ import { proto } from "../proto/protoLobby";
  */
 export class EmailView extends cc.Component {
 
+    // 为了能在 render 函数中取this
     private static instance: EmailView;
+    // 邮件列表
     private emails: proto.lobby.IMsgMail[];
+    // 选中的邮件
     private selectedEmail: proto.lobby.IMsgMail;
     private view: fgui.GComponent;
     private win: fgui.Window;
@@ -35,7 +38,6 @@ export class EmailView extends cc.Component {
         win.modal = true;
 
         this.win = win;
-
         this.win.show();
 
         EmailView.instance = this;
@@ -99,6 +101,11 @@ export class EmailView extends cc.Component {
 
     }
 
+    /**
+     * 刷新附件
+     * @param index 第几个
+     * @param obj 该UI对象
+     */
     private renderAttachmentListItem(index: number, obj: fgui.GObject): void {
         //
         const email = EmailView.instance.selectedEmail;
@@ -115,7 +122,9 @@ export class EmailView extends cc.Component {
         } else {
             readController.selectedIndex = 1;
         }
-        // 有bug， 会有多个点击事件
+        //  会有多个点击事件,先取消
+        obj.offClick(undefined, undefined);
+
         obj.onClick(() => {
             if (attachment.isReceive === false) {
 
@@ -125,6 +134,11 @@ export class EmailView extends cc.Component {
         }, this);
     }
 
+    /**
+     * 刷新邮件列表Item
+     * @param index 下标
+     * @param obj 该UI对象
+     */
     private renderPhraseListItem(index: number, obj: fgui.GObject): void {
         //
         const email = EmailView.instance.emails[index];
@@ -143,6 +157,7 @@ export class EmailView extends cc.Component {
 
         //空白按钮，为了点击列表，并且保留item被选择的效果
         const btn = obj.asCom.getChild("spaceBtn");
+
         btn.onClick(() => {
             EmailView.instance.selectEmail(email, index);
             // tslint:disable-next-line:align
@@ -243,6 +258,10 @@ export class EmailView extends cc.Component {
 
     }
 
+    /**
+     *  领取邮件的附件
+     * @param email 邮件
+     */
     private takeAttachment(email: proto.lobby.IMsgMail): void {
         const tk = DataStore.getString("token", "");
         const setReadEmailUrl = `${LEnv.rootURL}${LEnv.receiveAttachment}?&tk=${tk}&mailID=${email.id}`;
@@ -270,6 +289,12 @@ export class EmailView extends cc.Component {
         this.emailRequest(setReadEmailUrl, null, cb);
     }
 
+    /**
+     * 网络请求
+     * @param url 链接
+     * @param msg 滚动圈弹的信息
+     * @param cb 回调
+     */
     private emailRequest(url: string, msg: string, cb: Function): void {
         //
         if (url === null) {

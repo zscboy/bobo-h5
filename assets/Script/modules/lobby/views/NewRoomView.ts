@@ -1,13 +1,9 @@
-import { DataStore, Dialog, HTTP, LEnv, LobbyModuleInterface, Logger } from "../lcore/LCoreExports";
+import { DataStore, Dialog, GameModuleLaunchArgs, HTTP, LEnv, LobbyModuleInterface, Logger } from "../lcore/LCoreExports";
 import { proto } from "../proto/protoLobby";
 import { DFRuleView } from "./DFRuleView";
 import { RunFastRuleView } from "./RunFastRuleView";
 
 const { ccclass } = cc._decorator;
-
-interface LobbyViewInterface {
-    enterGame: Function;
-}
 
 /**
  * LoginView 登录界面
@@ -22,15 +18,11 @@ export class NewRoomView extends cc.Component {
     private runFastRuleView: RunFastRuleView;
 
     private dfRuleView: DFRuleView;
-    private  lobbyViewInterface: LobbyViewInterface;
 
     public getView(): fgui.GComponent {
         return this.view;
     }
 
-    public setViewInterface(lobbyViewInterface: LobbyViewInterface): void {
-        this.lobbyViewInterface = lobbyViewInterface;
-    }
     public createRoom(ruleJson: string): void {
         Logger.debug("NewRoomView.createRoom, ruleJson:", ruleJson);
         const tk = DataStore.getString("token", "");
@@ -135,8 +127,19 @@ export class NewRoomView extends cc.Component {
 
         this.win.hide();
         this.win.dispose();
+        const myUserID = DataStore.getString("userID", "");
+        const myUser = { userID: myUserID };
+        const myRoomInfo = { roomID:  roomInfo.roomID };
 
-        this.lobbyViewInterface.enterGame(roomInfo);
+        const params: GameModuleLaunchArgs = {
+            jsonString: "",
+            userInfo: myUser,
+            roomInfo: myRoomInfo,
+            uuid: "uuid"
+        };
+
+        const lobbyModuleInterface = <LobbyModuleInterface>this.getComponent("LobbyModule");
+        lobbyModuleInterface.switchToGame(params, "gameb");
     }
 
     private reEnterGame(roomInfo: proto.lobby.IRoomInfo): void {

@@ -1,10 +1,9 @@
 // tslint:disable-next-line:max-line-length
 import {
-    DataStore, Dialog, GameModule, GameModuleLaunchArgs,
-    LEnv, LobbyModule, Logger, MsgQueue, MsgType,
-    RoomInfo, UserInfo, WS
+    DataStore, Dialog, GameModuleInterface, GameModuleLaunchArgs,
+    GResLoader, LEnv, LobbyModuleInterface, Logger, MsgQueue,
+    MsgType, RoomInfo, UserInfo, WS
 } from "../lobby/lcore/LCoreExports";
-import { Loader } from "./Loader";
 import { proto } from "./proto/protoGame";
 import { Room } from "./Room";
 
@@ -16,8 +15,10 @@ const priorityMap: { [key: number]: number } = {
 /**
  * 子游戏入口
  */
-export class Game extends cc.Component implements GameModule {
+export class GameModule extends cc.Component implements GameModuleInterface {
     public eventTarget: cc.EventTarget;
+
+    public loader: GResLoader;
 
     private view: fgui.GComponent;
 
@@ -29,11 +30,24 @@ export class Game extends cc.Component implements GameModule {
     private retry: boolean = false;
     private forceExit: boolean = false;
     private room: Room;
-    private lm: LobbyModule;
+    private lm: LobbyModuleInterface;
+
+    public get resLoader(): GResLoader {
+        return this.loader;
+    }
 
     public async launch(args: GameModuleLaunchArgs): Promise<void> {
         // 尝试进入房间
         this.lm = args.lm;
+        this.loader = args.loader;
+
+        // 加载游戏界面
+        this.loader.fguiAddPackage("lobby/fui_lobby_mahjong/lobby_mahjong");
+        this.loader.fguiAddPackage("gameb/dafeng");
+
+        const view = fgui.UIPackage.createObject("dafeng", "desk").asCom;
+        fgui.GRoot.inst.addChild(view);
+        this.view = view;
 
         await this.tryEnterRoom(args.uuid, args.userInfo, args.roomInfo);
     }
@@ -46,18 +60,10 @@ export class Game extends cc.Component implements GameModule {
 
     protected onLoad(): void {
         this.eventTarget = new cc.EventTarget();
-
-        // 加载游戏界面
-        Loader.fguiLoad("lobby/fui_lobby_mahjong/lobby_mahjong");
-        Loader.fguiLoad("gameb/dafeng");
-
-        const view = fgui.UIPackage.createObject("dafeng", "desk").asCom;
-        fgui.GRoot.inst.addChild(view);
-        this.view = view;
     }
 
     protected start(): void {
-        this.testProto();
+        // nothing to do
     }
 
     protected onDestroy(): void {
@@ -67,16 +73,6 @@ export class Game extends cc.Component implements GameModule {
         this.view.dispose();
 
         this.lm.returnFromGame();
-    }
-
-    private testProto(): void {
-        const gm = new proto.mahjong.GameMessage();
-        gm.Ops = 1;
-
-        const decoded = proto.mahjong.GameMessage.encode(gm);
-        const gm2 = proto.mahjong.GameMessage.decode(decoded);
-
-        console.log(gm2);
     }
 
     private async tryEnterRoom(

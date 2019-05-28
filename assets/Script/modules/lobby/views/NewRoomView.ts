@@ -1,12 +1,9 @@
-import { DataStore, Dialog, HTTP, LEnv, Logger } from "../lcore/LCoreExports";
+import { DataStore, Dialog, GameModuleLaunchArgs, HTTP, LEnv, LobbyModuleInterface, Logger } from "../lcore/LCoreExports";
 import { proto } from "../proto/protoLobby";
+import { DFRuleView } from "./DFRuleView";
 import { RunFastRuleView } from "./RunFastRuleView";
 
 const { ccclass } = cc._decorator;
-
-interface LobbyViewInterface {
-    enterGame: Function;
-}
 
 /**
  * LoginView 登录界面
@@ -19,15 +16,13 @@ export class NewRoomView extends cc.Component {
     private eventTarget: cc.EventTarget;
 
     private runFastRuleView: RunFastRuleView;
-    private  lobbyViewInterface: LobbyViewInterface;
+
+    private dfRuleView: DFRuleView;
 
     public getView(): fgui.GComponent {
         return this.view;
     }
 
-    public setViewInterface(lobbyViewInterface: LobbyViewInterface): void {
-        this.lobbyViewInterface = lobbyViewInterface;
-    }
     public createRoom(ruleJson: string): void {
         Logger.debug("NewRoomView.createRoom, ruleJson:", ruleJson);
         const tk = DataStore.getString("token", "");
@@ -80,8 +75,9 @@ export class NewRoomView extends cc.Component {
     protected onLoad(): void {
         // 加载大厅界面
         this.eventTarget = new cc.EventTarget();
-
-        fgui.UIPackage.addPackage("lobby/fui_create_room/lobby_create_room");
+        const lm = <LobbyModuleInterface>this.getComponent("LobbyModule");
+        const loader = lm.loader;
+        loader.fguiAddPackage("lobby/fui_create_room/lobby_create_room");
         const view = fgui.UIPackage.createObject("lobby_create_room", "createRoom").asCom;
         this.view = view;
 
@@ -94,10 +90,12 @@ export class NewRoomView extends cc.Component {
         this.initView();
 
         this.win.show();
+
     }
 
     protected onDestroy(): void {
         this.runFastRuleView.destroy();
+        this.dfRuleView.destroy();
 
         this.eventTarget.emit("destroy");
 
@@ -113,6 +111,11 @@ export class NewRoomView extends cc.Component {
 
         this.runFastRuleView = new RunFastRuleView();
         this.runFastRuleView.bindView(this);
+
+        this.dfRuleView = new DFRuleView();
+        this.dfRuleView.bindView(this);
+
+        this.loadRoomPrice();
     }
 
     private onCloseClick(): void {
@@ -124,12 +127,53 @@ export class NewRoomView extends cc.Component {
 
         this.win.hide();
         this.win.dispose();
+        const myUserID = DataStore.getString("userID", "");
+        const myUser = { userID: myUserID };
+        const myRoomInfo = { roomID:  roomInfo.roomID };
 
-        this.lobbyViewInterface.enterGame(roomInfo);
+        const params: GameModuleLaunchArgs = {
+            jsonString: "",
+            userInfo: myUser,
+            roomInfo: myRoomInfo,
+            uuid: "uuid"
+        };
+
+        const lobbyModuleInterface = <LobbyModuleInterface>this.getComponent("LobbyModule");
+        lobbyModuleInterface.switchToGame(params, "gameb");
     }
 
     private reEnterGame(roomInfo: proto.lobby.IRoomInfo): void {
         this.enterGame(roomInfo);
     }
 
+    private loadRoomPrice(): void {
+        const tk = DataStore.getString("token", "");
+        const loadRoomPriceCfgsURL = `${LEnv.rootURL}${LEnv.loadRoomPriceCfgs}?&tk=${tk}`;
+        HTTP.hGet(
+            this.eventTarget,
+            loadRoomPriceCfgsURL,
+            (xhr: XMLHttpRequest, err: string) => {
+                let errMsg = null;
+                if (err !== null) {
+                    errMsg = `拉取价格配置错误，错误码:${err}`;
+                } else {
+                    errMsg = HTTP.hError(xhr);
+                    if (errMsg === null) {
+                        const data = <Uint8Array>xhr.response;
+                        const dataString = new TextDecoder("utf-8").decode(data);
+                        const priceCfgs = <{[key: string]: object}>JSON.parse(dataString);
+                        this.dfRuleView.updatePriceCfg(priceCfgs);
+                        Logger.debug("price:", dataString);
+                    }
+                }
+
+                if (errMsg !== null) {
+                    Logger.debug("NewRoomView.createRoom failed:", errMsg);
+                    // 显示错误对话框
+                    Dialog.showDialog(errMsg, () => {
+                        //
+                    });
+                }
+            });
+    }
 }

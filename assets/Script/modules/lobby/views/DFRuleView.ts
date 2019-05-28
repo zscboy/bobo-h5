@@ -49,7 +49,7 @@ export class DFRuleView {
             ["fengDingType"]: 0,
             ["dunziPointType"]: 0,
             //--游戏模块
-            ["modName"]: "game2"
+            ["modName"]: "gameb"
     };
 
     public destroy(): void {

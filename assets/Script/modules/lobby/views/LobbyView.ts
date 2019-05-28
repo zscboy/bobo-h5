@@ -32,7 +32,7 @@ export class LobbyView extends cc.Component {
     }
 
     public onMessage(data: ByteBuffer): void {
-        Logger.debug("EmailView.onMessage");
+        Logger.debug("LobbyView.onMessage");
         const diamondBody = proto.lobby.MsgUpdateUserDiamond.decode(data);
         const diamond = diamondBody.diamond;
         this.updateDiamond(diamond);
@@ -56,8 +56,6 @@ export class LobbyView extends cc.Component {
     }
 
     private updateDiamond(diamond: Long): void {
-        //
-        DataStore.setItem("diamond", diamond);
         this.diamondText.text = `${diamond}`;
     }
 
@@ -177,7 +175,7 @@ export class LobbyView extends cc.Component {
 
     private registerHandler(msgHandler: MsgHandler, msgCode: number): void {
         const handler = this.msgHandlers[msgCode];
-        if (handler === null) {
+        if (handler === undefined || handler === null) {
             this.msgHandlers[msgCode] = msgHandler;
         }
     }

@@ -27,6 +27,7 @@ export class EmailView extends cc.Component {
 
     public onMessage(data: ByteBuffer): void {
         Logger.debug("EmailView.onMessage");
+
     }
 
     protected onLoad(): void {
@@ -95,7 +96,7 @@ export class EmailView extends cc.Component {
         this.emailList.numItems = EmailView.instance.emails.length;
 
         //默认选择第一个
-        if (EmailView.instance.emails.length > 1) {
+        if (EmailView.instance.emails.length >= 1) {
             this.emailList.selectedIndex = 0;
 
             const email = EmailView.instance.emails[0];

@@ -100,6 +100,14 @@ export class Dialog {
         Dialog.inst.win.show();
     }
 
+    public static hideDialog(): void {
+        if (Dialog.inst.view === undefined) {
+            return;
+        }
+
+        Dialog.inst.win.hide();
+    }
+
     public static async coShowDialog(msg: string, yes: boolean, no: boolean): Promise<boolean> {
         return new Promise<boolean>((resolve, reject) => {
             let myYesCB;

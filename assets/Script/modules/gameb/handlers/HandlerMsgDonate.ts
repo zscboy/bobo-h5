@@ -1,10 +1,10 @@
-import { RoomInterface } from "./RoomInterfaces";
+import { RoomInterfaces } from "../RoomInterfaces";
 
 /**
  * 响应donate通知
  */
 export namespace HandlerMsgDonate {
-    export const onMsg = (msgData: ByteBuffer, room: RoomInterface): void => {
+    export const onMsg = (msgData: ByteBuffer, room: RoomInterfaces): void => {
         // TODO:
     };
 }

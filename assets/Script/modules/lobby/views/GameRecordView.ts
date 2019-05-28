@@ -68,7 +68,7 @@ export class GameRecordView extends cc.Component {
         const replayRoom = this.replayRooms[index];
 
         obj.onClick(() => {
-            GameRecordView.instance.goSubrecordView(replayRoom);
+            GameRecordView.instance.goSubRecordView(replayRoom);
             // tslint:disable-next-line:align
         }, this);
 
@@ -178,7 +178,7 @@ export class GameRecordView extends cc.Component {
         this.recordList.numItems = this.replayRooms === undefined ? 0 : this.replayRooms.length;
     }
 
-    private goSubrecordView(replayRoom: proto.lobby.MsgReplayRoom): void {
+    private goSubRecordView(replayRoom: proto.lobby.MsgReplayRoom): void {
 
         const subView = this.addComponent(GameSubRecordView);
         subView.updateData(replayRoom);

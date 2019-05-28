@@ -149,15 +149,21 @@ export class DFRuleView {
             const jsonStr = DataStore.getString(this.recordKey, "");
             Logger.debug("jsnoStr:", jsonStr);
             if (jsonStr !== "") {
-                const config = <{[key: string]: boolean | number}>JSON.parse(jsonStr);
-                this.toggleRoundCounts[<number>config[1]].selected = true;
-                this.togglePays[<number>config[2]].selected = true;
-                this.togglePlayerNums[<number>config[3]].selected = true;
-                this.toggleFengDingTypes[<number>config[4]].selected = true;
-                this.toggleDunziPointTypes[<number>config[5]].selected = true;
-                this.toggleZMJF.selected = <boolean>config[6];
-                this.toggleLZJF.selected = <boolean> config[7];
-                this.toggleJYZ.selected = <boolean> config[8];
+                try {
+                    const config = <{[key: string]: boolean | number}>JSON.parse(jsonStr);
+                    this.toggleRoundCounts[<number>config[1]].selected = true;
+                    this.togglePays[<number>config[2]].selected = true;
+                    this.togglePlayerNums[<number>config[3]].selected = true;
+                    this.toggleFengDingTypes[<number>config[4]].selected = true;
+                    this.toggleDunziPointTypes[<number>config[5]].selected = true;
+                    this.toggleZMJF.selected = <boolean>config[6];
+                    this.toggleLZJF.selected = <boolean> config[7];
+                    this.toggleJYZ.selected = <boolean> config[8];
+                } catch (e) {
+                    Logger.error("parse config error:", e);
+                    // 如果解析不了，则清理数据
+                    DataStore.setItem(this.recordKey, "");
+                }
             }
         }
     }

@@ -1,6 +1,13 @@
-import { DataStore, GameModuleLaunchArgs, LobbyModuleInterface } from "../lcore/LCoreExports";
+import { DataStore, GameModuleLaunchArgs, LEnv, LobbyModuleInterface } from "../lcore/LCoreExports";
+import { LMsgCenter } from "../LMsgCenter";
+import { proto } from "../proto/protoLobby";
+import { EmailView } from "./EmailView";
 import { NewRoomView } from "./NewRoomView";
 const { ccclass } = cc._decorator;
+
+interface MsgHandler {
+    onMessage: Function;
+}
 
 /**
  * 大厅视图
@@ -11,7 +18,19 @@ export class LobbyView extends cc.Component {
     private diamondText: fgui.GObject;
     private lm: LobbyModuleInterface;
 
-    protected onLoad(): void {
+    private msgCenter: LMsgCenter;
+
+    private msgHandlers: {[key: number]: MsgHandler} = {};
+
+    public dispatchMessage(msg: proto.lobby.LobbyMessage): void {
+        const ops = msg.Ops;
+        const handler = this.msgHandlers[ops];
+        if (handler !== undefined) {
+            handler.onMessage(msg.Data);
+        }
+    }
+
+    protected async onLoad(): Promise<void> {
         // 加载大厅界面
         const lm = <LobbyModuleInterface>this.getComponent("LobbyModule");
         this.lm = lm;
@@ -23,6 +42,8 @@ export class LobbyView extends cc.Component {
         this.view = view;
 
         this.initView();
+
+        await this.startWebSocket();
     }
 
     private initView(): void {
@@ -53,6 +74,13 @@ export class LobbyView extends cc.Component {
         userInfo.onClick(this.openUserInfoView, this);
     }
 
+    private async startWebSocket(): Promise<void> {
+        const tk = DataStore.getString("token", "");
+        const webSocketURL = `${LEnv.lobbyWebsocket}?&tk=${tk}`;
+
+        this.msgCenter = new LMsgCenter(webSocketURL, this, this);
+        await this.msgCenter.start();
+    }
     private onFriendClick(): void {
         const myUser = { userID: "6" };
         const roomInfo = { roomID: "monkey-room" };
@@ -80,7 +108,8 @@ export class LobbyView extends cc.Component {
     }
 
     private openEmailView(): void {
-        // TODO:
+        const emailView = this.addComponent(EmailView);
+        this.registerHandler(emailView, proto.lobby.MessageCode.OPMail);
     }
 
     private onJoinRoom(): void {
@@ -127,4 +156,12 @@ export class LobbyView extends cc.Component {
     private registerDiamondChange(): void {
         // TODO:
     }
+
+    private registerHandler(msgHandler: MsgHandler, msgCode: number): void {
+        const handler = this.msgHandlers[msgCode];
+        if (handler === null) {
+            this.msgHandlers[msgCode] = msgHandler;
+        }
+    }
+
 }

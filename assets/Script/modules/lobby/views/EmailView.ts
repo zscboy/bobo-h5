@@ -25,6 +25,10 @@ export class EmailView extends cc.Component {
 
     private eventTarget: cc.EventTarget;
 
+    public onMessage(data: ByteBuffer): void {
+        Logger.debug("EmailView.onMessage");
+    }
+
     protected onLoad(): void {
 
         this.eventTarget = new cc.EventTarget();

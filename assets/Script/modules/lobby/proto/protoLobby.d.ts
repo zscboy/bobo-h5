@@ -393,6 +393,8 @@ export namespace proto {
 			OPChat = 2,
 			OPUpdateDiamond = 3,
 			OPMail = 4,
+			OPPing = 100,
+			OPPong = 101,
 		}
 
 		enum RoomType {

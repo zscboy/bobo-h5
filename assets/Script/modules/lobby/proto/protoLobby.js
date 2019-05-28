@@ -2022,6 +2022,14 @@ exports.proto = require("../protobufjs/protobuf").newBuilder({})['import']({
                         {
                             "name": "OPMail",
                             "id": 4
+                        },
+                        {
+                            "name": "OPPing",
+                            "id": 100
+                        },
+                        {
+                            "name": "OPPong",
+                            "id": 101
                         }
                     ]
                 },

@@ -9,7 +9,6 @@ export class GameRecordView extends cc.Component {
 
     // 为了能在 render 函数中取this
     private static instance: GameRecordView;
-    // 邮件列表
     private view: fgui.GComponent;
     private win: fgui.Window;
     private eventTarget: cc.EventTarget;
@@ -49,13 +48,10 @@ export class GameRecordView extends cc.Component {
     }
 
     private onCloseClick(): void {
-        //
-        //this.goSubrecordView(null);
         this.destroy();
     }
 
     private initView(): void {
-        //body
         const closeBtn = this.view.getChild("closeBtn");
         closeBtn.onClick(this.onCloseClick, this);
 
@@ -68,7 +64,7 @@ export class GameRecordView extends cc.Component {
     }
 
     private renderListItem(index: number, obj: fgui.GObject): void {
-        //
+
         const replayRoom = this.replayRooms[index];
 
         obj.onClick(() => {
@@ -143,7 +139,6 @@ export class GameRecordView extends cc.Component {
     }
 
     private loadGameRecord(): void {
-        //
         const tk = DataStore.getString("token", "");
         const loadGameRecordUrl = `${LEnv.rootURL}${LEnv.lrproom}?&rt=1&tk=${tk}`;
         Logger.debug("loadGameRecord loadGameRecordUrl:", loadGameRecordUrl);
@@ -161,7 +156,7 @@ export class GameRecordView extends cc.Component {
                 errMsg = HTTP.hError(xhr);
 
                 if (errMsg === null) {
-                    //
+
                     const data = <Uint8Array>xhr.response;
                     const gameRecords = proto.lobby.MsgAccLoadReplayRoomsReply.decode(data);
                     this.updateList(gameRecords);
@@ -173,7 +168,6 @@ export class GameRecordView extends cc.Component {
     }
 
     private updateList(recordRsp: proto.lobby.MsgAccLoadReplayRoomsReply): void {
-        //
 
         recordRsp.replayRooms.forEach(element => {
 
@@ -185,7 +179,7 @@ export class GameRecordView extends cc.Component {
     }
 
     private goSubrecordView(replayRoom: proto.lobby.MsgReplayRoom): void {
-        //
+
         const subView = this.addComponent(GameSubRecordView);
         subView.updateData(replayRoom);
     }

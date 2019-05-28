@@ -127,9 +127,13 @@ export class NewRoomView extends cc.Component {
 
         this.win.hide();
         this.win.dispose();
+
         const myUserID = DataStore.getString("userID", "");
         const myUser = { userID: myUserID };
-        const myRoomInfo = { roomID: roomInfo.roomID };
+        const myRoomInfo = { roomID:  roomInfo.roomID };
+        const roomConfig = roomInfo.config;
+        const roomConfigJSON = <{[key: string]: boolean | number | string}>JSON.parse(roomConfig);
+        const modName = <string>roomConfigJSON[`modName`];
 
         const params: GameModuleLaunchArgs = {
             jsonString: "",
@@ -139,7 +143,7 @@ export class NewRoomView extends cc.Component {
         };
 
         const lobbyModuleInterface = <LobbyModuleInterface>this.getComponent("LobbyModule");
-        lobbyModuleInterface.switchToGame(params, "gameb");
+        lobbyModuleInterface.switchToGame(params, modName);
     }
 
     private reEnterGame(roomInfo: proto.lobby.IRoomInfo): void {
@@ -161,7 +165,7 @@ export class NewRoomView extends cc.Component {
                     if (errMsg === null) {
                         const data = <Uint8Array>xhr.response;
                         const dataString = new TextDecoder("utf-8").decode(data);
-                        const priceCfgs = <{ [key: string]: object }>JSON.parse(dataString);
+                        const priceCfgs = <{[key: string]: object}>JSON.parse(dataString);
                         this.dfRuleView.updatePriceCfg(priceCfgs);
                         Logger.debug("price:", dataString);
                     }

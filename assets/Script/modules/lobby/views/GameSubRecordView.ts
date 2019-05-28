@@ -8,7 +8,6 @@ export class GameSubRecordView extends cc.Component {
 
     // 为了能在 render 函数中取this
     private static instance: GameSubRecordView;
-    // 邮件列表
     private view: fgui.GComponent;
     private win: fgui.Window;
     private eventTarget: cc.EventTarget;
@@ -75,12 +74,10 @@ export class GameSubRecordView extends cc.Component {
     }
 
     private onCloseClick(): void {
-        //
         this.destroy();
     }
 
     private initView(): void {
-        //body
         const closeBtn = this.view.getChild("closeBtn");
         closeBtn.onClick(this.onCloseClick, this);
 
@@ -91,7 +88,7 @@ export class GameSubRecordView extends cc.Component {
     }
 
     private renderListItem(index: number, obj: fgui.GObject): void {
-        //
+
         const record = this.replayRoom.records[index];
 
         const roomNumber = obj.asCom.getChild("roundText");
@@ -117,7 +114,6 @@ export class GameSubRecordView extends cc.Component {
     }
 
     private enterReplayRoom(record: proto.lobby.IMsgReplayRecordSummary): void {
-        //
 
         const recordCfg = this.replayRoom;
         let modName;
@@ -134,7 +130,6 @@ export class GameSubRecordView extends cc.Component {
     }
 
     private updateList(): void {
-        //
         this.recordList.numItems = this.replayRoom.records === undefined ? 0 : this.replayRoom.records.length;
     }
 

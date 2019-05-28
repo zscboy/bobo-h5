@@ -129,7 +129,7 @@ export class NewRoomView extends cc.Component {
         this.win.dispose();
         const myUserID = DataStore.getString("userID", "");
         const myUser = { userID: myUserID };
-        const myRoomInfo = { roomID:  roomInfo.roomID };
+        const myRoomInfo = { roomID: roomInfo.roomID };
 
         const params: GameModuleLaunchArgs = {
             jsonString: "",
@@ -161,7 +161,7 @@ export class NewRoomView extends cc.Component {
                     if (errMsg === null) {
                         const data = <Uint8Array>xhr.response;
                         const dataString = new TextDecoder("utf-8").decode(data);
-                        const priceCfgs = <{[key: string]: object}>JSON.parse(dataString);
+                        const priceCfgs = <{ [key: string]: object }>JSON.parse(dataString);
                         this.dfRuleView.updatePriceCfg(priceCfgs);
                         Logger.debug("price:", dataString);
                     }

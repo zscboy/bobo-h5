@@ -1,4 +1,6 @@
 import { DataStore, GameModuleLaunchArgs, LobbyModuleInterface } from "../lcore/LCoreExports";
+import { EmailView } from "./EmailView";
+import { GameRecordView } from "./GameRecordView";
 import { NewRoomView } from "./NewRoomView";
 const { ccclass } = cc._decorator;
 
@@ -77,10 +79,12 @@ export class LobbyView extends cc.Component {
 
     private openRecordView(): void {
         // TODO:
+        this.addComponent(GameRecordView);
     }
 
     private openEmailView(): void {
         // TODO:
+        this.addComponent(EmailView);
     }
 
     private onJoinRoom(): void {

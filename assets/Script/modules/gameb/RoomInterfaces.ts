@@ -19,7 +19,7 @@ export class TingPai {
  */
 export class PlayerInfo {
 
-    public readonly sex: number;
+    public readonly gender: number;
     public readonly headIconURI: string;
     public readonly ip: string;
     public readonly location: string;

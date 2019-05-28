@@ -466,7 +466,7 @@ export class Player {
     public playOperationSound(str: string): void {
         Logger.debug("播放吃碰杠胡听音效: ", str);
         //const soundName = ""
-        // if this.sex == 1 {
+        // if this.gender == 1 {
         //soundName = directory.. "/boy/"..effectName
         // else
         //soundName = directory.. "/girl/"..effectName
@@ -511,7 +511,7 @@ export class Player {
     public updateByPlayerInfo(playerInfo: PlayerInfo): void {
         //TODO. 更新用户状态
         // const player = this
-        // player.sex = playerInfo.sex
+        // player.gender = playerInfo.gender
         // player.headIconURI = playerInfo.headIconURI
         // player.ip = playerInfo.ip
         // player.location = playerInfo.location

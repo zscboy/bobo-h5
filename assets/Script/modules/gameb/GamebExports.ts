@@ -1,4 +1,4 @@
 /**
  * 导出
  */
-export * from "./Game";
+export * from "./GameModule";

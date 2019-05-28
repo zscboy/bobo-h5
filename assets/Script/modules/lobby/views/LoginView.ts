@@ -1,4 +1,4 @@
-import { DataStore, Dialog, HTTP, LEnv, Logger } from "../lcore/LCoreExports";
+import { DataStore, Dialog, HTTP, LEnv, LobbyModuleInterface, Logger } from "../lcore/LCoreExports";
 import { proto } from "../proto/protoLobby";
 import { LobbyView } from "./LobbyView";
 
@@ -19,7 +19,9 @@ export class LoginView extends cc.Component {
     private eventTarget: cc.EventTarget;
 
     public showLoginView(): void {
-        fgui.UIPackage.addPackage("lobby/fui_login/lobby_login");
+        const lm = <LobbyModuleInterface>this.getComponent("LobbyModule");
+        const loader = lm.loader;
+        loader.fguiAddPackage("lobby/fui_login/lobby_login");
         const view = fgui.UIPackage.createObject("lobby_login", "login").asCom;
 
         const win = new fgui.Window();

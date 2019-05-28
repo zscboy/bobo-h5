@@ -1,4 +1,4 @@
-import { DataStore, Dialog, HTTP, LEnv, Logger } from "../lcore/LCoreExports";
+import { DataStore, Dialog, HTTP, LEnv, LobbyModuleInterface, Logger } from "../lcore/LCoreExports";
 import { proto } from "../proto/protoLobby";
 import { DFRuleView } from "./DFRuleView";
 import { RunFastRuleView } from "./RunFastRuleView";
@@ -83,8 +83,9 @@ export class NewRoomView extends cc.Component {
     protected onLoad(): void {
         // 加载大厅界面
         this.eventTarget = new cc.EventTarget();
-
-        fgui.UIPackage.addPackage("lobby/fui_create_room/lobby_create_room");
+        const lm = <LobbyModuleInterface>this.getComponent("LobbyModule");
+        const loader = lm.loader;
+        loader.fguiAddPackage("lobby/fui_create_room/lobby_create_room");
         const view = fgui.UIPackage.createObject("lobby_create_room", "createRoom").asCom;
         this.view = view;
 

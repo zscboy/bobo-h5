@@ -46,6 +46,10 @@ export class LobbyView extends cc.Component {
         await this.startWebSocket();
     }
 
+    protected onDestroy(): void {
+        this.msgCenter.destory();
+    }
+
     private initView(): void {
         const friendBtn = this.view.getChild("n1");
         friendBtn.onClick(this.onFriendClick, this);

@@ -1,4 +1,4 @@
-import { RoomInterface } from "./RoomInterfaces";
+import { RoomInterface } from "../RoomInterfaces";
 
 /**
  * 响应服务器返回大厅通知

@@ -1,5 +1,6 @@
 import { Logger } from "../../lobby/lcore/LCoreExports";
 import { proto } from "../proto/protoGame";
+import { RoomInterface } from "../RoomInterfaces";
 import { HandlerActionResultChow } from "./HandlerActionResultChow";
 import { HandlerActionResultDiscarded } from "./HandlerActionResultDiscarded";
 import { HandlerActionResultDraw } from "./HandlerActionResultDraw";
@@ -8,7 +9,6 @@ import { HandlerActionResultKongExposed } from "./HandlerActionResultKongExposed
 import { HandlerActionResultPong } from "./HandlerActionResultPong";
 import { HandlerActionResultReadyHand } from "./HandlerActionResultReadyHand";
 import { HandlerActionResultTriplet2Kong } from "./HandlerActionResultTriplet2Kong";
-import { RoomInterface } from "./RoomInterfaces";
 
 type ActionHandler = (actionResultMsg: proto.mahjong.MsgActionResultNotify, room: RoomInterface) => void;
 const actionType = proto.mahjong.ActionType;

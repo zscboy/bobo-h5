@@ -231,7 +231,7 @@ export namespace proto {
 			nick?: string;
 			chairID: number;
 			totalScore?: number;
-			sex?: number;
+			gender?: number;
 			headIconURI?: string;
 			avatarID?: number;
 		}
@@ -241,7 +241,7 @@ export namespace proto {
 			public nick: string;
 			public chairID: number;
 			public totalScore: number;
-			public sex: number;
+			public gender: number;
 			public headIconURI: string;
 			public avatarID: number;
 			constructor(properties?: mahjong.IMsgReplayPlayerInfo);
@@ -310,7 +310,7 @@ export namespace proto {
 			userID: string;
 			chairID: number;
 			nick?: string;
-			sex?: number;
+			gender?: number;
 			headIconURI?: string;
 			avatarID?: number;
 		}
@@ -319,7 +319,7 @@ export namespace proto {
 			public userID: string;
 			public chairID: number;
 			public nick: string;
-			public sex: number;
+			public gender: number;
 			public headIconURI: string;
 			public avatarID: number;
 			constructor(properties?: mahjong.ISRMsgPlayerInfo);
@@ -421,7 +421,7 @@ export namespace proto {
 			state: number;
 			name?: string;
 			nick?: string;
-			sex?: number;
+			gender?: number;
 			headIconURI?: string;
 			ip?: string;
 			location?: string;
@@ -439,7 +439,7 @@ export namespace proto {
 			public state: number;
 			public name: string;
 			public nick: string;
-			public sex: number;
+			public gender: number;
 			public headIconURI: string;
 			public ip: string;
 			public location: string;

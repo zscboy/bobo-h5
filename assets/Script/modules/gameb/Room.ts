@@ -18,16 +18,13 @@ import { HandlerMsgUpdateLocation } from "./handlers/HandlerMsgUpdateLocation";
 import { HandlerMsgUpdatePropCfg } from "./handlers/HandlerMsgUpdatePropCfg";
 import { Player } from "./Player";
 import { proto } from "./proto/protoGame";
-import { MeldType, PlayerInfo, RoomInterfaces, TingPai } from "./RoomInterfaces";
+import { MeldType, PlayerInfo, RoomHost, RoomInterface, TingPai } from "./RoomInterface";
 import { RoomView } from "./RoomView";
 /**
  * 定义一个接口 关联Game 到room
  */
-interface RoomHost {
-    quit: Function;
-}
 const msgCodeEnum = proto.mahjong.MessageCode;
-const msgHandlers: { [key: number]: (msgData: ByteBuffer, room: RoomInterfaces) => void } = {
+const msgHandlers: { [key: number]: (msgData: ByteBuffer, room: RoomInterface) => void } = {
     [msgCodeEnum.OPActionAllowed]: HandlerMsgActionAllowed.onMsg,
     [msgCodeEnum.OPReActionAllowed]: HandlerMsgReActionAllowed.onMsg,
     [msgCodeEnum.OPActionResultNotify]: HandlerActionResultNotify.onMsg,

@@ -1,7 +1,7 @@
 import { Logger } from "../lobby/lcore/LCoreExports";
-import { ClickCtrl, PlayerInterfaces } from "./PlayerInterfaces";
+import { ClickCtrl, PlayerInterface } from "./PlayerInterface";
 import { proto } from "./proto/protoGame";
-import { MeldType, RoomInterfaces, TingPai } from "./RoomInterfaces";
+import { MeldType, RoomInterface, TingPai } from "./RoomInterface";
 import { TileImageMounter } from "./TileImageMounter";
 
 const mjproto = proto.mahjong;
@@ -61,8 +61,8 @@ const enum ButtonDef {
 export class PlayerView extends cc.Component {
     public handsClickCtrls: ClickCtrl[];
     public checkReadyHandBtn: fgui.GButton = null;
-    public player: PlayerInterfaces;
-    public room: RoomInterfaces;
+    public player: PlayerInterface;
+    public room: RoomInterface;
 
     //打出的牌放大显示
     public discardTips: fgui.GComponent;
@@ -87,7 +87,7 @@ export class PlayerView extends cc.Component {
     private discardTipsTile: fgui.GComponent;
     // private onUpdateStatus: Function[]
 
-    public constructor(viewUnityNode: fgui.GComponent, viewChairID: number, room: RoomInterfaces) {
+    public constructor(viewUnityNode: fgui.GComponent, viewChairID: number, room: RoomInterface) {
         super();
         MELD_COMPONENT_SUFFIX[mjproto.MeldType.enumMeldTypeTriplet2Kong] = "gang1";
         MELD_COMPONENT_SUFFIX[mjproto.MeldType.enumMeldTypeExposedKong] = "gang1";

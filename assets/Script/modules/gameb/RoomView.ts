@@ -1,7 +1,7 @@
 import { GameModuleInterface, Logger } from "../lobby/lcore/LCoreExports";
 import { PlayerView } from "./PlayerView";
 import { proto } from "./proto/protoGame";
-import { MeldType, RoomInterfaces, TingPai } from "./RoomInterfaces";
+import { MeldType, RoomInterface, TingPai } from "./RoomInterface";
 // import { TileImageMounter } from "./TileImageMounter";
 // const mjproto = proto.mahjong;
 
@@ -16,7 +16,7 @@ export class RoomView extends cc.Component {
     public tilesInWall: fgui.GObject;
     public statusHandlers: Function[];
 
-    private room: RoomInterfaces;
+    private room: RoomInterface;
     private unityViewNode: fgui.GComponent;
     private readyButton: fgui.GButton;
     private roomInfoText: fgui.GObject;
@@ -30,7 +30,7 @@ export class RoomView extends cc.Component {
     // private multiOpsObj: fgui.GList;
     // private listensDataList: TingPai[];
     // private multiOpsDataList: MeldType[];
-    public constructor(room: RoomInterfaces) {
+    public constructor(room: RoomInterface) {
         super();
         this.room = room;
         // 加载房间界面

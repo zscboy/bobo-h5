@@ -1,7 +1,7 @@
 import { Logger } from "../lobby/lcore/LCoreExports";
 import { PlayerView } from "./PlayerView";
 import { proto } from "./proto/protoGame";
-import { MeldType, PlayerInfo, RoomInterfaces } from "./RoomInterfaces";
+import { MeldType, PlayerInfo, RoomInterface } from "./RoomInterface";
 // const playerInfoView = require "lobby/scripts/playerInfo/playerInfoView"
 const mjproto = proto.mahjong;
 const enum SoundDef {
@@ -33,7 +33,7 @@ const enum EffectsDef {
 export class Player {
     public readonly userID: string;
     public readonly chairID: number;
-    public readonly host: RoomInterfaces;
+    public readonly host: RoomInterface;
 
     public tilesDiscarded: number[];
     public melds: MeldType[];
@@ -55,7 +55,7 @@ export class Player {
 
     private flagsTing: boolean;
     private isGuoHuTips: boolean;
-    public constructor(userID: string, chairID: number, host: RoomInterfaces) {
+    public constructor(userID: string, chairID: number, host: RoomInterface) {
         this.userID = userID;
         this.chairID = chairID;
         this.host = host;

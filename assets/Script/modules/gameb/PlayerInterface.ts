@@ -14,7 +14,7 @@ export class ClickCtrl {
 /**
  * player 接口
  */
-export interface PlayerInterfaces {
+export interface PlayerInterface {
     readyHandList: number[];
     waitSkip: boolean;
     isRichi: boolean;

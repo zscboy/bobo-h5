@@ -29,8 +29,12 @@ export class GameModule extends cc.Component implements GameModuleInterface {
     private connectErrorCount: number;
     private retry: boolean = false;
     private forceExit: boolean = false;
-    private room: Room;
+    private mRoom: Room;
     private lm: LobbyModuleInterface;
+
+    public get room(): Room {
+        return this.mRoom;
+    }
 
     public get resLoader(): GResLoader {
         return this.loader;
@@ -96,7 +100,7 @@ export class GameModule extends cc.Component implements GameModuleInterface {
         // this.url = url;
         // this.myUser = myUser;
         this.ws = null;
-        this.room = null;
+        this.mRoom = null;
         this.connectErrorCount = 0;
 
         let loop = true;
@@ -116,8 +120,8 @@ export class GameModule extends cc.Component implements GameModuleInterface {
             }
         }
 
-        if (this.room !== null) {
-            this.room = null;
+        if (this.mRoom !== null) {
+            this.mRoom = null;
         }
 
         // 退出到大厅
@@ -140,7 +144,7 @@ export class GameModule extends cc.Component implements GameModuleInterface {
         this.retry = false;
 
         // this.room可能不为null，因为如果断线重入，room以及roomview就可能已经加载
-        if (this.room === null) {
+        if (this.mRoom === null) {
             this.createRoom(myUser, roomInfo);
         }
 
@@ -187,7 +191,7 @@ export class GameModule extends cc.Component implements GameModuleInterface {
 
             return;
         } else {
-            Logger.debug("waitWebsocketMessage wait room reply");
+            Logger.debug("waitWebsocketMessage wait mRoom reply");
             enterRoomReplyMsg = await this.waitWebsocketMessage(showProgressTips);
         }
 
@@ -203,10 +207,10 @@ export class GameModule extends cc.Component implements GameModuleInterface {
         }
 
         enterRoomResult = proto.mahjong.MsgEnterRoomResult.decode(enterRoomReplyMsg.Data);
-        Logger.debug(" server reply enter room status:", enterRoomResult.status);
+        Logger.debug(" server reply enter mRoom status:", enterRoomResult.status);
         if (enterRoomResult.status !== 0) {
             // 进入房间错误提示
-            Logger.debug(" server return enter room ~= 0");
+            Logger.debug(" server return enter mRoom ~= 0");
             await this.showEnterRoomError(enterRoomResult.status);
 
             return;
@@ -220,7 +224,7 @@ export class GameModule extends cc.Component implements GameModuleInterface {
         myUser: UserInfo,
         roomInfo: RoomInfo): void {
         //
-        this.room = new Room(myUser, roomInfo, this);
+        this.mRoom = new Room(myUser, roomInfo, this);
     }
 
     private async waitConnect(showProgressTips: string): Promise<number> {
@@ -246,7 +250,7 @@ export class GameModule extends cc.Component implements GameModuleInterface {
 
     private async showEnterRoomError(code: number): Promise<void> {
         const msg = this.getEnterRoomErrorCode(code);
-        Logger.warn("enter room failed, server return error：", msg);
+        Logger.warn("enter mRoom failed, server return error：", msg);
         await Dialog.coShowDialog(msg, true, false);
     }
 
@@ -291,12 +295,12 @@ export class GameModule extends cc.Component implements GameModuleInterface {
             }
 
             if (msg.mt === MsgType.wsData) {
-                this.room.dispatchWebsocketMsg(<proto.mahjong.GameMessage>msg.data);
+                this.mRoom.dispatchWebsocketMsg(<proto.mahjong.GameMessage>msg.data);
             } else if (msg.mt === MsgType.wsClosed || msg.mt === MsgType.wsError) {
                 Logger.debug(" websocket connection has broken");
-                if (this.room.isDestroy) {
+                if (this.mRoom.isDestroy) {
                     // 用户主动离开房间，不再做重入
-                    Logger.debug(" room has been destroy");
+                    Logger.debug(" mRoom has been destroy");
                     break;
                 }
 

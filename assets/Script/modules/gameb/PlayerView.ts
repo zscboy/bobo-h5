@@ -31,7 +31,7 @@ class Head {
     public continuousBankerFlag: fgui.GObject;
     public huaNode: fgui.GObject;
     public huaNodeText: fgui.GObject;
-    public onUpdateBankerFlag: Function;
+    public onUpdateBankerFlag: (isBanker: boolean, isContinue: boolean) => void;
     public hideAll: Function;
 }
 
@@ -43,7 +43,7 @@ const MELD_COMPONENT_PREFIX: string[] = [
     "mahjong_left_meld_"
 ];
 
-// //面子牌组资源 后缀
+//面子牌组资源 后缀
 const MELD_COMPONENT_SUFFIX: string[] = [];
 const enum ButtonDef {
     Chow = "ui.//dafeng/chi_button",
@@ -94,7 +94,7 @@ export class PlayerView extends cc.Component {
         MELD_COMPONENT_SUFFIX[mjproto.MeldType.enumMeldTypeConcealedKong] = "gang2";
         MELD_COMPONENT_SUFFIX[mjproto.MeldType.enumMeldTypeSequence] = "chipeng";
         MELD_COMPONENT_SUFFIX[mjproto.MeldType.enumMeldTypeTriplet] = "chipeng";
-
+        this.room = room;
         this.viewChairID = viewChairID;
         this.viewUnityNode = viewUnityNode;
         //这里需要把player的chairID转换为游戏视图中的chairID，这是因为，无论当前玩家本人

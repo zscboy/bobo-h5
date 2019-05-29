@@ -14,6 +14,7 @@ export class UserInfo {
  */
 export class RoomInfo {
     public roomID: string;
+    public roomNumber: string;
 }
 
 export interface GResLoader {

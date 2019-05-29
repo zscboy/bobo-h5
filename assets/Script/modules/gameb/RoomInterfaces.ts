@@ -1,4 +1,5 @@
 
+import { RoomInfo } from "../lobby/lcore/LCoreExports";
 import { proto } from "./proto/protoGame";
 
 /**
@@ -45,6 +46,7 @@ export class MeldType {
  * room 接口
  */
 export interface RoomInterfaces {
+    readonly roomInfo: RoomInfo;
     isDestroy: boolean;
     quit: Function;
     isMe(o: object): boolean;
@@ -57,6 +59,7 @@ export interface RoomInterfaces {
 
     showTingDataView(tingP: TingPai[]): void;
     hideTingDataView(): void;
-
+    onReadyButtonClick(): void;
+    resetForNewHand(): void;
     isListensObjVisible(): boolean;
 }

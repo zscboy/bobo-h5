@@ -112,7 +112,7 @@ export class Room {
     // 加载房间的view
     //////////////////////////////////////////////
     public loadRoomView(): void {
-        const roomView = new RoomView();
+        const roomView = new RoomView(this);
         this.roomView = roomView;
     }
 

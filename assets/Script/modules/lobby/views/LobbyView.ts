@@ -20,7 +20,7 @@ export class LobbyView extends cc.Component {
 
     private msgCenter: LMsgCenter;
 
-    private msgHandlers: {[key: number]: MsgHandler} = {};
+    private msgHandlers: { [key: number]: MsgHandler } = {};
 
     public dispatchMessage(msg: proto.lobby.LobbyMessage): void {
         const ops = msg.Ops;
@@ -87,7 +87,7 @@ export class LobbyView extends cc.Component {
     }
     private onFriendClick(): void {
         const myUser = { userID: "6" };
-        const roomInfo = { roomID: "monkey-room" };
+        const roomInfo = { roomID: "monkey-room", roomNumber: "123456" };
 
         const params: GameModuleLaunchArgs = {
             jsonString: "",

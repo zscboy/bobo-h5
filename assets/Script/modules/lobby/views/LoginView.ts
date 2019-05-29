@@ -139,6 +139,7 @@ export class LoginView extends cc.Component {
         DataStore.setItem("gender", userInfo.gender);
         DataStore.setItem("province", userInfo.province);
         DataStore.setItem("city", userInfo.city);
+        DataStore.setItem("diamond", userInfo.diamond);
         DataStore.setItem("country", userInfo.country);
         DataStore.setItem("headImgUrl", userInfo.headImgUrl);
         DataStore.setItem("phone", userInfo.phone);

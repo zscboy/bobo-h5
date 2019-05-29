@@ -1,8 +1,10 @@
-import { DataStore, GameModuleLaunchArgs, LEnv, LobbyModuleInterface } from "../lcore/LCoreExports";
+import { DataStore, GameModuleLaunchArgs, LEnv, LobbyModuleInterface, Logger } from "../lcore/LCoreExports";
 import { LMsgCenter } from "../LMsgCenter";
 import { proto } from "../proto/protoLobby";
 import { EmailView } from "./EmailView";
+import { GameRecordView } from "./GameRecordView";
 import { NewRoomView } from "./NewRoomView";
+import { UserInfoView } from "./UserInfoView";
 const { ccclass } = cc._decorator;
 
 interface MsgHandler {
@@ -20,7 +22,7 @@ export class LobbyView extends cc.Component {
 
     private msgCenter: LMsgCenter;
 
-    private msgHandlers: {[key: number]: MsgHandler} = {};
+    private msgHandlers: { [key: number]: MsgHandler } = {};
 
     public dispatchMessage(msg: proto.lobby.LobbyMessage): void {
         const ops = msg.Ops;
@@ -28,6 +30,13 @@ export class LobbyView extends cc.Component {
         if (handler !== undefined) {
             handler.onMessage(msg.Data);
         }
+    }
+
+    public onMessage(data: ByteBuffer): void {
+        Logger.debug("LobbyView.onMessage");
+        const diamondBody = proto.lobby.MsgUpdateUserDiamond.decode(data);
+        const diamond = diamondBody.diamond;
+        this.updateDiamond(diamond);
     }
 
     protected async onLoad(): Promise<void> {
@@ -44,10 +53,11 @@ export class LobbyView extends cc.Component {
         this.initView();
 
         await this.startWebSocket();
+
     }
 
-    protected onDestroy(): void {
-        this.msgCenter.destory();
+    private updateDiamond(diamond: Long): void {
+        this.diamondText.text = `${diamond}`;
     }
 
     private initView(): void {
@@ -76,6 +86,8 @@ export class LobbyView extends cc.Component {
         const userInfo = this.view.getChild("userInfo").asCom;
         this.initInfoView(userInfo);
         userInfo.onClick(this.openUserInfoView, this);
+
+        this.registerHandler(this, proto.lobby.MessageCode.OPUpdateDiamond);
     }
 
     private async startWebSocket(): Promise<void> {
@@ -109,6 +121,7 @@ export class LobbyView extends cc.Component {
 
     private openRecordView(): void {
         // TODO:
+        this.addComponent(GameRecordView);
     }
 
     private openEmailView(): void {
@@ -126,6 +139,7 @@ export class LobbyView extends cc.Component {
 
     private openUserInfoView(): void {
         // TODO:
+        this.addComponent(UserInfoView);
     }
 
     private initInfoView(userInfo: fgui.GComponent): void {
@@ -163,7 +177,7 @@ export class LobbyView extends cc.Component {
 
     private registerHandler(msgHandler: MsgHandler, msgCode: number): void {
         const handler = this.msgHandlers[msgCode];
-        if (handler === null) {
+        if (handler === undefined || handler === null) {
             this.msgHandlers[msgCode] = msgHandler;
         }
     }

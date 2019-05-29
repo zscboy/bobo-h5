@@ -68,13 +68,20 @@ export class Dialog {
         const yesBtn = Dialog.inst.view.getChild("ok_btn");
         yesBtn.offClick(undefined, undefined);
 
-        if (yesCb !== null) {
+        let yesCb2 = yesCb;
+        if (yesCb === null && noCB === null) {
+            yesCb2 = () => {
+                //
+            };
+        }
+
+        if (yesCb2 !== null) {
             Logger.debug("showDialog, callBackOK valid");
             yesBtn.visible = true;
             yesBtn.onClick(
                 () => {
                     Dialog.inst.win.hide();
-                    yesCb();
+                    yesCb2();
                 },
                 undefined);
         } else {

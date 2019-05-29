@@ -69,7 +69,7 @@ export class UserInfoView extends cc.Component {
         itemText = item.asCom.getChild("text");
         itemText.text = DataStore.getString("userID");
 
-        const genderCtrl = this.view.asCom.getController("gender");
+        const genderCtrl = this.view.getController("gender");
         const gender = DataStore.getString("sex");
         Logger.debug("gender -----------------= ", gender);
         genderCtrl.selectedIndex = +gender;

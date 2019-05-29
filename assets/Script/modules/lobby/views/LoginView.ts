@@ -136,7 +136,7 @@ export class LoginView extends cc.Component {
         const userInfo = quicklyLoginReply.userInfo;
         DataStore.setItem("userID", userInfo.userID);
         DataStore.setItem("nickName", userInfo.nickName);
-        DataStore.setItem("sex", userInfo.sex);
+        DataStore.setItem("gender", userInfo.gender);
         DataStore.setItem("province", userInfo.province);
         DataStore.setItem("city", userInfo.city);
         DataStore.setItem("diamond", userInfo.diamond);

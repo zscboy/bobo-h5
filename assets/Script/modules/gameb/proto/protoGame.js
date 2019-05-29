@@ -190,7 +190,7 @@ exports.proto = require("../lobby/protobufjs/protobuf").newBuilder({})['import']
                         {
                             "rule": "optional",
                             "type": "uint32",
-                            "name": "sex",
+                            "name": "gender",
                             "id": 5
                         },
                         {
@@ -340,7 +340,7 @@ exports.proto = require("../lobby/protobufjs/protobuf").newBuilder({})['import']
                         {
                             "rule": "optional",
                             "type": "uint32",
-                            "name": "sex",
+                            "name": "gender",
                             "id": 4
                         },
                         {
@@ -574,7 +574,7 @@ exports.proto = require("../lobby/protobufjs/protobuf").newBuilder({})['import']
                         {
                             "rule": "optional",
                             "type": "uint32",
-                            "name": "sex",
+                            "name": "gender",
                             "id": 6
                         },
                         {

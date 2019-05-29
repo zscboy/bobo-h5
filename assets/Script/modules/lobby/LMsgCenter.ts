@@ -58,6 +58,10 @@ export class LMsgCenter {
         }
     }
 
+    public destory(): void {
+        this.eventTarget.emit("destroy");
+    }
+
     private async connectServer(): Promise<void> {
         const mc = proto.lobby.MessageCode;
         // host 结构
@@ -151,4 +155,5 @@ export class LMsgCenter {
 
         this.lobbyViewInterface.dispatchMessage(msg);
     }
+
 }

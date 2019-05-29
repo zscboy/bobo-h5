@@ -1,5 +1,5 @@
 import { proto } from "../proto/protoGame";
-import { RoomInterface } from "./RoomInterfaces";
+import { RoomInterface } from "../RoomInterfaces";
 
 /**
  * 响应服务器打牌通知

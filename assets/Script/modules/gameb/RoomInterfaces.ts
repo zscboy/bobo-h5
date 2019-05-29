@@ -2,6 +2,14 @@
 import { proto } from "./proto/protoGame";
 
 /**
+ * Room host
+ */
+export interface RoomHost {
+    room: RoomInterface;
+    quit: Function;
+}
+
+/**
  * 听牌详情类
  */
 export class TingPai {
@@ -44,7 +52,7 @@ export class MeldType {
 /**
  * room 接口
  */
-export interface RoomInterfaces {
+export interface RoomInterface {
     isDestroy: boolean;
     quit: Function;
     isMe(o: object): boolean;

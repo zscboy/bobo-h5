@@ -1,6 +1,6 @@
 import { Logger } from "../../lobby/lcore/LCoreExports";
 import { proto } from "../proto/protoGame";
-import { RoomInterfaces } from "../RoomInterfaces";
+import { RoomInterface } from "../RoomInterfaces";
 
 const mjproto2 = proto.mahjong.RoomDeleteReason;
 const deletedReasons: { [key: number]: string } = {
@@ -16,7 +16,7 @@ const deletedReasons: { [key: number]: string } = {
  * 响应服务器删除房间
  */
 export namespace HandlerMsgDeleted {
-    export const onMsg = (msgData: ByteBuffer, room: RoomInterfaces): void => {
+    export const onMsg = (msgData: ByteBuffer, room: RoomInterface): void => {
         room.isDestroy = true;
 
         const msgDelete = proto.mahjong.MsgRoomDelete.decode(msgData);

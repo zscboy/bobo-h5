@@ -1,7 +1,7 @@
 import { Logger } from "../lobby/lcore/LCoreExports";
-import { ClickCtrl, PlayerInterfaces } from "./PlayerInterfaces";
+import { ButtonDef, ClickCtrl, PlayerInterface } from "./PlayerInterface";
 import { proto } from "./proto/protoGame";
-import { MeldType, RoomInterface, TingPai } from "./RoomInterfaces";
+import { MeldType, RoomInterface, TingPai } from "./RoomInterface";
 import { TileImageMounter } from "./TileImageMounter";
 
 const mjproto = proto.mahjong;
@@ -31,7 +31,7 @@ class Head {
     public continuousBankerFlag: fgui.GObject;
     public huaNode: fgui.GObject;
     public huaNodeText: fgui.GObject;
-    public onUpdateBankerFlag: Function;
+    public onUpdateBankerFlag: (isBanker: boolean, isContinue: boolean) => void;
     public hideAll: Function;
 }
 
@@ -43,17 +43,8 @@ const MELD_COMPONENT_PREFIX: string[] = [
     "mahjong_left_meld_"
 ];
 
-// //面子牌组资源 后缀
+//面子牌组资源 后缀
 const MELD_COMPONENT_SUFFIX: string[] = [];
-const enum ButtonDef {
-    Chow = "ui.//dafeng/chi_button",
-    Pong = "ui.//dafeng/peng_button",
-    Kong = "ui.//dafeng/gang_button",
-    Ting = "ui.//dafeng/ting_button",
-    Skip = "ui.//dafeng/guo_button",
-    Hu = "ui.//dafeng/hu_button",
-    Zhua = "ui.//dafeng/zhua_button"
-}
 
 /**
  * 玩家
@@ -61,7 +52,7 @@ const enum ButtonDef {
 export class PlayerView extends cc.Component {
     public handsClickCtrls: ClickCtrl[];
     public checkReadyHandBtn: fgui.GButton = null;
-    public player: PlayerInterfaces;
+    public player: PlayerInterface;
     public room: RoomInterface;
 
     //打出的牌放大显示
@@ -69,6 +60,7 @@ export class PlayerView extends cc.Component {
     public head: Head;
 
     public viewChairID: number;
+    public onUpdateStatus: Function[];
     private discards: fgui.GComponent[];
     private lights: fgui.GComponent[];
     private hands: fgui.GComponent[];
@@ -85,7 +77,6 @@ export class PlayerView extends cc.Component {
     // private userInfoPos: fgui.GObject
     private alreadyShowNonDiscardAbleTips: boolean;
     private discardTipsTile: fgui.GComponent;
-    // private onUpdateStatus: Function[]
 
     public constructor(viewUnityNode: fgui.GComponent, viewChairID: number, room: RoomInterface) {
         super();
@@ -94,7 +85,7 @@ export class PlayerView extends cc.Component {
         MELD_COMPONENT_SUFFIX[mjproto.MeldType.enumMeldTypeConcealedKong] = "gang2";
         MELD_COMPONENT_SUFFIX[mjproto.MeldType.enumMeldTypeSequence] = "chipeng";
         MELD_COMPONENT_SUFFIX[mjproto.MeldType.enumMeldTypeTriplet] = "chipeng";
-
+        this.room = room;
         this.viewChairID = viewChairID;
         this.viewUnityNode = viewUnityNode;
         //这里需要把player的chairID转换为游戏视图中的chairID，这是因为，无论当前玩家本人
@@ -365,7 +356,7 @@ export class PlayerView extends cc.Component {
         status[mjproto.PlayerState.PSReady] = onReady;
         status[mjproto.PlayerState.PSOffline] = onLeave;
         status[mjproto.PlayerState.PSPlaying] = onPlaying;
-        // this.onUpdateStatus = status;
+        this.onUpdateStatus = status;
     }
 
     ////////////////////////////////////////////////-

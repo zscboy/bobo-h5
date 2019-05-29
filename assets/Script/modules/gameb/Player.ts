@@ -41,6 +41,7 @@ export class Player {
     public tilesHand: number[];
     public isRichi: boolean;
     public tileCountInHand: number;
+    public totalScores: number;
     public playerView: PlayerView;
     //设置一个标志，表示已经点击了动作按钮（吃碰杠胡过）
     public waitSkip: boolean;
@@ -50,11 +51,11 @@ export class Player {
     public waitDiscardReAction: boolean;
     public readyHandList: number[];
 
-    private allowedReActionMsg: proto.mahjong.MsgAllowPlayerReAction;
-    private allowedActionMsg: proto.mahjong.MsgAllowPlayerAction;
+    public allowedReActionMsg: proto.mahjong.MsgAllowPlayerReAction;
+    public allowedActionMsg: proto.mahjong.MsgAllowPlayerAction;
+    public isGuoHuTips: boolean;
 
     private flagsTing: boolean;
-    private isGuoHuTips: boolean;
     public constructor(userID: string, chairID: number, host: RoomInterface) {
         this.userID = userID;
         this.chairID = chairID;
@@ -100,7 +101,7 @@ export class Player {
     //player对象是当前用户的，抑或是对手的
     ////////////////////////////////////
     public isMe(): boolean {
-        return this.host.isMe(this);
+        return this.host.isMe(this.userID);
     }
 
     public addHandTile(tileID: number): void {
@@ -197,6 +198,9 @@ export class Player {
     ////////////////////////////////////
     public addMeld(meld: MeldType): void {
         //插入到队列尾部
+        if (meld === null) {
+            return;
+        }
         this.melds.push(meld);
     }
 
@@ -508,7 +512,7 @@ export class Player {
         }
     }
 
-    public updateByPlayerInfo(playerInfo: PlayerInfo): void {
+    public updateByPlayerInfo(playerInfo: proto.mahjong.IMsgPlayerInfo): void {
         //TODO. 更新用户状态
         // const player = this
         // player.gender = playerInfo.gender
@@ -525,7 +529,7 @@ export class Player {
         //g_dataModule. GetUserData(). SetCharm(playerInfo.charm)
         //}
         this.state = playerInfo.state;
-        this.playerInfo = playerInfo;
+        this.playerInfo = new PlayerInfo(playerInfo);
     }
 
     public discardOutTileID(tileID: number): void {

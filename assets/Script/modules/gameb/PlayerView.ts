@@ -1,5 +1,5 @@
 import { Logger } from "../lobby/lcore/LCoreExports";
-import { ClickCtrl, PlayerInterface } from "./PlayerInterface";
+import { ButtonDef, ClickCtrl, PlayerInterface } from "./PlayerInterface";
 import { proto } from "./proto/protoGame";
 import { MeldType, RoomInterface, TingPai } from "./RoomInterface";
 import { TileImageMounter } from "./TileImageMounter";
@@ -45,15 +45,6 @@ const MELD_COMPONENT_PREFIX: string[] = [
 
 //面子牌组资源 后缀
 const MELD_COMPONENT_SUFFIX: string[] = [];
-const enum ButtonDef {
-    Chow = "ui.//dafeng/chi_button",
-    Pong = "ui.//dafeng/peng_button",
-    Kong = "ui.//dafeng/gang_button",
-    Ting = "ui.//dafeng/ting_button",
-    Skip = "ui.//dafeng/guo_button",
-    Hu = "ui.//dafeng/hu_button",
-    Zhua = "ui.//dafeng/zhua_button"
-}
 
 /**
  * 玩家
@@ -69,6 +60,7 @@ export class PlayerView extends cc.Component {
     public head: Head;
 
     public viewChairID: number;
+    public onUpdateStatus: Function[];
     private discards: fgui.GComponent[];
     private lights: fgui.GComponent[];
     private hands: fgui.GComponent[];
@@ -85,7 +77,6 @@ export class PlayerView extends cc.Component {
     // private userInfoPos: fgui.GObject
     private alreadyShowNonDiscardAbleTips: boolean;
     private discardTipsTile: fgui.GComponent;
-    // private onUpdateStatus: Function[]
 
     public constructor(viewUnityNode: fgui.GComponent, viewChairID: number, room: RoomInterface) {
         super();
@@ -365,7 +356,7 @@ export class PlayerView extends cc.Component {
         status[mjproto.PlayerState.PSReady] = onReady;
         status[mjproto.PlayerState.PSOffline] = onLeave;
         status[mjproto.PlayerState.PSPlaying] = onPlaying;
-        // this.onUpdateStatus = status;
+        this.onUpdateStatus = status;
     }
 
     ////////////////////////////////////////////////-

@@ -49,14 +49,13 @@ const indexMap: string[] = [
 /**
  * 牌id 跟 图片名映射
  */
-// tslint:disable-next-line: no-unnecessary-class
-export class AgariIndex {
-    public static tileId2ArtId(tileID: number): string {
+export namespace AgariIndex {
+    export const tileId2ArtId = (tileID: number): string => {
         const artId = indexMap[tileID];
         if (artId == null) {
             Logger.debug(`no art id for tile:${tileID}`);
         }
 
         return artId;
-    }
+    };
 }

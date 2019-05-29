@@ -11,6 +11,15 @@ export class ClickCtrl {
     public isGray: boolean;
     public readyHandList: number[];
 }
+export enum ButtonDef {
+    Chow = "ui.//dafeng/chi_button",
+    Pong = "ui.//dafeng/peng_button",
+    Kong = "ui.//dafeng/gang_button",
+    Ting = "ui.//dafeng/ting_button",
+    Skip = "ui.//dafeng/guo_button",
+    Hu = "ui.//dafeng/hu_button",
+    Zhua = "ui.//dafeng/zhua_button"
+}
 /**
  * player 接口
  */

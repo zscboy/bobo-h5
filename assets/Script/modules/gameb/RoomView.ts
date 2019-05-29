@@ -2,8 +2,8 @@ import { GameModuleInterface, Logger } from "../lobby/lcore/LCoreExports";
 import { PlayerView } from "./PlayerView";
 import { proto } from "./proto/protoGame";
 import { MeldType, RoomInterface, TingPai } from "./RoomInterface";
-// import { TileImageMounter } from "./TileImageMounter";
-// const mjproto = proto.mahjong;
+import { TileImageMounter } from "./TileImageMounter";
+const mjproto = proto.mahjong;
 
 /**
  * 房间
@@ -23,13 +23,14 @@ export class RoomView extends cc.Component {
     private roundMarkView: fgui.GComponent;
     private roundMarks: fgui.GObject[];
     private wind: fgui.GObject;
-    private windTile: fgui.GObject;
-    // private countDownText: fgui.GObject;
+    private windTile: fgui.GComponent;
+    private countDownText: fgui.GObject;
     private listensObjList: fgui.GList;
-    // private listensObjNum: fgui.GObject;
-    // private multiOpsObj: fgui.GList;
-    // private listensDataList: TingPai[];
-    // private multiOpsDataList: MeldType[];
+    private listensObjNum: fgui.GObject;
+    private multiOpsObj: fgui.GList;
+    private listensDataList: TingPai[];
+    private multiOpsDataList: MeldType[];
+    private arrowObj: fgui.GObject;
     public constructor(room: RoomInterface) {
         super();
         this.room = room;
@@ -125,7 +126,7 @@ export class RoomView extends cc.Component {
     public stopDiscardCountdown(): void {
         //清理定时器
         // this.unityViewNode: StopTimer("roomViewCountDown");
-        // this.countDownText.text = "";
+        this.countDownText.text = "";
     }
 
     //设置当前房间所等待的操作玩家
@@ -154,20 +155,67 @@ export class RoomView extends cc.Component {
 
     }
     public showOrHideMeldsOpsPanel(meld: MeldType[]): void {
-        Logger.debug("等待加代码");
+        const size = meld.length;
+        this.multiOpsDataList = meld;
+        this.multiOpsObj.numItems = size;
+        this.multiOpsObj.resizeToFit(size);
+        this.meldOpsPanel.visible = size > 0;
     }
-    public hideTingDataView(): void {
-        Logger.debug("等待加代码");
+    //显示出牌提示箭头
+    public setArrowByParent(btn: fgui.GComponent): void {
+        if (btn == null) {
+            //隐藏出牌提示箭头
+            if (this.arrowObj !== null) {
+                this.arrowObj.visible = false;
+            }
 
+            return;
+        }
+        const pos = btn.getChild("pos");
+        const x = pos.x;
+        const y = pos.y;
+        Logger.debug("ss", x, y);
+        // this.arrowObj = animation.play("animations/Effects_UI_jiantou.prefab", btn, x, y, true);
+        // this.arrowObj.wrapper.scale = pos.scale;
+        // this.arrowObj.setVisible(true);
     }
-    public setArrowByParent(d: fgui.GComponent): void {
-        Logger.debug("等待加代码");
-
+    public setJiaJiaZhuang(): void {
+        Logger.debug("家家庄");
     }
     public showTingDataView(list: TingPai[]): void {
-        Logger.debug("等待加代码");
+        if (list.length <= 0) {
+            this.listensObj.visible = false;
+
+            return;
+        }
+        const len = list.length;
+        this.listensDataList = list;
+        let width = 290;
+        let height = 110;
+        if (len <= 2) {
+            width = 150;
+        } else if (len > 4) {
+            height = 230;
+        }
+        this.listensObjList.setSize(width, height);
+        let nCount = 0;
+        for (const d of list) {
+            nCount = nCount + d.num;
+        }
+        this.listensObjNum.text = `${nCount}张`;
+        this.listensObjList.numItems = len;
+        this.listensObj.visible = true;
+    }
+    public hideTingDataView(): void {
+        this.listensObj.visible = false;
     }
 
+    //设置当前房间所使用的风圈
+    public setRoundMask(): void {
+        this.wind.visible = true;
+        this.windTile.visible = true;
+        TileImageMounter.mountTileImage(this.windTile, this.room.windFlowerID);
+    }
     //////////////////////////////////////////////
     // 根据玩家的chairID获得相应的playerView
     // 注意服务器的chairID是由0开始
@@ -182,6 +230,27 @@ export class RoomView extends cc.Component {
         return playerViews[c + 1];
     }
 
+    //根据房间的状态做一些开关变量切换
+    public onUpdateStatus(state: number): void {
+        const handler = this.statusHandlers[state];
+        if (handler !== null) {
+            handler(this);
+        }
+    }
+    //解散房间按钮点击事件
+    private onDissolveClick(): void {
+        // const msg = "确实要申请解散房间吗？";
+        // dialog.showDialog(
+        //     msg,
+        //     function () {
+        //         this.room.onDissolveClicked();
+        //     },
+        //     function () {
+        //         //do nothing
+        //     }
+        // )
+    }
+
     /**
      * 初始化
      */
@@ -193,7 +262,7 @@ export class RoomView extends cc.Component {
         //     }
         // )
 
-        // const settingBtn = this.unityViewNode.getChild("settingBtn");
+        const settingBtn = this.unityViewNode.getChild("settingBtn");
 
         const infoBtn = this.unityViewNode.getChild("guizeBtn");
         infoBtn.visible = true;
@@ -202,7 +271,7 @@ export class RoomView extends cc.Component {
         this.readyButton.visible = false;
         this.readyButton.onClick(this.room.onReadyButtonClick, this);
 
-        // settingBtn.onClick(this.onDissolveClick, this);
+        settingBtn.onClick(this.onDissolveClick, this);
     }
 
     private initOtherView(): void {
@@ -217,12 +286,12 @@ export class RoomView extends cc.Component {
         }
         this.roundMarks = roundMarks;
         this.wind = this.unityViewNode.getChild("n3");
-        this.windTile = this.unityViewNode.getChild("fengquan");
+        this.windTile = this.unityViewNode.getChild("fengquan").asCom;
         this.wind.visible = false;
         this.windTile.visible = false;
 
         //倒计时
-        // this.countDownText = this.roundMarkView.getChild("num");
+        this.countDownText = this.roundMarkView.getChild("num");
         //道具
         this.donateMoveObj = this.unityViewNode.getChild("donate").asLoader;
         //剩牌
@@ -278,10 +347,9 @@ export class RoomView extends cc.Component {
     private initTingData(): void {
         this.listensObj = this.unityViewNode.getChild("listensPanel").asCom;
         this.listensObjList = this.listensObj.getChild("list").asList;
-        // this.listensObjNum = this.listensObj.getChild("num");
-        // this.listensObjList.itemRenderer = function (index, obj) {
-        //     this.renderListensListItem(index, obj);
-        // }
+        this.listensObjNum = this.listensObj.getChild("num");
+        // tslint:disable-next-line: no-unsafe-any
+        this.listensObjList.itemRenderer = this.renderListensListItem.bind(this);
         // this.listensObj.onClick: Set(
         //     function () {
         //         this.listensObj.visible = false
@@ -290,22 +358,21 @@ export class RoomView extends cc.Component {
         this.listensObjList.setVirtual();
     }
 
-    // private renderListensListItem(index: number, obj: fgui.GComponent): void {
-    //     const tingPai = this.listensDataList[index + 1];
-    //     const t = obj.getChild("n1").asCom;
-    //     const num = obj.getChild("num");
-    //     num.text = `${tingPai.num}张`;
-    //     TileImageMounter.mountTileImage(t, tingPai.card);
-    // }
+    private renderListensListItem(index: number, obj: fgui.GComponent): void {
+        const tingPai = this.listensDataList[index + 1];
+        const t = obj.getChild("n1").asCom;
+        const num = obj.getChild("num");
+        num.text = `${tingPai.num}张`;
+        TileImageMounter.mountTileImage(t, tingPai.card);
+    }
 
     //面子牌选择面板
     private initMeldsPanel(): void {
         // const meldMap = {}
         this.meldOpsPanel = this.unityViewNode.getChild("meldOpsPanel").asCom;
-        // this.multiOpsObj = this.meldOpsPanel.getChild("list").asList;
-        // this.multiOpsObj.itemRenderer = function (index, obj) {
-        //     this: renderMultiOpsListItem(index, obj)
-        // }
+        this.multiOpsObj = this.meldOpsPanel.getChild("list").asList;
+        // tslint:disable-next-line: no-unsafe-any
+        this.multiOpsObj.itemRenderer = this.renderMultiOpsListItem.bind(this);
         // this.multiOpsObj.onClickItem: Add(
         //     function (onClickItem) {
         //         this: onMeldOpsClick(onClickItem.data.name)
@@ -313,27 +380,27 @@ export class RoomView extends cc.Component {
         // )
     }
 
-    // private renderMultiOpsListItem(index: number, obj: fgui.GComponent): void {
-    //     const meld = this.multiOpsDataList[index + 1];
-    //     obj.name = index.toString();
-    //     let add = 0;
-    //     let num = 4;
-    //     if (meld.meldType === mjproto.MeldType.enumMeldTypeSequence) {
-    //         //吃的时候exp是3，所以第4个牌可以隐藏起来
-    //         obj.getChild("n4").visible = false;
-    //         add = 1;
-    //         num = 3;
-    //     }
-    //     let a = 0;
-    //     for (let i = 1; i <= num; i++) {
-    //         const oCurCard = obj.getChild(`n${i}`).asCom;
-    //         TileImageMounter.mountTileImage(oCurCard, meld.tile1 + a);
-    //         oCurCard.visible = true;
-    //         a += add;
-    //     }
+    private renderMultiOpsListItem(index: number, obj: fgui.GComponent): void {
+        const meld = this.multiOpsDataList[index + 1];
+        obj.name = index.toString();
+        let add = 0;
+        let num = 4;
+        if (meld.meldType === mjproto.MeldType.enumMeldTypeSequence) {
+            //吃的时候exp是3，所以第4个牌可以隐藏起来
+            obj.getChild("n4").visible = false;
+            add = 1;
+            num = 3;
+        }
+        let a = 0;
+        for (let i = 1; i <= num; i++) {
+            const oCurCard = obj.getChild(`n${i}`).asCom;
+            TileImageMounter.mountTileImage(oCurCard, meld.tile1 + a);
+            oCurCard.visible = true;
+            a += add;
+        }
 
-    //     obj.visible = true;
-    // }
+        obj.visible = true;
+    }
 
     // private onMeldOpsClick(index: number): void {
     //     const data = this.multiOpsDataList[index + 1];

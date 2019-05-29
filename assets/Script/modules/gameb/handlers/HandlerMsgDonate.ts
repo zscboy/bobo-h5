@@ -1,3 +1,4 @@
+import { proto } from "../proto/protoGame";
 import { RoomInterface } from "../RoomInterface";
 
 /**
@@ -5,6 +6,7 @@ import { RoomInterface } from "../RoomInterface";
  */
 export namespace HandlerMsgDonate {
     export const onMsg = (msgData: ByteBuffer, room: RoomInterface): void => {
-        // TODO:
+        const msgDonate = proto.mahjong.MsgDonate.decode(msgData);
+        room.showDonate(msgDonate);
     };
 }

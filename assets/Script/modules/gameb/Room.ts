@@ -17,8 +17,9 @@ import { HandlerMsgShowTips } from "./handlers/HandlerMsgShowTips";
 import { HandlerMsgUpdateLocation } from "./handlers/HandlerMsgUpdateLocation";
 import { HandlerMsgUpdatePropCfg } from "./handlers/HandlerMsgUpdatePropCfg";
 import { Player } from "./Player";
+import { PlayerInterface } from "./PlayerInterface";
 import { proto } from "./proto/protoGame";
-import { MeldType, PlayerInfo, RoomHost, RoomInterface, TingPai } from "./RoomInterface";
+import { MeldType, RoomHost, RoomInterface, TingPai } from "./RoomInterface";
 import { RoomView } from "./RoomView";
 /**
  * 定义一个接口 关联Game 到room
@@ -50,8 +51,15 @@ export class Room {
     public readonly myUser: UserInfo;
     public readonly roomInfo: RoomInfo;
     public readonly host: RoomHost;
+    public scoreRecords: proto.mahjong.IMsgRoomHandScoreRecord[];
+    public state: number;
+    public ownerID: string;
+    public roomNumber: string;
+    public handStartted: number;
+    public windFlowerID: number;
     public isDestroy: boolean = false;
     public bankerChairID: number = 0;
+    public markup: number;
     public isContinuousBanker: boolean;
     public roomView: RoomView;
     public players: Player[] = [];
@@ -59,7 +67,7 @@ export class Room {
     public tilesInWall: number;
     public myPlayer: Player;
     public msgDisbandNotify: proto.mahjong.MsgDisbandNotify;
-    private disbandLocked: boolean;
+    public disbandLocked: boolean;
     public constructor(myUser: UserInfo, roomInfo: RoomInfo, host: RoomHost) {
         this.myUser = myUser;
         this.roomInfo = roomInfo;
@@ -117,7 +125,7 @@ export class Room {
     // 创建玩家对象
     // 并绑定playerView
     //////////////////////////////////////////////
-    public createPlayerByInfo(playerInfo: PlayerInfo): void {
+    public createPlayerByInfo(playerInfo: proto.mahjong.IMsgPlayerInfo): void {
         const player = new Player(playerInfo.userID, playerInfo.chairID, this);
         // player.state = playerInfo.state
         // player.nick = playerInfo.nick
@@ -137,7 +145,7 @@ export class Room {
     // 创建自身的玩家对象
     // 并绑定playerView
     //////////////////////////////////////////////
-    public createMyPlayer(playerInfo: PlayerInfo): void {
+    public createMyPlayer(playerInfo: proto.mahjong.IMsgPlayerInfo): void {
         const player = new Player(playerInfo.userID, playerInfo.chairID, this);
         // player.state = playerInfo.state
         // player.nick = playerInfo.nick
@@ -179,8 +187,8 @@ export class Room {
     //从房间的玩家列表中删除一个玩家
     //注意玩家视图的解除绑定需要外部处理
     ////////////////////////////////////////
-    public removePlayer(player: Player): void {
-        this.players[player.chairID] = null;
+    public removePlayer(chairID: number): void {
+        this.players[chairID] = null;
     }
 
     ////////////////////////////////////////
@@ -423,8 +431,8 @@ export class Room {
     public showOrHideMeldsOpsPanel(chowMelds: MeldType[]): void {
         this.roomView.showOrHideMeldsOpsPanel(chowMelds);
     }
-    public isMe(player: Player): boolean {
-        return this.myUser.userID === player.userID;
+    public isMe(userID: string): boolean {
+        return this.myUser.userID === userID;
     }
     public isReplayMode(): boolean {
         return this.replay;
@@ -448,5 +456,52 @@ export class Room {
     }
     public isListensObjVisible(): boolean {
         return this.roomView.listensObj.visible;
+    }
+    public getPlayerInterfaceByChairID(chairID: number): PlayerInterface {
+        for (const player of this.players) {
+            if (player.chairID === chairID) {
+                return <PlayerInterface>player;
+            }
+        }
+
+        return null;
+    }
+
+    public getPlayerInterfaceByUserID(userID: string): PlayerInterface {
+        for (const player of this.players) {
+            if (player.userID === userID) {
+                return <PlayerInterface>player;
+            }
+        }
+
+        return null;
+    }
+
+    public getMyPlayer(): PlayerInterface {
+        return this.myPlayer;
+    }
+    //设置当前房间所等待的操作玩家
+    public setWaitingPlayer(chairID: number): void {
+        const player = this.getPlayerByChairID(chairID);
+        this.roomView.setWaitingPlayer(player.playerView);
+    }
+    public getPlayers(): PlayerInterface[] {
+        return this.players;
+    }
+
+    public setJiaJiaZhuang(): void {
+        this.roomView.setJiaJiaZhuang();
+    }
+    public setRoundMask(): void {
+        this.roomView.setRoundMask();
+    }
+    public showRoomNumber(): void {
+        this.roomView.showRoomNumber();
+    }
+    public showOrHideReadyButton(isShow: boolean): void {
+        this.showOrHideReadyButton(isShow);
+    }
+    public onUpdateStatus(state: number): void {
+        this.roomView.onUpdateStatus(state);
     }
 }

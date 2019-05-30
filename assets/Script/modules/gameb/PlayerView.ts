@@ -1,7 +1,7 @@
 import { Logger } from "../lobby/lcore/LCoreExports";
 import { ButtonDef, ClickCtrl, PlayerInterface } from "./PlayerInterface";
 import { proto } from "./proto/protoGame";
-import { MeldType, RoomInterface, TingPai } from "./RoomInterface";
+import { RoomInterface, TingPai } from "./RoomInterface";
 import { TileImageMounter } from "./TileImageMounter";
 
 const mjproto = proto.mahjong;
@@ -44,12 +44,18 @@ const MELD_COMPONENT_PREFIX: string[] = [
 ];
 
 //面子牌组资源 后缀
-const MELD_COMPONENT_SUFFIX: string[] = [];
+const MELD_COMPONENT_SUFFIX: { [key: string]: string } = {
+    [mjproto.MeldType.enumMeldTypeTriplet2Kong]: "gang1",
+    [mjproto.MeldType.enumMeldTypeExposedKong]: "gang1",
+    [mjproto.MeldType.enumMeldTypeConcealedKong]: "gang2",
+    [mjproto.MeldType.enumMeldTypeSequence]: "chipeng",
+    [mjproto.MeldType.enumMeldTypeTriplet]: "chipeng"
+};
 
 /**
  * 玩家
  */
-export class PlayerView extends cc.Component {
+export class PlayerView {
     public handsClickCtrls: ClickCtrl[];
     public checkReadyHandBtn: fgui.GButton = null;
     public player: PlayerInterface;
@@ -79,12 +85,6 @@ export class PlayerView extends cc.Component {
     private discardTipsTile: fgui.GComponent;
 
     public constructor(viewUnityNode: fgui.GComponent, viewChairID: number, room: RoomInterface) {
-        super();
-        MELD_COMPONENT_SUFFIX[mjproto.MeldType.enumMeldTypeTriplet2Kong] = "gang1";
-        MELD_COMPONENT_SUFFIX[mjproto.MeldType.enumMeldTypeExposedKong] = "gang1";
-        MELD_COMPONENT_SUFFIX[mjproto.MeldType.enumMeldTypeConcealedKong] = "gang2";
-        MELD_COMPONENT_SUFFIX[mjproto.MeldType.enumMeldTypeSequence] = "chipeng";
-        MELD_COMPONENT_SUFFIX[mjproto.MeldType.enumMeldTypeTriplet] = "chipeng";
         this.room = room;
         this.viewChairID = viewChairID;
         this.viewUnityNode = viewUnityNode;
@@ -107,15 +107,13 @@ export class PlayerView extends cc.Component {
 
     }
 
-    ////////////////////////////////////////////////-
     //初始化
-    ////////////////////////////////////////////////-
     //花牌列表
     public initFlowers(): void {
         const flowers: fgui.GComponent[] = [];
         const myFlowerTilesNode = this.myView.getChild("flowers").asCom;
-        for (let i = 1; i < 12; i++) {
-            const h = myFlowerTilesNode.getChild(`n${i}`).asCom;
+        for (let i = 0; i < 12; i++) {
+            const h = myFlowerTilesNode.getChild(`n${i + 1}`).asCom;
             flowers[i] = h;
         }
         this.flowers = flowers;
@@ -125,8 +123,8 @@ export class PlayerView extends cc.Component {
     public initLights(): void {
         const lights: fgui.GComponent[] = [];
         const myLightTilesNode = this.myView.getChild("lights").asCom;
-        for (let i = 1; i < 14; i++) {
-            const h = myLightTilesNode.getChild(`n${i}`).asCom;
+        for (let i = 0; i < 14; i++) {
+            const h = myLightTilesNode.getChild(`n${i + 1}`).asCom;
             lights[i] = h;
         }
         this.lights = lights;
@@ -136,8 +134,8 @@ export class PlayerView extends cc.Component {
     public initDiscards(): void {
         const discards: fgui.GComponent[] = [];
         const myDicardTilesNode = this.myView.getChild("discards").asCom;
-        for (let i = 1; i < 20; i++) {
-            const card = myDicardTilesNode.getChild(`n${i}`).asCom;
+        for (let i = 0; i < 20; i++) {
+            const card = myDicardTilesNode.getChild(`n${i + 1}`).asCom;
             discards[i] = card;
         }
         this.discards = discards;
@@ -151,8 +149,8 @@ export class PlayerView extends cc.Component {
         const myHandTilesNode = this.myView.getChild("hands").asCom;
         //const resName = ""
         const isMe = this.viewChairID === 1;
-        for (let i = 1; i < 14; i++) {
-            const card = myHandTilesNode.getChild(`n${i}`).asCom;
+        for (let i = 0; i < 14; i++) {
+            const card = myHandTilesNode.getChild(`n${i + 1}`).asCom;
 
             card.name = i.toString(); //把手牌按钮对应的序号记忆，以便点击时可以识别
             card.visible = false;
@@ -166,11 +164,12 @@ export class PlayerView extends cc.Component {
             handsClickCtrls[i] = cc;
 
             if (isMe) {
-                // card.onClick.Set(
-                //     function (obj) {
-                //         this.onHandTileBtnClick(obj, i)
-                //     }
-                // )
+                card.onClick(
+                    () => {
+                        this.onHandTileBtnClick(i);
+                    },
+                    this
+                );
                 // this.onDrag(card, i)
             }
         }
@@ -192,18 +191,17 @@ export class PlayerView extends cc.Component {
     }
 
     public itemProviderButtonList(index: number): string {
-        return this.buttonDataList[index + 1];
+        return this.buttonDataList[index];
     }
     //操作按钮
     public initOperationButtons(): void {
         this.buttonList = this.operationPanel.getChild("buttonList").asList;
-        // this.buttonList.itemRenderer = this.renderButtonListItem.bind(this);
-        // this.buttonList.itemProvider = this.itemProviderButtonList.bind(this);
-        // this.buttonList.onClickItem.Add(
-        //     function (onClickItem) {
-        //         this.onClickBtn(onClickItem.data.name)
-        //     }
-        // )
+        // tslint:disable-next-line: no-unsafe-any
+        this.buttonList.itemRenderer = this.renderButtonListItem.bind(this);
+        // tslint:disable-next-line: no-unsafe-any
+        this.buttonList.itemProvider = this.itemProviderButtonList.bind(this);
+        this.buttonList.on(fgui.Event.CLICK_ITEM, (onClickItem: fgui.GObject) => { this.onClickBtn(onClickItem.name); }, this);
+
         this.operationButtonsRoot = this.operationPanel;
 
         this.hideOperationButtons();
@@ -213,7 +211,7 @@ export class PlayerView extends cc.Component {
         this.checkReadyHandBtn.onClick(this.onCheckReadyHandBtnClick, this);
     }
     public renderButtonListItem(index: number, obj: fgui.GObject): void {
-        const name = this.buttonDataList[index + 1];
+        const name = this.buttonDataList[index];
         obj.name = name;
         obj.visible = true;
     }
@@ -247,7 +245,6 @@ export class PlayerView extends cc.Component {
 
     //隐藏所有操作按钮
     public hideOperationButtons(): void {
-
         //先隐藏掉所有按钮
         this.showButton([]);
         //隐藏根节点
@@ -329,7 +326,7 @@ export class PlayerView extends cc.Component {
         //起始
         const onStart = (): void => {
             this.head.readyIndicator.visible = false;
-            if (this.checkReadyHandBtn !== undefined) {
+            if (this.viewChairID === 1) {
                 this.checkReadyHandBtn.visible = false;
             }
         };
@@ -359,10 +356,7 @@ export class PlayerView extends cc.Component {
         this.onUpdateStatus = status;
     }
 
-    ////////////////////////////////////////////////-
     //界面操作
-    ////////////////////////////////////////////////-
-
     //设置金币数显示（目前是累计分数）
     public setGold(): void {
 
@@ -377,9 +371,7 @@ export class PlayerView extends cc.Component {
         //}
     }
 
-    ////////////////////////////////////
     //设置头像特殊效果是否显示（当前出牌者则显示）
-    //////////////////////////////////-
     public setHeadEffectBox(isShow: boolean): void {
         // const x = this.head.pos.x
         // const y = this.head.pos.y
@@ -464,7 +456,8 @@ export class PlayerView extends cc.Component {
     }
 
     //显示花牌，注意花牌需要是平放的
-    public showFlowers(tilesFlower: number[]): void {
+    public showFlowers(): void {
+        const tilesFlower = this.player.tilesFlower;
         const flowers = this.flowers;
 
         //花牌个数
@@ -478,14 +471,14 @@ export class PlayerView extends cc.Component {
 
         //从那张牌开始挂载，由于tileCount可能大于dCount
         //因此，需要选择tilesDiscarded末尾的dCount个牌显示即可
-        let begin = tileCount - dCount + 1;
-        if (begin < 1) {
-            begin = 1;
+        let begin = tileCount - dCount;
+        if (begin < 0) {
+            begin = 0;
         }
 
         //i计数器对应tilesFlower列表
-        for (let i = begin; i <= tileCount; i++) {
-            const d = flowers[(i - 1) % dCount + 1];
+        for (let i = begin; i < tileCount; i++) {
+            const d = flowers[i % dCount];
             const tileID = tilesFlower[i];
             TileImageMounter.mountTileImage(d, tileID);
             d.visible = true;
@@ -493,27 +486,27 @@ export class PlayerView extends cc.Component {
     }
 
     //显示打出去的牌，明牌显示
-    public showDiscarded(newDiscard: boolean, waitDiscardReAction: boolean, tilesDiscard: number[]): void {
+    public showDiscarded(newDiscard: boolean, waitDiscardReAction: boolean): void {
         //先隐藏所有的打出牌节点
         const discards = this.discards;
         for (const d of discards) {
             d.visible = false;
         }
-
+        const tilesDiscard = this.player.tilesDiscarded;
         //已经打出去的牌个数
         const tileCount = tilesDiscard.length;
         //打出牌的挂载点个数
         const dCount = discards.length;
         //从那张牌开始挂载，由于tileCount可能大于dCount
         //因此，需要选择tilesDiscarded末尾的dCount个牌显示即可
-        let begin = tileCount - dCount + 1;
-        if (begin < 1) {
-            begin = 1;
+        let begin = tileCount - dCount;
+        if (begin < 0) {
+            begin = 0;
         }
 
         //i计数器对应tilesDiscarded列表
-        for (let i = begin; i <= tileCount; i++) {
-            const d = discards[(i - 1) % dCount + 1];
+        for (let i = begin; i < tileCount; i++) {
+            const d = discards[i % dCount];
             const tileID = tilesDiscard[i];
             TileImageMounter.mountTileImage(d, tileID);
             d.visible = true;
@@ -521,11 +514,11 @@ export class PlayerView extends cc.Component {
 
         //如果是新打出的牌，给加一个箭头
         if (newDiscard) {
-            const d = discards[(tileCount - 1) % dCount + 1];
+            const d = discards[tileCount % dCount];
             this.room.setArrowByParent(d);
 
             //放大打出去的牌
-            this.enlargeDiscarded(tilesDiscard[tileCount], waitDiscardReAction);
+            this.enlargeDiscarded(tilesDiscard[tileCount - 1], waitDiscardReAction);
         }
     }
 
@@ -548,31 +541,33 @@ export class PlayerView extends cc.Component {
     }
 
     //显示对手玩家的手牌，对手玩家的手牌是暗牌显示
-    public showHandsForOpponents(tileCountInHand: number, melds: MeldType[]): void {
+    public showHandsForOpponents(tileCountInHand: number): void {
         let t = tileCountInHand;
+        const melds = this.player.melds;
 
         const meldCount = melds.length;
         if ((meldCount * 3 + t) > 13) {
-            this.hands[14].visible = true;
+            this.hands[13].visible = true;
             t = t - 1;
         }
 
         //melds面子牌组
-        this.showMelds(melds);
+        this.showMelds();
 
-        for (let i = 1; i <= t; i++) {
+        for (let i = 0; i < t; i++) {
             this.hands[i].visible = true;
         }
     }
 
     //显示面子牌组
-    public showMelds(ms: MeldType[]): void {
+    public showMelds(): void {
+        const ms = this.player.melds;
         const length = ms.length;
         const rm = MELD_COMPONENT_PREFIX[this.viewChairID - 1];
         //摆放牌
         const mymeldTilesNode = this.myView.getChild("melds").asCom;
-        for (let i = 1; i <= length; i++) {
-            const mv = mymeldTilesNode.getChild(`meld${i}`);
+        for (let i = 0; i < length; i++) {
+            const mv = mymeldTilesNode.getChild(`meld${i + 1}`);
             const mm = mymeldTilesNode.getChild(`myMeld${i}`);
             if (mm != null) {
                 mymeldTilesNode.removeChild(mm, true);
@@ -591,13 +586,12 @@ export class PlayerView extends cc.Component {
     //显示面子牌组，暗杠需要特殊处理，如果是自己的暗杠，
     //则明牌显示前3张，第4张暗牌显示（以便和明杠区分）
     //如果是别人的暗杠，则全部暗牌显示
-    public mountMeldImage(meldView: fgui.GComponent, msgMeld: MeldType): void {
+    public mountMeldImage(meldView: fgui.GComponent, msgMeld: proto.mahjong.IMsgMeldTile): void {
         const viewChairID = this.room.getPlayerViewChairIDByChairID(msgMeld.contributor);
 
         const t1 = meldView.getChild("n1").asCom;
         const t2 = meldView.getChild("n2").asCom;
         const t3 = meldView.getChild("n3").asCom;
-        const t4 = meldView.getChild("n4").asCom;
         const meldType = msgMeld.meldType;
         const mtProto = mjproto.MeldType;
         if (meldType === mtProto.enumMeldTypeSequence) {
@@ -619,6 +613,7 @@ export class PlayerView extends cc.Component {
             TileImageMounter.mountMeldEnableImage(t3, msgMeld.tile1, this.viewChairID);
             this.setMeldTileDirection(false, t2, viewChairID, this.viewChairID);
         } else if (meldType === mtProto.enumMeldTypeExposedKong || meldType === mtProto.enumMeldTypeTriplet2Kong) {
+            const t4 = meldView.getChild("n4").asCom;
             TileImageMounter.mountMeldEnableImage(t1, msgMeld.tile1, this.viewChairID);
             TileImageMounter.mountMeldEnableImage(t2, msgMeld.tile1, this.viewChairID);
             TileImageMounter.mountMeldEnableImage(t3, msgMeld.tile1, this.viewChairID);
@@ -660,57 +655,59 @@ export class PlayerView extends cc.Component {
     }
 
     public hideFlowerOnHandTail(): void {
-        this.hands[14].visible = false;
+        this.hands[13].visible = false;
     }
 
     public showFlowerOnHandTail(flower: number): void {
-        this.hands[14].visible = true;
+        this.hands[13].visible = true;
         //const player = this.player
         if (this.viewChairID === 1) {
-            TileImageMounter.mountTileImage(this.hands[14], flower);
+            TileImageMounter.mountTileImage(this.hands[13], flower);
         }
     }
 
     //为本人显示手牌，也即是1号playerView(prefab中的1号)//@param wholeMove 是否整体移动
-    public showHandsForMe(wholeMove: boolean, tileshand: number[], melds: MeldType[], isRichi: boolean): void {
+    public showHandsForMe(wholeMove: boolean): void {
+        const melds = this.player.melds;
+        const tileshand = this.player.tilesHand;
         const tileCountInHand = tileshand.length;
         const handsClickCtrls = this.handsClickCtrls;
         //删除tileID
         //tileID主要是用于点击手牌时，知道该手牌对应那张牌ID
-        for (let i = 1; i <= 14; i++) {
-            handsClickCtrls[i].tileID = null;
+        for (const handsClickCtrl of handsClickCtrls) {
+            handsClickCtrl.tileID = null;
         }
 
         //恢复所有牌的位置，由于点击手牌时会把手牌向上移动
         this.restoreHandPositionAndClickCount(-1);
 
-        let begin = 1;
+        let begin = 0;
         let endd = tileCountInHand;
 
         const meldCount = melds.length;
         if ((meldCount * 3 + tileCountInHand) > 13) {
-            this.hands[14].visible = true;
+            this.hands[13].visible = true;
             if (wholeMove) {
-                TileImageMounter.mountTileImage(this.hands[14], tileshand[1]);
-                handsClickCtrls[14].tileID = tileshand[1];
-                begin = 2;
+                TileImageMounter.mountTileImage(this.hands[13], tileshand[0]);
+                handsClickCtrls[13].tileID = tileshand[0];
+                begin = 1;
             } else {
-                TileImageMounter.mountTileImage(this.hands[14], tileshand[tileCountInHand]);
-                handsClickCtrls[14].tileID = tileshand[tileCountInHand];
+                TileImageMounter.mountTileImage(this.hands[13], tileshand[tileCountInHand - 1]);
+                handsClickCtrls[13].tileID = tileshand[tileCountInHand - 1];
                 endd = tileCountInHand - 1;
             }
         }
 
         //melds面子牌组
-        this.showMelds(melds);
+        this.showMelds();
 
-        let j = 1;
-        for (let i = begin; i <= endd; i++) {
+        let j = 0;
+        for (let i = begin; i < endd; i++) {
             const h = this.hands[j];
             TileImageMounter.mountTileImage(h, tileshand[i]);
             h.visible = true;
             handsClickCtrls[j].tileID = tileshand[i];
-            if (isRichi) {
+            if (this.player.isRichi) {
                 //如果是听牌状态下，则不再把牌弄回白色（让手牌一直是灰色的）
                 //判断 handsClickCtrls[j].isDiscardable 是否为 true, 是的话 则不能 setGray
                 this.setGray(h);
@@ -721,33 +718,35 @@ export class PlayerView extends cc.Component {
     }
 
     //把手牌摊开，包括对手的暗杠牌，用于一手牌结束时
-    public hand2Exposed(wholeMove: boolean, melds: MeldType[], tileshand: number[]): void {
+    public hand2Exposed(wholeMove: boolean): void {
         //不需要手牌显示了，全部摊开
         this.hideLights();
 
         //先显示所有melds面子牌组
-        this.showMelds(melds);
+        const melds = this.player.melds;
+        const tileshand = this.player.tilesHand;
+        this.showMelds();
         const tileCountInHand = tileshand.length;
 
-        let begin = 1;
+        let begin = 0;
         let endd = tileCountInHand;
 
         const meldCount = melds.length;
         if ((meldCount * 3 + tileCountInHand) > 13) {
-            const light = this.lights[14];
+            const light = this.lights[13];
             if (wholeMove) {
-                TileImageMounter.mountTileImage(light, tileshand[tileCountInHand]);
+                TileImageMounter.mountTileImage(light, tileshand[tileCountInHand - 1]);
                 light.visible = true;
                 endd = tileCountInHand - 1;
             } else {
-                TileImageMounter.mountTileImage(light, tileshand[1]);
+                TileImageMounter.mountTileImage(light, tileshand[0]);
                 light.visible = true;
-                begin = 2;
+                begin = 1;
             }
         }
 
-        let j = 1;
-        for (let i = begin; i <= endd; i++) {
+        let j = 0;
+        for (let i = begin; i < endd; i++) {
             const light = this.lights[j];
             TileImageMounter.mountTileImage(light, tileshand[i]);
             light.visible = true;
@@ -770,7 +769,7 @@ export class PlayerView extends cc.Component {
     }
 
     //处理玩家点击手牌按钮
-    public onHandTileBtnClick(obj: fgui.GObject, index: number): void {
+    public onHandTileBtnClick(index: number): void {
         const handsClickCtrls = this.handsClickCtrls;
 
         const player = this.player;
@@ -798,7 +797,7 @@ export class PlayerView extends cc.Component {
         if (clickCtrl.readyHandList != null && clickCtrl.readyHandList.length > 0) {
             //如果此牌可以听
             const tingP: TingPai[] = [];
-            for (let i = 1; i <= clickCtrl.readyHandList.length; i += 2) {
+            for (let i = 0; i < clickCtrl.readyHandList.length; i += 2) {
                 tingP.push(new TingPai(clickCtrl.readyHandList[i], 1, clickCtrl.readyHandList[i + 1]));
             }
             this.room.showTingDataView(tingP);
@@ -835,7 +834,7 @@ export class PlayerView extends cc.Component {
         if (!this.room.isListensObjVisible() && readyHandList != null && readyHandList.length > 0) {
             //const tingData = {}
             const tingP: TingPai[] = [];
-            for (let i = 1; i <= readyHandList.length; i += 2) {
+            for (let i = 0; i < readyHandList.length; i += 2) {
                 tingP.push(new TingPai(readyHandList[i], 1, readyHandList[i + 1]));
             }
             this.room.showTingDataView(tingP);
@@ -939,7 +938,7 @@ export class PlayerView extends cc.Component {
 
     //还原所有手牌到它初始化时候的位置，并把clickCount重置为0
     public restoreHandPositionAndClickCount(index: number): void {
-        for (let i = 1; i <= 14; i++) {
+        for (let i = 0; i < 14; i++) {
             if (i !== index) {
                 const clickCtrl = this.handsClickCtrls[i];
                 const originPos = this.handsOriginPos[i];
@@ -952,7 +951,7 @@ export class PlayerView extends cc.Component {
 
     //隐藏听牌标志
     public hideTing(): void {
-        for (let i = 1; i <= 14; i++) {
+        for (let i = 0; i < 14; i++) {
             const clickCtrl = this.handsClickCtrls[i];
             if (clickCtrl != null && clickCtrl.t != null) {
                 clickCtrl.t.visible = false;
@@ -973,8 +972,7 @@ export class PlayerView extends cc.Component {
             //如果是听牌状态下，则不再把牌弄回白色（让手牌一直是灰色的）
             return;
         }
-        for (let i = 1; i <= 14; i++) {
-            const clickCtrl = this.handsClickCtrls[i];
+        for (const clickCtrl of this.handsClickCtrls) {
             clickCtrl.isDiscardable = null;
             if (clickCtrl.isGray) {
                 clickCtrl.isGray = false;
@@ -995,9 +993,7 @@ export class PlayerView extends cc.Component {
         this.head.roomOwnerFlag.visible = player.isMe();
     }
 
-    //////////////////////////////////////////////////////////
     //特效播放
-    //////////////////////////////////////////////////////////
     //播放补花效果，并等待结束
     public playDrawFlowerAnimation(): void {
         this.playerOperationEffect("Effects_zi_buhua", true);

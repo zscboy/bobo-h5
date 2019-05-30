@@ -22,27 +22,27 @@ export namespace HandlerMsgReActionAllowed {
             if ((actions & at.enumActionType_CHOW) !== 0) {//如果可以吃
                 Logger.debug("llwant, can chow");
                 needShowOperationButtons = true;
-                buttonMap[buttonMap.length + 1] = ButtonDef.Chow;
+                buttonMap.push(ButtonDef.Chow);
             }
             if ((actions & at.enumActionType_PONG) !== 0) { //如果可以碰
                 Logger.debug("llwant, can peng");
                 needShowOperationButtons = true;
-                buttonMap[buttonMap.length + 1] = ButtonDef.Pong;
+                buttonMap.push(ButtonDef.Pong);
             }
             if ((actions & at.enumActionType_KONG_Exposed) !== 0) {//如果可以明杠
                 Logger.debug("llwant, can concealed kong");
                 needShowOperationButtons = true;
-                buttonMap[buttonMap.length + 1] = ButtonDef.Kong;
+                buttonMap.push(ButtonDef.Kong);
             }
             if ((actions & at.enumActionType_WIN_Chuck) !== 0) {//如果可以吃铳胡牌
                 Logger.debug("llwant, can win chuck");
                 needShowOperationButtons = true;
-                buttonMap[buttonMap.length + 1] = ButtonDef.Hu;
+                buttonMap.push(ButtonDef.Hu);
             }
             if ((actions & at.enumActionType_SKIP) !== 0) {//如果可以过
                 Logger.debug("llwant, can skip");
                 needShowOperationButtons = true;
-                buttonMap[buttonMap.length + 1] = ButtonDef.Skip;
+                buttonMap.push(ButtonDef.Skip);
             }
             if ((actions & at.enumActionType_WIN_SelfDrawn) !== 0) {// 可胡牌时，需要点击2次过才可过牌。
                 if ((actions & at.enumActionType_SKIP) !== 0) {

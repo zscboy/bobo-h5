@@ -20,7 +20,7 @@ export namespace HandlerMsgDeal {
         //print("llwant,handlerMsgRestore //////////////-"..tostring(msgDeal.markup))
         room.updateTilesInWallUI();
 
-        const players = <Player[]>room.getPlayers();
+        const players = room.getPlayers();
         //隐藏复制按钮
         //room.roomView.copyRoomNumber.visible = false
         //对局开始动画
@@ -66,10 +66,11 @@ export namespace HandlerMsgDeal {
         mySelf.sortHands(mySelf.chairID === room.bankerChairID);
 
         //显示各个玩家的手牌（对手只显示暗牌）和花牌
-        for (const p of players) {
-            // print("llwant, 显示各个玩家的手牌")
+
+        Object.keys(players).forEach((key: string) => {
+            const p = <Player>players[key];
             p.hand2UI(false);
             p.flower2UI();
-        }
+        });
     };
 }

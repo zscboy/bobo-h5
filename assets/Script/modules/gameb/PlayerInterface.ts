@@ -1,3 +1,4 @@
+import { proto } from "./proto/protoGame";
 
 /**
  * 手牌辅助类
@@ -26,6 +27,10 @@ export enum ButtonDef {
 export interface PlayerInterface {
     readyHandList: number[];
     waitSkip: boolean;
+    tilesHand: number[];
+    tilesFlower: number[];
+    tilesDiscarded: number[];
+    melds: proto.mahjong.IMsgMeldTile[];
     isRichi: boolean;
     waitDiscardReAction: boolean;
     onChowBtnClick: Function;

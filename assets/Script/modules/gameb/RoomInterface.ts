@@ -9,6 +9,7 @@ import { proto } from "./proto/protoGame";
 export interface RoomHost {
     room: RoomInterface;
     quit: Function;
+    sendBinary(buf: ByteBuffer): void;
 }
 
 /**
@@ -56,17 +57,7 @@ export class PlayerInfo {
         this.nick = playerIfo.nick;
     }
 }
-/**
- * 落地牌组定义
- */
-export class MeldType implements proto.mahjong.IMsgMeldTile {
-    public meldType: number;
-    public tile1: number;
-    public contributor?: number;
-    public chowTile?: number;
-    public actionMsg: proto.mahjong.MsgPlayerAction;
 
-}
 /**
  * room 接口
  */
@@ -89,7 +80,7 @@ export interface RoomInterface {
     isReplayMode(): boolean;
     sendActionMsg(msgAction: ByteBuffer): void;
     getBankerChairID(): number;
-    showOrHideMeldsOpsPanel(chowMelds: MeldType[]): void;
+    showOrHideMeldsOpsPanel(chowMelds: proto.mahjong.IMsgMeldTile[], actionMsg: proto.mahjong.MsgPlayerAction): void;
     setArrowByParent(d: fgui.GComponent): void;
     getPlayerViewChairIDByChairID(chairID: number): number;
 
@@ -106,7 +97,7 @@ export interface RoomInterface {
     updateTilesInWallUI(): void;
     setWaitingPlayer(chairID: number): void;
     getMyPlayer(): PlayerInterface;
-    getPlayers(): PlayerInterface[];
+    getPlayers(): { [key: string]: PlayerInterface };
 
     setJiaJiaZhuang(): void;
     setRoundMask(): void;

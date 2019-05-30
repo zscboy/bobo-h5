@@ -1,6 +1,6 @@
 import { Player } from "../Player";
 import { proto } from "../proto/protoGame";
-import { MeldType, RoomInterface } from "../RoomInterface";
+import { RoomInterface } from "../RoomInterface";
 
 /**
  * 响应服务器暗杠通知
@@ -18,7 +18,7 @@ export namespace HandlerActionResultKongConcealed {
         }
 
         //暗杠需要构建一个新的meld
-        const newMeld = new MeldType();
+        const newMeld = new proto.mahjong.MsgMeldTile();
         newMeld.meldType = proto.mahjong.MeldType.enumMeldTypeConcealedKong;
         newMeld.tile1 = kongTileId;
         newMeld.contributor = player.chairID;

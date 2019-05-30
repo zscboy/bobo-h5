@@ -1,4 +1,4 @@
-import { GameModuleInterface, Logger } from "../lobby/lcore/LCoreExports";
+import { Logger } from "../lobby/lcore/LCoreExports";
 import { PlayerView } from "./PlayerView";
 import { proto } from "./proto/protoGame";
 import { MeldType, RoomInterface, TingPai } from "./RoomInterface";
@@ -8,7 +8,7 @@ const mjproto = proto.mahjong;
 /**
  * 房间
  */
-export class RoomView extends cc.Component {
+export class RoomView {
     public playerViews: PlayerView[];
     public listensObj: fgui.GComponent;
     public meldOpsPanel: fgui.GComponent;
@@ -31,19 +31,8 @@ export class RoomView extends cc.Component {
     private listensDataList: TingPai[];
     private multiOpsDataList: MeldType[];
     private arrowObj: fgui.GObject;
-    public constructor(room: RoomInterface) {
-        super();
+    public constructor(room: RoomInterface, view: fgui.GComponent) {
         this.room = room;
-        // 加载房间界面
-        const lm = <GameModuleInterface>this.getComponent("GameModule");
-        const loader = lm.resLoader;
-
-        loader.fguiAddPackage("lobby/fui_lobby_mahjong/lobby_mahjong");
-        loader.fguiAddPackage("fgui/dafeng");
-        loader.fguiAddPackage("lobby/fui_lobby_mahjong/lobby_mahjong");
-
-        const view = fgui.UIPackage.createObject("dafeng", "desk").asCom;
-        fgui.GRoot.inst.addChild(view);
         this.unityViewNode = view;
 
         const playerViews: PlayerView[] = [];
@@ -140,11 +129,11 @@ export class RoomView extends cc.Component {
     }
     //清除当前房间的等待玩家标志
     public clearWaitingPlayer(): void {
-        for (const mask of this.roundMarks) {
-            mask.visible = false;
+        for (let i = 1; i <= 4; i++) {
+            this.roundMarks[i].visible = false;
         }
-        for (const playerView of this.playerViews) {
-            playerView.setHeadEffectBox(false);
+        for (let i = 1; i <= 4; i++) {
+            this.playerViews[i].setHeadEffectBox(false);
         }
     }
     public showRoomNumber(): void {
@@ -216,10 +205,8 @@ export class RoomView extends cc.Component {
         this.windTile.visible = true;
         TileImageMounter.mountTileImage(this.windTile, this.room.windFlowerID);
     }
-    //////////////////////////////////////////////
     // 根据玩家的chairID获得相应的playerView
     // 注意服务器的chairID是由0开始
-    //////////////////////////////////////////////
     public getPlayerViewByChairID(chairID: number, myChairId: number): PlayerView {
         const playerViews = this.playerViews;
 
@@ -269,7 +256,7 @@ export class RoomView extends cc.Component {
 
         this.readyButton = this.unityViewNode.getChild("ready").asButton;
         this.readyButton.visible = false;
-        this.readyButton.onClick(this.room.onReadyButtonClick, this);
+        this.readyButton.onClick(this.room.onReadyButtonClick, this.room);
 
         settingBtn.onClick(this.onDissolveClick, this);
     }

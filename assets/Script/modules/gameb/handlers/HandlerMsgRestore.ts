@@ -13,10 +13,11 @@ export namespace HandlerMsgRestore {
         // msgRestore:ParseFromString(msgData)
 
         //首先清空所有玩家的牌列表
-        for (const p of room.getPlayers()) {
-            const ps = <Player>p;
+        const players = room.getPlayers();
+        Object.keys(players).forEach((key: string) => {
+            const ps = <Player>players[key];
             ps.resetForNewHand();
-        }
+        });
 
         //一手牌数据
         const msgDeal = msgRestore.msgDeal;
@@ -50,7 +51,6 @@ export namespace HandlerMsgRestore {
             const playerTileList = v;
             const chairID = v.chairID;
             const player = <Player>room.getPlayerInterfaceByChairID(chairID);
-
             //填充手牌列表，仅自己有手牌列表，对手只有手牌张数
             if (player.isMe()) {
                 player.addHandTiles(playerTileList.tilesHand);
@@ -88,8 +88,8 @@ export namespace HandlerMsgRestore {
         mySelf.sortHands(newDraw);
 
         //显示各个玩家的手牌（对手只显示暗牌）和花牌和打出去的牌
-        for (const player of room.getPlayers()) {
-            const p = <Player>player;
+        Object.keys(players).forEach((key: string) => {
+            const p = <Player>players[key];
             p.hand2UI(!newDraw);
 
             p.flower2UI();
@@ -99,6 +99,6 @@ export namespace HandlerMsgRestore {
                 newDiscarded = true;
             }
             p.discarded2UI(newDiscarded, msgRestore.waitDiscardReAction);
-        }
+        });
     };
 }

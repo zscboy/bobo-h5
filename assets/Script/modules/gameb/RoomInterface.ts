@@ -9,6 +9,7 @@ import { proto } from "./proto/protoGame";
 export interface RoomHost {
     room: RoomInterface;
     quit: Function;
+    sendBinary(buf: ByteBuffer): void;
 }
 
 /**
@@ -106,7 +107,7 @@ export interface RoomInterface {
     updateTilesInWallUI(): void;
     setWaitingPlayer(chairID: number): void;
     getMyPlayer(): PlayerInterface;
-    getPlayers(): PlayerInterface[];
+    getPlayers(): { [key: string]: PlayerInterface };
 
     setJiaJiaZhuang(): void;
     setRoundMask(): void;

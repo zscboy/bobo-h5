@@ -49,7 +49,7 @@ const MELD_COMPONENT_SUFFIX: string[] = [];
 /**
  * 玩家
  */
-export class PlayerView extends cc.Component {
+export class PlayerView {
     public handsClickCtrls: ClickCtrl[];
     public checkReadyHandBtn: fgui.GButton = null;
     public player: PlayerInterface;
@@ -79,7 +79,6 @@ export class PlayerView extends cc.Component {
     private discardTipsTile: fgui.GComponent;
 
     public constructor(viewUnityNode: fgui.GComponent, viewChairID: number, room: RoomInterface) {
-        super();
         MELD_COMPONENT_SUFFIX[mjproto.MeldType.enumMeldTypeTriplet2Kong] = "gang1";
         MELD_COMPONENT_SUFFIX[mjproto.MeldType.enumMeldTypeExposedKong] = "gang1";
         MELD_COMPONENT_SUFFIX[mjproto.MeldType.enumMeldTypeConcealedKong] = "gang2";
@@ -107,15 +106,13 @@ export class PlayerView extends cc.Component {
 
     }
 
-    ////////////////////////////////////////////////-
     //初始化
-    ////////////////////////////////////////////////-
     //花牌列表
     public initFlowers(): void {
         const flowers: fgui.GComponent[] = [];
         const myFlowerTilesNode = this.myView.getChild("flowers").asCom;
-        for (let i = 1; i < 12; i++) {
-            const h = myFlowerTilesNode.getChild(`n${i}`).asCom;
+        for (let i = 0; i < 12; i++) {
+            const h = myFlowerTilesNode.getChild(`n${i + 1}`).asCom;
             flowers[i] = h;
         }
         this.flowers = flowers;
@@ -125,8 +122,8 @@ export class PlayerView extends cc.Component {
     public initLights(): void {
         const lights: fgui.GComponent[] = [];
         const myLightTilesNode = this.myView.getChild("lights").asCom;
-        for (let i = 1; i < 14; i++) {
-            const h = myLightTilesNode.getChild(`n${i}`).asCom;
+        for (let i = 0; i < 14; i++) {
+            const h = myLightTilesNode.getChild(`n${i + 1}`).asCom;
             lights[i] = h;
         }
         this.lights = lights;
@@ -136,8 +133,8 @@ export class PlayerView extends cc.Component {
     public initDiscards(): void {
         const discards: fgui.GComponent[] = [];
         const myDicardTilesNode = this.myView.getChild("discards").asCom;
-        for (let i = 1; i < 20; i++) {
-            const card = myDicardTilesNode.getChild(`n${i}`).asCom;
+        for (let i = 0; i < 20; i++) {
+            const card = myDicardTilesNode.getChild(`n${i + 1}`).asCom;
             discards[i] = card;
         }
         this.discards = discards;
@@ -151,8 +148,8 @@ export class PlayerView extends cc.Component {
         const myHandTilesNode = this.myView.getChild("hands").asCom;
         //const resName = ""
         const isMe = this.viewChairID === 1;
-        for (let i = 1; i < 14; i++) {
-            const card = myHandTilesNode.getChild(`n${i}`).asCom;
+        for (let i = 0; i < 14; i++) {
+            const card = myHandTilesNode.getChild(`n${i + 1}`).asCom;
 
             card.name = i.toString(); //把手牌按钮对应的序号记忆，以便点击时可以识别
             card.visible = false;
@@ -359,10 +356,7 @@ export class PlayerView extends cc.Component {
         this.onUpdateStatus = status;
     }
 
-    ////////////////////////////////////////////////-
     //界面操作
-    ////////////////////////////////////////////////-
-
     //设置金币数显示（目前是累计分数）
     public setGold(): void {
 
@@ -377,9 +371,7 @@ export class PlayerView extends cc.Component {
         //}
     }
 
-    ////////////////////////////////////
     //设置头像特殊效果是否显示（当前出牌者则显示）
-    //////////////////////////////////-
     public setHeadEffectBox(isShow: boolean): void {
         // const x = this.head.pos.x
         // const y = this.head.pos.y
@@ -434,6 +426,7 @@ export class PlayerView extends cc.Component {
 
     //隐藏手牌列表
     public hideHands(): void {
+        Logger.debug("this.hands -----------------:", this.hands);
         if (this.hands != null) {
             for (const h of this.hands) {
                 h.visible = false;
@@ -553,7 +546,7 @@ export class PlayerView extends cc.Component {
 
         const meldCount = melds.length;
         if ((meldCount * 3 + t) > 13) {
-            this.hands[14].visible = true;
+            this.hands[13].visible = true;
             t = t - 1;
         }
 
@@ -660,14 +653,14 @@ export class PlayerView extends cc.Component {
     }
 
     public hideFlowerOnHandTail(): void {
-        this.hands[14].visible = false;
+        this.hands[13].visible = false;
     }
 
     public showFlowerOnHandTail(flower: number): void {
-        this.hands[14].visible = true;
+        this.hands[13].visible = true;
         //const player = this.player
         if (this.viewChairID === 1) {
-            TileImageMounter.mountTileImage(this.hands[14], flower);
+            TileImageMounter.mountTileImage(this.hands[13], flower);
         }
     }
 
@@ -677,8 +670,8 @@ export class PlayerView extends cc.Component {
         const handsClickCtrls = this.handsClickCtrls;
         //删除tileID
         //tileID主要是用于点击手牌时，知道该手牌对应那张牌ID
-        for (let i = 1; i <= 14; i++) {
-            handsClickCtrls[i].tileID = null;
+        for (const handsClickCtrl of handsClickCtrls) {
+            handsClickCtrl.tileID = null;
         }
 
         //恢复所有牌的位置，由于点击手牌时会把手牌向上移动
@@ -689,14 +682,14 @@ export class PlayerView extends cc.Component {
 
         const meldCount = melds.length;
         if ((meldCount * 3 + tileCountInHand) > 13) {
-            this.hands[14].visible = true;
+            this.hands[13].visible = true;
             if (wholeMove) {
-                TileImageMounter.mountTileImage(this.hands[14], tileshand[1]);
-                handsClickCtrls[14].tileID = tileshand[1];
+                TileImageMounter.mountTileImage(this.hands[13], tileshand[1]);
+                handsClickCtrls[13].tileID = tileshand[1];
                 begin = 2;
             } else {
-                TileImageMounter.mountTileImage(this.hands[14], tileshand[tileCountInHand]);
-                handsClickCtrls[14].tileID = tileshand[tileCountInHand];
+                TileImageMounter.mountTileImage(this.hands[13], tileshand[tileCountInHand]);
+                handsClickCtrls[13].tileID = tileshand[tileCountInHand];
                 endd = tileCountInHand - 1;
             }
         }
@@ -734,7 +727,7 @@ export class PlayerView extends cc.Component {
 
         const meldCount = melds.length;
         if ((meldCount * 3 + tileCountInHand) > 13) {
-            const light = this.lights[14];
+            const light = this.lights[13];
             if (wholeMove) {
                 TileImageMounter.mountTileImage(light, tileshand[tileCountInHand]);
                 light.visible = true;
@@ -939,7 +932,7 @@ export class PlayerView extends cc.Component {
 
     //还原所有手牌到它初始化时候的位置，并把clickCount重置为0
     public restoreHandPositionAndClickCount(index: number): void {
-        for (let i = 1; i <= 14; i++) {
+        for (let i = 0; i < 13; i++) {
             if (i !== index) {
                 const clickCtrl = this.handsClickCtrls[i];
                 const originPos = this.handsOriginPos[i];
@@ -952,7 +945,7 @@ export class PlayerView extends cc.Component {
 
     //隐藏听牌标志
     public hideTing(): void {
-        for (let i = 1; i <= 14; i++) {
+        for (let i = 0; i < 13; i++) {
             const clickCtrl = this.handsClickCtrls[i];
             if (clickCtrl != null && clickCtrl.t != null) {
                 clickCtrl.t.visible = false;
@@ -973,8 +966,7 @@ export class PlayerView extends cc.Component {
             //如果是听牌状态下，则不再把牌弄回白色（让手牌一直是灰色的）
             return;
         }
-        for (let i = 1; i <= 14; i++) {
-            const clickCtrl = this.handsClickCtrls[i];
+        for (const clickCtrl of this.handsClickCtrls) {
             clickCtrl.isDiscardable = null;
             if (clickCtrl.isGray) {
                 clickCtrl.isGray = false;
@@ -995,9 +987,7 @@ export class PlayerView extends cc.Component {
         this.head.roomOwnerFlag.visible = player.isMe();
     }
 
-    //////////////////////////////////////////////////////////
     //特效播放
-    //////////////////////////////////////////////////////////
     //播放补花效果，并等待结束
     public playDrawFlowerAnimation(): void {
         this.playerOperationEffect("Effects_zi_buhua", true);

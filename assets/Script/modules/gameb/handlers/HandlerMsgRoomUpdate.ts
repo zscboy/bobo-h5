@@ -51,12 +51,13 @@ export namespace HandlerMsgRoomUpdate {
             userID2Player[msgPlayer.userID] = msgPlayer;
         }
         //记录需要被删除的玩家
-        for (const p of room.getPlayers()) {
-            const player = <Player>p;
+        const players = room.getPlayers();
+        Object.keys(players).forEach((key: string) => {
+            const player = <Player>players[key];
             if (userID2Player[player.userID] === null || userID2Player[player.userID].chairID !== player.chairID) {
                 player2Remove.push(player);
             }
-        }
+        });
         //删除已经离开的玩家，并隐藏其视图
         for (const player of player2Remove) {
             room.removePlayer(player.chairID);
@@ -66,8 +67,8 @@ export namespace HandlerMsgRoomUpdate {
         }
         //如果自己还没有创建，创建自己
         for (const msgPlayer of msgPlayers) {
-            const player = <Player>room.getPlayerInterfaceByChairID(msgPlayer.chairID);
             if (room.isMe(msgPlayer.userID)) {
+                const player = <Player>room.getPlayerInterfaceByChairID(msgPlayer.chairID);
                 if (player === null) {
                     room.createMyPlayer(msgPlayer);
                 } else if (player.chairID !== msgPlayer.chairID) {
@@ -82,8 +83,8 @@ export namespace HandlerMsgRoomUpdate {
         const myOldState = me.state;
         //更新，或者创建其他player
         for (const msgPlayer of msgPlayers) {
-            const player = <Player>room.getPlayerInterfaceByChairID(msgPlayer.chairID);
-            if (room.isMe(msgPlayer.userID)) {
+            if (!room.isMe(msgPlayer.userID)) {
+                const player = <Player>room.getPlayerInterfaceByChairID(msgPlayer.chairID);
                 if (player === null) {
                     room.createPlayerByInfo(msgPlayer);
                     //有人进来或者更新，更新GPS
@@ -93,7 +94,6 @@ export namespace HandlerMsgRoomUpdate {
                 } else {
                     player.updateByPlayerInfo(msgPlayer);
                 }
-                break;
             }
         }
         const roomStateEnum = proto.mahjong.RoomState;
@@ -114,15 +114,15 @@ export namespace HandlerMsgRoomUpdate {
 
         saveScore(room, msgRoomUpdate);
         //更新用户状态到视图
-        const players = room.getPlayers();
-        for (const player of players) {
-            const p = <Player>player;
+        const ps = room.getPlayers();
+        Object.keys(ps).forEach((key: string) => {
+            const p = <Player>ps[key];
             const onUpdate = p.playerView.onUpdateStatus[p.state];
             onUpdate(room.state);
             //显示分数
             // player.playerView:setCurScore()
             //显示房主
             p.playerView.showOwner();
-        }
+        });
     };
 }

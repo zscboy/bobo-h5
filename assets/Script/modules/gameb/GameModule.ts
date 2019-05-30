@@ -65,6 +65,10 @@ export class GameModule extends cc.Component implements GameModuleInterface {
         await this.tryEnterRoom(args.uuid, args.userInfo, args.roomInfo);
     }
 
+    public sendBinary(buf: ByteBuffer): void {
+        this.ws.ww.send(buf.toArrayBuffer());
+    }
+
     public quit(): void {
         if (this.mq !== undefined && this.mq !== null) {
             this.mq.pushQuit();
@@ -234,6 +238,7 @@ export class GameModule extends cc.Component implements GameModuleInterface {
         roomInfo: RoomInfo): void {
         //
         this.mRoom = new Room(myUser, roomInfo, this);
+        this.mRoom.loadRoomView(this.view);
     }
 
     private async waitConnect(showProgressTips: string): Promise<number> {

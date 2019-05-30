@@ -32,7 +32,7 @@ export namespace HandlerActionResultDiscarded {
 
         const readyHandList = me.readyHandList;
         if (readyHandList !== null && readyHandList.length > 0) {
-            for (let i = 1; i <= me.readyHandList.length; i += 2) {
+            for (let i = 0; i < me.readyHandList.length; i += 2) {
                 if (readyHandList[i] === discardTileId) {
                     if (readyHandList[i + 1] > 1) {
                         readyHandList[i + 1] = readyHandList[i + 1] - 1;

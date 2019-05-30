@@ -271,7 +271,8 @@ export class Replay {
 
         // 所有玩家状态改为playing
         const players = room.players;
-        players.forEach((p) => {
+        Object.keys(players).forEach((key) => {
+            const p = players[key];
             p.state = proto.mahjong.PlayerState.PSPlaying;
             const onUpdate = p.playerView.onUpdateStatus[p.state];
             onUpdate(room.state);
@@ -296,7 +297,8 @@ export class Replay {
         });
 
         // 显示各个玩家的手牌（对手只显示暗牌）和花牌
-        players.forEach((p) => {
+        Object.keys(players).forEach((key) => {
+            const p = players[key];
             p.sortHands(false);
             p.hand2UI(false);
             p.flower2UI();

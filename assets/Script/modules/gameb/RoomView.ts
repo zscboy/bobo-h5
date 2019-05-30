@@ -1,14 +1,14 @@
-import { GameModuleInterface, Logger } from "../lobby/lcore/LCoreExports";
+import { Logger } from "../lobby/lcore/LCoreExports";
 import { PlayerView } from "./PlayerView";
 import { proto } from "./proto/protoGame";
-import { MeldType, RoomInterface, TingPai } from "./RoomInterface";
+import { RoomInterface, TingPai } from "./RoomInterface";
 import { TileImageMounter } from "./TileImageMounter";
 const mjproto = proto.mahjong;
 
 /**
  * 房间
  */
-export class RoomView extends cc.Component {
+export class RoomView {
     public playerViews: PlayerView[];
     public listensObj: fgui.GComponent;
     public meldOpsPanel: fgui.GComponent;
@@ -29,21 +29,11 @@ export class RoomView extends cc.Component {
     private listensObjNum: fgui.GObject;
     private multiOpsObj: fgui.GList;
     private listensDataList: TingPai[];
-    private multiOpsDataList: MeldType[];
+    private multiOpsDataList: proto.mahjong.IMsgMeldTile[];
     private arrowObj: fgui.GObject;
-    public constructor(room: RoomInterface) {
-        super();
+    private actionMsg: proto.mahjong.MsgPlayerAction;
+    public constructor(room: RoomInterface, view: fgui.GComponent) {
         this.room = room;
-        // 加载房间界面
-        const lm = <GameModuleInterface>this.getComponent("GameModule");
-        const loader = lm.resLoader;
-
-        loader.fguiAddPackage("lobby/fui_lobby_mahjong/lobby_mahjong");
-        loader.fguiAddPackage("fgui/dafeng");
-        loader.fguiAddPackage("lobby/fui_lobby_mahjong/lobby_mahjong");
-
-        const view = fgui.UIPackage.createObject("dafeng", "desk").asCom;
-        fgui.GRoot.inst.addChild(view);
         this.unityViewNode = view;
 
         const playerViews: PlayerView[] = [];
@@ -140,11 +130,11 @@ export class RoomView extends cc.Component {
     }
     //清除当前房间的等待玩家标志
     public clearWaitingPlayer(): void {
-        for (const mask of this.roundMarks) {
-            mask.visible = false;
+        for (let i = 1; i <= 4; i++) {
+            this.roundMarks[i].visible = false;
         }
-        for (const playerView of this.playerViews) {
-            playerView.setHeadEffectBox(false);
+        for (let i = 1; i <= 4; i++) {
+            this.playerViews[i].setHeadEffectBox(false);
         }
     }
     public showRoomNumber(): void {
@@ -154,7 +144,8 @@ export class RoomView extends cc.Component {
         this.roomInfoText.text = str;
 
     }
-    public showOrHideMeldsOpsPanel(meld: MeldType[]): void {
+    public showOrHideMeldsOpsPanel(meld: proto.mahjong.IMsgMeldTile[], actionMsg: proto.mahjong.MsgPlayerAction): void {
+        this.actionMsg = actionMsg;
         const size = meld.length;
         this.multiOpsDataList = meld;
         this.multiOpsObj.numItems = size;
@@ -165,7 +156,7 @@ export class RoomView extends cc.Component {
     public setArrowByParent(btn: fgui.GComponent): void {
         if (btn == null) {
             //隐藏出牌提示箭头
-            if (this.arrowObj !== null) {
+            if (this.arrowObj !== undefined && this.arrowObj !== null) {
                 this.arrowObj.visible = false;
             }
 
@@ -216,10 +207,8 @@ export class RoomView extends cc.Component {
         this.windTile.visible = true;
         TileImageMounter.mountTileImage(this.windTile, this.room.windFlowerID);
     }
-    //////////////////////////////////////////////
     // 根据玩家的chairID获得相应的playerView
     // 注意服务器的chairID是由0开始
-    //////////////////////////////////////////////
     public getPlayerViewByChairID(chairID: number, myChairId: number): PlayerView {
         const playerViews = this.playerViews;
 
@@ -269,7 +258,7 @@ export class RoomView extends cc.Component {
 
         this.readyButton = this.unityViewNode.getChild("ready").asButton;
         this.readyButton.visible = false;
-        this.readyButton.onClick(this.room.onReadyButtonClick, this);
+        this.readyButton.onClick(this.room.onReadyButtonClick, this.room);
 
         settingBtn.onClick(this.onDissolveClick, this);
     }
@@ -328,6 +317,7 @@ export class RoomView extends cc.Component {
             this.roundMarkView.visible = true;
             this.clearWaitingPlayer();
             this.showRoomNumber();
+            this.showOrHideReadyButton(false);
         };
 
         //房间已经被删除，客户端永远看不到这个状态
@@ -350,16 +340,12 @@ export class RoomView extends cc.Component {
         this.listensObjNum = this.listensObj.getChild("num");
         // tslint:disable-next-line: no-unsafe-any
         this.listensObjList.itemRenderer = this.renderListensListItem.bind(this);
-        // this.listensObj.onClick: Set(
-        //     function () {
-        //         this.listensObj.visible = false
-        //     }
-        // )
+        this.listensObj.onClick(() => { this.listensObj.visible = false; }, this);
         this.listensObjList.setVirtual();
     }
 
     private renderListensListItem(index: number, obj: fgui.GComponent): void {
-        const tingPai = this.listensDataList[index + 1];
+        const tingPai = this.listensDataList[index];
         const t = obj.getChild("n1").asCom;
         const num = obj.getChild("num");
         num.text = `${tingPai.num}张`;
@@ -373,15 +359,11 @@ export class RoomView extends cc.Component {
         this.multiOpsObj = this.meldOpsPanel.getChild("list").asList;
         // tslint:disable-next-line: no-unsafe-any
         this.multiOpsObj.itemRenderer = this.renderMultiOpsListItem.bind(this);
-        // this.multiOpsObj.onClickItem: Add(
-        //     function (onClickItem) {
-        //         this: onMeldOpsClick(onClickItem.data.name)
-        //     }
-        // )
+        this.multiOpsObj.on(fgui.Event.CLICK_ITEM, (onClickItem: fgui.GObject) => { this.onMeldOpsClick(onClickItem.name); }, this);
     }
 
     private renderMultiOpsListItem(index: number, obj: fgui.GComponent): void {
-        const meld = this.multiOpsDataList[index + 1];
+        const meld = this.multiOpsDataList[index];
         obj.name = index.toString();
         let add = 0;
         let num = 4;
@@ -402,25 +384,25 @@ export class RoomView extends cc.Component {
         obj.visible = true;
     }
 
-    // private onMeldOpsClick(index: number): void {
-    //     const data = this.multiOpsDataList[index + 1];
-    //     const actionMsg = new proto.mahjong.MsgPlayerAction();
-    //     actionMsg.qaIndex = data.actionMsg.qaIndex;
-    //     actionMsg.action = data.actionMsg.action;
-    //     actionMsg.tile = data.actionMsg.tile;
-    //     actionMsg.meldType = data.meldType;
-    //     actionMsg.meldTile1 = data.tile1;
-    //     if (data.meldType === mjproto.MeldType.enumMeldTypeConcealedKong) {
-    //         actionMsg.tile = data.tile1;
-    //         actionMsg.action = mjproto.ActionType.enumActionType_KONG_Concealed;
-    //     } else if (data.meldType === mjproto.MeldType.enumMeldTypeTriplet2Kong) {
-    //         actionMsg.tile = data.tile1;
-    //         actionMsg.action = mjproto.ActionType.enumActionType_KONG_Triplet2;
-    //     }
+    private onMeldOpsClick(index: string): void {
+        const data = this.multiOpsDataList[+index];
+        const actionMsg = new proto.mahjong.MsgPlayerAction();
+        actionMsg.qaIndex = this.actionMsg.qaIndex;
+        actionMsg.action = this.actionMsg.action;
+        actionMsg.tile = this.actionMsg.tile;
+        actionMsg.meldType = data.meldType;
+        actionMsg.meldTile1 = data.tile1;
+        if (data.meldType === mjproto.MeldType.enumMeldTypeConcealedKong) {
+            actionMsg.tile = data.tile1;
+            actionMsg.action = mjproto.ActionType.enumActionType_KONG_Concealed;
+        } else if (data.meldType === mjproto.MeldType.enumMeldTypeTriplet2Kong) {
+            actionMsg.tile = data.tile1;
+            actionMsg.action = mjproto.ActionType.enumActionType_KONG_Triplet2;
+        }
 
-    //     const actionMsgBuf = proto.mahjong.MsgPlayerAction.encode(actionMsg);
-    //     this.room.sendActionMsg(actionMsgBuf);
-    //     this.playerViews[1].hideOperationButtons();
-    //     this.meldOpsPanel.visible = false;
-    // }
+        const actionMsgBuf = proto.mahjong.MsgPlayerAction.encode(actionMsg);
+        this.room.sendActionMsg(actionMsgBuf);
+        this.playerViews[1].hideOperationButtons();
+        this.meldOpsPanel.visible = false;
+    }
 }

@@ -9,7 +9,7 @@ export namespace HandlerActionResultKongConcealed {
     export const onMsg = (actionResultMsg: proto.mahjong.MsgActionResultNotify, room: RoomInterface): void => {
 
         const targetChairID = actionResultMsg.targetChairID;
-        const player = <Player>room.getPlayerInterfaceByChairID(targetChairID);
+        const player = <Player>room.getPlayerByChairID(targetChairID);
         const kongTileId = actionResultMsg.actionTile;
 
         //从手牌移除4张

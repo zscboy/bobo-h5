@@ -8,7 +8,7 @@ import { RoomInterface } from "../RoomInterface";
 export namespace HandlerActionResultDiscarded {
     export const onMsg = (actionResultMsg: proto.mahjong.MsgActionResultNotify, room: RoomInterface): void => {
         const targetChairID = actionResultMsg.targetChairID;
-        const player = <Player>room.getPlayerInterfaceByChairID(targetChairID);
+        const player = <Player>room.getPlayerByChairID(targetChairID);
         const discardTileId = actionResultMsg.actionTile;
 
         const me = room.getMyPlayer();

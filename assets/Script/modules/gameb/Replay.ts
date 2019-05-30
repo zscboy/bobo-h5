@@ -1,4 +1,13 @@
 import { Dialog, Logger, Message, MsgQueue, MsgType } from "../lobby/lcore/LCoreExports";
+import { HandlerActionResultChow } from "./handlers/HandlerActionResultChow";
+import { HandlerActionResultDiscarded } from "./handlers/HandlerActionResultDiscarded";
+import { HandlerActionResultDraw } from "./handlers/HandlerActionResultDraw";
+import { HandlerActionResultKongConcealed } from "./handlers/HandlerActionResultKongConcealed";
+import { HandlerActionResultKongExposed } from "./handlers/HandlerActionResultKongExposed";
+import { HandlerActionResultPong } from "./handlers/HandlerActionResultPong";
+import { HandlerActionResultReadyHand } from "./handlers/HandlerActionResultReadyHand";
+import { HandlerActionResultTriplet2Kong } from "./handlers/HandlerActionResultTriplet2Kong";
+import { Player } from "./Player";
 // import { HandlerMsgHandOver } from "./handlers/HandlerMsgHandOver";
 import { proto } from "./proto/protoGame";
 import { Room } from "./Room";
@@ -23,6 +32,8 @@ export class Replay {
     private mq: MsgQueue;
     private timerCb: Function;
     private actionHandlers: { [key: number]: Function } = {};
+    // private latestDiscardedTile: number;
+    private latestDiscardedPlayer: Player;
 
     public constructor(host: RoomHost, msgHandRecord: proto.mahjong.SRMsgHandRecorder) {
         this.host = host;
@@ -343,37 +354,157 @@ export class Replay {
         // HandlerMsgHandOver.onHandOver(msgHandOver, room);
     }
 
-    public firstReadyHandActionHandler(): void {
-        //
+    public firstReadyHandActionHandler(srAction: proto.mahjong.ISRAction): void {
+        Logger.debug("llwant, dfreplay, firstReadyHand");
+
+        const actionResultMsg = { targetChairID: srAction.chairID };
+        HandlerActionResultReadyHand.onMsg(<proto.mahjong.MsgActionResultNotify>actionResultMsg, this.host.room);
     }
 
-    public discardedActionHandler(): void {
-        //
+    public discardedActionHandler(srAction: proto.mahjong.ISRAction, waitDiscardReAction: boolean): void {
+        Logger.debug("llwant, dfreplay, discarded");
+        const tiles = srAction.tiles;
+        // const discardTileId = tiles[1];
+        const actionResultMsg = {
+            targetChairID: srAction.chairID,
+            actionTile: tiles[1],
+            waitDiscardReAction: waitDiscardReAction
+        };
+
+        HandlerActionResultDiscarded.onMsg(<proto.mahjong.MsgActionResultNotify>actionResultMsg, this.host.room);
+
+        const room = <Room>this.host.room;
+        this.latestDiscardedPlayer = room.getPlayerByChairID(srAction.chairID);
+        // this.latestDiscardedTile = discardTileId;
+
+        if ((srAction.flags & proto.mahjong.SRFlags.SRRichi) !== 0) {
+            this.firstReadyHandActionHandler(srAction);
+        }
     }
 
-    public drawActionHandler(): void {
-        //
+    public drawActionHandler(srAction: proto.mahjong.ISRAction): void {
+        Logger.debug("llwant, dfreplay, draw");
+        const tiles = srAction.tiles;
+        const tilesFlower: number[] = [];
+        const len = tiles.length;
+        if (len > 1) {
+            for (let i = 1; i < len; i++) {
+                tilesFlower.push(tiles[i]);
+            }
+        }
+
+        const drawTile = tiles[tiles.length - 1];
+        let drawCnt = len;
+        if (drawTile === proto.mahjong.TileID.enumTid_MAX + 1) {
+            drawCnt = drawCnt - 1;
+        }
+
+        const room = <Room>this.host.room;
+        const tilesInWall = room.tilesInWall - drawCnt;
+
+        const actionResultMsg = {
+            targetChairID: srAction.chairID,
+            actionTile: drawTile,
+            newFlowers: tilesFlower,
+            tilesInWall: tilesInWall
+        };
+
+        const player = room.getPlayerByChairID(srAction.chairID);
+        room.roomView.setWaitingPlayer(player.playerView);
+
+        HandlerActionResultDraw.onMsg(<proto.mahjong.MsgActionResultNotify>actionResultMsg, room);
     }
 
-    public chowActionHandler(): void {
-        //
+    public chowActionHandler(srAction: proto.mahjong.ISRAction): void {
+        Logger.debug("llwant, dfreplay, chow");
+
+        const tiles = srAction.tiles;
+        const actionMeld = {
+            tile1: tiles[1],
+            chowTile: tiles[2],
+            meldType: proto.mahjong.MeldType.enumMeldTypeSequence,
+            contributor: this.latestDiscardedPlayer.chairID
+        };
+
+        const chowTileId = tiles[2];
+        const actionResultMsg = {
+            targetChairID: srAction.chairID,
+            actionMeld: actionMeld,
+            actionTile: chowTileId
+        };
+
+        HandlerActionResultChow.onMsg(<proto.mahjong.MsgActionResultNotify>actionResultMsg, this.host.room);
     }
-    public pongActionHandler(): void {
-        //
+
+    public pongActionHandler(srAction: proto.mahjong.ISRAction): void {
+        Logger.debug("llwant, dfreplay, pong");
+
+        const tiles = srAction.tiles;
+        const actionMeld = {
+            tile1: tiles[1],
+            meldType: proto.mahjong.MeldType.enumMeldTypeTriplet,
+            contributor: this.latestDiscardedPlayer.chairID
+        };
+
+        const actionResultMsg = {
+            targetChairID: srAction.chairID,
+            actionMeld: actionMeld
+        };
+
+        HandlerActionResultPong.onMsg(<proto.mahjong.MsgActionResultNotify>actionResultMsg, this.host.room);
     }
-    public kongExposedActionHandler(): void {
-        //
+
+    public kongExposedActionHandler(srAction: proto.mahjong.ISRAction): void {
+        Logger.debug("llwant, dfreplay, kong-exposed");
+        const tiles = srAction.tiles;
+        const actionMeld = {
+            tile1: tiles[1],
+            meldType: proto.mahjong.MeldType.enumMeldTypeExposedKong,
+            contributor: this.latestDiscardedPlayer.chairID
+        };
+
+        const actionResultMsg = {
+            targetChairID: srAction.chairID,
+            actionMeld: actionMeld
+        };
+
+        HandlerActionResultKongExposed.onMsg(<proto.mahjong.MsgActionResultNotify>actionResultMsg, this.host.room);
     }
-    public triplet2KongActionHandler(): void {
-        //
+
+    public kongConcealedActionHandler(srAction: proto.mahjong.ISRAction): void {
+        Logger.debug("llwant, dfreplay, kong-concealed");
+        const tiles = srAction.tiles;
+        const kongTileId = tiles[1];
+
+        const actionResultMsg = {
+            targetChairID: srAction.chairID,
+            actionTile: kongTileId
+        };
+
+        HandlerActionResultKongConcealed.onMsg(<proto.mahjong.MsgActionResultNotify>actionResultMsg, this.host.room);
     }
-    public winChuckActionHandler(): void {
-        //
+
+    public triplet2KongActionHandler(srAction: proto.mahjong.ISRAction): void {
+        Logger.debug("llwant, dfreplay, triplet2kong");
+        const tiles = srAction.tiles;
+        const kongTileId = tiles[1];
+
+        const actionResultMsg = {
+            targetChairID: srAction.chairID,
+            actionTile: kongTileId
+        };
+
+        HandlerActionResultTriplet2Kong.onMsg(<proto.mahjong.MsgActionResultNotify>actionResultMsg, this.host.room);
     }
+
+    public winChuckActionHandler(srAction: proto.mahjong.ISRAction): void {
+        Logger.debug("llwant, dfreplay, win chuck ");
+        const room = <Room>this.host.room;
+        const player = room.getPlayerByChairID(srAction.chairID);
+        player.addHandTile(srAction.tiles[1]);
+    }
+
     public winSelfDrawActionHandler(): void {
-        //
-    }
-    public kongConcealedActionHandler(): void {
-        //
+        Logger.debug("llwant, dfreplay, win self draw ");
     }
 }

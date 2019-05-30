@@ -22,7 +22,7 @@ export namespace HandlerMsgRoomUpdate {
                     if (playerRecord !== undefined && playerRecord !== null) {
                         const scoreNumber = playerRecord.score;
                         const userID = playerRecord.userID;
-                        const player = <Player>room.getPlayerInterfaceByUserID(userID);
+                        const player = <Player>room.getPlayerByUserID(userID);
                         totalScores[j] = totalScores[j] + scoreNumber;
                         player.totalScores = totalScores[j];
                     }
@@ -68,7 +68,7 @@ export namespace HandlerMsgRoomUpdate {
         //如果自己还没有创建，创建自己
         for (const msgPlayer of msgPlayers) {
             if (room.isMe(msgPlayer.userID)) {
-                const player = <Player>room.getPlayerInterfaceByChairID(msgPlayer.chairID);
+                const player = <Player>room.getPlayerByChairID(msgPlayer.chairID);
                 if (player === null) {
                     room.createMyPlayer(msgPlayer);
                 } else if (player.chairID !== msgPlayer.chairID) {
@@ -84,7 +84,7 @@ export namespace HandlerMsgRoomUpdate {
         //更新，或者创建其他player
         for (const msgPlayer of msgPlayers) {
             if (!room.isMe(msgPlayer.userID)) {
-                const player = <Player>room.getPlayerInterfaceByChairID(msgPlayer.chairID);
+                const player = <Player>room.getPlayerByChairID(msgPlayer.chairID);
                 if (player === null) {
                     room.createPlayerByInfo(msgPlayer);
                     //有人进来或者更新，更新GPS

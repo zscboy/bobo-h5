@@ -1,5 +1,5 @@
 
-import { RoomInfo } from "../lobby/lcore/LCoreExports";
+import { GResLoader, RoomInfo, UserInfo } from "../lobby/lcore/LCoreExports";
 import { PlayerInterface } from "./PlayerInterface";
 import { proto } from "./proto/protoGame";
 
@@ -9,6 +9,9 @@ import { proto } from "./proto/protoGame";
 export interface RoomHost {
     room: RoomInterface;
     quit: Function;
+    user: UserInfo;
+    component: cc.Component;
+    loader: GResLoader;
 }
 
 /**

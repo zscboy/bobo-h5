@@ -31,6 +31,7 @@ export class GameModule extends cc.Component implements GameModuleInterface {
     private forceExit: boolean = false;
     private mRoom: Room;
     private lm: LobbyModuleInterface;
+    private mUser: UserInfo;
 
     public get room(): Room {
         return this.mRoom;
@@ -38,6 +39,14 @@ export class GameModule extends cc.Component implements GameModuleInterface {
 
     public get resLoader(): GResLoader {
         return this.loader;
+    }
+
+    public get component(): cc.Component {
+        return this;
+    }
+
+    public get user(): UserInfo {
+        return this.mUser;
     }
 
     public async launch(args: GameModuleLaunchArgs): Promise<void> {
@@ -98,7 +107,7 @@ export class GameModule extends cc.Component implements GameModuleInterface {
 
         // 保存一下，以便重连时使用
         // this.url = url;
-        // this.myUser = myUser;
+        this.mUser = myUser;
         this.ws = null;
         this.mRoom = null;
         this.connectErrorCount = 0;

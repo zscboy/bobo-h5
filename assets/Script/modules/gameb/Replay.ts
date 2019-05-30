@@ -7,6 +7,7 @@ import { HandlerActionResultKongExposed } from "./handlers/HandlerActionResultKo
 import { HandlerActionResultPong } from "./handlers/HandlerActionResultPong";
 import { HandlerActionResultReadyHand } from "./handlers/HandlerActionResultReadyHand";
 import { HandlerActionResultTriplet2Kong } from "./handlers/HandlerActionResultTriplet2Kong";
+import { HandlerMsgHandOver } from "./handlers/HandlerMsgHandOver";
 import { Player } from "./Player";
 // import { HandlerMsgHandOver } from "./handlers/HandlerMsgHandOver";
 import { proto } from "./proto/protoGame";
@@ -351,7 +352,7 @@ export class Replay {
         // //     p.lastTile = p.tilesHand[len - 1]; // 保存最后一张牌，可能是胡牌。。。用于最后结算显示
         // // });
 
-        // HandlerMsgHandOver.onHandOver(msgHandOver, room);
+        HandlerMsgHandOver.onHandOver(<proto.mahjong.IMsgHandOver>msgHandOver, this.host.room);
     }
 
     public firstReadyHandActionHandler(srAction: proto.mahjong.ISRAction): void {

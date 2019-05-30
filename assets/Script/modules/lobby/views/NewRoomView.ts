@@ -1,6 +1,7 @@
 import { DataStore, Dialog, GameModuleLaunchArgs, HTTP, LEnv, LobbyModuleInterface, Logger } from "../lcore/LCoreExports";
 import { proto } from "../proto/protoLobby";
 import { DFRuleView } from "./DFRuleView";
+import { LobbyError } from "./LobbyError";
 import { RunFastRuleView } from "./RunFastRuleView";
 
 const { ccclass } = cc._decorator;
@@ -52,9 +53,10 @@ export class NewRoomView extends cc.Component {
                         } else if (msgCreateRoomRsp.result === proto.lobby.MsgError.ErrUserInOtherRoom) {
                             this.reEnterGame(msgCreateRoomRsp.roomInfo);
                         } else {
-                            // TODO: show error msg
                             Logger.error("Create room error:, code:", msgCreateRoomRsp.result);
-                            Dialog.showDialog(`创建房间失败，错误码:${msgCreateRoomRsp.result}`);
+
+                            const errorString = LobbyError.getErrorString(msgCreateRoomRsp.result);
+                            Dialog.showDialog(errorString);
 
                         }
                     }

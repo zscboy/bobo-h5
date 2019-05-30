@@ -1,6 +1,6 @@
 import { Player } from "../Player";
 import { proto } from "../proto/protoGame";
-import { MeldType, RoomInterface } from "../RoomInterface";
+import { RoomInterface } from "../RoomInterface";
 
 /**
  * 响应服务器牌局回复
@@ -65,17 +65,7 @@ export namespace HandlerMsgRestore {
             player.addDiscardedTiles(playerTileList.tilesDiscard);
 
             //填充面子牌列表
-            const meldTypes: MeldType[] = [];
-            for (let i = 0; i < playerTileList.melds.length; i++) {
-                const me = playerTileList.melds[i];
-                const m = new MeldType();
-                m.chowTile = me.chowTile;
-                m.contributor = me.contributor;
-                m.meldType = me.meldType;
-                m.tile1 = me.tile1;
-                meldTypes[i + 1] = m;
-            }
-            player.addMelds(meldTypes);
+            player.addMelds(playerTileList.melds);
 
             if (player.chairID === room.bankerChairID) {
                 room.setWaitingPlayer(player.chairID);

@@ -1,7 +1,7 @@
 import { Logger } from "../lobby/lcore/LCoreExports";
 import { PlayerView } from "./PlayerView";
 import { proto } from "./proto/protoGame";
-import { MeldType, PlayerInfo, RoomInterface } from "./RoomInterface";
+import { PlayerInfo, RoomInterface } from "./RoomInterface";
 // const playerInfoView = require "lobby/scripts/playerInfo/playerInfoView"
 const mjproto = proto.mahjong;
 const enum SoundDef {
@@ -36,7 +36,7 @@ export class Player {
     public readonly host: RoomInterface;
 
     public tilesDiscarded: number[];
-    public melds: MeldType[];
+    public melds: proto.mahjong.IMsgMeldTile[];
     public tilesFlower: number[];
     public tilesHand: number[];
     public isRichi: boolean;
@@ -181,7 +181,7 @@ export class Player {
     }
 
     //增加一个落地面子牌组
-    public addMeld(meld: MeldType): void {
+    public addMeld(meld: proto.mahjong.IMsgMeldTile): void {
         //插入到队列尾部
         if (meld === null) {
             return;
@@ -202,14 +202,14 @@ export class Player {
     }
 
     //增加多个落地面子牌组
-    public addMelds(melds: MeldType[]): void {
+    public addMelds(melds: proto.mahjong.IMsgMeldTile[]): void {
         for (const v of melds) {
             this.melds.push(v);
         }
     }
 
     //获取一个落地面子牌组
-    public getMeld(tileID: number, meldType: number): MeldType {
+    public getMeld(tileID: number, meldType: number): proto.mahjong.IMsgMeldTile {
         for (const v of this.melds) {
             if (v.tile1 === tileID && v.meldType === meldType) {
                 return v;
@@ -228,25 +228,22 @@ export class Player {
         const playerView = this.playerView;
         playerView.hideHands();
         if (this.isMe()) {
-            this.showHandsForMe(wholeMove);
+            this.playerView.showHandsForMe(wholeMove);
         } else {
             if (this.host.isReplayMode()) {
-                playerView.hand2Exposed(wholeMove, this.melds, this.tilesHand);
+                playerView.hand2Exposed(wholeMove);
             } else {
-                playerView.showHandsForOpponents(this.tileCountInHand, this.melds);
+                playerView.showHandsForOpponents(this.tileCountInHand);
             }
         }
     }
 
-    public showHandsForMe(wholeMove: boolean): void {
-        this.playerView.showHandsForMe(wholeMove, this.tilesHand, this.melds, this.isRichi);
-    }
     //把牌摊开
     public hand2Exposed(): void {
         const playerView = this.playerView;
         playerView.hideHands();
 
-        playerView.hand2Exposed(false, this.melds, this.tilesHand);
+        playerView.hand2Exposed(false);
     }
 
     //把花牌列表显示到界面上
@@ -255,12 +252,12 @@ export class Player {
         const playerView = this.playerView;
         playerView.hideFlowers();
 
-        playerView.showFlowers(this.tilesFlower);
+        playerView.showFlowers();
     }
 
     //把打出的牌列表显示到界面上
     public discarded2UI(newDiscard: boolean, waitDiscardReAction: boolean): void {
-        this.playerView.showDiscarded(newDiscard, waitDiscardReAction, this.tilesDiscarded);
+        this.playerView.showDiscarded(newDiscard, waitDiscardReAction);
     }
 
     //隐藏打出的牌提示
@@ -284,7 +281,7 @@ export class Player {
         if (this.isMe()) {
             //隐藏牌组
             this.playerView.hideHands();
-            this.showHandsForMe(true);
+            this.playerView.showHandsForMe(true);
         }
 
         //播放对应音效
@@ -297,7 +294,7 @@ export class Player {
         if (this.isMe()) {
             //隐藏牌组
             this.playerView.hideHands();
-            this.showHandsForMe(true);
+            this.playerView.showHandsForMe(true);
         }
 
         //播放对应音效
@@ -310,7 +307,7 @@ export class Player {
         if (this.isMe()) {
             //隐藏牌组
             this.playerView.hideHands();
-            this.showHandsForMe(true);
+            this.playerView.showHandsForMe(true);
         }
 
         //播放对应音效
@@ -323,7 +320,7 @@ export class Player {
         if (this.isMe()) {
             //隐藏牌组
             this.playerView.hideHands();
-            this.showHandsForMe(true);
+            this.playerView.showHandsForMe(true);
         }
 
         //播放对应音效
@@ -336,7 +333,7 @@ export class Player {
         if (this.isMe()) {
             //隐藏牌组
             this.playerView.hideHands();
-            this.showHandsForMe(true);
+            this.playerView.showHandsForMe(true);
         }
 
         //播放对应音效
@@ -349,7 +346,7 @@ export class Player {
         if (this.isMe()) {
             //隐藏牌组
             this.playerView.hideHands();
-            this.showHandsForMe(true);
+            this.playerView.showHandsForMe(true);
         }
         //播放对应音效
         // this.playOperationSound(SoundDef.DrawCard)
@@ -596,14 +593,14 @@ export class Player {
             //必然只有一个可以碰的面子牌组
             //TODO. 吃牌可以有多种吃法
             const ss = this.allowedReActionMsg.meldsForAction;
-            const chowMelds = this.selectMeldFromMeldsForAction(ss, mjproto.MeldType.enumMeldTypeSequence, actionMsg);
+            const chowMelds = this.selectMeldFromMeldsForAction(ss, mjproto.MeldType.enumMeldTypeSequence);
             //logger.debug("chowMelds . ", chowMelds)
             actionMsg.tile = this.allowedReActionMsg.victimTileID;
             if (chowMelds.length > 1) {
-                this.host.showOrHideMeldsOpsPanel(chowMelds);
+                this.host.showOrHideMeldsOpsPanel(chowMelds, actionMsg);
             } else {
-                actionMsg.meldType = chowMelds[1].meldType;
-                actionMsg.meldTile1 = chowMelds[1].tile1;
+                actionMsg.meldType = chowMelds[0].meldType;
+                actionMsg.meldTile1 = chowMelds[0].tile1;
                 this.sendActionMsg(actionMsg);
             }
         }
@@ -621,10 +618,10 @@ export class Player {
 
             //必然只有一个可以碰的面子牌组
             const ss = this.allowedReActionMsg.meldsForAction;
-            const pongMelds = this.selectMeldFromMeldsForAction(ss, mjproto.MeldType.enumMeldTypeTriplet, actionMsg);
+            const pongMelds = this.selectMeldFromMeldsForAction(ss, mjproto.MeldType.enumMeldTypeTriplet);
             actionMsg.tile = this.allowedReActionMsg.victimTileID;
-            actionMsg.meldType = pongMelds[1].meldType;
-            actionMsg.meldTile1 = pongMelds[1].tile1;
+            actionMsg.meldType = pongMelds[0].meldType;
+            actionMsg.meldTile1 = pongMelds[0].tile1;
 
             this.sendActionMsg(actionMsg);
         }
@@ -646,8 +643,8 @@ export class Player {
             //}
             actionMsg.qaIndex = this.allowedActionMsg.qaIndex;
             const ss = this.allowedActionMsg.meldsForAction;
-            const kConcealed = this.selectMeldFromMeldsForAction(ss, mjproto.MeldType.enumMeldTypeConcealedKong, actionMsg);
-            const kongTriplet2 = this.selectMeldFromMeldsForAction(ss, mjproto.MeldType.enumMeldTypeTriplet2Kong, actionMsg);
+            const kConcealed = this.selectMeldFromMeldsForAction(ss, mjproto.MeldType.enumMeldTypeConcealedKong);
+            const kongTriplet2 = this.selectMeldFromMeldsForAction(ss, mjproto.MeldType.enumMeldTypeTriplet2Kong);
             const kongs = [];
             let action = mjproto.ActionType.enumActionType_KONG_Triplet2;
             if (kConcealed.length > 0) {
@@ -663,13 +660,13 @@ export class Player {
             }
 
             if (kongs.length > 1) {
-                this.host.showOrHideMeldsOpsPanel(kongs);
+                this.host.showOrHideMeldsOpsPanel(kongs, actionMsg);
             } else {
                 actionMsg.action = action;
                 //无论是加杠，或者暗杠，肯定只有一个面子牌组
-                actionMsg.tile = kongs[1].tile1;
-                actionMsg.meldType = kongs[1].meldType;
-                actionMsg.meldTile1 = kongs[1].tile1;
+                actionMsg.tile = kongs[0].tile1;
+                actionMsg.meldType = kongs[0].meldType;
+                actionMsg.meldTile1 = kongs[0].tile1;
                 this.sendActionMsg(actionMsg);
             }
         } else if (this.allowedReActionMsg != null) {
@@ -679,27 +676,21 @@ export class Player {
 
             //必然只有一个可以明杠的牌组
             const ss = this.allowedReActionMsg.meldsForAction;
-            const kMelds = this.selectMeldFromMeldsForAction(ss, mjproto.MeldType.enumMeldTypeExposedKong, actionMsg);
+            const kMelds = this.selectMeldFromMeldsForAction(ss, mjproto.MeldType.enumMeldTypeExposedKong);
             actionMsg.tile = this.allowedReActionMsg.victimTileID;
-            actionMsg.meldType = kMelds[1].meldType;
-            actionMsg.meldTile1 = kMelds[1].tile1;
+            actionMsg.meldType = kMelds[0].meldType;
+            actionMsg.meldTile1 = kMelds[0].tile1;
 
             this.sendActionMsg(actionMsg);
         }
 
         this.playerView.clearAllowedActionsView(false);
     }
-    public selectMeldFromMeldsForAction(ms: proto.mahjong.IMsgMeldTile[], ty: number, msg: proto.mahjong.MsgPlayerAction): MeldType[] {
-        const r: MeldType[] = [];
+    public selectMeldFromMeldsForAction(ms: proto.mahjong.IMsgMeldTile[], ty: number): proto.mahjong.IMsgMeldTile[] {
+        const r: proto.mahjong.IMsgMeldTile[] = [];
         for (const m of ms) {
             if (m.meldType === ty) {
-                const nn = new MeldType();
-                nn.actionMsg = msg;
-                nn.meldType = m.meldType;
-                nn.tile1 = m.tile1;
-                nn.chowTile = m.chowTile;
-                nn.contributor = m.contributor;
-                r.push(nn);
+                r.push(m);
             }
         }
 

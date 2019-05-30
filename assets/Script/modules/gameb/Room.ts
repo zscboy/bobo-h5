@@ -19,7 +19,7 @@ import { HandlerMsgUpdatePropCfg } from "./handlers/HandlerMsgUpdatePropCfg";
 import { Player } from "./Player";
 import { PlayerInterface } from "./PlayerInterface";
 import { proto } from "./proto/protoGame";
-import { MeldType, RoomHost, RoomInterface, TingPai } from "./RoomInterface";
+import { RoomHost, RoomInterface, TingPai } from "./RoomInterface";
 import { RoomView } from "./RoomView";
 /**
  * 定义一个接口 关联Game 到room
@@ -381,8 +381,8 @@ export class Room {
     public setArrowByParent(d: fgui.GComponent): void {
         this.roomView.setArrowByParent(d);
     }
-    public showOrHideMeldsOpsPanel(chowMelds: MeldType[]): void {
-        this.roomView.showOrHideMeldsOpsPanel(chowMelds);
+    public showOrHideMeldsOpsPanel(chowMelds: proto.mahjong.IMsgMeldTile[], actionMsg: proto.mahjong.MsgPlayerAction): void {
+        this.roomView.showOrHideMeldsOpsPanel(chowMelds, actionMsg);
     }
     public isMe(userID: string): boolean {
         return this.myUser.userID === userID;

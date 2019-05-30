@@ -23,34 +23,34 @@ export namespace HandlerMsgActionAllowed {
             if ((actions & at.enumActionType_CustomB) !== 0) {//如果可以抓牌
                 Logger.debug("llwant, can zhua");
                 needShowOperationButtons = true;
-                buttonMap[buttonMap.length + 1] = ButtonDef.Zhua;
+                buttonMap.push(ButtonDef.Zhua);
                 p.waitSkip = true;
             }
             if ((actions & at.enumActionType_FirstReadyHand) !== 0) { //如果可以起手听牌
                 Logger.debug("llwant, can ready hand");
                 needShowOperationButtons = true;
-                buttonMap[buttonMap.length + 1] = ButtonDef.Ting;
+                buttonMap.push(ButtonDef.Ting);
                 p.waitSkip = true; //这个标志用来判断可否出牌，当点击了动作按钮之后flagsAction会设置为true，这时候才可以出牌
             }
             if ((actions & at.enumActionType_SKIP) !== 0) {//如果可以过
                 Logger.debug("llwant, can skip");
                 needShowOperationButtons = true;
-                buttonMap[buttonMap.length + 1] = ButtonDef.Skip;
+                buttonMap.push(ButtonDef.Skip);
             }
             if ((actions & at.enumActionType_KONG_Concealed) !== 0) {//如果可以暗杠
                 Logger.debug("llwant, can concealed kong");
                 needShowOperationButtons = true;
-                buttonMap[buttonMap.length + 1] = ButtonDef.Kong;
+                buttonMap.push(ButtonDef.Kong);
             }
             if ((actions & at.enumActionType_KONG_Triplet2) !== 0) {//如果可以加杠
                 Logger.debug("llwant, can triplet2 kong");
                 needShowOperationButtons = true;
-                buttonMap[buttonMap.length + 1] = ButtonDef.Kong;
+                buttonMap.push(ButtonDef.Kong);
             }
             if ((actions & at.enumActionType_WIN_SelfDrawn) !== 0) { //如果可以自摸胡牌
                 Logger.debug("llwant, can win self drawn");
                 needShowOperationButtons = true;
-                buttonMap[buttonMap.length + 1] = ButtonDef.Hu;
+                buttonMap.push(ButtonDef.Hu);
             }
             if ((actions & at.enumActionType_WIN_SelfDrawn) !== 0) {// 可胡牌时，需要点击2次过才可过牌。
                 if ((actions & at.enumActionType_SKIP) !== 0) {
@@ -66,7 +66,7 @@ export namespace HandlerMsgActionAllowed {
                 }
                 const handsClickCtrls = playerView.handsClickCtrls;
                 if (p.isRichi) {
-                    for (let i = 0; i < 13; i++) {
+                    for (let i = 0; i < 14; i++) {
                         const handsClickCtrl = handsClickCtrls[i];
                         handsClickCtrl.isDiscardable = false;
                         handsClickCtrl.isGray = true;

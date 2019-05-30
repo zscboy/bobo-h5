@@ -1,7 +1,7 @@
 import { Logger } from "../lobby/lcore/LCoreExports";
 import { ButtonDef, ClickCtrl, PlayerInterface } from "./PlayerInterface";
 import { proto } from "./proto/protoGame";
-import { MeldType, RoomInterface, TingPai } from "./RoomInterface";
+import { RoomInterface, TingPai } from "./RoomInterface";
 import { TileImageMounter } from "./TileImageMounter";
 
 const mjproto = proto.mahjong;
@@ -44,7 +44,13 @@ const MELD_COMPONENT_PREFIX: string[] = [
 ];
 
 //面子牌组资源 后缀
-const MELD_COMPONENT_SUFFIX: string[] = [];
+const MELD_COMPONENT_SUFFIX: { [key: string]: string } = {
+    [mjproto.MeldType.enumMeldTypeTriplet2Kong]: "gang1",
+    [mjproto.MeldType.enumMeldTypeExposedKong]: "gang1",
+    [mjproto.MeldType.enumMeldTypeConcealedKong]: "gang2",
+    [mjproto.MeldType.enumMeldTypeSequence]: "chipeng",
+    [mjproto.MeldType.enumMeldTypeTriplet]: "chipeng"
+};
 
 /**
  * 玩家
@@ -79,11 +85,6 @@ export class PlayerView {
     private discardTipsTile: fgui.GComponent;
 
     public constructor(viewUnityNode: fgui.GComponent, viewChairID: number, room: RoomInterface) {
-        MELD_COMPONENT_SUFFIX[mjproto.MeldType.enumMeldTypeTriplet2Kong] = "gang1";
-        MELD_COMPONENT_SUFFIX[mjproto.MeldType.enumMeldTypeExposedKong] = "gang1";
-        MELD_COMPONENT_SUFFIX[mjproto.MeldType.enumMeldTypeConcealedKong] = "gang2";
-        MELD_COMPONENT_SUFFIX[mjproto.MeldType.enumMeldTypeSequence] = "chipeng";
-        MELD_COMPONENT_SUFFIX[mjproto.MeldType.enumMeldTypeTriplet] = "chipeng";
         this.room = room;
         this.viewChairID = viewChairID;
         this.viewUnityNode = viewUnityNode;
@@ -190,18 +191,17 @@ export class PlayerView {
     }
 
     public itemProviderButtonList(index: number): string {
-        return this.buttonDataList[index + 1];
+        return this.buttonDataList[index];
     }
     //操作按钮
     public initOperationButtons(): void {
         this.buttonList = this.operationPanel.getChild("buttonList").asList;
-        // this.buttonList.itemRenderer = this.renderButtonListItem.bind(this);
-        // this.buttonList.itemProvider = this.itemProviderButtonList.bind(this);
-        // this.buttonList.onClickItem.Add(
-        //     function (onClickItem) {
-        //         this.onClickBtn(onClickItem.data.name)
-        //     }
-        // )
+        // tslint:disable-next-line: no-unsafe-any
+        this.buttonList.itemRenderer = this.renderButtonListItem.bind(this);
+        // tslint:disable-next-line: no-unsafe-any
+        this.buttonList.itemProvider = this.itemProviderButtonList.bind(this);
+        this.buttonList.on(fgui.Event.CLICK_ITEM, (onClickItem: fgui.GObject) => { this.onClickBtn(onClickItem.name); }, this);
+
         this.operationButtonsRoot = this.operationPanel;
 
         this.hideOperationButtons();
@@ -211,7 +211,7 @@ export class PlayerView {
         this.checkReadyHandBtn.onClick(this.onCheckReadyHandBtnClick, this);
     }
     public renderButtonListItem(index: number, obj: fgui.GObject): void {
-        const name = this.buttonDataList[index + 1];
+        const name = this.buttonDataList[index];
         obj.name = name;
         obj.visible = true;
     }
@@ -245,7 +245,6 @@ export class PlayerView {
 
     //隐藏所有操作按钮
     public hideOperationButtons(): void {
-
         //先隐藏掉所有按钮
         this.showButton([]);
         //隐藏根节点
@@ -457,7 +456,8 @@ export class PlayerView {
     }
 
     //显示花牌，注意花牌需要是平放的
-    public showFlowers(tilesFlower: number[]): void {
+    public showFlowers(): void {
+        const tilesFlower = this.player.tilesFlower;
         const flowers = this.flowers;
 
         //花牌个数
@@ -478,7 +478,7 @@ export class PlayerView {
 
         //i计数器对应tilesFlower列表
         for (let i = begin; i < tileCount; i++) {
-            const d = flowers[(i - 1) % dCount + 1];
+            const d = flowers[i % dCount];
             const tileID = tilesFlower[i];
             TileImageMounter.mountTileImage(d, tileID);
             d.visible = true;
@@ -486,13 +486,13 @@ export class PlayerView {
     }
 
     //显示打出去的牌，明牌显示
-    public showDiscarded(newDiscard: boolean, waitDiscardReAction: boolean, tilesDiscard: number[]): void {
+    public showDiscarded(newDiscard: boolean, waitDiscardReAction: boolean): void {
         //先隐藏所有的打出牌节点
         const discards = this.discards;
         for (const d of discards) {
             d.visible = false;
         }
-
+        const tilesDiscard = this.player.tilesDiscarded;
         //已经打出去的牌个数
         const tileCount = tilesDiscard.length;
         //打出牌的挂载点个数
@@ -506,7 +506,7 @@ export class PlayerView {
 
         //i计数器对应tilesDiscarded列表
         for (let i = begin; i < tileCount; i++) {
-            const d = discards[(i - 1) % dCount + 1];
+            const d = discards[i % dCount];
             const tileID = tilesDiscard[i];
             TileImageMounter.mountTileImage(d, tileID);
             d.visible = true;
@@ -514,11 +514,11 @@ export class PlayerView {
 
         //如果是新打出的牌，给加一个箭头
         if (newDiscard) {
-            const d = discards[(tileCount - 1) % dCount + 1];
+            const d = discards[tileCount % dCount];
             this.room.setArrowByParent(d);
 
             //放大打出去的牌
-            this.enlargeDiscarded(tilesDiscard[tileCount], waitDiscardReAction);
+            this.enlargeDiscarded(tilesDiscard[tileCount - 1], waitDiscardReAction);
         }
     }
 
@@ -541,8 +541,9 @@ export class PlayerView {
     }
 
     //显示对手玩家的手牌，对手玩家的手牌是暗牌显示
-    public showHandsForOpponents(tileCountInHand: number, melds: MeldType[]): void {
+    public showHandsForOpponents(tileCountInHand: number): void {
         let t = tileCountInHand;
+        const melds = this.player.melds;
 
         const meldCount = melds.length;
         if ((meldCount * 3 + t) > 13) {
@@ -551,7 +552,7 @@ export class PlayerView {
         }
 
         //melds面子牌组
-        this.showMelds(melds);
+        this.showMelds();
 
         for (let i = 0; i < t; i++) {
             this.hands[i].visible = true;
@@ -559,13 +560,14 @@ export class PlayerView {
     }
 
     //显示面子牌组
-    public showMelds(ms: MeldType[]): void {
+    public showMelds(): void {
+        const ms = this.player.melds;
         const length = ms.length;
         const rm = MELD_COMPONENT_PREFIX[this.viewChairID - 1];
         //摆放牌
         const mymeldTilesNode = this.myView.getChild("melds").asCom;
-        for (let i = 1; i <= length; i++) {
-            const mv = mymeldTilesNode.getChild(`meld${i}`);
+        for (let i = 0; i < length; i++) {
+            const mv = mymeldTilesNode.getChild(`meld${i + 1}`);
             const mm = mymeldTilesNode.getChild(`myMeld${i}`);
             if (mm != null) {
                 mymeldTilesNode.removeChild(mm, true);
@@ -584,13 +586,12 @@ export class PlayerView {
     //显示面子牌组，暗杠需要特殊处理，如果是自己的暗杠，
     //则明牌显示前3张，第4张暗牌显示（以便和明杠区分）
     //如果是别人的暗杠，则全部暗牌显示
-    public mountMeldImage(meldView: fgui.GComponent, msgMeld: MeldType): void {
+    public mountMeldImage(meldView: fgui.GComponent, msgMeld: proto.mahjong.IMsgMeldTile): void {
         const viewChairID = this.room.getPlayerViewChairIDByChairID(msgMeld.contributor);
 
         const t1 = meldView.getChild("n1").asCom;
         const t2 = meldView.getChild("n2").asCom;
         const t3 = meldView.getChild("n3").asCom;
-        const t4 = meldView.getChild("n4").asCom;
         const meldType = msgMeld.meldType;
         const mtProto = mjproto.MeldType;
         if (meldType === mtProto.enumMeldTypeSequence) {
@@ -612,6 +613,7 @@ export class PlayerView {
             TileImageMounter.mountMeldEnableImage(t3, msgMeld.tile1, this.viewChairID);
             this.setMeldTileDirection(false, t2, viewChairID, this.viewChairID);
         } else if (meldType === mtProto.enumMeldTypeExposedKong || meldType === mtProto.enumMeldTypeTriplet2Kong) {
+            const t4 = meldView.getChild("n4").asCom;
             TileImageMounter.mountMeldEnableImage(t1, msgMeld.tile1, this.viewChairID);
             TileImageMounter.mountMeldEnableImage(t2, msgMeld.tile1, this.viewChairID);
             TileImageMounter.mountMeldEnableImage(t3, msgMeld.tile1, this.viewChairID);
@@ -665,7 +667,9 @@ export class PlayerView {
     }
 
     //为本人显示手牌，也即是1号playerView(prefab中的1号)//@param wholeMove 是否整体移动
-    public showHandsForMe(wholeMove: boolean, tileshand: number[], melds: MeldType[], isRichi: boolean): void {
+    public showHandsForMe(wholeMove: boolean): void {
+        const melds = this.player.melds;
+        const tileshand = this.player.tilesHand;
         const tileCountInHand = tileshand.length;
         const handsClickCtrls = this.handsClickCtrls;
         //删除tileID
@@ -695,7 +699,7 @@ export class PlayerView {
         }
 
         //melds面子牌组
-        this.showMelds(melds);
+        this.showMelds();
 
         let j = 0;
         for (let i = begin; i < endd; i++) {
@@ -703,7 +707,7 @@ export class PlayerView {
             TileImageMounter.mountTileImage(h, tileshand[i]);
             h.visible = true;
             handsClickCtrls[j].tileID = tileshand[i];
-            if (isRichi) {
+            if (this.player.isRichi) {
                 //如果是听牌状态下，则不再把牌弄回白色（让手牌一直是灰色的）
                 //判断 handsClickCtrls[j].isDiscardable 是否为 true, 是的话 则不能 setGray
                 this.setGray(h);
@@ -714,12 +718,14 @@ export class PlayerView {
     }
 
     //把手牌摊开，包括对手的暗杠牌，用于一手牌结束时
-    public hand2Exposed(wholeMove: boolean, melds: MeldType[], tileshand: number[]): void {
+    public hand2Exposed(wholeMove: boolean): void {
         //不需要手牌显示了，全部摊开
         this.hideLights();
 
         //先显示所有melds面子牌组
-        this.showMelds(melds);
+        const melds = this.player.melds;
+        const tileshand = this.player.tilesHand;
+        this.showMelds();
         const tileCountInHand = tileshand.length;
 
         let begin = 0;
@@ -791,7 +797,7 @@ export class PlayerView {
         if (clickCtrl.readyHandList != null && clickCtrl.readyHandList.length > 0) {
             //如果此牌可以听
             const tingP: TingPai[] = [];
-            for (let i = 1; i <= clickCtrl.readyHandList.length; i += 2) {
+            for (let i = 0; i < clickCtrl.readyHandList.length; i += 2) {
                 tingP.push(new TingPai(clickCtrl.readyHandList[i], 1, clickCtrl.readyHandList[i + 1]));
             }
             this.room.showTingDataView(tingP);
@@ -828,7 +834,7 @@ export class PlayerView {
         if (!this.room.isListensObjVisible() && readyHandList != null && readyHandList.length > 0) {
             //const tingData = {}
             const tingP: TingPai[] = [];
-            for (let i = 1; i <= readyHandList.length; i += 2) {
+            for (let i = 0; i < readyHandList.length; i += 2) {
                 tingP.push(new TingPai(readyHandList[i], 1, readyHandList[i + 1]));
             }
             this.room.showTingDataView(tingP);
@@ -932,7 +938,7 @@ export class PlayerView {
 
     //还原所有手牌到它初始化时候的位置，并把clickCount重置为0
     public restoreHandPositionAndClickCount(index: number): void {
-        for (let i = 0; i < 13; i++) {
+        for (let i = 0; i < 14; i++) {
             if (i !== index) {
                 const clickCtrl = this.handsClickCtrls[i];
                 const originPos = this.handsOriginPos[i];
@@ -945,7 +951,7 @@ export class PlayerView {
 
     //隐藏听牌标志
     public hideTing(): void {
-        for (let i = 0; i < 13; i++) {
+        for (let i = 0; i < 14; i++) {
             const clickCtrl = this.handsClickCtrls[i];
             if (clickCtrl != null && clickCtrl.t != null) {
                 clickCtrl.t.visible = false;

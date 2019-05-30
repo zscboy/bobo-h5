@@ -11,15 +11,15 @@ export namespace HandlerMsgRoomUpdate {
         room.scoreRecords = scoreRecords;
         if (scoreRecords !== null && scoreRecords.length > 0) {
             const totalScores: number[] = [];
+            totalScores[0] = 0;
             totalScores[1] = 0;
             totalScores[2] = 0;
             totalScores[3] = 0;
-            totalScores[4] = 0;
-            for (let i = 1; i <= scoreRecords.length; i++) {
-                const playerRecords = scoreRecords[i].playerRecords;
-                for (let j = 1; j <= 4; j++) {
+            for (const scoreRecord of scoreRecords) {
+                const playerRecords = scoreRecord.playerRecords;
+                for (let j = 0; j < 3; j++) {
                     const playerRecord = playerRecords[j];
-                    if (playerRecord !== null) {
+                    if (playerRecord !== undefined && playerRecord !== null) {
                         const scoreNumber = playerRecord.score;
                         const userID = playerRecord.userID;
                         const player = <Player>room.getPlayerInterfaceByUserID(userID);

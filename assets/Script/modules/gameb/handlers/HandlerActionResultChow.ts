@@ -1,6 +1,6 @@
 import { Player } from "../Player";
 import { proto } from "../proto/protoGame";
-import { MeldType, RoomInterface } from "../RoomInterface";
+import { RoomInterface } from "../RoomInterface";
 
 /**
  * 响应服务器吃牌通知
@@ -21,7 +21,7 @@ export namespace HandlerActionResultChow {
         }
 
         //直接把消息meld保存到玩家的meld列表中
-        player.addMeld(<MeldType>actionMeld);
+        player.addMeld(actionMeld);
 
         //如果newFlowers有内容，则需要刷新暗杠列表
         const newFlowers = actionResultMsg.newFlowers;

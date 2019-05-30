@@ -163,11 +163,12 @@ export class PlayerView {
             handsClickCtrls[i] = cc;
 
             if (isMe) {
-                // card.onClick.Set(
-                //     function (obj) {
-                //         this.onHandTileBtnClick(obj, i)
-                //     }
-                // )
+                card.onClick(
+                    () => {
+                        this.onHandTileBtnClick(i);
+                    },
+                    this
+                );
                 // this.onDrag(card, i)
             }
         }
@@ -326,7 +327,7 @@ export class PlayerView {
         //起始
         const onStart = (): void => {
             this.head.readyIndicator.visible = false;
-            if (this.checkReadyHandBtn !== undefined) {
+            if (this.viewChairID === 1) {
                 this.checkReadyHandBtn.visible = false;
             }
         };
@@ -426,7 +427,6 @@ export class PlayerView {
 
     //隐藏手牌列表
     public hideHands(): void {
-        Logger.debug("this.hands -----------------:", this.hands);
         if (this.hands != null) {
             for (const h of this.hands) {
                 h.visible = false;
@@ -471,13 +471,13 @@ export class PlayerView {
 
         //从那张牌开始挂载，由于tileCount可能大于dCount
         //因此，需要选择tilesDiscarded末尾的dCount个牌显示即可
-        let begin = tileCount - dCount + 1;
-        if (begin < 1) {
-            begin = 1;
+        let begin = tileCount - dCount;
+        if (begin < 0) {
+            begin = 0;
         }
 
         //i计数器对应tilesFlower列表
-        for (let i = begin; i <= tileCount; i++) {
+        for (let i = begin; i < tileCount; i++) {
             const d = flowers[(i - 1) % dCount + 1];
             const tileID = tilesFlower[i];
             TileImageMounter.mountTileImage(d, tileID);
@@ -499,13 +499,13 @@ export class PlayerView {
         const dCount = discards.length;
         //从那张牌开始挂载，由于tileCount可能大于dCount
         //因此，需要选择tilesDiscarded末尾的dCount个牌显示即可
-        let begin = tileCount - dCount + 1;
-        if (begin < 1) {
-            begin = 1;
+        let begin = tileCount - dCount;
+        if (begin < 0) {
+            begin = 0;
         }
 
         //i计数器对应tilesDiscarded列表
-        for (let i = begin; i <= tileCount; i++) {
+        for (let i = begin; i < tileCount; i++) {
             const d = discards[(i - 1) % dCount + 1];
             const tileID = tilesDiscard[i];
             TileImageMounter.mountTileImage(d, tileID);
@@ -553,7 +553,7 @@ export class PlayerView {
         //melds面子牌组
         this.showMelds(melds);
 
-        for (let i = 1; i <= t; i++) {
+        for (let i = 0; i < t; i++) {
             this.hands[i].visible = true;
         }
     }
@@ -677,19 +677,19 @@ export class PlayerView {
         //恢复所有牌的位置，由于点击手牌时会把手牌向上移动
         this.restoreHandPositionAndClickCount(-1);
 
-        let begin = 1;
+        let begin = 0;
         let endd = tileCountInHand;
 
         const meldCount = melds.length;
         if ((meldCount * 3 + tileCountInHand) > 13) {
             this.hands[13].visible = true;
             if (wholeMove) {
-                TileImageMounter.mountTileImage(this.hands[13], tileshand[1]);
-                handsClickCtrls[13].tileID = tileshand[1];
-                begin = 2;
+                TileImageMounter.mountTileImage(this.hands[13], tileshand[0]);
+                handsClickCtrls[13].tileID = tileshand[0];
+                begin = 1;
             } else {
-                TileImageMounter.mountTileImage(this.hands[13], tileshand[tileCountInHand]);
-                handsClickCtrls[13].tileID = tileshand[tileCountInHand];
+                TileImageMounter.mountTileImage(this.hands[13], tileshand[tileCountInHand - 1]);
+                handsClickCtrls[13].tileID = tileshand[tileCountInHand - 1];
                 endd = tileCountInHand - 1;
             }
         }
@@ -697,8 +697,8 @@ export class PlayerView {
         //melds面子牌组
         this.showMelds(melds);
 
-        let j = 1;
-        for (let i = begin; i <= endd; i++) {
+        let j = 0;
+        for (let i = begin; i < endd; i++) {
             const h = this.hands[j];
             TileImageMounter.mountTileImage(h, tileshand[i]);
             h.visible = true;
@@ -722,25 +722,25 @@ export class PlayerView {
         this.showMelds(melds);
         const tileCountInHand = tileshand.length;
 
-        let begin = 1;
+        let begin = 0;
         let endd = tileCountInHand;
 
         const meldCount = melds.length;
         if ((meldCount * 3 + tileCountInHand) > 13) {
             const light = this.lights[13];
             if (wholeMove) {
-                TileImageMounter.mountTileImage(light, tileshand[tileCountInHand]);
+                TileImageMounter.mountTileImage(light, tileshand[tileCountInHand - 1]);
                 light.visible = true;
                 endd = tileCountInHand - 1;
             } else {
-                TileImageMounter.mountTileImage(light, tileshand[1]);
+                TileImageMounter.mountTileImage(light, tileshand[0]);
                 light.visible = true;
-                begin = 2;
+                begin = 1;
             }
         }
 
-        let j = 1;
-        for (let i = begin; i <= endd; i++) {
+        let j = 0;
+        for (let i = begin; i < endd; i++) {
             const light = this.lights[j];
             TileImageMounter.mountTileImage(light, tileshand[i]);
             light.visible = true;
@@ -763,7 +763,7 @@ export class PlayerView {
     }
 
     //处理玩家点击手牌按钮
-    public onHandTileBtnClick(obj: fgui.GObject, index: number): void {
+    public onHandTileBtnClick(index: number): void {
         const handsClickCtrls = this.handsClickCtrls;
 
         const player = this.player;

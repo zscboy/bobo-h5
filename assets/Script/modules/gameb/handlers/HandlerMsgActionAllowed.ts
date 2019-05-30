@@ -66,13 +66,13 @@ export namespace HandlerMsgActionAllowed {
                 }
                 const handsClickCtrls = playerView.handsClickCtrls;
                 if (p.isRichi) {
-                    for (let i = 1; i <= 13; i++) {
+                    for (let i = 0; i < 13; i++) {
                         const handsClickCtrl = handsClickCtrls[i];
                         handsClickCtrl.isDiscardable = false;
                         handsClickCtrl.isGray = true;
                         playerView.setGray(handsClickCtrl.h);
                     }
-                    const handsClickCtrl14 = handsClickCtrls[14];
+                    const handsClickCtrl14 = handsClickCtrls[13];
                     handsClickCtrl14.isDiscardable = true;
                     if (discarAbleTiles[1].readyHandList.length < 1) {
                         handsClickCtrl14.t.visible = false;
@@ -80,7 +80,7 @@ export namespace HandlerMsgActionAllowed {
                         handsClickCtrl14.t.visible = true;
                     }
                 } else {//检查所有可以打出的牌，并设置其点击控制isDiscardable为true，以便玩家可以点击
-                    for (let i = 1; i <= 14; i++) {
+                    for (let i = 0; i < 14; i++) {
                         const handsClickCtrl = handsClickCtrls[i];
                         const tileID = handsClickCtrl.tileID;
                         const discardAbleTile = discarAbleTilesMap[tileID];

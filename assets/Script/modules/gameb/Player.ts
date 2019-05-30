@@ -118,7 +118,7 @@ export class Player {
                 last = this.tilesHand.pop();
             }
             this.tilesHand.sort((x: number, y: number) => {
-                return x - y;
+                return y - x;
             });
             if (excludeLast) {
                 this.tilesHand.push(last);

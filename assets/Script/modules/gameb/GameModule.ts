@@ -104,7 +104,13 @@ export class GameModule extends cc.Component implements GameModuleInterface {
         const rID = roomInfo.roomID;
         const uID = myUser.userID;
 
-        const path = LEnv.cfmt(LEnv.gameWebsocketPlay, serverUUID);
+        let path;
+        if (roomInfo.roomID === "monkey-room") {
+            path = LEnv.cfmt(LEnv.gameWebsocketMonkey, serverUUID);
+        } else {
+            path = LEnv.cfmt(LEnv.gameWebsocketPlay, serverUUID);
+        }
+
         url = `${host}${path}?userID=${uID}&roomID=${rID}&tk=${tk}&web=1`;
 
         Logger.debug("tryEnterRoom, url:", url);

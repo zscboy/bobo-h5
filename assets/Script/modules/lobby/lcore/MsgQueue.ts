@@ -61,10 +61,6 @@ export class MsgQueue {
         return this.waiting.promise;
     }
 
-    public pushWebsocketEvent(msg: Message): void {
-        this.pushMessage(msg);
-    }
-
     public pushWebsocketBinaryEvent(gmsg: MessageView): void {
         Logger.debug("pushWebsocketBinaryEvent:", gmsg);
         const msg = new Message(MsgType.wsData, gmsg);
@@ -117,7 +113,7 @@ export class MsgQueue {
         }
     }
 
-    protected pushMessage(msg: Message): void {
+    public pushMessage(msg: Message): void {
         let isBlocked = false;
         if (this.priority > 0) {
             isBlocked = true;

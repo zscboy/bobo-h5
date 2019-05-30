@@ -114,7 +114,7 @@ export class Replay {
     public startStepTimer(): void {
         const cb = () => {
             const mt = new Message(MsgType.replay);
-            this.mq.pushWebsocketEvent(mt);
+            this.mq.pushMessage(mt);
         };
 
         this.host.component.schedule(
@@ -160,7 +160,7 @@ export class Replay {
 
     public onBackClick(): void {
         const msg = new Message(MsgType.quit);
-        this.mq.pushWebsocketEvent(msg);
+        this.mq.pushMessage(msg);
     }
 
     public onPauseClick(): void {
@@ -175,7 +175,7 @@ export class Replay {
         this.startStepTimer();
 
         const msg = new Message(MsgType.replay);
-        this.mq.pushWebsocketEvent(msg);
+        this.mq.pushMessage(msg);
     }
 
     public onFastClick(): void {

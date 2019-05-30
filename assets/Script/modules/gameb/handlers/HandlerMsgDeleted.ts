@@ -1,6 +1,6 @@
 import { Logger } from "../../lobby/lcore/LCoreExports";
 import { proto } from "../proto/protoGame";
-import { RoomInterface } from "../RoomInterfaces";
+import { RoomInterface } from "../RoomInterface";
 
 const mjproto2 = proto.mahjong.RoomDeleteReason;
 const deletedReasons: { [key: number]: string } = {

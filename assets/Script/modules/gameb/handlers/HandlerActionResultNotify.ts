@@ -1,6 +1,6 @@
 import { Logger } from "../../lobby/lcore/LCoreExports";
 import { proto } from "../proto/protoGame";
-import { RoomInterface } from "../RoomInterfaces";
+import { RoomInterface } from "../RoomInterface";
 import { HandlerActionResultChow } from "./HandlerActionResultChow";
 import { HandlerActionResultDiscarded } from "./HandlerActionResultDiscarded";
 import { HandlerActionResultDraw } from "./HandlerActionResultDraw";

@@ -1,4 +1,4 @@
-import { RoomInterface } from "../RoomInterfaces";
+import { RoomInterface } from "../RoomInterface";
 
 /**
  * 响应显示提示

@@ -4,6 +4,7 @@ import { proto } from "../proto/protoLobby";
 import { EmailView } from "./EmailView";
 import { GameRecordView } from "./GameRecordView";
 import { NewRoomView } from "./NewRoomView";
+import { UserInfoView } from "./UserInfoView";
 const { ccclass } = cc._decorator;
 
 interface MsgHandler {
@@ -98,7 +99,7 @@ export class LobbyView extends cc.Component {
     }
     private onFriendClick(): void {
         const myUser = { userID: "6" };
-        const roomInfo = { roomID: "monkey-room" };
+        const roomInfo = { roomID: "monkey-room", roomNumber: "monkey-roo" };
 
         const params: GameModuleLaunchArgs = {
             jsonString: "",
@@ -138,6 +139,7 @@ export class LobbyView extends cc.Component {
 
     private openUserInfoView(): void {
         // TODO:
+        this.addComponent(UserInfoView);
     }
 
     private initInfoView(userInfo: fgui.GComponent): void {

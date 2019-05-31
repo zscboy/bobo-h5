@@ -1,4 +1,5 @@
 import { Logger } from "../lobby/lcore/LCoreExports";
+import { ChatView } from "../lobby/views/chat/ChatExports";
 import { DisbandView } from "./DisbandView";
 import { PlayerView } from "./PlayerView";
 import { proto } from "./proto/protoGame";
@@ -268,6 +269,23 @@ export class RoomView {
     }
 
     /**
+     * 聊天按钮点击事件
+     */
+    private onChatBtnClick(): void {
+        const load = this.room.getRoomHost().loader;
+        if (load === null) {
+            Logger.debug("load === null");
+        }
+
+        let chatView = this.room.getRoomHost().component.getComponent(ChatView);
+        if (chatView === null) {
+            chatView = this.room.getRoomHost().component.addComponent(ChatView);
+        }
+
+        chatView.show(load);
+    }
+
+    /**
      * 初始化
      */
     private initButton(): void {
@@ -277,6 +295,9 @@ export class RoomView {
         //         chatView.showChatView()
         //     }
         // )
+
+        const chatBtn = this.unityViewNode.getChild("chatBtn");
+        chatBtn.onClick(this.onChatBtnClick, this);
 
         const settingBtn = this.unityViewNode.getChild("settingBtn");
 

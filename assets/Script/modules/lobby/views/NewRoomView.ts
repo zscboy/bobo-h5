@@ -128,6 +128,7 @@ export class NewRoomView extends cc.Component {
 
         this.win.hide();
         this.win.dispose();
+        this.destroy();
 
         const myUserID = DataStore.getString("userID", "");
         const myUser = { userID: myUserID };

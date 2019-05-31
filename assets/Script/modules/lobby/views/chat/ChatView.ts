@@ -2,6 +2,7 @@ import { DataStore, Dialog, GResLoader, HTTP, LEnv, Logger } from "../../lcore/L
 import { proto } from "../../proto/protoLobby";
 // tslint:disable-next-line:no-require-imports
 import bytebuffer = require("../../protobufjs/bytebuffer");
+import { LobbyViewInterface } from "../LobbyViewInterface";
 
 const phraseMap: {[key: number]: string} = {
     [1]: "快点啊，都等到我花都谢了。。。",
@@ -40,15 +41,13 @@ export class ChatView extends cc.Component {
     private chatText: fgui.GTextInput;
     private eventTarget: cc.EventTarget;
 
+    private lobbyView: LobbyViewInterface;
+
+    private onMessageFunc: Function;
+
     private userID: string;
 
     private msgList: {[key: number]: proto.lobby.MsgChat};
-
-    public onMessage(data: ByteBuffer): void {
-        Logger.debug("EmailView.onMessage");
-        this.addMsg(data);
-
-    }
 
     public show(loader: GResLoader): void {
         if (this.view !== null) {
@@ -74,6 +73,16 @@ export class ChatView extends cc.Component {
 
         this.userID = DataStore.getString("userID", "");
 
+        // this.lm = lm;
+        this.lobbyView = <LobbyViewInterface> this.node.getParent().getComponent("LobbyView");
+        if (this.lobbyView !== null) {
+          this.onMessageFunc = this.lobbyView.on(`${proto.lobby.MessageCode.OPChat}`, this.onMessage, this);
+        }
+
+    }
+
+    protected onMessage(data: ByteBuffer): void {
+        this.addMsg(data);
     }
 
     protected onLoad(): void {
@@ -81,7 +90,12 @@ export class ChatView extends cc.Component {
     }
 
     protected onDestroy(): void {
+        if (this.lobbyView !== null) {
+            this.lobbyView.off(`${proto.lobby.MessageCode.OPChat}`, this.onMessageFunc);
+        }
+
         this.view.dispose();
+
     }
 
     private initView(): void {
@@ -241,13 +255,6 @@ export class ChatView extends cc.Component {
 
     // 更新短语列表
     private updatePhraseList(): void {
-
-        // this.phraseList.onClickItem:Add(
-        //     function(onClickItem)
-        //         self:sendMsg(onClickItem.data:GetChild("n0").text)
-        //     end
-        // )
-
         this.phraseList.numItems = Object.keys(phraseMap).length;
     }
 

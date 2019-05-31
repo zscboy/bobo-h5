@@ -74,6 +74,10 @@ export class Room {
         this.host = host;
     }
 
+    public getRoomHost(): RoomHost {
+        return this.host;
+    }
+
     public dispatchWebsocketMsg(msg: proto.mahjong.GameMessage): void {
         Logger.debug("Room.dispatchWebsocketMsg, ops:", msg.Ops);
         const handler = msgHandlers[msg.Ops];

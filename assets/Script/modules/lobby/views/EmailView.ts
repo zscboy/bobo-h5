@@ -74,14 +74,11 @@ export class EmailView extends cc.Component {
         //附件列表
         this.attachmentsList = this.view.getChild("emailAttachmentList").asList;
         this.attachmentsList.itemRenderer = this.renderAttachmentListItem;
-
         this.attachmentsList.setVirtual();
 
         //邮件列表
         this.emailList = this.view.getChild("mailList").asList;
-
         this.emailList.itemRenderer = this.renderPhraseListItem;
-
         this.emailList.setVirtual();
 
         //拉取邮件

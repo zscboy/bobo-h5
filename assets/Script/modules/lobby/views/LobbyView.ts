@@ -4,6 +4,7 @@ import {
 } from "../lcore/LCoreExports";
 import { LMsgCenter } from "../LMsgCenter";
 import { proto } from "../proto/protoLobby";
+import { ClubView } from "./club/ClubView";
 import { EmailView } from "./EmailView";
 import { GameRecordView } from "./GameRecordView";
 import { NewRoomView } from "./NewRoomView";
@@ -116,6 +117,7 @@ export class LobbyView extends cc.Component {
 
     private onCreateClick(): void {
         // TODO:
+        this.addComponent(ClubView);
     }
 
     private onCoinClick(): void {

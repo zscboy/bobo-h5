@@ -26,7 +26,7 @@ export class GResLoaderImpl implements GResLoader {
                 Logger.debug(`GResLoader load progress:${completedCount}/${totalCount}`);
             },
             (error, _, urls) => {
-                console.log(`GResLoader load, error:${error}`);
+                Logger.debug(`GResLoader load, error:${error}`);
 
                 urls.forEach((u) => {
                     Logger.debug("GResLoader loaded:", u);

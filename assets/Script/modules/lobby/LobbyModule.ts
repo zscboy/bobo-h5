@@ -69,7 +69,7 @@ export class LobbyModule extends cc.Component implements LobbyModuleInterface {
         this.gameLoader.loadResDir(
             moduleName,
             (error) => {
-                console.log(`gamea load, error:${error}`);
+                Logger.debug(`gamea load, error:${error}`);
                 if (error == null) {
                     switch (moduleName) {
                         case "gameb":
@@ -92,6 +92,8 @@ export class LobbyModule extends cc.Component implements LobbyModuleInterface {
     protected start(): void {
         // 设置帧率
         cc.game.setFrameRate(29);
+        cc.debug.setDisplayStats(true);
+        (<any>cc.debug)._resetDebugSetting(cc.debug.DebugMode.INFO); // tslint:disable-line:no-any no-unsafe-any
 
         // 初始化fgui
         fgui.addLoadHandler();
@@ -102,7 +104,7 @@ export class LobbyModule extends cc.Component implements LobbyModuleInterface {
 
         // 加载大厅的所有资源，显示加载进度
         this.loader.loadResDir("lobby", (error) => {
-            console.log(`lobby load, error:${error}`);
+            Logger.debug(`lobby load, error:${error}`);
             if (error == null) {
                 this.onResLoadedCompleted();
             }

@@ -1,4 +1,7 @@
-import { DataStore, GameModuleLaunchArgs, LEnv, LobbyModuleInterface, Logger } from "../lcore/LCoreExports";
+import {
+    DataStore,
+    GameModuleLaunchArgs, LEnv, LobbyModuleInterface, Logger
+} from "../lcore/LCoreExports";
 import { LMsgCenter } from "../LMsgCenter";
 import { proto } from "../proto/protoLobby";
 import { ClubView } from "./club/ClubView";

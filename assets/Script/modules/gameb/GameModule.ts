@@ -1,8 +1,8 @@
 // tslint:disable-next-line:max-line-length
 import {
-    DataStore, Dialog, GameModuleInterface, GameModuleLaunchArgs,
-    GResLoader, LEnv, LobbyModuleInterface, Logger, MsgQueue,
-    MsgType, RoomInfo, UserInfo, WS
+    AnimationMgr, DataStore, Dialog, GameModuleInterface,
+    GameModuleLaunchArgs, GResLoader, LEnv, LobbyModuleInterface, Logger,
+    MsgQueue, MsgType, RoomInfo, UserInfo, WS
 } from "../lobby/lcore/LCoreExports";
 import { proto } from "./proto/protoGame";
 import { Room } from "./Room";
@@ -22,8 +22,6 @@ export class GameModule extends cc.Component implements GameModuleInterface {
 
     private view: fgui.GComponent;
 
-    // private url: string;
-    // private myUser: UserInfo;
     private ws: WS;
     private mq: MsgQueue;
     private connectErrorCount: number;
@@ -32,6 +30,7 @@ export class GameModule extends cc.Component implements GameModuleInterface {
     private mRoom: Room;
     private lm: LobbyModuleInterface;
     private mUser: UserInfo;
+    private mAnimationMgr: AnimationMgr;
 
     public get room(): Room {
         return this.mRoom;
@@ -49,6 +48,10 @@ export class GameModule extends cc.Component implements GameModuleInterface {
         return this.mUser;
     }
 
+    public get animationMgr(): AnimationMgr {
+        return this.mAnimationMgr;
+    }
+
     public async launch(args: GameModuleLaunchArgs): Promise<void> {
         // 尝试进入房间
         this.lm = args.lm;
@@ -62,6 +65,7 @@ export class GameModule extends cc.Component implements GameModuleInterface {
         fgui.GRoot.inst.addChild(view);
         this.view = view;
 
+        this.mAnimationMgr = new AnimationMgr(this.lm.loader);
         await this.tryEnterRoom(args.uuid, args.userInfo, args.roomInfo);
     }
 

@@ -9,17 +9,12 @@
   "design-resolution-width": 1136,
   "excluded-modules": [
     "Canvas Renderer",
-    "WebGL Renderer",
     "Renderer Texture",
     "Dynamic Atlas",
-    "Label Effect",
-    "Mask",
-    "Graphics",
     "ParticleSystem",
     "TiledMap",
     "Spine Skeleton",
     "DragonBones",
-    "RichText",
     "MotionStreak",
     "Widget",
     "Button",
@@ -31,7 +26,6 @@
     "PageViewIndicator",
     "Slider",
     "Layout",
-    "EditBox",
     "VideoPlayer",
     "WebView",
     "Audio",
@@ -64,13 +58,12 @@
   "group-list": [
     "default"
   ],
-  "last-module-event-record-time": 0,
+  "last-module-event-record-time": 1559277604399,
   "simulator-orientation": false,
   "simulator-resolution": {
     "height": 640,
     "width": 960
   },
   "use-customize-simulator": true,
-  "use-project-simulator-setting": false,
-  "start-scene": "current"
+  "use-project-simulator-setting": false
 }

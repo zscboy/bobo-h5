@@ -82,7 +82,7 @@ export class LoginView extends cc.Component {
     }
 
     public onLoginClick(): void {
-        console.log("onQuicklyBtnClick");
+        Logger.debug("onQuicklyBtnClick");
         this.quicklyLogin();
     }
 

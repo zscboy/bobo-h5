@@ -20,37 +20,33 @@ export namespace Logger {
         level = filterLevel;
     };
 
-    const log = (msg: any, ...args: any[]): void => { // tslint:disable-line:no-any
-        cc.log(msg, ...args);
-    };
-
     export const trace = (msg: any, ...args: any[]): void => { // tslint:disable-line:no-any
         if (level >= LogLevel.TRACE) {
-            log(msg, ...args);
+            cc.log(msg, ...args);
         }
     };
 
     export const debug = (msg: any, ...args: any[]): void => { // tslint:disable-line:no-any
         if (level >= LogLevel.DEBUG) {
-            log(msg, ...args);
+            cc.log(msg, ...args);
         }
     };
 
     export const warn = (msg: any, ...args: any[]): void => { // tslint:disable-line:no-any
         if (level >= LogLevel.WARN) {
-            log(msg, ...args);
+            cc.warn(msg, ...args);
         }
     };
 
     export const error = (msg: any, ...args: any[]): void => { // tslint:disable-line:no-any
         if (level >= LogLevel.ERROR) {
-            log(msg, ...args);
+            cc.error(msg, ...args);
         }
     };
 
     export const fatal = (msg: any, ...args: any[]): void => { // tslint:disable-line:no-any
         if (level >= LogLevel.FATAL) {
-            log(msg, ...args);
+            cc.error(msg, ...args);
         }
     };
 }

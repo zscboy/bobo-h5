@@ -26,7 +26,7 @@ export class GResLoaderImpl implements GResLoader {
                 Logger.debug(`GResLoader load progress:${completedCount}/${totalCount}`);
             },
             (error, _, urls) => {
-                console.log(`GResLoader load, error:${error}`);
+                Logger.debug(`GResLoader load, error:${error}`);
 
                 urls.forEach((u) => {
                     Logger.debug("GResLoader loaded:", u);
@@ -36,6 +36,17 @@ export class GResLoaderImpl implements GResLoader {
                 onCompleted(error);
             }
         );
+    }
+
+    public loadPrefab(prefabName: string, onCompleted: (error: Error, res: cc.Prefab) => void): void {
+        cc.loader.loadRes(prefabName, cc.Prefab, (error, res: cc.Prefab) => {
+            if (error !== null) {
+                onCompleted(error, null);
+            } else {
+                this.loadedResSet[prefabName] = true;
+                onCompleted(null, res);
+            }
+        });
     }
 
     public unload(): void {

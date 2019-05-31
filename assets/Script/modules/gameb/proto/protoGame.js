@@ -1,17 +1,14 @@
-exports.proto = require("../lobby/protobufjs/protobuf").newBuilder({})['import']({
+exports.proto = require("protobuf").newBuilder({})['import']({
     "package": null,
     "syntax": "proto2",
-    "messages": [
-        {
+    "messages": [{
             "name": "dfmahjong",
             "fields": [],
             "syntax": "proto2",
-            "enums": [
-                {
+            "enums": [{
                     "name": "GreatWinType",
                     "syntax": "proto2",
-                    "values": [
-                        {
+                    "values": [{
                             "name": "enumGreatWinType_None",
                             "id": 0
                         },
@@ -96,8 +93,7 @@ exports.proto = require("../lobby/protobufjs/protobuf").newBuilder({})['import']
                 {
                     "name": "MiniWinType",
                     "syntax": "proto2",
-                    "values": [
-                        {
+                    "values": [{
                             "name": "enumMiniWinType_None",
                             "id": 0
                         },
@@ -158,12 +154,10 @@ exports.proto = require("../lobby/protobufjs/protobuf").newBuilder({})['import']
             "name": "mahjong",
             "fields": [],
             "syntax": "proto2",
-            "messages": [
-                {
+            "messages": [{
                     "name": "MsgReplayPlayerInfo",
                     "syntax": "proto2",
-                    "fields": [
-                        {
+                    "fields": [{
                             "rule": "required",
                             "type": "string",
                             "name": "userID",
@@ -210,8 +204,7 @@ exports.proto = require("../lobby/protobufjs/protobuf").newBuilder({})['import']
                 {
                     "name": "MsgReplayPlayerScoreSummary",
                     "syntax": "proto2",
-                    "fields": [
-                        {
+                    "fields": [{
                             "rule": "required",
                             "type": "int32",
                             "name": "chairID",
@@ -234,8 +227,7 @@ exports.proto = require("../lobby/protobufjs/protobuf").newBuilder({})['import']
                 {
                     "name": "MsgReplayRecordSummary",
                     "syntax": "proto2",
-                    "fields": [
-                        {
+                    "fields": [{
                             "rule": "required",
                             "type": "string",
                             "name": "recordUUID",
@@ -270,8 +262,7 @@ exports.proto = require("../lobby/protobufjs/protobuf").newBuilder({})['import']
                 {
                     "name": "MsgReplayRoom",
                     "syntax": "proto2",
-                    "fields": [
-                        {
+                    "fields": [{
                             "rule": "required",
                             "type": "int32",
                             "name": "recordRoomType",
@@ -318,8 +309,7 @@ exports.proto = require("../lobby/protobufjs/protobuf").newBuilder({})['import']
                 {
                     "name": "SRMsgPlayerInfo",
                     "syntax": "proto2",
-                    "fields": [
-                        {
+                    "fields": [{
                             "rule": "required",
                             "type": "string",
                             "name": "userID",
@@ -360,8 +350,7 @@ exports.proto = require("../lobby/protobufjs/protobuf").newBuilder({})['import']
                 {
                     "name": "SRDealDetail",
                     "syntax": "proto2",
-                    "fields": [
-                        {
+                    "fields": [{
                             "rule": "required",
                             "type": "int32",
                             "name": "chairID",
@@ -384,8 +373,7 @@ exports.proto = require("../lobby/protobufjs/protobuf").newBuilder({})['import']
                 {
                     "name": "SRAction",
                     "syntax": "proto2",
-                    "fields": [
-                        {
+                    "fields": [{
                             "rule": "required",
                             "type": "int32",
                             "name": "action",
@@ -426,8 +414,7 @@ exports.proto = require("../lobby/protobufjs/protobuf").newBuilder({})['import']
                 {
                     "name": "SRMsgHandRecorderExtra",
                     "syntax": "proto2",
-                    "fields": [
-                        {
+                    "fields": [{
                             "rule": "optional",
                             "type": "int32",
                             "name": "markup",
@@ -444,8 +431,7 @@ exports.proto = require("../lobby/protobufjs/protobuf").newBuilder({})['import']
                 {
                     "name": "SRMsgHandRecorder",
                     "syntax": "proto2",
-                    "fields": [
-                        {
+                    "fields": [{
                             "rule": "required",
                             "type": "int32",
                             "name": "bankerChairID",
@@ -540,8 +526,7 @@ exports.proto = require("../lobby/protobufjs/protobuf").newBuilder({})['import']
                 {
                     "name": "MsgPlayerInfo",
                     "syntax": "proto2",
-                    "fields": [
-                        {
+                    "fields": [{
                             "rule": "required",
                             "type": "string",
                             "name": "userID",
@@ -636,8 +621,7 @@ exports.proto = require("../lobby/protobufjs/protobuf").newBuilder({})['import']
                 {
                     "name": "PlayerHandScoreRecord",
                     "syntax": "proto2",
-                    "fields": [
-                        {
+                    "fields": [{
                             "rule": "required",
                             "type": "string",
                             "name": "userID",
@@ -660,8 +644,7 @@ exports.proto = require("../lobby/protobufjs/protobuf").newBuilder({})['import']
                 {
                     "name": "MsgRoomHandScoreRecord",
                     "syntax": "proto2",
-                    "fields": [
-                        {
+                    "fields": [{
                             "rule": "required",
                             "type": "int32",
                             "name": "endType",
@@ -684,8 +667,7 @@ exports.proto = require("../lobby/protobufjs/protobuf").newBuilder({})['import']
                 {
                     "name": "MsgRoomInfo",
                     "syntax": "proto2",
-                    "fields": [
-                        {
+                    "fields": [{
                             "rule": "required",
                             "type": "int32",
                             "name": "state",
@@ -732,32 +714,27 @@ exports.proto = require("../lobby/protobufjs/protobuf").newBuilder({})['import']
                 {
                     "name": "RoomScoreRecords",
                     "syntax": "proto2",
-                    "fields": [
-                        {
-                            "rule": "repeated",
-                            "type": "MsgRoomHandScoreRecord",
-                            "name": "scoreRecords",
-                            "id": 1
-                        }
-                    ]
+                    "fields": [{
+                        "rule": "repeated",
+                        "type": "MsgRoomHandScoreRecord",
+                        "name": "scoreRecords",
+                        "id": 1
+                    }]
                 },
                 {
                     "name": "MsgDisbandAnswer",
                     "syntax": "proto2",
-                    "fields": [
-                        {
-                            "rule": "required",
-                            "type": "bool",
-                            "name": "agree",
-                            "id": 1
-                        }
-                    ]
+                    "fields": [{
+                        "rule": "required",
+                        "type": "bool",
+                        "name": "agree",
+                        "id": 1
+                    }]
                 },
                 {
                     "name": "MsgDisbandNotify",
                     "syntax": "proto2",
-                    "fields": [
-                        {
+                    "fields": [{
                             "rule": "required",
                             "type": "int32",
                             "name": "disbandState",
@@ -798,8 +775,7 @@ exports.proto = require("../lobby/protobufjs/protobuf").newBuilder({})['import']
                 {
                     "name": "MsgGameOverPlayerStat",
                     "syntax": "proto2",
-                    "fields": [
-                        {
+                    "fields": [{
                             "rule": "required",
                             "type": "int32",
                             "name": "chairID",
@@ -846,20 +822,17 @@ exports.proto = require("../lobby/protobufjs/protobuf").newBuilder({})['import']
                 {
                     "name": "MsgGameOver",
                     "syntax": "proto2",
-                    "fields": [
-                        {
-                            "rule": "repeated",
-                            "type": "MsgGameOverPlayerStat",
-                            "name": "playerStats",
-                            "id": 1
-                        }
-                    ]
+                    "fields": [{
+                        "rule": "repeated",
+                        "type": "MsgGameOverPlayerStat",
+                        "name": "playerStats",
+                        "id": 1
+                    }]
                 },
                 {
                     "name": "MsgRoomShowTips",
                     "syntax": "proto2",
-                    "fields": [
-                        {
+                    "fields": [{
                             "rule": "optional",
                             "type": "string",
                             "name": "tips",
@@ -876,32 +849,27 @@ exports.proto = require("../lobby/protobufjs/protobuf").newBuilder({})['import']
                 {
                     "name": "MsgRoomDelete",
                     "syntax": "proto2",
-                    "fields": [
-                        {
-                            "rule": "required",
-                            "type": "int32",
-                            "name": "reason",
-                            "id": 1
-                        }
-                    ]
+                    "fields": [{
+                        "rule": "required",
+                        "type": "int32",
+                        "name": "reason",
+                        "id": 1
+                    }]
                 },
                 {
                     "name": "MsgKickout",
                     "syntax": "proto2",
-                    "fields": [
-                        {
-                            "rule": "required",
-                            "type": "string",
-                            "name": "victimUserID",
-                            "id": 1
-                        }
-                    ]
+                    "fields": [{
+                        "rule": "required",
+                        "type": "string",
+                        "name": "victimUserID",
+                        "id": 1
+                    }]
                 },
                 {
                     "name": "MsgKickoutResult",
                     "syntax": "proto2",
-                    "fields": [
-                        {
+                    "fields": [{
                             "rule": "required",
                             "type": "int32",
                             "name": "result",
@@ -936,20 +904,17 @@ exports.proto = require("../lobby/protobufjs/protobuf").newBuilder({})['import']
                 {
                     "name": "MsgEnterRoomResult",
                     "syntax": "proto2",
-                    "fields": [
-                        {
-                            "rule": "required",
-                            "type": "int32",
-                            "name": "status",
-                            "id": 1
-                        }
-                    ]
+                    "fields": [{
+                        "rule": "required",
+                        "type": "int32",
+                        "name": "status",
+                        "id": 1
+                    }]
                 },
                 {
                     "name": "MsgDonate",
                     "syntax": "proto2",
-                    "fields": [
-                        {
+                    "fields": [{
                             "rule": "required",
                             "type": "int32",
                             "name": "toChairID",
@@ -972,8 +937,7 @@ exports.proto = require("../lobby/protobufjs/protobuf").newBuilder({})['import']
                 {
                     "name": "GameMessage",
                     "syntax": "proto2",
-                    "fields": [
-                        {
+                    "fields": [{
                             "rule": "required",
                             "type": "int32",
                             "name": "Ops",
@@ -990,8 +954,7 @@ exports.proto = require("../lobby/protobufjs/protobuf").newBuilder({})['import']
                 {
                     "name": "MsgMeldTile",
                     "syntax": "proto2",
-                    "fields": [
-                        {
+                    "fields": [{
                             "rule": "required",
                             "type": "int32",
                             "name": "meldType",
@@ -1020,8 +983,7 @@ exports.proto = require("../lobby/protobufjs/protobuf").newBuilder({})['import']
                 {
                     "name": "MsgPlayerTileList",
                     "syntax": "proto2",
-                    "fields": [
-                        {
+                    "fields": [{
                             "rule": "required",
                             "type": "int32",
                             "name": "chairID",
@@ -1062,8 +1024,7 @@ exports.proto = require("../lobby/protobufjs/protobuf").newBuilder({})['import']
                 {
                     "name": "MsgDeal",
                     "syntax": "proto2",
-                    "fields": [
-                        {
+                    "fields": [{
                             "rule": "required",
                             "type": "int32",
                             "name": "bankerChairID",
@@ -1116,8 +1077,7 @@ exports.proto = require("../lobby/protobufjs/protobuf").newBuilder({})['import']
                 {
                     "name": "MsgReadyHandTips",
                     "syntax": "proto2",
-                    "fields": [
-                        {
+                    "fields": [{
                             "rule": "required",
                             "type": "int32",
                             "name": "targetTile",
@@ -1134,8 +1094,7 @@ exports.proto = require("../lobby/protobufjs/protobuf").newBuilder({})['import']
                 {
                     "name": "MsgAllowPlayerAction",
                     "syntax": "proto2",
-                    "fields": [
-                        {
+                    "fields": [{
                             "rule": "required",
                             "type": "int32",
                             "name": "qaIndex",
@@ -1176,8 +1135,7 @@ exports.proto = require("../lobby/protobufjs/protobuf").newBuilder({})['import']
                 {
                     "name": "MsgAllowPlayerReAction",
                     "syntax": "proto2",
-                    "fields": [
-                        {
+                    "fields": [{
                             "rule": "required",
                             "type": "int32",
                             "name": "qaIndex",
@@ -1224,8 +1182,7 @@ exports.proto = require("../lobby/protobufjs/protobuf").newBuilder({})['import']
                 {
                     "name": "MsgPlayerAction",
                     "syntax": "proto2",
-                    "fields": [
-                        {
+                    "fields": [{
                             "rule": "required",
                             "type": "int32",
                             "name": "qaIndex",
@@ -1266,8 +1223,7 @@ exports.proto = require("../lobby/protobufjs/protobuf").newBuilder({})['import']
                 {
                     "name": "MsgActionResultNotify",
                     "syntax": "proto2",
-                    "fields": [
-                        {
+                    "fields": [{
                             "rule": "required",
                             "type": "int32",
                             "name": "targetChairID",
@@ -1314,8 +1270,7 @@ exports.proto = require("../lobby/protobufjs/protobuf").newBuilder({})['import']
                 {
                     "name": "MsgRestore",
                     "syntax": "proto2",
-                    "fields": [
-                        {
+                    "fields": [{
                             "rule": "required",
                             "type": "MsgDeal",
                             "name": "msgDeal",
@@ -1362,8 +1317,7 @@ exports.proto = require("../lobby/protobufjs/protobuf").newBuilder({})['import']
                 {
                     "name": "MsgPlayerScoreGreatWin",
                     "syntax": "proto2",
-                    "fields": [
-                        {
+                    "fields": [{
                             "rule": "required",
                             "type": "int32",
                             "name": "baseWinScore",
@@ -1398,8 +1352,7 @@ exports.proto = require("../lobby/protobufjs/protobuf").newBuilder({})['import']
                 {
                     "name": "MsgPlayerScoreMiniWin",
                     "syntax": "proto2",
-                    "fields": [
-                        {
+                    "fields": [{
                             "rule": "required",
                             "type": "int32",
                             "name": "miniWinType",
@@ -1440,8 +1393,7 @@ exports.proto = require("../lobby/protobufjs/protobuf").newBuilder({})['import']
                 {
                     "name": "MsgPlayerScore",
                     "syntax": "proto2",
-                    "fields": [
-                        {
+                    "fields": [{
                             "rule": "required",
                             "type": "int32",
                             "name": "targetChairID",
@@ -1506,20 +1458,17 @@ exports.proto = require("../lobby/protobufjs/protobuf").newBuilder({})['import']
                 {
                     "name": "MsgHandScore",
                     "syntax": "proto2",
-                    "fields": [
-                        {
-                            "rule": "repeated",
-                            "type": "MsgPlayerScore",
-                            "name": "playerScores",
-                            "id": 1
-                        }
-                    ]
+                    "fields": [{
+                        "rule": "repeated",
+                        "type": "MsgPlayerScore",
+                        "name": "playerScores",
+                        "id": 1
+                    }]
                 },
                 {
                     "name": "MsgHandOver",
                     "syntax": "proto2",
-                    "fields": [
-                        {
+                    "fields": [{
                             "rule": "required",
                             "type": "int32",
                             "name": "endType",
@@ -1548,8 +1497,7 @@ exports.proto = require("../lobby/protobufjs/protobuf").newBuilder({})['import']
                 {
                     "name": "MsgUpdateLocation",
                     "syntax": "proto2",
-                    "fields": [
-                        {
+                    "fields": [{
                             "rule": "required",
                             "type": "string",
                             "name": "userID",
@@ -1566,22 +1514,18 @@ exports.proto = require("../lobby/protobufjs/protobuf").newBuilder({})['import']
                 {
                     "name": "MsgUpdatePropCfg",
                     "syntax": "proto2",
-                    "fields": [
-                        {
-                            "rule": "required",
-                            "type": "string",
-                            "name": "propCfg",
-                            "id": 1
-                        }
-                    ]
+                    "fields": [{
+                        "rule": "required",
+                        "type": "string",
+                        "name": "propCfg",
+                        "id": 1
+                    }]
                 }
             ],
-            "enums": [
-                {
+            "enums": [{
                     "name": "SRFlags",
                     "syntax": "proto2",
-                    "values": [
-                        {
+                    "values": [{
                             "name": "SRNone",
                             "id": 0
                         },
@@ -1602,8 +1546,7 @@ exports.proto = require("../lobby/protobufjs/protobuf").newBuilder({})['import']
                 {
                     "name": "RoomState",
                     "syntax": "proto2",
-                    "values": [
-                        {
+                    "values": [{
                             "name": "SRoomIdle",
                             "id": 0
                         },
@@ -1624,8 +1567,7 @@ exports.proto = require("../lobby/protobufjs/protobuf").newBuilder({})['import']
                 {
                     "name": "PlayerState",
                     "syntax": "proto2",
-                    "values": [
-                        {
+                    "values": [{
                             "name": "PSNone",
                             "id": 0
                         },
@@ -1646,8 +1588,7 @@ exports.proto = require("../lobby/protobufjs/protobuf").newBuilder({})['import']
                 {
                     "name": "DisbandState",
                     "syntax": "proto2",
-                    "values": [
-                        {
+                    "values": [{
                             "name": "Waiting",
                             "id": 1
                         },
@@ -1680,8 +1621,7 @@ exports.proto = require("../lobby/protobufjs/protobuf").newBuilder({})['import']
                 {
                     "name": "TipCode",
                     "syntax": "proto2",
-                    "values": [
-                        {
+                    "values": [{
                             "name": "TCNone",
                             "id": 0
                         },
@@ -1698,8 +1638,7 @@ exports.proto = require("../lobby/protobufjs/protobuf").newBuilder({})['import']
                 {
                     "name": "RoomDeleteReason",
                     "syntax": "proto2",
-                    "values": [
-                        {
+                    "values": [{
                             "name": "IdleTimeout",
                             "id": 1
                         },
@@ -1728,8 +1667,7 @@ exports.proto = require("../lobby/protobufjs/protobuf").newBuilder({})['import']
                 {
                     "name": "KickoutResult",
                     "syntax": "proto2",
-                    "values": [
-                        {
+                    "values": [{
                             "name": "KickoutResult_Success",
                             "id": 1
                         },
@@ -1750,8 +1688,7 @@ exports.proto = require("../lobby/protobufjs/protobuf").newBuilder({})['import']
                 {
                     "name": "EnterRoomStatus",
                     "syntax": "proto2",
-                    "values": [
-                        {
+                    "values": [{
                             "name": "Success",
                             "id": 0
                         },
@@ -1812,8 +1749,7 @@ exports.proto = require("../lobby/protobufjs/protobuf").newBuilder({})['import']
                 {
                     "name": "TileID",
                     "syntax": "proto2",
-                    "values": [
-                        {
+                    "values": [{
                             "name": "enumTid_MAN1",
                             "id": 0
                         },
@@ -1990,8 +1926,7 @@ exports.proto = require("../lobby/protobufjs/protobuf").newBuilder({})['import']
                 {
                     "name": "MessageCode",
                     "syntax": "proto2",
-                    "values": [
-                        {
+                    "values": [{
                             "name": "OPInvalid",
                             "id": 0
                         },
@@ -2096,8 +2031,7 @@ exports.proto = require("../lobby/protobufjs/protobuf").newBuilder({})['import']
                 {
                     "name": "MeldType",
                     "syntax": "proto2",
-                    "values": [
-                        {
+                    "values": [{
                             "name": "enumMeldTypeSequence",
                             "id": 0
                         },
@@ -2142,8 +2076,7 @@ exports.proto = require("../lobby/protobufjs/protobuf").newBuilder({})['import']
                 {
                     "name": "ActionType",
                     "syntax": "proto2",
-                    "values": [
-                        {
+                    "values": [{
                             "name": "enumActionType_SKIP",
                             "id": 1
                         },
@@ -2212,8 +2145,7 @@ exports.proto = require("../lobby/protobufjs/protobuf").newBuilder({})['import']
                 {
                     "name": "HandOverType",
                     "syntax": "proto2",
-                    "values": [
-                        {
+                    "values": [{
                             "name": "enumHandOverType_None",
                             "id": 0
                         },

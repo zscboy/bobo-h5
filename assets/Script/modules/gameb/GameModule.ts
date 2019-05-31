@@ -78,6 +78,16 @@ export class GameModule extends cc.Component implements GameModuleInterface {
             this.mq.pushQuit();
         }
     }
+    public unblockNormal(): void {
+        if (this.mq !== undefined && this.mq !== null) {
+            this.mq.unblockNormal();
+        }
+    }
+    public blockNormal(): void {
+        if (this.mq !== undefined && this.mq !== null) {
+            this.mq.blockNormal();
+        }
+    }
 
     protected onLoad(): void {
         this.eventTarget = new cc.EventTarget();

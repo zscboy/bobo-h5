@@ -1,5 +1,6 @@
 
 import { Logger, RoomInfo, UserInfo } from "../lobby/lcore/LCoreExports";
+import { GameOverResultView } from "./GameOverResultView";
 import { HandlerActionResultNotify } from "./handlers/HandlerActionResultNotify";
 import { HandlerMsg2Lobby } from "./handlers/HandlerMsg2Lobby";
 import { HandlerMsgActionAllowed } from "./handlers/HandlerMsgActionAllowed";
@@ -16,6 +17,7 @@ import { HandlerMsgRoomUpdate } from "./handlers/HandlerMsgRoomUpdate";
 import { HandlerMsgShowTips } from "./handlers/HandlerMsgShowTips";
 import { HandlerMsgUpdateLocation } from "./handlers/HandlerMsgUpdateLocation";
 import { HandlerMsgUpdatePropCfg } from "./handlers/HandlerMsgUpdatePropCfg";
+import { HandResultView } from "./HandResultView";
 import { Player } from "./Player";
 import { PlayerInterface } from "./PlayerInterface";
 import { proto } from "./proto/protoGame";
@@ -142,7 +144,6 @@ export class Room {
         const gm = new proto.mahjong.GameMessage();
         gm.Ops = proto.mahjong.MessageCode.OPPlayerReady;
         const buf = proto.mahjong.GameMessage.encode(gm);
-        Logger.debug(" this.host ----------------- : ", this);
         this.host.sendBinary(buf);
     }
 
@@ -270,11 +271,17 @@ export class Room {
     }
 
     public loadHandResultView(msgHandOver: proto.mahjong.IMsgHandOver): void {
-        // HandResultView.new(this)
+        // tslint:disable-next-line:no-unused-expression
+        // new HandResultView(this, msgHandOver);
+        const view = this.host.component.addComponent(HandResultView);
+        view.showView(this, msgHandOver);
     }
 
     public loadGameOverResultView(msgGameOver: proto.mahjong.IMsgGameOver): void {
-        // GameOverResultView.new(this)
+        // tslint:disable-next-line:no-unused-expression
+        // new GameOverResultView(this, msgGameOver);
+        const view = this.host.component.addComponent(GameOverResultView);
+        view.showView(this, msgGameOver);
     }
 
     public hideDiscardedTips(): void {
@@ -447,4 +454,10 @@ export class Room {
     public onUpdateStatus(state: number): void {
         this.roomView.onUpdateStatus(state);
     }
+    public switchBg(index: number): void {
+        //
+        this.roomView.switchBg(index);
+    }
+
+    //
 }

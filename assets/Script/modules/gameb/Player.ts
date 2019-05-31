@@ -34,7 +34,8 @@ export class Player {
     public readonly userID: string;
     public readonly chairID: number;
     public readonly host: RoomInterface;
-
+    public playerScore: proto.mahjong.IMsgPlayerScore;
+    public lastTile: number;
     public tilesDiscarded: number[];
     public melds: proto.mahjong.IMsgMeldTile[];
     public tilesFlower: number[];
@@ -49,7 +50,7 @@ export class Player {
     public state: number;
     public playerInfo: PlayerInfo;
     public waitDiscardReAction: boolean;
-    public readyHandList: number[] = [];
+    public readyHandList: number[];
 
     public allowedReActionMsg: proto.mahjong.MsgAllowPlayerReAction;
     public allowedActionMsg: proto.mahjong.MsgAllowPlayerAction;

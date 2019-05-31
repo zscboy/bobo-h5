@@ -1,4 +1,4 @@
-import { Logger } from "../lobby/lcore/LCoreExports";
+import { RoomInterface } from "./RoomInterface";
 
 /**
  * 设置界面
@@ -9,6 +9,12 @@ export class SettingView extends cc.Component {
     private win: fgui.Window;
 
     private eventTarget: cc.EventTarget;
+
+    private roomView: RoomInterface;
+
+    public saveRoomView(roomView: RoomInterface): void {
+        this.roomView = roomView;
+    }
 
     protected onLoad(): void {
 
@@ -25,8 +31,6 @@ export class SettingView extends cc.Component {
         this.win.show();
 
         this.initView();
-
-        Logger.debug(`SettingView-------------------------------onLoad`);
     }
 
     protected onDestroy(): void {
@@ -41,8 +45,45 @@ export class SettingView extends cc.Component {
     }
 
     private initView(): void {
+
+        const bg = this.view.getChild("bg");
+        bg.onClick(this.onCloseClick, this);
+
         const closeBtn = this.view.getChild("closeBtn");
         closeBtn.onClick(this.onCloseClick, this);
+
+        const shutdownBtn = this.view.getChild("shutdownBtn");
+        shutdownBtn.onClick(this.onCloseClick, this);
+
+        const disbandBtn = this.view.getChild("disbandBtn");
+        disbandBtn.onClick(this.onDisbandBtnClick, this);
+
+        const blueColorBtn = this.view.getChild("blueColorBtn");
+        blueColorBtn.onClick(this.onBlueColorBtnClick, this);
+
+        const classColorBtn = this.view.getChild("classColorBtn");
+        classColorBtn.onClick(this.onClassColorBtnClick, this);
+
+        const arrowBtn = this.view.getChild("arrowBtn");
+        arrowBtn.onClick(this.onArrowBtnClick, this);
+    }
+
+    private onClassColorBtnClick(): void {
+        //
+        this.roomView.switchBg(0);
+    }
+
+    private onBlueColorBtnClick(): void {
+        //
+        this.roomView.switchBg(1);
+    }
+
+    private onDisbandBtnClick(): void {
+        //
+    }
+
+    private onArrowBtnClick(): void {
+        //
     }
 
 }

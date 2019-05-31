@@ -1,6 +1,6 @@
 import { Logger } from "../lobby/lcore/LCoreExports";
 import { proto } from "./proto/protoGame";
-import { RoomHost } from "./RoomInterfaces";
+import { RoomHost } from "./RoomInterface";
 
 /**
  * 回播

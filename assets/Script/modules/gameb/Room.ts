@@ -17,8 +17,9 @@ import { HandlerMsgShowTips } from "./handlers/HandlerMsgShowTips";
 import { HandlerMsgUpdateLocation } from "./handlers/HandlerMsgUpdateLocation";
 import { HandlerMsgUpdatePropCfg } from "./handlers/HandlerMsgUpdatePropCfg";
 import { Player } from "./Player";
+import { PlayerInterface } from "./PlayerInterface";
 import { proto } from "./proto/protoGame";
-import { MeldType, PlayerInfo, RoomHost, RoomInterface, TingPai } from "./RoomInterfaces";
+import { RoomHost, RoomInterface, TingPai } from "./RoomInterface";
 import { RoomView } from "./RoomView";
 /**
  * 定义一个接口 关联Game 到room
@@ -50,16 +51,23 @@ export class Room {
     public readonly myUser: UserInfo;
     public readonly roomInfo: RoomInfo;
     public readonly host: RoomHost;
+    public scoreRecords: proto.mahjong.IMsgRoomHandScoreRecord[];
+    public state: number;
+    public ownerID: string;
+    public roomNumber: string;
+    public handStartted: number;
+    public windFlowerID: number;
     public isDestroy: boolean = false;
     public bankerChairID: number = 0;
+    public markup: number;
     public isContinuousBanker: boolean;
     public roomView: RoomView;
-    public players: Player[] = [];
+    public players: { [key: string]: Player } = {};
     public replay: boolean;
     public tilesInWall: number;
     public myPlayer: Player;
     public msgDisbandNotify: proto.mahjong.MsgDisbandNotify;
-    private disbandLocked: boolean;
+    public disbandLocked: boolean;
     public constructor(myUser: UserInfo, roomInfo: RoomInfo, host: RoomHost) {
         this.myUser = myUser;
         this.roomInfo = roomInfo;
@@ -76,97 +84,65 @@ export class Room {
         }
     }
 
-    public getPlayerByUserId(userID: string): Player {
-        for (const player of this.players) {
-            if (player.userID === userID) {
-                return player;
-            }
-        }
-
-        return null;
-    }
-
     public getPlayerByChairID(chairID: number): Player {
-        for (const player of this.players) {
-            if (player.chairID === chairID) {
-                return player;
+        let player = null;
+        Object.keys(this.players).forEach((key: string) => {
+            const p = this.players[key];
+            if (p.chairID === chairID) {
+                player = p;
             }
-        }
+        });
 
-        return null;
+        return player;
     }
     public getRoomView(): RoomView {
         return this.roomView;
     }
-    ////////////////////////////////////
     //把tilesInWall显示到房间的剩余牌数中
-    ////////////////////////////////////
     public updateTilesInWallUI(): void {
         this.roomView.tilesInWall.text = `剩牌 :${this.tilesInWall}`;
     }
 
-    //////////////////////////////////////////////
     // 加载房间的view
-    //////////////////////////////////////////////
-    public loadRoomView(): void {
-        const roomView = new RoomView();
+    public loadRoomView(view: fgui.GComponent): void {
+        const roomView = new RoomView(this, view);
         this.roomView = roomView;
     }
 
-    //////////////////////////////////////////////
-    // 创建玩家对象
-    // 并绑定playerView
-    //////////////////////////////////////////////
-    public createPlayerByInfo(playerInfo: PlayerInfo): void {
+    // 创建玩家对象    // 并绑定playerView
+    public createPlayerByInfo(playerInfo: proto.mahjong.IMsgPlayerInfo): void {
         const player = new Player(playerInfo.userID, playerInfo.chairID, this);
-        // player.state = playerInfo.state
-        // player.nick = playerInfo.nick
-        // if player.nick == null || player.nick == "" {
-        //     player.nick = playerInfo.userID
-        // }
-
         player.updateByPlayerInfo(playerInfo);
 
         const playerView = this.roomView.getPlayerViewByChairID(playerInfo.chairID, this.myPlayer.chairID);
         player.bindView(playerView);
 
-        this.players[player.chairID] = player;
+        this.players[player.userID] = player;
     }
 
-    //////////////////////////////////////////////
-    // 创建自身的玩家对象
-    // 并绑定playerView
-    //////////////////////////////////////////////
-    public createMyPlayer(playerInfo: PlayerInfo): void {
+    // 创建自身的玩家对象    // 并绑定playerView
+    public createMyPlayer(playerInfo: proto.mahjong.IMsgPlayerInfo): void {
         const player = new Player(playerInfo.userID, playerInfo.chairID, this);
-        // player.state = playerInfo.state
-        // player.nick = playerInfo.nick
-        // if player.nick == null || player.nick == "" {
-        //     player.nick = playerInfo.userID
-        // }
 
         player.updateByPlayerInfo(playerInfo);
 
         const playerView = this.roomView.playerViews[1];
         player.bindView(playerView);
 
-        this.players[player.chairID] = player;
+        this.players[player.userID] = player;
 
         this.myPlayer = player;
     }
 
     public onReadyButtonClick(): void {
-        // this.host.sendPlayerReadyMsg()
+        const gm = new proto.mahjong.GameMessage();
+        gm.Ops = proto.mahjong.MessageCode.OPPlayerReady;
+        const buf = proto.mahjong.GameMessage.encode(gm);
+        Logger.debug(" this.host ----------------- : ", this);
+        this.host.sendBinary(buf);
     }
 
-    public playerCount(): number {
-        return this.players.length;
-    }
-
-    //////////////////////////////////////////////
-    // 根据玩家的chairID获得相应的playerViewChairID
-    // 注意服务器的chairID是由0开始
-    //////////////////////////////////////////////
+    // 根据玩家的chairID获得相应的playerViewChairID    // 注意服务器的chairID是由0开始
     public getPlayerViewChairIDByChairID(chairID: number): number {
         const myChairId = this.myPlayer.chairID;
         //获得chairID相对于本玩家的偏移
@@ -175,45 +151,38 @@ export class Room {
 
         return c + 1;
     }
-    ////////////////////////////////////////
     //从房间的玩家列表中删除一个玩家
     //注意玩家视图的解除绑定需要外部处理
-    ////////////////////////////////////////
-    public removePlayer(player: Player): void {
-        this.players[player.chairID] = null;
+    public removePlayer(chairID: number): void {
+        this.players[chairID] = null;
     }
 
-    ////////////////////////////////////////
     //往服务器发送消息
-    ////////////////////////////////////////
     public sendMsg(opCode: number, msg?: ByteBuffer): void {
         const host = this.host;
         if (host == null) {
             return;
         }
-
         // const ws = host.ws
         // if (ws == null) {
         //     return
         // }
+        const gm = new proto.mahjong.GameMessage();
+        gm.Ops = opCode;
 
-        // const gm = new proto.mahjong.GameMessage();
-        // gm.Ops = opCode;
-
-        // if (msg != null) {
-        //     gm.Data = msg
-        // }
-        // const buf = proto.mahjong.GameMessage.encode(gm);
-        // host.sendBinary(buf)
+        if (msg != null) {
+            gm.Data = msg;
+        }
+        const buf = proto.mahjong.GameMessage.encode(gm);
+        host.sendBinary(buf);
     }
 
-    //////////////////////////////////////
     //重置房间，以便开始新一手游戏
-    //////////////////////////////////////
     public resetForNewHand(): void {
-        for (const p of this.players) {
-            p.resetForNewHand();
-        }
+        Object.keys(this.players).forEach((key: string) => {
+            const v = this.players[key];
+            v.resetForNewHand();
+        });
         //隐藏箭头
     }
 
@@ -229,9 +198,7 @@ export class Room {
         //}
     }
 
-    //////////////////////////////////////-
     //处理玩家申请解散请求
-    //////////////////////////////////////-
     public onDissolveClicked(): void {
         if (this.disbandLocked && this.msgDisbandNotify != null) {
             //上次发送的，或者现在已经有了解散请求正在处理
@@ -247,9 +214,7 @@ export class Room {
         }
     }
 
-    //////////////////////////////////////-
     //更新解散处理界面
-    //////////////////////////////////////-
     public updateDisbandVoteView(msgDisbandNotify: proto.mahjong.MsgDisbandNotify): void {
         this.msgDisbandNotify = msgDisbandNotify;
 
@@ -263,9 +228,7 @@ export class Room {
         // }
     }
 
-    //////////////////////////////////////-
     //发送解散回复给服务器
-    //////////////////////////////////////-
     public sendDisbandAgree(agree: boolean): void {
         const msgDisbandAnswer = new proto.mahjong.MsgDisbandAnswer();
         msgDisbandAnswer.agree = agree;
@@ -294,13 +257,12 @@ export class Room {
         this.roomView.meldOpsPanel.visible = false;
     }
 
-    //////////////////////////////////////////////////////////-
     //设置庄家标志
-    //////////////////////////////////////////////////////////-
     public setBankerFlag(): void {
-        for (const v of this.players) {
+        Object.keys(this.players).forEach((key: string) => {
+            const v = this.players[key];
             v.playerView.head.onUpdateBankerFlag(v.chairID === this.bankerChairID, this.isContinuousBanker);
-        }
+        });
     }
 
     public loadHandResultView(): void {
@@ -312,9 +274,10 @@ export class Room {
     }
 
     public hideDiscardedTips(): void {
-        for (const p of this.players) {
-            p.hideDiscardedTips();
-        }
+        Object.keys(this.players).forEach((key: string) => {
+            const v = this.players[key];
+            v.hideDiscardedTips();
+        });
     }
 
     public sendDonate(donateId: number, toChairID: number): void {
@@ -331,9 +294,7 @@ export class Room {
         this.sendMsg(proto.mahjong.MessageCode.OPDonate, actionMsgBuf);
     }
 
-    //////////////////////////////////////////////
     // 显示道具动画
-    //////////////////////////////////////////////
     public showDonate(msgDonate: proto.mahjong.MsgDonate): void {
         // logger.debug("显示道具动画 msgDonate : ", msgDonate)
         // if (msgDonate != null) {
@@ -420,11 +381,11 @@ export class Room {
     public setArrowByParent(d: fgui.GComponent): void {
         this.roomView.setArrowByParent(d);
     }
-    public showOrHideMeldsOpsPanel(chowMelds: MeldType[]): void {
-        this.roomView.showOrHideMeldsOpsPanel(chowMelds);
+    public showOrHideMeldsOpsPanel(chowMelds: proto.mahjong.IMsgMeldTile[], actionMsg: proto.mahjong.MsgPlayerAction): void {
+        this.roomView.showOrHideMeldsOpsPanel(chowMelds, actionMsg);
     }
-    public isMe(player: Player): boolean {
-        return this.myUser.userID === player.userID;
+    public isMe(userID: string): boolean {
+        return this.myUser.userID === userID;
     }
     public isReplayMode(): boolean {
         return this.replay;
@@ -448,5 +409,49 @@ export class Room {
     }
     public isListensObjVisible(): boolean {
         return this.roomView.listensObj.visible;
+    }
+    public getPlayerInterfaceByChairID(chairID: number): PlayerInterface {
+        let player = null;
+        Object.keys(this.players).forEach((key: string) => {
+            const v = this.players[key];
+            if (v.chairID === chairID) {
+                player = v;
+            }
+        });
+
+        return player;
+    }
+
+    public getPlayerInterfaceByUserID(userID: string): PlayerInterface {
+
+        return this.players[userID];
+    }
+
+    public getMyPlayer(): PlayerInterface {
+        return this.myPlayer;
+    }
+    //设置当前房间所等待的操作玩家
+    public setWaitingPlayer(chairID: number): void {
+        const player = this.getPlayerByChairID(chairID);
+        this.roomView.setWaitingPlayer(player.playerView);
+    }
+    public getPlayers(): { [key: string]: PlayerInterface } {
+        return this.players;
+    }
+
+    public setJiaJiaZhuang(): void {
+        this.roomView.setJiaJiaZhuang();
+    }
+    public setRoundMask(): void {
+        this.roomView.setRoundMask();
+    }
+    public showRoomNumber(): void {
+        this.roomView.showRoomNumber();
+    }
+    public showOrHideReadyButton(isShow: boolean): void {
+        this.roomView.showOrHideReadyButton(isShow);
+    }
+    public onUpdateStatus(state: number): void {
+        this.roomView.onUpdateStatus(state);
     }
 }

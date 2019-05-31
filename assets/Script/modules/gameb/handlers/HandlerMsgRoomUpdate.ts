@@ -27,7 +27,7 @@ export namespace HandlerMsgRoomUpdate {
         }
     };
 
-    export const onMsg = (msgData: ByteBuffer, room: RoomInterface): void => {
+    export const onMsg = async (msgData: ByteBuffer, room: RoomInterface): Promise<void> => {
         const msgRoomUpdate = proto.mahjong.MsgRoomInfo.decode(msgData);
         const msgPlayers = msgRoomUpdate.players;
         // 房间状态

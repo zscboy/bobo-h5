@@ -6,7 +6,7 @@ import { RoomInterface } from "../RoomInterface";
  * 响应服务器抽牌通知
  */
 export namespace HandlerActionResultDraw {
-    export const onMsg = (actionResultMsg: proto.mahjong.MsgActionResultNotify, room: RoomInterface): void => {
+    export const onMsg = async (actionResultMsg: proto.mahjong.MsgActionResultNotify, room: RoomInterface): Promise<void> => {
         //
         const tilesFlower = actionResultMsg.newFlowers;
         const targetChairID = actionResultMsg.targetChairID;
@@ -18,9 +18,9 @@ export namespace HandlerActionResultDraw {
             for (const flower of tilesFlower) {
                 const xf = [];
                 player.playerView.showFlowerOnHandTail(flower);
-                player.playerView.playDrawFlowerAnimation();
+                await player.playerView.playDrawFlowerAnimation();
                 player.playerView.hideFlowerOnHandTail();
-                xf[1] = flower;
+                xf.push(flower);
                 player.addFlowerTiles(xf);
                 player.flower2UI();
             }

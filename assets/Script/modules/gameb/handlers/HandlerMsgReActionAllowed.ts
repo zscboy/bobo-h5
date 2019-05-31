@@ -53,7 +53,7 @@ export namespace HandlerMsgReActionAllowed {
                 playerView.showButton(buttonMap);
             }
         };
-    export const onMsg = (msgData: ByteBuffer, room: RoomInterface): void => {
+    export const onMsg = async (msgData: ByteBuffer, room: RoomInterface): Promise<void> => {
         const allowedReActionMsg = proto.mahjong.MsgAllowPlayerReAction.decode(msgData);
 
         const targetChairID = allowedReActionMsg.actionChairID;

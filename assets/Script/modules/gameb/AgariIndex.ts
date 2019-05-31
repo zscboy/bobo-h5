@@ -54,6 +54,7 @@ export namespace AgariIndex {
         const artId = indexMap[tileID];
         if (artId == null) {
             Logger.debug(`no art id for tile:${tileID}`);
+            throw Error(`no art id for tile:${tileID}`);
         }
 
         return artId;

@@ -7,18 +7,18 @@ import { RoomInterface } from "../RoomInterface";
  * 响应服务器通知一手牌结束
  */
 export namespace HandlerMsgHandOver {
-    export const onHandOver = (msgHandOver: proto.mahjong.IMsgHandOver, room: RoomInterface) => {
+    export const onHandOver = async (msgHandOver: proto.mahjong.IMsgHandOver, room: RoomInterface) => {
         if (msgHandOver.endType !== proto.mahjong.HandOverType.enumHandOverType_None) {
             const mjproto = proto.mahjong.HandOverType;
             for (const score of msgHandOver.scores.playerScores) {
                 const player = <Player>room.getPlayerByChairID(score.targetChairID);
 
                 if (score.winType === mjproto.enumHandOverType_Win_SelfDrawn) {
-                    player.playZiMoAnimation();
+                    await player.playZiMoAnimation();
                 } else if (score.winType === mjproto.enumHandOverType_Chucker) {
-                    player.playDianPaoAnimation();
+                    await player.playDianPaoAnimation();
                 } else if (score.winType === mjproto.enumHandOverType_Win_Chuck) {
-                    player.playChiChongAnimation();
+                    await player.playChiChongAnimation();
                 }
 
                 player.playerScore = score;
@@ -29,7 +29,7 @@ export namespace HandlerMsgHandOver {
         room.loadHandResultView(msgHandOver);
     };
 
-    export const onMsg = (msgData: ByteBuffer, roomInterface: RoomInterface): void => {
+    export const onMsg = async (msgData: ByteBuffer, roomInterface: RoomInterface): Promise<void> => {
         Logger.debug('llwant hand over msg');
         const room = roomInterface;
 
@@ -73,6 +73,6 @@ export namespace HandlerMsgHandOver {
             p.hand2Exposed();
         });
 
-        onHandOver(msgHandOver, room);
+        await onHandOver(msgHandOver, room);
     };
 }

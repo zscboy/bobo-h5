@@ -23,11 +23,13 @@ import { PlayerInterface } from "./PlayerInterface";
 import { proto } from "./proto/protoGame";
 import { RoomHost, RoomInterface, TingPai } from "./RoomInterface";
 import { RoomView } from "./RoomView";
+
+type msgHandler = (msgData: ByteBuffer, room: RoomInterface) => Promise<void>;
 /**
  * 定义一个接口 关联Game 到room
  */
 const msgCodeEnum = proto.mahjong.MessageCode;
-const msgHandlers: { [key: number]: (msgData: ByteBuffer, room: RoomInterface) => void } = {
+const msgHandlers: { [key: number]: msgHandler } = {
     [msgCodeEnum.OPActionAllowed]: HandlerMsgActionAllowed.onMsg,
     [msgCodeEnum.OPReActionAllowed]: HandlerMsgReActionAllowed.onMsg,
     [msgCodeEnum.OPActionResultNotify]: HandlerActionResultNotify.onMsg,
@@ -80,11 +82,11 @@ export class Room {
         return this.host;
     }
 
-    public dispatchWebsocketMsg(msg: proto.mahjong.GameMessage): void {
+    public async dispatchWebsocketMsg(msg: proto.mahjong.GameMessage): Promise<void> {
         Logger.debug("Room.dispatchWebsocketMsg, ops:", msg.Ops);
         const handler = msgHandlers[msg.Ops];
         if (handler !== undefined) {
-            handler(msg.Data, this);
+            await handler(msg.Data, this);
         } else {
             Logger.debug("room has no handler for msg, ops:", msg.Ops);
         }

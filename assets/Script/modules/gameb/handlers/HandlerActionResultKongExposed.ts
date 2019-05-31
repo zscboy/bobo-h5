@@ -6,7 +6,7 @@ import { RoomInterface } from "../RoomInterface";
  * 响应服务器明杠通知
  */
 export namespace HandlerActionResultKongExposed {
-    export const onMsg = (actionResultMsg: proto.mahjong.MsgActionResultNotify, room: RoomInterface): void => {
+    export const onMsg = async (actionResultMsg: proto.mahjong.MsgActionResultNotify, room: RoomInterface): Promise<void> => {
         const actionMeld = actionResultMsg.actionMeld;
         const targetChairID = actionResultMsg.targetChairID;
         const player = <Player>room.getPlayerByChairID(targetChairID);
@@ -31,7 +31,7 @@ export namespace HandlerActionResultKongExposed {
         const contributorPlayer = <Player>room.getPlayerByChairID(actionMeld.contributor);
         // print("llwant, kongExposedTileID:"..kongTileId.. ",contri:"..actionMeld.contributor)
         //播放明杠动画
-        player.exposedKongResultAnimation();
+        await player.exposedKongResultAnimation();
 
         //手牌列表更新UI
         player.hand2UI(true);

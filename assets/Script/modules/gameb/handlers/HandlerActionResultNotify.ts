@@ -10,7 +10,7 @@ import { HandlerActionResultPong } from "./HandlerActionResultPong";
 import { HandlerActionResultReadyHand } from "./HandlerActionResultReadyHand";
 import { HandlerActionResultTriplet2Kong } from "./HandlerActionResultTriplet2Kong";
 
-type ActionHandler = (actionResultMsg: proto.mahjong.MsgActionResultNotify, room: RoomInterface) => void;
+type ActionHandler = (actionResultMsg: proto.mahjong.MsgActionResultNotify, room: RoomInterface) => Promise<void>;
 const actionType = proto.mahjong.ActionType;
 const actionHandlers: { [key: number]: ActionHandler } = {
     [actionType.enumActionType_CHOW]: HandlerActionResultChow.onMsg,
@@ -27,13 +27,13 @@ const actionHandlers: { [key: number]: ActionHandler } = {
  * 响应服务器动作结果通知
  */
 export namespace HandlerActionResultNotify {
-    export const onMsg = (msgData: ByteBuffer, room: RoomInterface): void => {
+    export const onMsg = async (msgData: ByteBuffer, room: RoomInterface): Promise<void> => {
         const actionResultMsg = proto.mahjong.MsgActionResultNotify.decode(msgData);
         const action = actionResultMsg.action;
         const handler = actionHandlers[action];
 
         if (handler !== undefined) {
-            handler(actionResultMsg, room);
+            await handler(actionResultMsg, room);
         } else {
             Logger.debug("HandlerActionResultNotify failed, no action handler for:", action);
         }

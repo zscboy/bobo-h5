@@ -6,7 +6,7 @@ import { RoomInterface } from "../RoomInterface";
  * 响应服务器吃牌通知
  */
 export namespace HandlerActionResultChow {
-    export const onMsg = (actionResultMsg: proto.mahjong.MsgActionResultNotify, room: RoomInterface): void => {
+    export const onMsg = async (actionResultMsg: proto.mahjong.MsgActionResultNotify, room: RoomInterface): Promise<void> => {
         const actionMeld = actionResultMsg.actionMeld;
         const targetChairID = actionResultMsg.targetChairID;
         const player = <Player>room.getPlayerByChairID(targetChairID);
@@ -34,7 +34,7 @@ export namespace HandlerActionResultChow {
         // print("llwant, chowTileID:"..chowTileId.. ",contri:"..actionMeld.contributor)
 
         //播放吃牌动画
-        player.chowResultAnimation();
+        await player.chowResultAnimation();
 
         //手牌列表更新UI
         player.hand2UI(true);

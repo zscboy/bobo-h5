@@ -6,7 +6,7 @@ import { RoomInterface } from "../RoomInterface";
  * 响应服务器加杠通知
  */
 export namespace HandlerActionResultTriplet2Kong {
-    export const onMsg = (actionResultMsg: proto.mahjong.MsgActionResultNotify, room: RoomInterface): void => {
+    export const onMsg = async (actionResultMsg: proto.mahjong.MsgActionResultNotify, room: RoomInterface): Promise<void> => {
         const targetChairID = actionResultMsg.targetChairID;
         const player = <Player>room.getPlayerByChairID(targetChairID);
         const kongTileId = actionResultMsg.actionTile;
@@ -19,7 +19,7 @@ export namespace HandlerActionResultTriplet2Kong {
         meld.meldType = proto.mahjong.MeldType.enumMeldTypeTriplet2Kong;
 
         //播放加杠动画
-        player.triplet2KongResultAnimation();
+        await player.triplet2KongResultAnimation();
 
         //手牌列表更新UI
         player.hand2UI(false);

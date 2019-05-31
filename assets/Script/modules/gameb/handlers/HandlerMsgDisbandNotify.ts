@@ -5,7 +5,7 @@ import { RoomInterface } from "../RoomInterface";
  * 响应服务器更新解散事件，例如有人拒绝，有人同意等
  */
 export namespace HandlerMsgDisbandNotify {
-    export const onMsg = (msgData: ByteBuffer, room: RoomInterface): void => {
+    export const onMsg = async (msgData: ByteBuffer, room: RoomInterface): Promise<void> => {
 
         room.disbandLocked = false;
         const msgDisbandNotify = proto.mahjong.MsgDisbandNotify.decode(msgData);

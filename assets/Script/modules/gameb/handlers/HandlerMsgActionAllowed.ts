@@ -107,7 +107,7 @@ export namespace HandlerMsgActionAllowed {
                 playerView.showButton(buttonMap);
             }
         };
-    export const onMsg = (msgData: ByteBuffer, room: RoomInterface): void => {
+    export const onMsg = async (msgData: ByteBuffer, room: RoomInterface): Promise<void> => {
         const allowedActionMsg = proto.mahjong.MsgAllowPlayerAction.decode(msgData);
         // allowedActionMsg:ParseFromString(msg)
 

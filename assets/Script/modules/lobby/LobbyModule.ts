@@ -92,6 +92,7 @@ export class LobbyModule extends cc.Component implements LobbyModuleInterface {
     protected start(): void {
         // 设置帧率
         cc.game.setFrameRate(29);
+        cc.debug.setDisplayStats(true);
 
         // 初始化fgui
         fgui.addLoadHandler();

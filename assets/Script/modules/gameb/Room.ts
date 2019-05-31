@@ -269,7 +269,7 @@ export class Room {
         // HandResultView.new(this)
     }
 
-    public loadGameOverResultView(): void {
+    public loadGameOverResultView(msgGameOver: proto.mahjong.IMsgGameOver): void {
         // GameOverResultView.new(this)
     }
 

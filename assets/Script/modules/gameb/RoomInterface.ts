@@ -122,4 +122,5 @@ export interface RoomInterface {
     onUpdateStatus(state: number): void;
 
     loadHandResultView(msgHandOver: proto.mahjong.IMsgHandOver): void;
+    loadGameOverResultView(msgGameOver: proto.mahjong.IMsgGameOver): void;
 }

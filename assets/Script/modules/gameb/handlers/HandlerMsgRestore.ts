@@ -32,7 +32,7 @@ export namespace HandlerMsgRestore {
         // print("llwant , handlerMsgRestore.room.markup : " .. tostring(room.markup))
         //起手听状态
         for (const chairID of msgRestore.readyHandChairs) {
-            const player = <Player>room.getPlayerInterfaceByChairID(chairID);
+            const player = <Player>room.getPlayerByChairID(chairID);
             player.richiIconShow(true);
         }
 
@@ -50,7 +50,7 @@ export namespace HandlerMsgRestore {
         for (const v of playerTileLists) {
             const playerTileList = v;
             const chairID = v.chairID;
-            const player = <Player>room.getPlayerInterfaceByChairID(chairID);
+            const player = <Player>room.getPlayerByChairID(chairID);
             //填充手牌列表，仅自己有手牌列表，对手只有手牌张数
             if (player.isMe()) {
                 player.addHandTiles(playerTileList.tilesHand);

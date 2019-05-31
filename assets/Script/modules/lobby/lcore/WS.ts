@@ -106,7 +106,7 @@ export class WS {
 
             fileReader.readAsArrayBuffer(<Blob>blob);
         } else {
-            this.mq.pushWebsocketEvent(mx);
+            this.mq.pushMessage(mx);
             this.comp.scheduleOnce(nextRoll);
         }
     }

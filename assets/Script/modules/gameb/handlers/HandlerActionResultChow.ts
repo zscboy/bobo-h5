@@ -9,7 +9,7 @@ export namespace HandlerActionResultChow {
     export const onMsg = (actionResultMsg: proto.mahjong.MsgActionResultNotify, room: RoomInterface): void => {
         const actionMeld = actionResultMsg.actionMeld;
         const targetChairID = actionResultMsg.targetChairID;
-        const player = <Player>room.getPlayerInterfaceByChairID(targetChairID);
+        const player = <Player>room.getPlayerByChairID(targetChairID);
         const chowTileId = actionResultMsg.actionTile;
 
         //从手牌移除两张
@@ -30,7 +30,7 @@ export namespace HandlerActionResultChow {
         }
 
         //从贡献者（出牌者）的打出牌列表中移除最后一张牌
-        const contributorPlayer = <Player>room.getPlayerInterfaceByChairID(actionMeld.contributor);
+        const contributorPlayer = <Player>room.getPlayerByChairID(actionMeld.contributor);
         // print("llwant, chowTileID:"..chowTileId.. ",contri:"..actionMeld.contributor)
 
         //播放吃牌动画

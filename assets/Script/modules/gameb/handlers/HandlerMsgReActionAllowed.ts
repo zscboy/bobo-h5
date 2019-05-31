@@ -57,7 +57,7 @@ export namespace HandlerMsgReActionAllowed {
         const allowedReActionMsg = proto.mahjong.MsgAllowPlayerReAction.decode(msgData);
 
         const targetChairID = allowedReActionMsg.actionChairID;
-        const player = <Player>room.getPlayerInterfaceByChairID(targetChairID);
+        const player = <Player>room.getPlayerByChairID(targetChairID);
 
         if (player.isMe()) {
             Logger.debug("llwant, my allowed action");

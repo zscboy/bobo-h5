@@ -10,7 +10,7 @@ export namespace HandlerActionResultDraw {
         //
         const tilesFlower = actionResultMsg.newFlowers;
         const targetChairID = actionResultMsg.targetChairID;
-        const player = <Player>room.getPlayerInterfaceByChairID(targetChairID);
+        const player = <Player>room.getPlayerByChairID(targetChairID);
         const drawTile = actionResultMsg.actionTile;
         //本次抽牌如果有抽到花牌，则把花牌保存到player的花牌列表
         //并显示出来

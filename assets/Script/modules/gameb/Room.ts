@@ -265,11 +265,11 @@ export class Room {
         });
     }
 
-    public loadHandResultView(): void {
+    public loadHandResultView(msgHandOver: proto.mahjong.IMsgHandOver): void {
         // HandResultView.new(this)
     }
 
-    public loadGameOverResultView(): void {
+    public loadGameOverResultView(msgGameOver: proto.mahjong.IMsgGameOver): void {
         // GameOverResultView.new(this)
     }
 
@@ -410,19 +410,8 @@ export class Room {
     public isListensObjVisible(): boolean {
         return this.roomView.listensObj.visible;
     }
-    public getPlayerInterfaceByChairID(chairID: number): PlayerInterface {
-        let player = null;
-        Object.keys(this.players).forEach((key: string) => {
-            const v = this.players[key];
-            if (v.chairID === chairID) {
-                player = v;
-            }
-        });
 
-        return player;
-    }
-
-    public getPlayerInterfaceByUserID(userID: string): PlayerInterface {
+    public getPlayerByUserID(userID: string): PlayerInterface {
 
         return this.players[userID];
     }

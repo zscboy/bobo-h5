@@ -1,3 +1,4 @@
+import { proto } from "../proto/protoGame";
 import { RoomInterface } from "../RoomInterface";
 
 /**
@@ -5,6 +6,9 @@ import { RoomInterface } from "../RoomInterface";
  */
 export namespace HandlerMsgGameOver {
     export const onMsg = (msgData: ByteBuffer, room: RoomInterface): void => {
-        // TODO:
+        const msgGameOver = proto.mahjong.MsgGameOver.decode(msgData);
+
+        // 显示游戏最后结果()
+        room.loadGameOverResultView(msgGameOver);
     };
 }

@@ -31,6 +31,7 @@ export class GameModule extends cc.Component implements GameModuleInterface {
     private forceExit: boolean = false;
     private mRoom: Room;
     private lm: LobbyModuleInterface;
+    private mUser: UserInfo;
 
     public get room(): Room {
         return this.mRoom;
@@ -38,6 +39,14 @@ export class GameModule extends cc.Component implements GameModuleInterface {
 
     public get resLoader(): GResLoader {
         return this.loader;
+    }
+
+    public get component(): cc.Component {
+        return this;
+    }
+
+    public get user(): UserInfo {
+        return this.mUser;
     }
 
     public async launch(args: GameModuleLaunchArgs): Promise<void> {
@@ -95,14 +104,20 @@ export class GameModule extends cc.Component implements GameModuleInterface {
         const rID = roomInfo.roomID;
         const uID = myUser.userID;
 
-        const path = LEnv.cfmt(LEnv.gameWebsocketPlay, serverUUID);
+        let path;
+        if (roomInfo.roomID === "monkey-room") {
+            path = LEnv.cfmt(LEnv.gameWebsocketMonkey, serverUUID);
+        } else {
+            path = LEnv.cfmt(LEnv.gameWebsocketPlay, serverUUID);
+        }
+
         url = `${host}${path}?userID=${uID}&roomID=${rID}&tk=${tk}&web=1`;
 
         Logger.debug("tryEnterRoom, url:", url);
 
         // 保存一下，以便重连时使用
         // this.url = url;
-        // this.myUser = myUser;
+        this.mUser = myUser;
         this.ws = null;
         this.mRoom = null;
         this.connectErrorCount = 0;

@@ -41,7 +41,7 @@ export namespace HandlerMsgDeal {
         for (const v of playerTileLists) {
             const playerTileList = v;
             const chairID = v.chairID;
-            const player = <Player>room.getPlayerInterfaceByChairID(chairID);
+            const player = <Player>room.getPlayerByChairID(chairID);
 
             //填充手牌列表，仅自己有手牌列表，对手只有手牌张数
             if (player.isMe()) {

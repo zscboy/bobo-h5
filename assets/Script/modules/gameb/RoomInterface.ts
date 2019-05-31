@@ -1,5 +1,5 @@
 
-import { RoomInfo } from "../lobby/lcore/LCoreExports";
+import { GResLoader, RoomInfo, UserInfo } from "../lobby/lcore/LCoreExports";
 import { PlayerInterface } from "./PlayerInterface";
 import { proto } from "./proto/protoGame";
 
@@ -9,6 +9,9 @@ import { proto } from "./proto/protoGame";
 export interface RoomHost {
     room: RoomInterface;
     quit: Function;
+    user: UserInfo;
+    component: cc.Component;
+    loader: GResLoader;
     sendBinary(buf: ByteBuffer): void;
 }
 
@@ -58,11 +61,18 @@ export class PlayerInfo {
     }
 }
 
+export interface RoomViewInterface {
+    stopDiscardCountdown(): void;
+    clearWaitingPlayer(): void;
+}
+
 /**
  * room 接口
  */
 export interface RoomInterface {
     readonly roomInfo: RoomInfo;
+    readonly roomView: RoomViewInterface;
+
     scoreRecords: proto.mahjong.IMsgRoomHandScoreRecord[];
     state: number;
     ownerID: string;
@@ -90,8 +100,8 @@ export interface RoomInterface {
     resetForNewHand(): void;
     isListensObjVisible(): boolean;
 
-    getPlayerInterfaceByChairID(chairID: number): PlayerInterface;
-    getPlayerInterfaceByUserID(userID: string): PlayerInterface;
+    getPlayerByChairID(chairID: number): PlayerInterface;
+    getPlayerByUserID(userID: string): PlayerInterface;
     hideDiscardedTips(): void;
     cleanUI(): void;
     updateTilesInWallUI(): void;
@@ -110,4 +120,7 @@ export interface RoomInterface {
     createPlayerByInfo(playerInfo: proto.mahjong.IMsgPlayerInfo): void;
     showOrHideReadyButton(isShow: boolean): void;
     onUpdateStatus(state: number): void;
+
+    loadHandResultView(msgHandOver: proto.mahjong.IMsgHandOver): void;
+    loadGameOverResultView(msgGameOver: proto.mahjong.IMsgGameOver): void;
 }

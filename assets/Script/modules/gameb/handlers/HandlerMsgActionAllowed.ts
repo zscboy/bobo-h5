@@ -112,7 +112,7 @@ export namespace HandlerMsgActionAllowed {
         // allowedActionMsg:ParseFromString(msg)
 
         const targetChairID = allowedActionMsg.actionChairID;
-        const player = <Player>room.getPlayerInterfaceByChairID(targetChairID);
+        const player = <Player>room.getPlayerByChairID(targetChairID);
 
         if (player.isMe()) {
             Logger.debug("llwant, my allowed action");

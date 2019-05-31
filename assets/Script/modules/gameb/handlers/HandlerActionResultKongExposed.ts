@@ -9,7 +9,7 @@ export namespace HandlerActionResultKongExposed {
     export const onMsg = (actionResultMsg: proto.mahjong.MsgActionResultNotify, room: RoomInterface): void => {
         const actionMeld = actionResultMsg.actionMeld;
         const targetChairID = actionResultMsg.targetChairID;
-        const player = <Player>room.getPlayerInterfaceByChairID(targetChairID);
+        const player = <Player>room.getPlayerByChairID(targetChairID);
         const kongTileId = actionMeld.tile1;
 
         //清理吃牌界面
@@ -28,7 +28,7 @@ export namespace HandlerActionResultKongExposed {
         }
 
         //从贡献者（出牌者）的打出牌列表中移除最后一张牌
-        const contributorPlayer = <Player>room.getPlayerInterfaceByChairID(actionMeld.contributor);
+        const contributorPlayer = <Player>room.getPlayerByChairID(actionMeld.contributor);
         // print("llwant, kongExposedTileID:"..kongTileId.. ",contri:"..actionMeld.contributor)
         //播放明杠动画
         player.exposedKongResultAnimation();

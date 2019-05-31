@@ -109,15 +109,6 @@ export class LobbyModule extends cc.Component implements LobbyModuleInterface {
     }
 
     protected start(): void {
-        // 设置帧率
-        cc.game.setFrameRate(29);
-        cc.debug.setDisplayStats(true);
-        (<any>cc.debug)._resetDebugSetting(cc.debug.DebugMode.INFO); // tslint:disable-line:no-any no-unsafe-any
-
-        // 初始化fgui
-        fgui.addLoadHandler();
-        fgui.GRoot.create();
-
         this.loader = new GResLoaderImpl("lobby");
         Dialog.initDialogs(this.loader);
 

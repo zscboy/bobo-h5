@@ -85,14 +85,14 @@ export namespace HandlerMsgActionAllowed {
                         const tileID = handsClickCtrl.tileID;
                         const discardAbleTile = discarAbleTilesMap[tileID];
                         if (tileID !== null) {
-                            if (discardAbleTile !== null) {
+                            if (discardAbleTile !== undefined) {
                                 handsClickCtrl.isDiscardable = true;
-                                if (discardAbleTile.readyHandList.length < 1) { //加入可听列表，空表示不可听
-                                    handsClickCtrl.t.visible = false;
-                                } else {
-                                    handsClickCtrl.t.visible = true;
+                                let readyHandList = discardAbleTile.readyHandList;
+                                if (readyHandList === undefined || readyHandList.length === 0) { //加入可听列表，空表示不可听
+                                    readyHandList = [];
                                 }
-                                handsClickCtrl.readyHandList = discardAbleTile.readyHandList;
+                                handsClickCtrl.t.visible = readyHandList.length > 0;
+                                handsClickCtrl.readyHandList = readyHandList;
                             } else {
                                 handsClickCtrl.isGray = true;
                                 playerView.setGray(handsClickCtrl.h);

@@ -10,6 +10,8 @@ export interface RoomHost {
     animationMgr: AnimationMgr;
     room: RoomInterface;
     quit: Function;
+    unblockNormal: Function;
+    blockNormal: Function;
     user: UserInfo;
     component: cc.Component;
     loader: GResLoader;

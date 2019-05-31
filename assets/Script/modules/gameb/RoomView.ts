@@ -344,7 +344,6 @@ export class RoomView {
             this.roundMarkView.visible = true;
             this.clearWaitingPlayer();
             this.showRoomNumber();
-            this.showOrHideReadyButton(false);
         };
 
         //房间已经被删除，客户端永远看不到这个状态

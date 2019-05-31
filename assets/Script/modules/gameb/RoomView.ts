@@ -2,6 +2,7 @@ import { Logger } from "../lobby/lcore/LCoreExports";
 import { PlayerView } from "./PlayerView";
 import { proto } from "./proto/protoGame";
 import { RoomInterface, TingPai } from "./RoomInterface";
+import { SettingView } from "./SettingView";
 import { TileImageMounter } from "./TileImageMounter";
 const mjproto = proto.mahjong;
 
@@ -227,17 +228,22 @@ export class RoomView {
         }
     }
     //解散房间按钮点击事件
-    private onDissolveClick(): void {
-        // const msg = "确实要申请解散房间吗？";
-        // dialog.showDialog(
-        //     msg,
-        //     function () {
-        //         this.room.onDissolveClicked();
-        //     },
-        //     function () {
-        //         //do nothing
-        //     }
-        // )
+    // private onDissolveClick(): void {
+    //     // const msg = "确实要申请解散房间吗？";
+    //     // dialog.showDialog(
+    //     //     msg,
+    //     //     function () {
+    //     //         this.room.onDissolveClicked();
+    //     //     },
+    //     //     function () {
+    //     //         //do nothing
+    //     //     }
+    //     // )
+    // }
+
+    private onSettingBtnClick(): void {
+        // Logger.debug("onSettingBtnClick---------------");
+        this.room.getRoomHost().component.addComponent(SettingView);
     }
 
     /**
@@ -260,7 +266,7 @@ export class RoomView {
         this.readyButton.visible = false;
         this.readyButton.onClick(this.room.onReadyButtonClick, this.room);
 
-        settingBtn.onClick(this.onDissolveClick, this);
+        settingBtn.onClick(this.onSettingBtnClick, this);
     }
 
     private initOtherView(): void {

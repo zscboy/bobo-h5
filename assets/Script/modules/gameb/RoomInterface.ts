@@ -86,6 +86,8 @@ export interface RoomInterface {
     windFlowerID: number;
     isDestroy: boolean;
     quit: Function;
+
+    getRoomHost(): RoomHost;
     isMe(userID: string): boolean;
     isReplayMode(): boolean;
     sendActionMsg(msgAction: ByteBuffer): void;

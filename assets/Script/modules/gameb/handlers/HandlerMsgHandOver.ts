@@ -21,7 +21,7 @@ export namespace HandlerMsgHandOver {
                     player.playChiChongAnimation();
                 }
 
-                // player.score = score;
+                player.playerScore = score;
             }
         }
 
@@ -67,7 +67,7 @@ export namespace HandlerMsgHandOver {
         const players = room.getPlayers();
         Object.keys(players).forEach((key) => {
             const p = <Player>players[key];
-            // p.lastTile = p.tilesHand[p.tilesHand.length - 1]; // 保存最后一张牌，可能是胡牌。。。用于最后结算显示
+            p.lastTile = p.tilesHand[p.tilesHand.length - 1]; // 保存最后一张牌，可能是胡牌。。。用于最后结算显示
             p.sortHands(false);
             // 摊开手牌
             p.hand2Exposed();

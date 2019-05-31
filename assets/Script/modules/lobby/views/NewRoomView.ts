@@ -106,7 +106,6 @@ export class NewRoomView extends cc.Component {
     }
 
     private initView(): void {
-        Logger.error("initView");
 
         const closeBtn = this.view.getChild("closeBtn");
         closeBtn.onClick(this.onCloseClick, this);

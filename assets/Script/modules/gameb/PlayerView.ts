@@ -436,7 +436,7 @@ export class PlayerView {
     //隐藏面子牌组
     public hideMelds(): void {
         const mymeldTilesNode = this.myView.getChild("melds").asCom;
-        for (let i = 1; i <= 4; i++) {
+        for (let i = 0; i < 4; i++) {
             const mm = mymeldTilesNode.getChild(`myMeld${i}`);
             if (mm != null) {
                 mymeldTilesNode.removeChild(mm, true);

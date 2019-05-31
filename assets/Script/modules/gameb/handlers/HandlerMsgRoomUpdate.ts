@@ -10,11 +10,7 @@ export namespace HandlerMsgRoomUpdate {
         const scoreRecords = msgRoomUpdate.scoreRecords;
         room.scoreRecords = scoreRecords;
         if (scoreRecords !== null && scoreRecords.length > 0) {
-            const totalScores: number[] = [];
-            totalScores[0] = 0;
-            totalScores[1] = 0;
-            totalScores[2] = 0;
-            totalScores[3] = 0;
+            const totalScores: number[] = [0, 0, 0, 0];
             for (const scoreRecord of scoreRecords) {
                 const playerRecords = scoreRecord.playerRecords;
                 for (let j = 0; j < 3; j++) {
@@ -83,17 +79,15 @@ export namespace HandlerMsgRoomUpdate {
         const myOldState = me.state;
         //更新，或者创建其他player
         for (const msgPlayer of msgPlayers) {
-            if (!room.isMe(msgPlayer.userID)) {
-                const player = <Player>room.getPlayerByChairID(msgPlayer.chairID);
-                if (player === null) {
-                    room.createPlayerByInfo(msgPlayer);
-                    //有人进来或者更新，更新GPS
-                    if (updatePlayer === 0) {
-                        updatePlayer = 1;
-                    }
-                } else {
-                    player.updateByPlayerInfo(msgPlayer);
+            const player = <Player>room.getPlayerByChairID(msgPlayer.chairID);
+            if (player === null) {
+                room.createPlayerByInfo(msgPlayer);
+                //有人进来或者更新，更新GPS
+                if (updatePlayer === 0) {
+                    updatePlayer = 1;
                 }
+            } else {
+                player.updateByPlayerInfo(msgPlayer);
             }
         }
         const roomStateEnum = proto.mahjong.RoomState;

@@ -106,7 +106,6 @@ export class NewRoomView extends cc.Component {
     }
 
     private initView(): void {
-        Logger.error("initView");
 
         const closeBtn = this.view.getChild("closeBtn");
         closeBtn.onClick(this.onCloseClick, this);
@@ -129,6 +128,7 @@ export class NewRoomView extends cc.Component {
 
         this.win.hide();
         this.win.dispose();
+        this.destroy();
 
         const myUserID = DataStore.getString("userID", "");
         const myUser = { userID: myUserID };

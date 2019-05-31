@@ -4,15 +4,12 @@ import {
 } from "../lcore/LCoreExports";
 import { LMsgCenter } from "../LMsgCenter";
 import { proto } from "../proto/protoLobby";
+import { ClubView } from "./club/ClubView";
 import { EmailView } from "./EmailView";
 import { GameRecordView } from "./GameRecordView";
 import { NewRoomView } from "./NewRoomView";
 import { UserInfoView } from "./UserInfoView";
 const { ccclass } = cc._decorator;
-
-interface MsgHandler {
-    onMessage: Function;
-}
 
 /**
  * 大厅视图
@@ -25,14 +22,32 @@ export class LobbyView extends cc.Component {
 
     private msgCenter: LMsgCenter;
 
-    private msgHandlers: { [key: number]: MsgHandler } = {};
+    private eventTarget: cc.EventTarget;
+
+    private onMessageFunc: Function;
 
     public dispatchMessage(msg: proto.lobby.LobbyMessage): void {
         const ops = msg.Ops;
-        const handler = this.msgHandlers[ops];
-        if (handler !== undefined) {
-            handler.onMessage(msg.Data);
-        }
+        this.eventTarget.emit(`${ops}`, msg.Data);
+    }
+
+    /**
+     * 注册事件，可以用来收websocket的消息
+     * @param eventName 事件名称
+     * @param callback 事件函数
+     * @param target 事件对象
+     */
+    public on<T extends Function>(eventName: string, callback: T, target?: object): T {
+        return this.eventTarget.on(eventName, callback, target);
+    }
+
+    /**
+     * 关闭事件
+     * @param eventName 事件名称
+     * @param callback 事件函数
+     */
+    public off(eventName: string, callback: Function): void {
+        this.eventTarget.off(eventName, callback);
     }
 
     public onMessage(data: ByteBuffer): void {
@@ -44,6 +59,8 @@ export class LobbyView extends cc.Component {
 
     protected async onLoad(): Promise<void> {
         // 加载大厅界面
+        this.eventTarget = new cc.EventTarget();
+
         const lm = <LobbyModuleInterface>this.getComponent("LobbyModule");
         this.lm = lm;
         const loader = lm.loader;
@@ -57,6 +74,11 @@ export class LobbyView extends cc.Component {
 
         await this.startWebSocket();
 
+    }
+
+    protected onDestroy(): void {
+        this.off(`${proto.lobby.MessageCode.OPUpdateDiamond}`, this.onMessageFunc);
+        this.msgCenter.destory();
     }
 
     private updateDiamond(diamond: Long): void {
@@ -90,7 +112,7 @@ export class LobbyView extends cc.Component {
         this.initInfoView(userInfo);
         userInfo.onClick(this.openUserInfoView, this);
 
-        this.registerHandler(this, proto.lobby.MessageCode.OPUpdateDiamond);
+        this.onMessageFunc = this.on(`${proto.lobby.MessageCode.OPUpdateDiamond}`, this.onMessage);
     }
 
     private async startWebSocket(): Promise<void> {
@@ -116,6 +138,7 @@ export class LobbyView extends cc.Component {
 
     private onCreateClick(): void {
         // TODO:
+        this.addComponent(ClubView);
     }
 
     private onCoinClick(): void {
@@ -128,8 +151,7 @@ export class LobbyView extends cc.Component {
     }
 
     private openEmailView(): void {
-        const emailView = this.addComponent(EmailView);
-        this.registerHandler(emailView, proto.lobby.MessageCode.OPMail);
+        this.addComponent(EmailView);
     }
 
     private onJoinRoom(): void {
@@ -177,12 +199,4 @@ export class LobbyView extends cc.Component {
     private registerDiamondChange(): void {
         // TODO:
     }
-
-    private registerHandler(msgHandler: MsgHandler, msgCode: number): void {
-        const handler = this.msgHandlers[msgCode];
-        if (handler === undefined || handler === null) {
-            this.msgHandlers[msgCode] = msgHandler;
-        }
-    }
-
 }

@@ -1,7 +1,10 @@
 import { Logger } from "../lobby/lcore/LCoreExports";
+import { ChatView } from "../lobby/views/chat/ChatExports";
+import { DisbandView } from "./DisbandView";
 import { PlayerView } from "./PlayerView";
 import { proto } from "./proto/protoGame";
 import { RoomInterface, TingPai } from "./RoomInterface";
+import { SettingView } from "./SettingView";
 import { TileImageMounter } from "./TileImageMounter";
 const mjproto = proto.mahjong;
 
@@ -226,18 +229,60 @@ export class RoomView {
             handler(this);
         }
     }
+
+    public switchBg(index: number): void {
+        //
+        const bgController = this.unityViewNode.getController("bgController");
+        bgController.selectedIndex = index;
+    }
+
+    public updateDisbandVoteView(msgDisbandNotify: proto.mahjong.MsgDisbandNotify): void {
+        //
+
+        let disbandView = this.room.getRoomHost().component.getComponent(DisbandView);
+
+        if (disbandView === undefined || disbandView == null) {
+            disbandView = this.room.getRoomHost().component.addComponent(DisbandView);
+        }
+
+        disbandView.updateView(msgDisbandNotify);
+
+    }
     //解散房间按钮点击事件
-    private onDissolveClick(): void {
-        // const msg = "确实要申请解散房间吗？";
-        // dialog.showDialog(
-        //     msg,
-        //     function () {
-        //         this.room.onDissolveClicked();
-        //     },
-        //     function () {
-        //         //do nothing
-        //     }
-        // )
+    // private onDissolveClick(): void {
+    //     // const msg = "确实要申请解散房间吗？";
+    //     // dialog.showDialog(
+    //     //     msg,
+    //     //     function () {
+    //     //         this.room.onDissolveClicked();
+    //     //     },
+    //     //     function () {
+    //     //         //do nothing
+    //     //     }
+    //     // )
+    // }
+
+    private onSettingBtnClick(): void {
+        // Logger.debug("onSettingBtnClick---------------");
+        const settingView = this.room.getRoomHost().component.addComponent(SettingView);
+        settingView.saveRoomView(this.room);
+    }
+
+    /**
+     * 聊天按钮点击事件
+     */
+    private onChatBtnClick(): void {
+        const load = this.room.getRoomHost().loader;
+        if (load === null) {
+            Logger.debug("load === null");
+        }
+
+        let chatView = this.room.getRoomHost().component.getComponent(ChatView);
+        if (chatView === null) {
+            chatView = this.room.getRoomHost().component.addComponent(ChatView);
+        }
+
+        chatView.show(load);
     }
 
     /**
@@ -251,6 +296,9 @@ export class RoomView {
         //     }
         // )
 
+        const chatBtn = this.unityViewNode.getChild("chatBtn");
+        chatBtn.onClick(this.onChatBtnClick, this);
+
         const settingBtn = this.unityViewNode.getChild("settingBtn");
 
         const infoBtn = this.unityViewNode.getChild("guizeBtn");
@@ -260,7 +308,7 @@ export class RoomView {
         this.readyButton.visible = false;
         this.readyButton.onClick(this.room.onReadyButtonClick, this.room);
 
-        settingBtn.onClick(this.onDissolveClick, this);
+        settingBtn.onClick(this.onSettingBtnClick, this);
     }
 
     private initOtherView(): void {
@@ -317,7 +365,6 @@ export class RoomView {
             this.roundMarkView.visible = true;
             this.clearWaitingPlayer();
             this.showRoomNumber();
-            this.showOrHideReadyButton(false);
         };
 
         //房间已经被删除，客户端永远看不到这个状态

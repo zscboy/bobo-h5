@@ -20,7 +20,7 @@ export class RoomInfo {
 export interface GResLoader {
     fguiAddPackage(packageName: string): void;
     loadResDir(dir: string, onCompleted: (error: Error) => void): void;
-
+    loadPrefab(prefabName: string, onCompleted: (error: Error, res: cc.Prefab) => void): void;
 }
 
 /**

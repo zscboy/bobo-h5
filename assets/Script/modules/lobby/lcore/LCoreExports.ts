@@ -11,3 +11,4 @@ export * from "./PromiseDeferred";
 export * from "./LDataType";
 export * from "./WS";
 export * from "./MsgQueue";
+export * from "./AnimationMgr";

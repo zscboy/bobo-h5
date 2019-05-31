@@ -38,6 +38,17 @@ export class GResLoaderImpl implements GResLoader {
         );
     }
 
+    public loadPrefab(prefabName: string, onCompleted: (error: Error, res: cc.Prefab) => void): void {
+        cc.loader.loadRes(prefabName, cc.Prefab, (error, res: cc.Prefab) => {
+            if (error !== null) {
+                onCompleted(error, null);
+            } else {
+                this.loadedResSet[prefabName] = true;
+                onCompleted(null, res);
+            }
+        });
+    }
+
     public unload(): void {
         const resKeys = Object.keys(this.loadedResSet);
         cc.loader.release(resKeys);

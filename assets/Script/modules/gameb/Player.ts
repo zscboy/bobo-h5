@@ -49,7 +49,7 @@ export class Player {
     public state: number;
     public playerInfo: PlayerInfo;
     public waitDiscardReAction: boolean;
-    public readyHandList: number[];
+    public readyHandList: number[] = [];
 
     public allowedReActionMsg: proto.mahjong.MsgAllowPlayerReAction;
     public allowedActionMsg: proto.mahjong.MsgAllowPlayerAction;

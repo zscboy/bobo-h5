@@ -21,7 +21,26 @@ export class LobbyModule extends cc.Component implements LobbyModuleInterface {
     private gameLoader: GResLoaderImpl;
     private view: fgui.GObject;
 
+    public cleanupGRoot(): void {
+        const children = fgui.GRoot.inst._children;
+        const wins: fgui.Window[] = [];
+        children.forEach((c) => {
+            if (c instanceof fgui.Window) {
+                wins.push(c);
+            }
+        });
+
+        wins.forEach((w) => {
+            w.hide();
+            w.dispose();
+        });
+
+        fgui.GRoot.inst.removeChildren(0, -1, true);
+    }
+
     public returnFromGame(): void {
+        this.cleanupGRoot();
+
         this.gameNode.destroyAllChildren();
         this.gameNode.destroy();
 

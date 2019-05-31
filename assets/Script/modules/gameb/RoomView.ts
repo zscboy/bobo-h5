@@ -227,6 +227,12 @@ export class RoomView {
             handler(this);
         }
     }
+
+    public switchBg(index: number): void {
+        //
+        const bgController = this.unityViewNode.getController("bgController");
+        bgController.selectedIndex = index;
+    }
     //解散房间按钮点击事件
     // private onDissolveClick(): void {
     //     // const msg = "确实要申请解散房间吗？";
@@ -243,7 +249,8 @@ export class RoomView {
 
     private onSettingBtnClick(): void {
         // Logger.debug("onSettingBtnClick---------------");
-        this.room.getRoomHost().component.addComponent(SettingView);
+        const settingView = this.room.getRoomHost().component.addComponent(SettingView);
+        settingView.saveRoomView(this.room);
     }
 
     /**

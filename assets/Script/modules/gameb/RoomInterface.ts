@@ -87,6 +87,7 @@ export interface RoomInterface {
     isDestroy: boolean;
     quit: Function;
 
+    // 获取RoomHost
     getRoomHost(): RoomHost;
     isMe(userID: string): boolean;
     isReplayMode(): boolean;
@@ -125,4 +126,6 @@ export interface RoomInterface {
 
     loadHandResultView(msgHandOver: proto.mahjong.IMsgHandOver): void;
     loadGameOverResultView(msgGameOver: proto.mahjong.IMsgGameOver): void;
+
+    switchBg(index: number): void;
 }

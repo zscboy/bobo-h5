@@ -447,4 +447,10 @@ export class Room {
     public onUpdateStatus(state: number): void {
         this.roomView.onUpdateStatus(state);
     }
+    public switchBg(index: number): void {
+        //
+        this.roomView.switchBg(index);
+    }
+
+    //
 }

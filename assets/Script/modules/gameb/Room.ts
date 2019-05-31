@@ -76,6 +76,10 @@ export class Room {
         this.host = host;
     }
 
+    public getRoomHost(): RoomHost {
+        return this.host;
+    }
+
     public dispatchWebsocketMsg(msg: proto.mahjong.GameMessage): void {
         Logger.debug("Room.dispatchWebsocketMsg, ops:", msg.Ops);
         const handler = msgHandlers[msg.Ops];
@@ -268,12 +272,16 @@ export class Room {
 
     public loadHandResultView(msgHandOver: proto.mahjong.IMsgHandOver): void {
         // tslint:disable-next-line:no-unused-expression
-        new HandResultView(this, msgHandOver);
+        // new HandResultView(this, msgHandOver);
+        const view = this.host.component.addComponent(HandResultView);
+        view.showView(this, msgHandOver);
     }
 
     public loadGameOverResultView(msgGameOver: proto.mahjong.IMsgGameOver): void {
         // tslint:disable-next-line:no-unused-expression
-        new GameOverResultView(this, msgGameOver);
+        // new GameOverResultView(this, msgGameOver);
+        const view = this.host.component.addComponent(GameOverResultView);
+        view.showView(this, msgGameOver);
     }
 
     public hideDiscardedTips(): void {
@@ -446,4 +454,10 @@ export class Room {
     public onUpdateStatus(state: number): void {
         this.roomView.onUpdateStatus(state);
     }
+    public switchBg(index: number): void {
+        //
+        this.roomView.switchBg(index);
+    }
+
+    //
 }

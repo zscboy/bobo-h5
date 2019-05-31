@@ -22,7 +22,7 @@ class ViewGroup {
 /**
  * 显示一手牌结束后的得分结果
  */
-export class GameOverResultView {
+export class GameOverResultView extends cc.Component {
     private room: RoomInterface;
     private unityViewNode: fgui.GComponent = null;
     private win: fgui.Window;
@@ -34,9 +34,11 @@ export class GameOverResultView {
     private maxChuckerIndexs: ViewGroup[];
     private contentGroup: ViewGroup[];
 
-    public constructor(room: RoomInterface, msgGameOver: proto.mahjong.IMsgGameOver) {
+    public showView(room: RoomInterface, msgGameOver: proto.mahjong.IMsgGameOver): void {
         // -- 提高消息队列的优先级为1
         // room.host.mq:blockNormal()
+        const loader = room.getRoomHost().loader;
+        loader.fguiAddPackage("gameb/dafeng");
         const viewObj = fgui.UIPackage.createObject("dafeng", "game_over").asCom;
         this.unityViewNode = viewObj;
         const win = new fgui.Window();
@@ -227,11 +229,11 @@ export class GameOverResultView {
     //玩家点击返回按钮
     private onCloseButtonClick(): void {
         // -- 降低消息队列的优先级为0
-        // self.room.host.mq:unblockNormal()
+        this.room.getRoomHost().unblockNormal();
+        this.unityViewNode = null;
+        this.destroy();
         this.win.hide();
         this.win.dispose();
-        this.unityViewNode = null;
-        this.win = null;
 
         this.room.quit();
     }

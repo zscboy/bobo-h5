@@ -71,7 +71,7 @@ export class UserInfoView extends cc.Component {
 
         const genderCtrl = this.view.getController("gender");
         const gender = DataStore.getString("sex");
-        Logger.debug("gender -----------------= ", gender);
+        Logger.debug("gender ----------------- ", gender);
         genderCtrl.selectedIndex = +gender;
 
     }

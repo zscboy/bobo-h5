@@ -1,4 +1,3 @@
-import { Logger } from "../lobby/lcore/LCoreExports";
 import { Player } from "./Player";
 import { proto } from "./proto/protoGame";
 import { RoomInterface } from "./RoomInterface";
@@ -39,7 +38,7 @@ class ViewGroup {
 /**
  * 显示一手牌结束后的得分结果
  */
-export class HandResultView {
+export class HandResultView extends cc.Component {
     private room: RoomInterface;
     private unityViewNode: fgui.GComponent = null;
     private win: fgui.Window;
@@ -49,24 +48,22 @@ export class HandResultView {
     // private textTime: fgui.GObject;
     // private aniPos: fgui.GObject;
     private contentGroup: ViewGroup[];
-    public constructor(room: RoomInterface, msgHandOver: proto.mahjong.IMsgHandOver) {
+
+    public showView(room: RoomInterface, msgHandOver: proto.mahjong.IMsgHandOver): void {
         this.room = room;
         // 提高消息队列的优先级为1
         if (room.isReplayMode()) {
-            // room.host.mq.blockNormal();
+            room.getRoomHost().blockNormal();
         }
-
-        if (this.unityViewNode !== null) {
-            Logger.debug("HandResultView ////////////////////-");
-        } else {
-            const viewObj = fgui.UIPackage.createObject("dafeng", "hand_result").asCom;
-            this.unityViewNode = viewObj;
-            const win = new fgui.Window();
-            win.contentPane = viewObj;
-            this.win = win;
-            //初始化View
-            this.initAllView();
-        }
+        const loader = room.getRoomHost().loader;
+        loader.fguiAddPackage("gameb/dafeng");
+        const viewObj = fgui.UIPackage.createObject("dafeng", "hand_result").asCom;
+        this.unityViewNode = viewObj;
+        const win = new fgui.Window();
+        win.contentPane = viewObj;
+        this.win = win;
+        //初始化View
+        this.initAllView();
         //结算数据
         this.msgHandOver = msgHandOver;
 
@@ -449,14 +446,17 @@ export class HandResultView {
         // 降低消息队列的优先级为0
         const room = this.room;
         if (!room.isReplayMode()) {
-            // room.host.mq: unblockNormal()
+            this.room.getRoomHost().unblockNormal();
         }
         // if (this.ani) {
         //     this.ani.setVisible(false);
         // }
+        this.destroy();
         this.win.hide();
+        this.win.dispose();
         if (this.msgHandOver.continueAble) {
             this.room.onReadyButtonClick();
         }
     }
+
 }

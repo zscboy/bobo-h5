@@ -10,6 +10,8 @@ export interface RoomHost {
     animationMgr: AnimationMgr;
     room: RoomInterface;
     quit: Function;
+    unblockNormal: Function;
+    blockNormal: Function;
     user: UserInfo;
     component: cc.Component;
     loader: GResLoader;
@@ -87,6 +89,9 @@ export interface RoomInterface {
     windFlowerID: number;
     isDestroy: boolean;
     quit: Function;
+
+    // 获取RoomHost
+    getRoomHost(): RoomHost;
     isMe(userID: string): boolean;
     isReplayMode(): boolean;
     sendActionMsg(msgAction: ByteBuffer): void;
@@ -124,4 +129,6 @@ export interface RoomInterface {
 
     loadHandResultView(msgHandOver: proto.mahjong.IMsgHandOver): void;
     loadGameOverResultView(msgGameOver: proto.mahjong.IMsgGameOver): void;
+
+    switchBg(index: number): void;
 }

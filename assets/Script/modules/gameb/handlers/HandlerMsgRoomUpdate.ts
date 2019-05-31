@@ -76,35 +76,31 @@ export namespace HandlerMsgRoomUpdate {
             }
         }
         const me = <Player>room.getMyPlayer();
-        // const myOldState = me.state;
+        const myOldState = me.state;
         //更新，或者创建其他player
         for (const msgPlayer of msgPlayers) {
-            if (!room.isMe(msgPlayer.userID)) {
-                const player = <Player>room.getPlayerByChairID(msgPlayer.chairID);
-                if (player === null) {
-                    room.createPlayerByInfo(msgPlayer);
-                    //有人进来或者更新，更新GPS
-                    if (updatePlayer === 0) {
-                        updatePlayer = 1;
-                    }
-                } else {
-                    player.updateByPlayerInfo(msgPlayer);
+            const player = <Player>room.getPlayerByChairID(msgPlayer.chairID);
+            if (player === null) {
+                room.createPlayerByInfo(msgPlayer);
+                //有人进来或者更新，更新GPS
+                if (updatePlayer === 0) {
+                    updatePlayer = 1;
                 }
+            } else {
+                player.updateByPlayerInfo(msgPlayer);
             }
         }
         const roomStateEnum = proto.mahjong.RoomState;
         const playerStateEnum = proto.mahjong.PlayerState;
         //如果房间是等待状态，那么检查自己的状态是否已经是ready状态
-        room.showOrHideReadyButton(false);
         if (msgRoomUpdate.state === roomStateEnum.SRoomWaiting) {
             if (me.state !== playerStateEnum.PSReady) {
                 // 显示准备按钮，以便玩家可以点击
                 room.showOrHideReadyButton(true);
+            } else if (myOldState !== playerStateEnum.PSReady) {
+                // 并隐藏to ready按钮
+                room.showOrHideReadyButton(false);
             }
-            // else if (myOldState !== playerStateEnum.PSReady) {
-            //     // 并隐藏to ready按钮
-            //     room.showOrHideReadyButton(false);
-            // }
         }
 
         //更新房间界面

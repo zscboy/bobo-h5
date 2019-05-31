@@ -33,7 +33,15 @@ export namespace LEnv {
     // -- 牌友圈
     export const createClub = "/lobby/uuid/createClub";
     export const loadMyClubs = "/lobby/uuid/loadMyClubs";
-    export const deleteClub = "/lobby/uuid/deleteClub";
+    export const deleteClub = "/lobby/uuid/disbandClub";
+
+    export const joinClub = "/lobby/uuid/joinClub";
+
+    export const loadClubMembers = "/lobby/uuid/loadClubMembers";
+
+    export const joinApproval = "/lobby/uuid/joinApproval";
+
+    export const loadClubEvents = "/lobby/uuid/loadClubEvents";
 
     export const cfmt = (str: string, ...args: any[]): string => { // tslint:disable-line:no-any
         return str.replace(/{(\d+)}/g, (match, n) => {

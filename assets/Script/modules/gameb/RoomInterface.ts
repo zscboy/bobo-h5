@@ -128,4 +128,6 @@ export interface RoomInterface {
     loadGameOverResultView(msgGameOver: proto.mahjong.IMsgGameOver): void;
 
     switchBg(index: number): void;
+
+    onDissolveClicked(): void;
 }

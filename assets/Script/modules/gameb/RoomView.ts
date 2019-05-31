@@ -1,4 +1,5 @@
 import { Logger } from "../lobby/lcore/LCoreExports";
+import { DisbandView } from "./DisbandView";
 import { PlayerView } from "./PlayerView";
 import { proto } from "./proto/protoGame";
 import { RoomInterface, TingPai } from "./RoomInterface";
@@ -232,6 +233,19 @@ export class RoomView {
         //
         const bgController = this.unityViewNode.getController("bgController");
         bgController.selectedIndex = index;
+    }
+
+    public updateDisbandVoteView(msgDisbandNotify: proto.mahjong.MsgDisbandNotify): void {
+        //
+
+        let disbandView = this.room.getRoomHost().component.getComponent(DisbandView);
+
+        if (disbandView === undefined || disbandView == null) {
+            disbandView = this.room.getRoomHost().component.addComponent(DisbandView);
+        }
+
+        disbandView.updateView(msgDisbandNotify);
+
     }
     //解散房间按钮点击事件
     // private onDissolveClick(): void {

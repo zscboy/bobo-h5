@@ -1,3 +1,4 @@
+import { Dialog } from "../lobby/lcore/LCoreExports";
 import { RoomInterface } from "./RoomInterface";
 
 /**
@@ -10,10 +11,10 @@ export class SettingView extends cc.Component {
 
     private eventTarget: cc.EventTarget;
 
-    private roomView: RoomInterface;
+    private room: RoomInterface;
 
-    public saveRoomView(roomView: RoomInterface): void {
-        this.roomView = roomView;
+    public saveRoomView(room: RoomInterface): void {
+        this.room = room;
     }
 
     protected onLoad(): void {
@@ -70,20 +71,32 @@ export class SettingView extends cc.Component {
 
     private onClassColorBtnClick(): void {
         //
-        this.roomView.switchBg(0);
+        this.room.switchBg(0);
     }
 
     private onBlueColorBtnClick(): void {
         //
-        this.roomView.switchBg(1);
+        this.room.switchBg(1);
     }
 
     private onDisbandBtnClick(): void {
         //
+        Dialog.showDialog("是否解散房间？", () => {
+
+            this.sendDisbandMsg();
+            // tslint:disable-next-line:align
+        }, () => {
+            //
+        });
     }
 
     private onArrowBtnClick(): void {
         //
+    }
+
+    private sendDisbandMsg(): void {
+        //
+        this.room.onDissolveClicked();
     }
 
 }

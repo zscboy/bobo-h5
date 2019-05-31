@@ -222,6 +222,8 @@ export class Room {
     public updateDisbandVoteView(msgDisbandNotify: proto.mahjong.MsgDisbandNotify): void {
         this.msgDisbandNotify = msgDisbandNotify;
 
+        this.roomView.updateDisbandVoteView(msgDisbandNotify);
+
         // if (this.disbandVoteView) {
         //     this.disbandVoteView: updateView(msgDisbandNotify)
         // } else {
@@ -451,6 +453,5 @@ export class Room {
         //
         this.roomView.switchBg(index);
     }
-
     //
 }

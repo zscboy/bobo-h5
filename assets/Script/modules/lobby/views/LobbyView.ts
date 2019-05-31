@@ -1,5 +1,5 @@
 import {
-    AnimationMgr, AnimationPlayOptions, DataStore,
+    DataStore,
     GameModuleLaunchArgs, LEnv, LobbyModuleInterface, Logger
 } from "../lcore/LCoreExports";
 import { LMsgCenter } from "../LMsgCenter";
@@ -26,8 +26,6 @@ export class LobbyView extends cc.Component {
     private msgCenter: LMsgCenter;
 
     private msgHandlers: { [key: number]: MsgHandler } = {};
-
-    private animationMgr: AnimationMgr;
 
     public dispatchMessage(msg: proto.lobby.LobbyMessage): void {
         const ops = msg.Ops;
@@ -56,7 +54,6 @@ export class LobbyView extends cc.Component {
         this.view = view;
 
         this.initView();
-        this.animationMgr = new AnimationMgr(loader);
 
         await this.startWebSocket();
 
@@ -122,14 +119,7 @@ export class LobbyView extends cc.Component {
     }
 
     private onCoinClick(): void {
-        const prefabName = "lobby/prefabs/Effect_zi_gang";
-        const n = this.view.getChild("n5").node;
-        const options: AnimationPlayOptions = {};
-        options.onFinished = (error: Error): void => {
-            Logger.debug("animation completed:", error);
-        };
-
-        this.animationMgr.play(prefabName, n, options);
+        // TODO:
     }
 
     private openRecordView(): void {

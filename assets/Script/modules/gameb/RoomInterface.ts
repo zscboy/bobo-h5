@@ -1,5 +1,5 @@
 
-import { GResLoader, RoomInfo, UserInfo } from "../lobby/lcore/LCoreExports";
+import { AnimationMgr, GResLoader, RoomInfo, UserInfo } from "../lobby/lcore/LCoreExports";
 import { PlayerInterface } from "./PlayerInterface";
 import { proto } from "./proto/protoGame";
 
@@ -7,6 +7,7 @@ import { proto } from "./proto/protoGame";
  * Room host
  */
 export interface RoomHost {
+    animationMgr: AnimationMgr;
     room: RoomInterface;
     quit: Function;
     user: UserInfo;

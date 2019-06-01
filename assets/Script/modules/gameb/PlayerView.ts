@@ -221,7 +221,14 @@ export class PlayerView {
         obj.name = name;
         obj.visible = true;
 
-        this.roomHost.animationMgr.play(`lobby/prefabs/mahjong/${name}`, obj.node);
+        const node = obj.node;
+        if (node.childrenCount > 0) {
+            node.children.forEach((c) => {
+                c.active = false;
+            });
+        }
+
+        this.roomHost.animationMgr.play(`lobby/prefabs/mahjong/${name}`, node);
     }
 
     public onClickBtn(name: string): void {

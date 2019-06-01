@@ -1,3 +1,4 @@
+import { Dialog } from "./Dialog";
 import { Logger } from "./Logger";
 
 /**
@@ -17,6 +18,14 @@ export namespace HTTP {
         const cb = () => {
             xhr.abort();
         };
+
+        const onEnd = (error: Error): void => {
+            destroyListener.off("destroy", cb);
+            onFinished(xhr, error);
+
+            Dialog.hideWaiting();
+        };
+
         // 如果组件已经销毁则终止网络请求
         destroyListener.once("destory", cb);
 
@@ -28,20 +37,17 @@ export namespace HTTP {
 
         xhr.onloadend = () => {
             Logger.trace("xhr onloaded");
-            destroyListener.off("destroy", cb);
-            onFinished(xhr, null);
+            onEnd(null);
         };
 
         xhr.onerror = () => {
             Logger.trace("xhr onerror");
-            destroyListener.off("destroy", cb);
-            onFinished(xhr, "xhr onerror");
+            onEnd(Error("xhr onerror"));
         };
 
         xhr.ontimeout = () => {
             Logger.trace("xhr ontimeout");
-            destroyListener.off("destroy", cb);
-            onFinished(xhr, "xhr ontimeout");
+            onEnd(Error("xhr ontimeout"));
         };
 
         // 设置服务器响应类型
@@ -58,6 +64,9 @@ export namespace HTTP {
         } else {
             xhr.send();
         }
+
+        // 显示等待滚动圈
+        Dialog.showWaiting();
 
         return xhr;
     };

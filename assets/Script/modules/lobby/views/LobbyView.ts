@@ -112,7 +112,7 @@ export class LobbyView extends cc.Component {
         this.initInfoView(userInfo);
         userInfo.onClick(this.openUserInfoView, this);
 
-        this.onMessageFunc = this.on(`${proto.lobby.MessageCode.OPUpdateDiamond}`, this.onMessage);
+        this.onMessageFunc = this.on(`${proto.lobby.MessageCode.OPUpdateDiamond}`, this.onMessage, this);
     }
 
     private async startWebSocket(): Promise<void> {

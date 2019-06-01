@@ -1,6 +1,6 @@
 import {
     DataStore,
-    GameModuleLaunchArgs, LEnv, LobbyModuleInterface, Logger
+    Dialog, GameModuleLaunchArgs, LEnv, LobbyModuleInterface, Logger
 } from "../lcore/LCoreExports";
 import { LMsgCenter } from "../LMsgCenter";
 import { proto } from "../proto/protoLobby";
@@ -143,6 +143,13 @@ export class LobbyView extends cc.Component {
 
     private onCoinClick(): void {
         // TODO:
+        Dialog.showWaiting();
+
+        this.scheduleOnce(
+            () => {
+                Dialog.hideWaiting();
+            },
+            5);
     }
 
     private openRecordView(): void {

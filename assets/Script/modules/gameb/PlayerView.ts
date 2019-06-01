@@ -1,7 +1,7 @@
 import { Logger } from "../lobby/lcore/LCoreExports";
 import { ButtonDef, ClickCtrl, PlayerInterface } from "./PlayerInterface";
 import { proto } from "./proto/protoGame";
-import { RoomInterface, TingPai } from "./RoomInterface";
+import { RoomHost, RoomInterface, TingPai } from "./RoomInterface";
 import { TileImageMounter } from "./TileImageMounter";
 
 const mjproto = proto.mahjong;
@@ -83,11 +83,15 @@ export class PlayerView {
     private userInfoPos: fgui.GObject;
     private alreadyShowNonDiscardAbleTips: boolean;
     private discardTipsTile: fgui.GComponent;
+    private btnHanders: { [key: string]: Function };
+    private roomHost: RoomHost;
 
     public constructor(viewUnityNode: fgui.GComponent, viewChairID: number, room: RoomInterface) {
         this.room = room;
         this.viewChairID = viewChairID;
         this.viewUnityNode = viewUnityNode;
+        this.roomHost = this.room.getRoomHost();
+
         //这里需要把player的chairID转换为游戏视图中的chairID，这是因为，无论当前玩家本人
         //的chair ID是多少，他都是居于正中下方，左手是上家，右手是下家，正中上方是对家
         const view = viewUnityNode.getChild(`player${viewChairID}`).asCom;
@@ -192,14 +196,15 @@ export class PlayerView {
         this.initLights();
     }
 
-    public itemProviderButtonList(index: number): string {
-        return this.buttonDataList[index];
-    }
+    // public itemProviderButtonList(index: number): string {
+    //     return this.buttonDataList[index];
+    // }
     //操作按钮
     public initOperationButtons(): void {
         this.buttonList = this.operationPanel.getChild("buttonList").asList;
         this.buttonList.itemRenderer = <(index: number, item: fgui.GComponent) => void>this.renderButtonListItem.bind(this);
-        this.buttonList.itemProvider = <(index: number) => string>this.itemProviderButtonList.bind(this);
+        // 不设置itemProvider，此时GList就使用编辑器中配置的默认Item
+        // this.buttonList.itemProvider = <(index: number) => string>this.itemProviderButtonList.bind(this);
         this.buttonList.on(fgui.Event.CLICK_ITEM, (onClickItem: fgui.GObject) => { this.onClickBtn(onClickItem.name); }, this);
 
         this.operationButtonsRoot = this.operationPanel;
@@ -210,29 +215,44 @@ export class PlayerView {
         this.checkReadyHandBtn = this.viewUnityNode.getChild("checkReadyHandBtn").asButton;
         this.checkReadyHandBtn.onClick(this.onCheckReadyHandBtnClick, this);
     }
+
     public renderButtonListItem(index: number, obj: fgui.GObject): void {
         const name = this.buttonDataList[index];
         obj.name = name;
         obj.visible = true;
+
+        this.roomHost.animationMgr.play(`lobby/prefabs/mahjong/${name}`, obj.node);
     }
 
     public onClickBtn(name: string): void {
-        const player = this.player;
-        if (name === ButtonDef.Chow) {
-            player.onChowBtnClick();
-        } else if (name === ButtonDef.Kong) {
-            player.onKongBtnClick();
-        } else if (name === ButtonDef.Skip) {
-            player.onSkipBtnClick();
-        } else if (name === ButtonDef.Hu) {
-            player.onWinBtnClick();
-        } else if (name === ButtonDef.Pong) {
-            player.onPongBtnClick();
-        } else if (name === ButtonDef.Ting) {
-            player.onReadyHandBtnClick();
-        } else if (name === ButtonDef.Zhua) {
-            player.onFinalDrawBtnClick();
+        if (this.btnHanders === undefined) {
+            this.btnHanders = {};
+            const btnHanders = this.btnHanders;
+            btnHanders[ButtonDef.Chow] = () => {
+                this.player.onChowBtnClick();
+            };
+            btnHanders[ButtonDef.Kong] = () => {
+                this.player.onKongBtnClick();
+            };
+            btnHanders[ButtonDef.Skip] = () => {
+                this.player.onSkipBtnClick();
+            };
+            btnHanders[ButtonDef.Pong] = () => {
+                this.player.onPongBtnClick();
+            };
+            btnHanders[ButtonDef.Ting] = () => {
+                this.player.onReadyHandBtnClick();
+            };
+            btnHanders[ButtonDef.Hu] = () => {
+                this.player.onWinBtnClick();
+            };
+            btnHanders[ButtonDef.Zhua] = () => {
+                this.player.onFinalDrawBtnClick();
+            };
         }
+
+        const handler = this.btnHanders[name];
+        handler();
     }
 
     //显示操作按钮
@@ -378,7 +398,7 @@ export class PlayerView {
         // const ani = animation.play("animations/Effects_UI_touxiang.prefab", this.head.headView, x, y, true);
         // ani.setVisible(isShow)
         if (isShow) {
-            this.room.getRoomHost().animationMgr.play(`lobby/prefabs/mahjong/Effect_UI_touxiang`, this.head.pos.node);
+            this.roomHost.animationMgr.play(`lobby/prefabs/mahjong/Effect_UI_touxiang`, this.head.pos.node);
         }
         this.head.pos.visible = isShow;
     }
@@ -535,7 +555,7 @@ export class PlayerView {
         if (waitDiscardReAction) {
             this.player.waitDiscardReAction = true;
         } else {
-            this.room.getRoomHost().component.scheduleOnce(
+            this.roomHost.component.scheduleOnce(
                 () => {
                     discardTips.visible = false;
                 },
@@ -1011,9 +1031,9 @@ export class PlayerView {
 
     public async playerOperationEffect(effectName: string, isWait?: boolean): Promise<void> {
         if (isWait) {
-            await this.room.getRoomHost().animationMgr.coPlay(`lobby/prefabs/mahjong/${effectName}`, this.aniPos.node);
+            await this.roomHost.animationMgr.coPlay(`lobby/prefabs/mahjong/${effectName}`, this.aniPos.node);
         } else {
-            this.room.getRoomHost().animationMgr.play(`lobby/prefabs/mahjong/${effectName}`, this.aniPos.node);
+            this.roomHost.animationMgr.play(`lobby/prefabs/mahjong/${effectName}`, this.aniPos.node);
         }
     }
 

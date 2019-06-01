@@ -21,7 +21,7 @@ import { HandResultView } from "./HandResultView";
 import { Player } from "./Player";
 import { PlayerInterface } from "./PlayerInterface";
 import { proto } from "./proto/protoGame";
-import { RoomHost, RoomInterface, TingPai } from "./RoomInterface";
+import { PlayerInfo, RoomHost, RoomInterface, TingPai } from "./RoomInterface";
 import { RoomView } from "./RoomView";
 
 type msgHandler = (msgData: ByteBuffer, room: RoomInterface) => Promise<void>;
@@ -103,6 +103,19 @@ export class Room {
 
         return player;
     }
+
+    public getPlayerInfoByChairID(chairID: number): PlayerInfo {
+        let player = null;
+        Object.keys(this.players).forEach((key: string) => {
+            const p = this.players[key];
+            if (p.chairID === chairID) {
+                player = p;
+            }
+        });
+
+        return player;
+    }
+
     public getRoomView(): RoomView {
         return this.roomView;
     }
@@ -430,10 +443,19 @@ export class Room {
 
         return this.players[userID];
     }
+    public getPlayerByCharID(charID: number): Player {
+
+        return this.players[charID];
+    }
 
     public getMyPlayer(): PlayerInterface {
         return this.myPlayer;
     }
+
+    public getMyPlayerInfo(): PlayerInfo {
+        return this.myPlayer.playerInfo;
+    }
+
     //设置当前房间所等待的操作玩家
     public setWaitingPlayer(chairID: number): void {
         const player = this.getPlayerByChairID(chairID);

@@ -8,7 +8,6 @@ const { ccclass } = cc._decorator;
 @ccclass
 export class ApplyRecordView extends cc.Component {
 
-    private static instance: ApplyRecordView;
     private view: fgui.GComponent;
     private win: fgui.Window;
     private eventTarget: cc.EventTarget;
@@ -39,8 +38,6 @@ export class ApplyRecordView extends cc.Component {
         this.win = win;
         this.win.show();
 
-        ApplyRecordView.instance = this;
-
         this.initView();
     }
 
@@ -63,7 +60,9 @@ export class ApplyRecordView extends cc.Component {
 
         //邮件列表
         this.recordList = this.view.getChild("recordList").asList;
-        this.recordList.itemRenderer = this.renderPhraseListItem;
+        this.recordList.itemRenderer = (index: number, item: fgui.GObject) => {
+            this.renderPhraseListItem(index, item);
+        };
         this.recordList.setVirtual();
 
         //拉取邮件
@@ -72,7 +71,7 @@ export class ApplyRecordView extends cc.Component {
 
     private renderPhraseListItem(index: number, obj: fgui.GObject): void {
 
-        const record = ApplyRecordView.instance.records[index];
+        const record = this.records[index];
         Logger.debug(record);
 
     }

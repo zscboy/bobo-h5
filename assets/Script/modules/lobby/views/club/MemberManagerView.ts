@@ -8,7 +8,6 @@ const { ccclass } = cc._decorator;
 @ccclass
 export class MemberManagerView extends cc.Component {
 
-    private static instance: MemberManagerView;
     private view: fgui.GComponent;
     private win: fgui.Window;
     private eventTarget: cc.EventTarget;
@@ -51,8 +50,6 @@ export class MemberManagerView extends cc.Component {
         this.win = win;
         this.win.show();
 
-        MemberManagerView.instance = this;
-
         this.initView();
     }
 
@@ -89,7 +86,9 @@ export class MemberManagerView extends cc.Component {
         Logger.debug(this.memberListPage);
         Logger.debug(this.memberApplyPage);
         Logger.debug(this.memberDeletePage);
-        this.recordList.itemRenderer = this.renderPhraseListItem;
+        this.recordList.itemRenderer = (index: number, item: fgui.GObject) => {
+            this.renderPhraseListItem(index, item);
+        };
         this.recordList.setVirtual();
 
     }
@@ -109,7 +108,7 @@ export class MemberManagerView extends cc.Component {
 
     private renderPhraseListItem(index: number, obj: fgui.GObject): void {
 
-        const record = MemberManagerView.instance.records[index];
+        const record = this.records[index];
         Logger.debug(record);
 
     }

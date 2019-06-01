@@ -7,8 +7,6 @@ import { LobbyViewInterface } from "./LobbyViewInterface";
  */
 export class EmailView extends cc.Component {
 
-    // 为了能在 render 函数中取this
-    private static instance: EmailView;
     // 邮件列表
     private emails: proto.lobby.IMsgMail[];
     // 选中的邮件
@@ -53,8 +51,6 @@ export class EmailView extends cc.Component {
         this.win = win;
         this.win.show();
 
-        EmailView.instance = this;
-
         this.initView();
 
         this.lobbyView = <LobbyViewInterface>this.getComponent("LobbyView");
@@ -82,12 +78,16 @@ export class EmailView extends cc.Component {
 
         //附件列表
         this.attachmentsList = this.view.getChild("emailAttachmentList").asList;
-        this.attachmentsList.itemRenderer = this.renderAttachmentListItem;
+        this.attachmentsList.itemRenderer = (index: number, item: fgui.GObject) => {
+            this.renderAttachmentListItem(index, item);
+        };
         this.attachmentsList.setVirtual();
 
         //邮件列表
         this.emailList = this.view.getChild("mailList").asList;
-        this.emailList.itemRenderer = this.renderPhraseListItem;
+        this.emailList.itemRenderer = (index: number, item: fgui.GObject) => {
+            this.renderPhraseListItem(index, item);
+        };
         this.emailList.setVirtual();
 
         //拉取邮件
@@ -98,14 +98,14 @@ export class EmailView extends cc.Component {
      * @param emailRsp 拉取的邮件
      */
     private updateList(emailRsp: proto.lobby.MsgLoadMail): void {
-        EmailView.instance.emails = emailRsp.mails;
-        this.emailList.numItems = EmailView.instance.emails.length;
+        this.emails = emailRsp.mails;
+        this.emailList.numItems = this.emails.length;
 
         //默认选择第一个
-        if (EmailView.instance.emails.length >= 1) {
+        if (this.emails.length >= 1) {
             this.emailList.selectedIndex = 0;
 
-            const email = EmailView.instance.emails[0];
+            const email = this.emails[0];
             this.selectEmail(email, 0);
         }
 
@@ -118,7 +118,7 @@ export class EmailView extends cc.Component {
      */
     private renderAttachmentListItem(index: number, obj: fgui.GObject): void {
 
-        const email = EmailView.instance.selectedEmail;
+        const email = this.selectedEmail;
         const attachment = email.attachments;
 
         const count = obj.asCom.getChild("count");
@@ -138,7 +138,7 @@ export class EmailView extends cc.Component {
         obj.onClick(() => {
             if (attachment.isReceive === false) {
 
-                EmailView.instance.takeAttachment(email);
+                this.takeAttachment(email);
             }
             // tslint:disable-next-line:align
         }, this);
@@ -151,7 +151,7 @@ export class EmailView extends cc.Component {
      */
     private renderPhraseListItem(index: number, obj: fgui.GObject): void {
 
-        const email = EmailView.instance.emails[index];
+        const email = this.emails[index];
 
         const readController = obj.asCom.getController("c1");
 
@@ -169,7 +169,7 @@ export class EmailView extends cc.Component {
         const btn = obj.asCom.getChild("spaceBtn");
 
         btn.onClick(() => {
-            EmailView.instance.selectEmail(email, index);
+            this.selectEmail(email, index);
             // tslint:disable-next-line:align
         }, this);
 
@@ -218,7 +218,7 @@ export class EmailView extends cc.Component {
 
         //刷新附件
         const selectedEmail = email;
-        EmailView.instance.selectedEmail = selectedEmail;
+        this.selectedEmail = selectedEmail;
 
         if (selectedEmail !== null) {
             this.updateAttachmentsView();

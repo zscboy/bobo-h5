@@ -18,7 +18,7 @@ export namespace LEnv {
     export const chat = "/lobby/uuid/chat";
     export const lobbyWebsocket = "ws://121.196.210.106:30002/lobby/uuid/ws";
 
-    // -- 创建房间
+// -- 创建房间
     export const createRoom = "/lobby/uuid/createRoom";
     export const loadRoomPriceCfgs = "/lobby/uuid/loadPrices";
     export const requestRoomInfo = "/lobby/uuid/requestRoomInfo";

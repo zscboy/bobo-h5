@@ -13,8 +13,6 @@ const { ccclass } = cc._decorator;
 @ccclass
 export class ClubView extends cc.Component {
 
-    // 为了能在 render 函数中取this
-    private static instance: ClubView;
     // 茶馆主界面节点
     private view: fgui.GComponent;
     private win: fgui.Window;
@@ -51,8 +49,6 @@ export class ClubView extends cc.Component {
 
         this.win = win;
         this.win.show();
-
-        ClubView.instance = this;
 
         this.initView();
     }
@@ -171,7 +167,7 @@ export class ClubView extends cc.Component {
         createClubBtn.onClick(() => {
             const view = this.addComponent(CreateClubView);
             this.createClubViewEventTarget = view.getEventTarget();
-            this.createClubViewEventTarget.on("addClub", this.addClub);
+            this.createClubViewEventTarget.on("addClub", this.addClub, this);
             // tslint:disable-next-line:align
         }, this);
 
@@ -191,7 +187,9 @@ export class ClubView extends cc.Component {
 
         //邮件列表
         this.clubList = this.view.getChild("clubList").asList;
-        this.clubList.itemRenderer = this.renderPhraseListItem;
+        this.clubList.itemRenderer = (index: number, item: fgui.GObject) => {
+            this.renderPhraseListItem(index, item);
+        };
         this.clubList.setVirtual();
 
         this.loadClub();
@@ -199,10 +197,10 @@ export class ClubView extends cc.Component {
     }
 
     private addClub(clubInfo: proto.club.IMsgClubInfo): void {
-        ClubView.instance.clubs.unshift(clubInfo);
-        ClubView.instance.clubList.numItems = ClubView.instance.clubs.length + 1;
-        ClubView.instance.clubList.selectedIndex = 0;
-        ClubView.instance.setContent(clubInfo);
+        this.clubs.unshift(clubInfo);
+        this.clubList.numItems = this.clubs.length + 1;
+        this.clubList.selectedIndex = 0;
+        this.setContent(clubInfo);
     }
 
     private loadClub(): void {
@@ -228,8 +226,8 @@ export class ClubView extends cc.Component {
         //
         let clubInfo: proto.club.IMsgClubInfo;
 
-        if (ClubView.instance.clubs !== undefined) {
-            clubInfo = ClubView.instance.clubs[index];
+        if (this.clubs !== undefined) {
+            clubInfo = this.clubs[index];
         }
 
         const isClubCtrl = obj.asCom.getController("isClub");
@@ -250,7 +248,7 @@ export class ClubView extends cc.Component {
         //spaceBtn.offClick(undefined, undefined);
         spaceBtn.onClick(() => {
             if (buttonCtrl.selectedIndex === 0) {
-                ClubView.instance.setContent(clubInfo);
+                this.setContent(clubInfo);
             }
             // tslint:disable-next-line:align
         }, this);

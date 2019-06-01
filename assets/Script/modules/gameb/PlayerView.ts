@@ -80,7 +80,7 @@ export class PlayerView {
     private buttonDataList: string[];
 
     private aniPos: fgui.GObject;
-    // private userInfoPos: fgui.GObject
+    private userInfoPos: fgui.GObject;
     private alreadyShowNonDiscardAbleTips: boolean;
     private discardTipsTile: fgui.GComponent;
 
@@ -256,7 +256,7 @@ export class PlayerView {
     public initOtherView(view: fgui.GComponent): void {
 
         // this.aniPos = view.getChild("aniPos")
-        // this.userInfoPos = view.getChild("userInfoPos")
+        this.userInfoPos = view.getChild("userInfoPos");
 
         //打出的牌放大显示
         this.discardTips = view.getChild("discardTip").asCom;
@@ -986,7 +986,7 @@ export class PlayerView {
     //显示玩家头像
     public showHeadImg(): void {
         this.head.headView.visible = true;
-        this.head.headView.onClick(this.player.onPlayerInfoClick, this);
+        this.head.headView.onClick(this.player.onPlayerInfoClick, this.player);
     }
 
     //显示桌主
@@ -1035,6 +1035,10 @@ export class PlayerView {
         //imageA.color = Color(1, 1, 1, 1)
         //imageB.color = Color(1, 1, 1, 1)
         //}
+    }
+
+    public getUserInfoPos(): fgui.GObject {
+        return this.userInfoPos;
     }
 
 }

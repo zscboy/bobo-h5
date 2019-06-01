@@ -52,7 +52,7 @@ export class HandResultView extends cc.Component {
     public showView(room: RoomInterface, msgHandOver: proto.mahjong.IMsgHandOver): void {
         this.room = room;
         // 提高消息队列的优先级为1
-        if (room.isReplayMode()) {
+        if (!room.isReplayMode()) {
             room.getRoomHost().blockNormal();
         }
         const loader = room.getRoomHost().loader;

@@ -73,7 +73,6 @@ export class ChatView extends cc.Component {
 
         this.userID = DataStore.getString("userID", "");
 
-        // this.lm = lm;
         this.lobbyView = <LobbyViewInterface> this.node.getParent().getComponent("LobbyView");
         if (this.lobbyView !== null) {
           this.onMessageFunc = this.lobbyView.on(`${proto.lobby.MessageCode.OPChat}`, this.onMessage, this);
@@ -156,8 +155,13 @@ export class ChatView extends cc.Component {
     }
 
     private onPhraseListItemClick(clickItem: fgui.GObject): void {
+        this.changeList(2);
+        this.historyBtn.selected = true;
+
         const obj = clickItem.asCom;
-        this.sendMsg(obj.getChild("n0").text);
+        const msg = obj.getChild("n3").text;
+        this.sendMsg(msg);
+
     }
 
     private getHistoryListItemResource(index: number): string {
@@ -267,7 +271,7 @@ export class ChatView extends cc.Component {
     private renderPhraseListItem(index: number, item: fgui.GObject): void {
         const obj = item.asCom;
         const msg = phraseMap[index + 1];
-        const t = obj.getChild("n0");
+        const t = obj.getChild("n3");
         t.text = msg;
 }
 

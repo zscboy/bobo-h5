@@ -863,7 +863,7 @@ export class Player {
 
         const pos = new cc.Vec2(this.playerView.getUserInfoPos().x, this.playerView.getUserInfoPos().y);
         // const pos = new cc.Vec2(0, 0);
-        const playerInfoString = JSON.stringify(this.playerInfo);
+        // const playerInfoString = JSON.stringify(this.playerInfo);
         // playerInfoView.showUserInfoView(self.playerInfo, pos, self:isMe() == false)
 
         const roomHost = this.host.getRoomHost();
@@ -876,6 +876,6 @@ export class Player {
             playerInfoView = roomHost.component.addComponent(PlayerInfoView);
         }
 
-        playerInfoView.showUserInfoView(roomHost.loader, playerInfoString, pos, this.isMe() === false);
+        playerInfoView.showUserInfoView(roomHost.loader, this.playerInfo, pos, this.isMe() === false);
     }
 }

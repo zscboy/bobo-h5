@@ -28,7 +28,7 @@ interface PlayerInfo {
 /**
  * 战绩界面
  */
-export class PlayerInfoView extends cc.Component  {
+export class PlayerInfoView extends cc.Component {
     private view: fgui.GComponent = null;
     private playerInfo: PlayerInfo;
     private isOther: boolean;
@@ -48,8 +48,9 @@ export class PlayerInfoView extends cc.Component  {
     private addressText: fgui.GTextField;
     private numberText: fgui.GTextField;
     private dataList: PropData[];
-    public showUserInfoView(loader: GResLoader, playerInfoString: string, pos: cc.Vec2, isOther: boolean): void {
-        const playerInfo = <PlayerInfo>JSON.parse(playerInfoString);
+    private dataListForOpponents: PropData[];
+
+    public showUserInfoView(loader: GResLoader, playerInfo: PlayerInfo, pos: cc.Vec2, isOther: boolean): void {
         if (this.view !== null) {
             // this.room = room;
             this.playerInfo = playerInfo;
@@ -70,15 +71,15 @@ export class PlayerInfoView extends cc.Component  {
         this.initView();
 
         // this.room = room;
-        this.playerInfo =  playerInfo;
+        this.playerInfo = playerInfo;
         this.isOther = isOther;
         this.updateView();
         fgui.GRoot.inst.showPopup(this.view);
         this.view.setPosition(pos.x, pos.y);
 
-        this.lobbyView = <LobbyViewInterface> this.node.getParent().getComponent("LobbyView");
+        this.lobbyView = <LobbyViewInterface>this.node.getParent().getComponent("LobbyView");
         if (this.lobbyView !== null) {
-          this.onMessageFunc = this.lobbyView.on(`${proto.lobby.MessageCode.OPChat}`, this.onMessage, this);
+            this.onMessageFunc = this.lobbyView.on(`${proto.lobby.MessageCode.OPChat}`, this.onMessage, this);
         }
     }
 
@@ -114,22 +115,25 @@ export class PlayerInfoView extends cc.Component  {
         // )
 
         this.propList.setVirtual();
+
+        this.dataListForOpponents = [];
+        const images: string[] = ["dj_bb", "dj_jd", "dj_qj", "dj_tuoxie", "dj_ganbei", "dj_hj", "dj_meigui", "dj_mmd"];
+        const ids: number[] = [6, 3, 5, 4, 2, 7, 1, 8];
+        for (let i = 0; i < 8; i++) {
+            const data = {
+                image: images[i],
+                num: i,
+                id: ids[i]
+            };
+
+            this.dataListForOpponents.push(<PropData>data);
+        }
     }
 
     private updatePropList(): void {
         this.dataList = [];
         if (this.isOther) {
-            const images: string[] = ["dj_bb", "dj_jd", "dj_qj", "dj_tuoxie", "dj_ganbei", "dj_hj", "dj_meigui", "dj_mmd"];
-            const ids: number[] = [6, 3, 5, 4, 2, 7, 1, 8];
-            for (let i = 0; i < 8; i++) {
-                const data = {
-                    image: images[i],
-                    num: i - 1,
-                    id : ids [i]
-                };
-
-                this.dataList.push(<PropData>data);
-            }
+            this.dataList = this.dataListForOpponents;
         }
 
         const num = this.dataList.length;
@@ -169,14 +173,14 @@ export class PlayerInfoView extends cc.Component  {
     }
 
     private renderPropListItem(index: number, gObject: fgui.GObject): void {
-        const data = this.dataList[index + 1];
+        const data = this.dataList[index];
         const obj = gObject.asCom;
         const icon = obj.getChild("icon").asLoader;
         const xinNum = obj.getChild("xinNum");
         const zuanNum = obj.getChild("zuanNum");
-        obj.name = `${data.id}` ;
-        xinNum.text = `${ data.num * 2}`;
-        zuanNum.text = `${ data.num * 2}`;
+        obj.name = `${data.id}`;
+        xinNum.text = `${data.num * 2}`;
+        zuanNum.text = `${data.num * 2}`;
         icon.url = `ui://lobby_player_info/${data.image}`;
     }
 

@@ -98,12 +98,12 @@ export class RoomView {
 
     public startDiscardCountdown(): void {
         //清理定时器
-        this.room.getRoomHost().component.unschedule(this.countDownCallBack);
-        this.leftTime = 1;
+        // this.room.getRoomHost().component.unschedule(this.countDownCallBack);
+        // this.leftTime = 1;
         //起定时器
-        this.room.getRoomHost().component.schedule(
-            <Function>this.countDownCallBack.bind(this),
-            1);
+        // this.room.getRoomHost().component.schedule(
+        //     <Function>this.countDownCallBack.bind(this),
+        //     1);
     }
 
     public countDownCallBack(): void {

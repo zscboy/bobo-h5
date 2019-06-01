@@ -375,8 +375,12 @@ export class PlayerView {
     public setHeadEffectBox(isShow: boolean): void {
         // const x = this.head.pos.x
         // const y = this.head.pos.y
-        // const ani = animation.play("animations/Effects_UI_touxiang.prefab", this.head.headView, x, y, true)
+        // const ani = animation.play("animations/Effects_UI_touxiang.prefab", this.head.headView, x, y, true);
         // ani.setVisible(isShow)
+        if (isShow) {
+            this.room.getRoomHost().animationMgr.play(`lobby/prefabs/mahjong/Effect_UI_touxiang`, this.head.pos.node);
+        }
+        this.head.pos.visible = isShow;
     }
 
     //从根节点上隐藏所有
@@ -1007,9 +1011,9 @@ export class PlayerView {
 
     public async playerOperationEffect(effectName: string, isWait?: boolean): Promise<void> {
         if (isWait) {
-            await this.room.getRoomHost().animationMgr.coPlay(`lobby/prefabs/${effectName}`, this.aniPos.node);
+            await this.room.getRoomHost().animationMgr.coPlay(`lobby/prefabs/mahjong/${effectName}`, this.aniPos.node);
         } else {
-            this.room.getRoomHost().animationMgr.play(`lobby/prefabs/${effectName}`, this.aniPos.node);
+            this.room.getRoomHost().animationMgr.play(`lobby/prefabs/mahjong/${effectName}`, this.aniPos.node);
         }
     }
 

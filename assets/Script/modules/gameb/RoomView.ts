@@ -37,10 +37,12 @@ export class RoomView {
     private actionMsg: proto.mahjong.MsgPlayerAction;
     private leftTime: number;
     private leftTimerCB: Function;
+    private component: cc.Component;
 
     public constructor(room: RoomInterface, view: fgui.GComponent) {
         this.room = room;
         this.unityViewNode = view;
+        this.component = room.getRoomHost().component;
 
         const playerViews: PlayerView[] = [];
         for (let i = 1; i <= 4; i++) {
@@ -104,10 +106,10 @@ export class RoomView {
         }
 
         //清理定时器
-        this.room.getRoomHost().component.unschedule(this.leftTimerCB);
+        this.component.unschedule(this.leftTimerCB);
         this.leftTime = 1;
         //起定时器
-        this.room.getRoomHost().component.schedule(
+        this.component.schedule(
             this.leftTimerCB,
             1,
             cc.macro.REPEAT_FOREVER,
@@ -118,13 +120,13 @@ export class RoomView {
         this.leftTime += 1;
         this.countDownText.text = `${this.leftTime}`;
         if (this.leftTime >= 999) {
-            this.room.getRoomHost().component.unschedule(this.leftTimerCB);
+            this.component.unschedule(this.leftTimerCB);
         }
     }
 
     public stopDiscardCountdown(): void {
         //清理定时器
-        this.room.getRoomHost().component.unschedule(this.countDownCallBack);
+        this.component.unschedule(this.leftTimerCB);
         this.countDownText.text = "";
     }
 
@@ -245,10 +247,10 @@ export class RoomView {
     public updateDisbandVoteView(msgDisbandNotify: proto.mahjong.MsgDisbandNotify): void {
         //
 
-        let disbandView = this.room.getRoomHost().component.getComponent(DisbandView);
+        let disbandView = this.component.getComponent(DisbandView);
 
         if (disbandView === undefined || disbandView == null) {
-            disbandView = this.room.getRoomHost().component.addComponent(DisbandView);
+            disbandView = this.component.addComponent(DisbandView);
         }
 
         disbandView.saveRoomView(this.room);
@@ -273,7 +275,7 @@ export class RoomView {
 
     private onSettingBtnClick(): void {
         // Logger.debug("onSettingBtnClick---------------");
-        const settingView = this.room.getRoomHost().component.addComponent(SettingView);
+        const settingView = this.component.addComponent(SettingView);
         settingView.saveRoomView(this.room);
     }
 
@@ -286,9 +288,9 @@ export class RoomView {
             Logger.debug("load === null");
         }
 
-        let chatView = this.room.getRoomHost().component.getComponent(ChatView);
+        let chatView = this.component.getComponent(ChatView);
         if (chatView === null) {
-            chatView = this.room.getRoomHost().component.addComponent(ChatView);
+            chatView = this.component.addComponent(ChatView);
         }
 
         chatView.show(load);

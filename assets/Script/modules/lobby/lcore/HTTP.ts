@@ -15,7 +15,7 @@ export namespace HTTP {
     const xhrRequest = (
         destroyListener: cc.EventTarget, method: string, url: string, onFinished: Function, options: HTTPRequestOption) => {
         // 使用XMLHttpRequest
-        const xhr = new XMLHttpRequest();
+        const xhr = cc.loader.getXMLHttpRequest();
         if (url.indexOf("https") === 0) {
             // 如果是https则使用证书
             xhr.withCredentials = true;

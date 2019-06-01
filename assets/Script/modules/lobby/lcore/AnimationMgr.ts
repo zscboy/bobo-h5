@@ -73,6 +73,7 @@ export class AnimationMgr {
                 n.removeFromParent();
                 mountNode.addChild(n);
                 mountNode.active = true;
+                n.active = true;
 
                 animation.off(cc.Animation.EventType.FINISHED);
                 animation.stop();

@@ -17,13 +17,13 @@ const enum SoundDef {
 
 //特效文件定义
 const enum EffectsDef {
-    Chow = "Effects_zi_chi",
-    Pong = "Effects_zi_peng",
-    Kong = "Effects_zi_gang",
+    Chow = "Effect_zi_chi",
+    Pong = "Effect_zi_peng",
+    Kong = "Effect_zi_gang",
     Ting = "ting",
-    WinChuck = "Effrcts_zi_dianpao", //被点炮
-    WinDraw = "Effects_zi_zimo", //自摸
-    DrawCard = "Effects_zi_zhua"
+    WinChuck = "Effrct_zi_dianpao", //被点炮
+    WinDraw = "Effect_zi_zimo", //自摸
+    DrawCard = "Effect_zi_zhua"
 }
 
 /**
@@ -278,7 +278,7 @@ export class Player {
         playerView.head.ting.visible = showOrHide;
     }
     //播放吃牌动画
-    public chowResultAnimation(): void {
+    public async chowResultAnimation(): Promise<void> {
         if (this.isMe()) {
             //隐藏牌组
             this.playerView.hideHands();
@@ -287,11 +287,11 @@ export class Player {
 
         //播放对应音效
         this.playOperationSound(SoundDef.Chow);
-        this.playerView.playerOperationEffect(EffectsDef.Chow, false);
+        await this.playerView.coPlayerOperationEffect(EffectsDef.Chow);
     }
 
     //播放碰牌动画
-    public pongResultAnimation(): void {
+    public async pongResultAnimation(): Promise<void> {
         if (this.isMe()) {
             //隐藏牌组
             this.playerView.hideHands();
@@ -300,11 +300,11 @@ export class Player {
 
         //播放对应音效
         this.playOperationSound(SoundDef.Pong);
-        this.playerView.playerOperationEffect(EffectsDef.Pong, false);
+        await this.playerView.coPlayerOperationEffect(EffectsDef.Pong);
     }
 
     //播放明杠动画
-    public exposedKongResultAnimation(): void {
+    public async exposedKongResultAnimation(): Promise<void> {
         if (this.isMe()) {
             //隐藏牌组
             this.playerView.hideHands();
@@ -313,11 +313,11 @@ export class Player {
 
         //播放对应音效
         this.playOperationSound(SoundDef.Kong);
-        this.playerView.playerOperationEffect(EffectsDef.Kong, false);
+        await this.playerView.coPlayerOperationEffect(EffectsDef.Kong);
     }
 
     //播放暗杠动画
-    public concealedKongResultAnimation(): void {
+    public async concealedKongResultAnimation(): Promise<void> {
         if (this.isMe()) {
             //隐藏牌组
             this.playerView.hideHands();
@@ -326,11 +326,11 @@ export class Player {
 
         //播放对应音效
         this.playOperationSound(SoundDef.Kong);
-        this.playerView.playerOperationEffect(EffectsDef.Kong, false);
+        await this.playerView.coPlayerOperationEffect(EffectsDef.Kong);
     }
 
     //播放加杠动画
-    public triplet2KongResultAnimation(): void {
+    public async triplet2KongResultAnimation(): Promise<void> {
         if (this.isMe()) {
             //隐藏牌组
             this.playerView.hideHands();
@@ -339,11 +339,11 @@ export class Player {
 
         //播放对应音效
         this.playOperationSound(SoundDef.Kong);
-        this.playerView.playerOperationEffect(EffectsDef.Kong, false);
+        await this.playerView.coPlayerOperationEffect(EffectsDef.Kong);
     }
 
     //播放抓牌
-    public playZhuaPaiAnimation(): void {
+    public async playZhuaPaiAnimation(): Promise<void> {
         if (this.isMe()) {
             //隐藏牌组
             this.playerView.hideHands();
@@ -351,11 +351,11 @@ export class Player {
         }
         //播放对应音效
         // this.playOperationSound(SoundDef.DrawCard)
-        this.playerView.playerOperationEffect(EffectsDef.DrawCard, false);
+        await this.playerView.coPlayerOperationEffect(EffectsDef.DrawCard);
     }
 
     //播放自摸
-    public playZiMoAnimation(): void {
+    public async playZiMoAnimation(): Promise<void> {
         //播放对应音效
         this.playOperationSound(SoundDef.WinDraw);
         //自摸, 1, 3 位置的玩家播放zimo1, 2, 4位置的玩家播放zimo2
@@ -363,21 +363,21 @@ export class Player {
         // if this.playerView.viewChairID == 2 or this.playerView.viewChairID == 4 {
         //effect = dfConfig.EFF_DEFINE.SUB_ZI_ZIMO.. "2"
         //}
-        this.playerView.playerOperationEffect(EffectsDef.WinDraw, false);
+        await this.playerView.coPlayerOperationEffect(EffectsDef.WinDraw);
     }
 
     //播放点炮
-    public playDianPaoAnimation(): void {
+    public async playDianPaoAnimation(): Promise<void> {
         //播放对应音效
         this.playOperationSound(SoundDef.WinChuck);
-        this.playerView.playerOperationEffect(EffectsDef.WinChuck, false);
+        await this.playerView.coPlayerOperationEffect(EffectsDef.WinChuck);
     }
 
     //播放吃铳
-    public playChiChongAnimation(): void {
+    public async playChiChongAnimation(): Promise<void> {
         //播放对应音效
-        //this. playOperationSound(SoundDef.WinChuck)
-        //this.playerView. playerOperationEffect(dfConfig.EFF_DEFINE.SUB_ZI_HU)
+        this.playOperationSound(SoundDef.WinChuck);
+        await this.playerView.coPlayerOperationEffect(EffectsDef.WinChuck);
     }
 
     //播放起手听牌特效

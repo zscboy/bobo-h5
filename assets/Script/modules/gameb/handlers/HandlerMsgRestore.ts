@@ -6,7 +6,7 @@ import { RoomInterface } from "../RoomInterface";
  * 响应服务器牌局回复
  */
 export namespace HandlerMsgRestore {
-    export const onMsg = (msgData: ByteBuffer, room: RoomInterface): void => {
+    export const onMsg = async (msgData: ByteBuffer, room: RoomInterface): Promise<void> => {
         //掉线恢复时，是通过MsgRestore下发的
         const msgRestore = proto.mahjong.MsgRestore.decode(msgData);
 

@@ -5,7 +5,7 @@ import { RoomInterface } from "../RoomInterface";
  * 响应服务器整个牌局结束通知
  */
 export namespace HandlerMsgGameOver {
-    export const onMsg = (msgData: ByteBuffer, room: RoomInterface): void => {
+    export const onMsg = async (msgData: ByteBuffer, room: RoomInterface): Promise<void> => {
         const msgGameOver = proto.mahjong.MsgGameOver.decode(msgData);
 
         // 显示游戏最后结果()

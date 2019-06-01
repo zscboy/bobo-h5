@@ -26,22 +26,25 @@ export class AnimationMgr {
     }
 
     public async coPlay(prefabName: string, mountNode: cc.Node, options?: AnimationPlayOptions): Promise<void> {
+        Logger.debug("Animation.coPlay prefabName:", prefabName);
+
         return new Promise<void>((resolve, reject) => {
             const cb = (error: Error): void => {
                 if (error !== null) {
                     Logger.debug("Animation.coPlay error:", error);
                 }
 
+                Logger.debug("Animation.coPlay completed, prefabName:", prefabName);
                 resolve();
             };
 
             let op = options;
-            if (op === undefined && op === null) {
+            if (op === undefined || op === null) {
                 op = {};
-                op.onFinished = cb;
             }
+            op.onFinished = cb;
 
-            this.play(prefabName, mountNode, options);
+            this.play(prefabName, mountNode, op);
         });
     }
 
@@ -69,12 +72,14 @@ export class AnimationMgr {
 
                 n.removeFromParent();
                 mountNode.addChild(n);
+                mountNode.active = true;
 
                 animation.off(cc.Animation.EventType.FINISHED);
                 animation.stop();
                 animation.play();
 
                 animation.on(cc.Animation.EventType.FINISHED, () => {
+                    Logger.debug("AnimationMgr.play FINISHED:", prefabName);
                     cb(null);
                 });
             }

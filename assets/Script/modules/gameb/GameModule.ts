@@ -5,6 +5,7 @@ import {
     MsgQueue, MsgType, RoomInfo, UserInfo, WS
 } from "../lobby/lcore/LCoreExports";
 import { proto } from "./proto/protoGame";
+import { Replay } from "./Replay";
 import { Room } from "./Room";
 
 const mc = proto.mahjong.MessageCode;
@@ -66,7 +67,13 @@ export class GameModule extends cc.Component implements GameModuleInterface {
         this.view = view;
 
         this.mAnimationMgr = new AnimationMgr(this.lm.loader);
-        await this.tryEnterRoom(args.uuid, args.userInfo, args.roomInfo);
+
+        if (args.jsonString === "replay") {
+            // TODO: use correct parameters
+            await this.tryEnterReplayRoom(null, null, null);
+        } else {
+            await this.tryEnterRoom(args.uuid, args.userInfo, args.roomInfo);
+        }
     }
 
     public sendBinary(buf: ByteBuffer): void {
@@ -329,7 +336,7 @@ export class GameModule extends cc.Component implements GameModuleInterface {
             }
 
             if (msg.mt === MsgType.wsData) {
-                this.mRoom.dispatchWebsocketMsg(<proto.mahjong.GameMessage>msg.data);
+                await this.mRoom.dispatchWebsocketMsg(<proto.mahjong.GameMessage>msg.data);
             } else if (msg.mt === MsgType.wsClosed || msg.mt === MsgType.wsError) {
                 Logger.debug(" websocket connection has broken");
                 if (this.mRoom.isDestroy) {
@@ -349,5 +356,51 @@ export class GameModule extends cc.Component implements GameModuleInterface {
                 loop = false;
             }
         }
+    }
+
+    private async tryEnterReplayRoom(
+        myUserID: string,
+        msgAccLoadReplayRecord: { replayRecordBytes: ByteBuffer; roomJSONConfig: string },
+        chairID: number): Promise<void> {
+
+        const msgHandRecord = proto.mahjong.SRMsgHandRecorder.decode(msgAccLoadReplayRecord.replayRecordBytes);
+        msgHandRecord.roomConfigID = msgAccLoadReplayRecord.roomJSONConfig;
+
+        Logger.debug(" sr-actions count:", msgHandRecord.actions.length);
+        // 如果不提供userID,则必须提供chairID，然后根据chairID获得userID
+        let userID = myUserID;
+        if (userID === null) {
+            Logger.debug(" userID is nil, use chairID to find userID");
+            msgHandRecord.players.forEach((p) => {
+                if (p.chairID === chairID) {
+                    userID = p.userID;
+                }
+            });
+        }
+
+        if (userID === null || userID === undefined) {
+            Dialog.prompt("您输入的回放码不存在,或录像已过期!");
+        }
+
+        Logger.debug(" tryEnterReplayRoom userID:", userID);
+        this.mUser = { userID: userID };
+        const roomInfo = {
+            roomID: "",
+            roomNumber: msgHandRecord.roomNumber,
+            gameServerURL: "",
+            state: 1,
+            config: msgHandRecord.roomConfigID,
+            timeStamp: "",
+            handStartted: msgHandRecord.handNum,
+            lastActiveTime: 0
+        };
+
+        const replay = new Replay(this, msgHandRecord);
+        // 新建room和绑定roomView
+        this.createRoom(this.user, roomInfo);
+
+        await replay.gogogo();
+
+        this.backToLobby();
     }
 }

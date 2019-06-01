@@ -6,7 +6,7 @@ import { RoomInterface } from "../RoomInterface";
  * 响应服务器暗杠通知
  */
 export namespace HandlerActionResultKongConcealed {
-    export const onMsg = (actionResultMsg: proto.mahjong.MsgActionResultNotify, room: RoomInterface): void => {
+    export const onMsg = async (actionResultMsg: proto.mahjong.MsgActionResultNotify, room: RoomInterface): Promise<void> => {
 
         const targetChairID = actionResultMsg.targetChairID;
         const player = <Player>room.getPlayerByChairID(targetChairID);
@@ -26,7 +26,7 @@ export namespace HandlerActionResultKongConcealed {
         player.addMeld(newMeld);
 
         //播放暗杠动画
-        player.concealedKongResultAnimation();
+        await player.concealedKongResultAnimation();
 
         //手牌列表更新UI
         player.hand2UI(false);

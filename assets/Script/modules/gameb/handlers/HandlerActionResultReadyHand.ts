@@ -6,7 +6,7 @@ import { RoomInterface } from "../RoomInterface";
  * 响应服务器听牌通知
  */
 export namespace HandlerActionResultReadyHand {
-    export const onMsg = (actionResultMsg: proto.mahjong.MsgActionResultNotify, room: RoomInterface): void => {
+    export const onMsg = async (actionResultMsg: proto.mahjong.MsgActionResultNotify, room: RoomInterface): Promise<void> => {
         const targetChairID = actionResultMsg.targetChairID;
         const player = <Player>room.getPlayerByChairID(targetChairID);
 

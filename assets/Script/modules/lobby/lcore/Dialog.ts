@@ -9,8 +9,10 @@ export class Dialog {
 
     public loader: GResLoader;
 
-    public view: fgui.GComponent;
-    public win: fgui.Window;
+    public dlgView: fgui.GComponent;
+    public dlgWin: fgui.Window;
+
+    public waitWin: fgui.Window;
 
     public packageLoaded: boolean = false;
 
@@ -45,7 +47,7 @@ export class Dialog {
     }
 
     public static showDialog = (msg: string, yesCb: Function = null, noCB: Function = null): void => {
-        if (Dialog.inst.view === undefined) {
+        if (Dialog.inst.dlgView === undefined) {
             Logger.debug("showDialog view is null, create new");
             if (!Dialog.inst.packageLoaded) {
                 Dialog.inst.loader.fguiAddPackage("lobby/fui_dialog/lobby_dialog");
@@ -58,14 +60,14 @@ export class Dialog {
             win.contentPane = view;
 
             win.setPosition(1136 / 2, 640 / 2);
-            Dialog.inst.view = view;
-            Dialog.inst.win = win;
+            Dialog.inst.dlgView = view;
+            Dialog.inst.dlgWin = win;
         }
 
-        const label = Dialog.inst.view.getChild("text");
+        const label = Dialog.inst.dlgView.getChild("text");
         label.text = msg;
 
-        const yesBtn = Dialog.inst.view.getChild("ok_btn");
+        const yesBtn = Dialog.inst.dlgView.getChild("ok_btn");
         yesBtn.offClick(undefined, undefined);
 
         let yesCb2 = yesCb;
@@ -80,7 +82,7 @@ export class Dialog {
             yesBtn.visible = true;
             yesBtn.onClick(
                 () => {
-                    Dialog.inst.win.hide();
+                    Dialog.inst.dlgWin.hide();
                     yesCb2();
                 },
                 undefined);
@@ -88,7 +90,7 @@ export class Dialog {
             yesBtn.visible = false;
         }
 
-        const noBtn = Dialog.inst.view.getChild("cancel_btn");
+        const noBtn = Dialog.inst.dlgView.getChild("cancel_btn");
         noBtn.offClick(undefined, undefined);
 
         if (noCB !== null) {
@@ -96,7 +98,7 @@ export class Dialog {
             noBtn.visible = true;
             noBtn.onClick(
                 () => {
-                    Dialog.inst.win.hide();
+                    Dialog.inst.dlgWin.hide();
                     noCB();
                 },
                 undefined);
@@ -104,15 +106,15 @@ export class Dialog {
             noBtn.visible = false;
         }
 
-        Dialog.inst.win.show();
+        Dialog.inst.dlgWin.show();
     }
 
     public static hideDialog(): void {
-        if (Dialog.inst.view === undefined) {
+        if (Dialog.inst.dlgView === undefined) {
             return;
         }
 
-        Dialog.inst.win.hide();
+        Dialog.inst.dlgWin.hide();
     }
 
     public static async coShowDialog(msg: string, yes: boolean, no: boolean): Promise<boolean> {
@@ -136,5 +138,27 @@ export class Dialog {
 
             Dialog.showDialog(msg, myYesCB, myNoCB);
         });
+    }
+
+    public static showWaiting(): void {
+        if (Dialog.inst.waitWin === undefined) {
+            Dialog.inst.loader.fguiAddPackage("lobby/fui_lobby_progress_bar/lobby_progress_bar");
+
+            const view = fgui.UIPackage.createObject("lobby_progress_bar", "rolling").asCom;
+            const win = new fgui.Window();
+            win.modal = true;
+            win.contentPane = view;
+
+            win.setPosition(1136 / 2, 640 / 2);
+            Dialog.inst.waitWin = win;
+        }
+
+        Dialog.inst.waitWin.show();
+    }
+
+    public static hideWaiting(): void {
+        if (Dialog.inst.waitWin !== undefined) {
+            Dialog.inst.waitWin.hide();
+        }
     }
 }

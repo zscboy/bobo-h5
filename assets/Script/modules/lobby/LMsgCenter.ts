@@ -1,9 +1,6 @@
 import { Logger, MsgQueue, MsgType, WS } from "./lcore/LCoreExports";
 import { proto } from "./proto/protoLobby";
-
-interface LobbyViewInterface {
-    dispatchMessage: Function;
-}
+import { LobbyViewInterface } from "./views/LobbyViewInterface";
 
 /**
  * LMsgCenter 大厅消息中心
@@ -149,9 +146,10 @@ export class LMsgCenter {
 
             return;
 
-        } else if (op === msgCode.OPChat) {
-            Logger.debug("dispatchWeboscketMessage, chat msg");
         }
+        //  else if (op === msgCode.OPChat) {
+        //     Logger.debug("dispatchWeboscketMessage, chat msg");
+        // }
 
         this.lobbyViewInterface.dispatchMessage(msg);
     }

@@ -79,7 +79,7 @@ export class PlayerView {
     private operationButtonsRoot: fgui.GComponent;
     private buttonDataList: string[];
 
-    // private aniPos: fgui.GObject
+    private aniPos: fgui.GObject;
     // private userInfoPos: fgui.GObject
     private alreadyShowNonDiscardAbleTips: boolean;
     private discardTipsTile: fgui.GComponent;
@@ -105,6 +105,8 @@ export class PlayerView {
         //玩家状态
         this.initPlayerStatus();
 
+        //动画挂载点
+        this.aniPos = view.getChild("aniPos");
     }
 
     //初始化
@@ -995,17 +997,14 @@ export class PlayerView {
 
     //特效播放
     //播放补花效果，并等待结束
-    public playDrawFlowerAnimation(): void {
-        this.playerOperationEffect("Effects_zi_buhua", true);
+    public async playDrawFlowerAnimation(): Promise<void> {
+        await this.coPlayerOperationEffect("Effect_zi_buhua");
     }
 
-    public playerOperationEffect(effectName: string, coYield: boolean): void {
-        if (coYield) {
-            // animation.coplay("animations/" + effectName + ".prefab", this.myView, this.aniPos.x, this.aniPos.y)
-        } else {
-            // animation.play("animations/" + effectName + ".prefab", this.myView, this.aniPos.x, this.aniPos.y)
-        }
+    public async coPlayerOperationEffect(effectName: string): Promise<void> {
+        await this.room.getRoomHost().animationMgr.coPlay(`lobby/prefabs/${effectName}`, this.aniPos.node);
     }
+
     //特效道具播放
     public playerDonateEffect(effectName: string): void {
         // const pos = this.head.headView

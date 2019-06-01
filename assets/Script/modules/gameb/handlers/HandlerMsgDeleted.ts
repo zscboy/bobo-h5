@@ -16,7 +16,7 @@ const deletedReasons: { [key: number]: string } = {
  * 响应服务器删除房间
  */
 export namespace HandlerMsgDeleted {
-    export const onMsg = (msgData: ByteBuffer, room: RoomInterface): void => {
+    export const onMsg = async (msgData: ByteBuffer, room: RoomInterface): Promise<void> => {
         room.isDestroy = true;
 
         const msgDelete = proto.mahjong.MsgRoomDelete.decode(msgData);

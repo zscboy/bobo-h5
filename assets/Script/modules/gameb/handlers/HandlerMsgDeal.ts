@@ -6,7 +6,7 @@ import { RoomInterface } from "../RoomInterface";
  * 发牌处理
  */
 export namespace HandlerMsgDeal {
-    export const onMsg = (msgData: ByteBuffer, room: RoomInterface): void => {
+    export const onMsg = async (msgData: ByteBuffer, room: RoomInterface): Promise<void> => {
         const msgDeal = proto.mahjong.MsgDeal.decode(msgData);
         //清理
         room.resetForNewHand();

@@ -310,14 +310,14 @@ export class EmailView extends cc.Component {
             return null;
         }
 
-        if (msg !== null) {
-            Dialog.showDialog(msg);
-        }
+        // if (msg !== null) {
+        //     Dialog.showDialog(msg);
+        // }
 
         Logger.debug("emailRequest url = ", url);
 
         HTTP.hGet(this.eventTarget, url, (xhr: XMLHttpRequest, err: string) => {
-            Dialog.hideDialog();
+            // Dialog.hideDialog();
             cb(xhr, err);
         });
     }

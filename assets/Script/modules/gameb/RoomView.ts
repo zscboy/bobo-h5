@@ -36,6 +36,8 @@ export class RoomView {
     private arrowObj: fgui.GObject;
     private actionMsg: proto.mahjong.MsgPlayerAction;
     private leftTime: number;
+    private leftTimerCB: Function;
+
     public constructor(room: RoomInterface, view: fgui.GComponent) {
         this.room = room;
         this.unityViewNode = view;
@@ -97,22 +99,29 @@ export class RoomView {
     }
 
     public startDiscardCountdown(): void {
+        if (this.leftTimerCB === undefined) {
+            this.leftTimerCB = <Function>this.countDownCallBack.bind(this);
+        }
+
         //清理定时器
-        // this.room.getRoomHost().component.unschedule(this.countDownCallBack);
-        // this.leftTime = 1;
+        this.room.getRoomHost().component.unschedule(this.leftTimerCB);
+        this.leftTime = 1;
         //起定时器
-        // this.room.getRoomHost().component.schedule(
-        //     <Function>this.countDownCallBack.bind(this),
-        //     1);
+        this.room.getRoomHost().component.schedule(
+            this.leftTimerCB,
+            1,
+            cc.macro.REPEAT_FOREVER,
+            1);
     }
 
     public countDownCallBack(): void {
         this.leftTime += 1;
         this.countDownText.text = `${this.leftTime}`;
         if (this.leftTime >= 999) {
-            this.room.getRoomHost().component.unschedule(<Function>this.countDownCallBack.bind(this));
+            this.room.getRoomHost().component.unschedule(this.leftTimerCB);
         }
     }
+
     public stopDiscardCountdown(): void {
         //清理定时器
         this.room.getRoomHost().component.unschedule(this.countDownCallBack);

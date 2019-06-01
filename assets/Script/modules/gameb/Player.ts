@@ -1,4 +1,5 @@
 import { Logger } from "../lobby/lcore/LCoreExports";
+import { PlayerInfoView } from "../lobby/views/playerInfo/PlayerInfoExports";
 import { PlayerView } from "./PlayerView";
 import { proto } from "./proto/protoGame";
 import { PlayerInfo, RoomInterface } from "./RoomInterface";
@@ -840,6 +841,13 @@ export class Player {
         return true;
     }
 
+    /**
+     * name
+     */
+    public getPlayInfo(): PlayerInfo {
+        return this.playerInfo;
+    }
+
     public updateReadyHandList(readyHandList: number[]): void {
         this.readyHandList = readyHandList;
         if (this.readyHandList != null && this.readyHandList.length > 0) {
@@ -852,5 +860,22 @@ export class Player {
     public onPlayerInfoClick(): void {
         // const pos = { x = this.playerView.userInfoPos.x, y = this.playerView.userInfoPos.y }
         // playerInfoView.showUserInfoView(this.playerInfo, pos, this.isMe() == false, this.host)
+
+        const pos = new cc.Vec2(this.playerView.getUserInfoPos().x, this.playerView.getUserInfoPos().y);
+        // const pos = new cc.Vec2(0, 0);
+        const playerInfoString = JSON.stringify(this.playerInfo);
+        // playerInfoView.showUserInfoView(self.playerInfo, pos, self:isMe() == false)
+
+        const roomHost = this.host.getRoomHost();
+        if (roomHost.loader === null) {
+            Logger.debug("roomHost.loader === null");
+        }
+
+        let playerInfoView = roomHost.component.getComponent(PlayerInfoView);
+        if (playerInfoView === null) {
+            playerInfoView = roomHost.component.addComponent(PlayerInfoView);
+        }
+
+        playerInfoView.showUserInfoView(roomHost.loader, playerInfoString, pos, this.isMe() === false);
     }
 }

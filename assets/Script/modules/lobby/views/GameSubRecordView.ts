@@ -78,7 +78,9 @@ export class GameSubRecordView extends cc.Component {
         closeBtn.onClick(this.onCloseClick, this);
 
         this.recordList = this.view.getChild("list").asList;
-        this.recordList.itemRenderer = this.renderListItem;
+        this.recordList.itemRenderer = (index: number, item: fgui.GObject) => {
+            this.renderListItem(index, item);
+        };
         this.recordList.setVirtual();
 
     }

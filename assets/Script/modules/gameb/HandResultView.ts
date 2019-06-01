@@ -46,7 +46,7 @@ export class HandResultView extends cc.Component {
     private players: Player[];
     private textRoomNumber: fgui.GObject;
     // private textTime: fgui.GObject;
-    // private aniPos: fgui.GObject;
+    private aniPos: fgui.GObject;
     private contentGroup: ViewGroup[];
 
     public showView(room: RoomInterface, msgHandOver: proto.mahjong.IMsgHandOver): void {
@@ -101,17 +101,18 @@ export class HandResultView extends cc.Component {
 
     //更新房间相关数据
     private updateRoomData(): void {
-        // let en: string;
-        // if (this.msgHandOver.endType !== proto.mahjong.HandOverType.enumHandOverType_None) {
-        //     if (this.room.myPlayer.playerScore.score > 0) {
-        //         en = "Effects_jiemian_ying";
-        //     } else {
-        //         en = "Effects_jiemian_shu";
-        //     }
-        // } else {
-        //     en = "Effects_jiemian_huangzhuang";
-        // }
-        // this.ani = animation.play("animations/" .. en .. ".prefab", this.unityViewNode, this.aniPos.x, this.aniPos.y, true)
+        let en: string;
+        if (this.msgHandOver.endType !== proto.mahjong.HandOverType.enumHandOverType_None) {
+            const myPlayer = <Player>this.room.getMyPlayer();
+            if (myPlayer.playerScore.score > 0) {
+                en = "Effect_jiemian_shengli";
+            } else {
+                en = "Effect_jiemian_shengli";
+            }
+        } else {
+            en = "Effect_jiemian_huangzhuang";
+        }
+        this.room.getRoomHost().animationMgr.play(`lobby/prefabs/mahjong/${en}`, this.aniPos.node);
 
         // let date: string;
         // if (this.room.isReplayMode()) {
@@ -389,7 +390,7 @@ export class HandResultView extends cc.Component {
         //房间信息
         this.textRoomNumber = this.unityViewNode.getChild("roomNumber");
         //特效位置节点
-        // this.aniPos = this.unityViewNode.getChild("aniPos");
+        this.aniPos = this.unityViewNode.getChild("aniPos");
 
         const contentGroup: ViewGroup[] = [];
         for (let i = 0; i < 4; i++) {

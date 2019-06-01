@@ -8,7 +8,6 @@ const { ccclass } = cc._decorator;
 @ccclass
 export class JoinClubView extends cc.Component {
 
-    private static instance: JoinClubView;
     private view: fgui.GComponent;
     private win: fgui.Window;
     private eventTarget: cc.EventTarget;
@@ -41,8 +40,6 @@ export class JoinClubView extends cc.Component {
         this.win = win;
         this.win.show();
 
-        JoinClubView.instance = this;
-
         this.initView();
     }
 
@@ -71,7 +68,7 @@ export class JoinClubView extends cc.Component {
         for (let i = 0; i < 10; i++) {
             const button = this.view.getChild(`button${i}`);
             button.onClick(() => {
-                JoinClubView.instance.onInputButton(i);
+                this.onInputButton(i);
                 // tslint:disable-next-line:align
             }, this);
 

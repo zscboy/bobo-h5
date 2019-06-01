@@ -35,6 +35,7 @@ export class RoomView {
     private multiOpsDataList: proto.mahjong.IMsgMeldTile[];
     private arrowObj: fgui.GObject;
     private actionMsg: proto.mahjong.MsgPlayerAction;
+    private leftTime: number;
     public constructor(room: RoomInterface, view: fgui.GComponent) {
         this.room = room;
         this.unityViewNode = view;
@@ -97,28 +98,24 @@ export class RoomView {
 
     public startDiscardCountdown(): void {
         //清理定时器
-        // this.unityViewNode.StopTimer("roomViewCountDown");
-
-        // this.leftTime = 0;
+        // this.room.getRoomHost().component.unschedule(this.countDownCallBack);
+        // this.leftTime = 1;
         //起定时器
-        //     this.unityViewNode.StartTimer(
-        //         "roomViewCountDown",
-        //         1,
-        //         0,
-        //         function () {
-        //             this.leftTime = this.leftTime + 1
-        //             this.countDownText.text = this.leftTime
-        //             if this.leftTime >= 999 {
-        //                 this.unityViewNode: StopTimer("roomViewCountDown");
-        //             }
-        //         },
-        //         this.leftTime;
-        // )
+        // this.room.getRoomHost().component.schedule(
+        //     <Function>this.countDownCallBack.bind(this),
+        //     1);
     }
 
+    public countDownCallBack(): void {
+        this.leftTime += 1;
+        this.countDownText.text = `${this.leftTime}`;
+        if (this.leftTime >= 999) {
+            this.room.getRoomHost().component.unschedule(<Function>this.countDownCallBack.bind(this));
+        }
+    }
     public stopDiscardCountdown(): void {
         //清理定时器
-        // this.unityViewNode: StopTimer("roomViewCountDown");
+        this.room.getRoomHost().component.unschedule(this.countDownCallBack);
         this.countDownText.text = "";
     }
 
@@ -244,6 +241,8 @@ export class RoomView {
         if (disbandView === undefined || disbandView == null) {
             disbandView = this.room.getRoomHost().component.addComponent(DisbandView);
         }
+
+        disbandView.saveRoomView(this.room);
 
         disbandView.updateView(msgDisbandNotify);
 

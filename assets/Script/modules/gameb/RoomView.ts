@@ -248,6 +248,21 @@ export class RoomView {
         disbandView.updateView(msgDisbandNotify);
 
     }
+
+    /**
+     * 挂起若干秒
+     * @param seconds 秒数
+     */
+    public async coWaitSeconds(seconds: number): Promise<void> {
+        return new Promise<void>((resovle) => {
+            this.room.getRoomHost().component.scheduleOnce(
+                () => {
+                    resovle();
+                },
+                seconds);
+        });
+    }
+
     //解散房间按钮点击事件
     // private onDissolveClick(): void {
     //     // const msg = "确实要申请解散房间吗？";

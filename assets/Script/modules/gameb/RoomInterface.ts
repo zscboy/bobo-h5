@@ -133,4 +133,5 @@ export interface RoomInterface {
     switchBg(index: number): void;
 
     onDissolveClicked(): void;
+    coWaitSeconds(seconds: number): Promise<void>;
 }

@@ -249,20 +249,6 @@ export class RoomView {
 
     }
 
-    /**
-     * 挂起若干秒
-     * @param seconds 秒数
-     */
-    public async coWaitSeconds(seconds: number): Promise<void> {
-        return new Promise<void>((resovle) => {
-            this.room.getRoomHost().component.scheduleOnce(
-                () => {
-                    resovle();
-                },
-                seconds);
-        });
-    }
-
     //解散房间按钮点击事件
     // private onDissolveClick(): void {
     //     // const msg = "确实要申请解散房间吗？";
@@ -400,8 +386,7 @@ export class RoomView {
         this.listensObj = this.unityViewNode.getChild("listensPanel").asCom;
         this.listensObjList = this.listensObj.getChild("list").asList;
         this.listensObjNum = this.listensObj.getChild("num");
-        // tslint:disable-next-line: no-unsafe-any
-        this.listensObjList.itemRenderer = this.renderListensListItem.bind(this);
+        this.listensObjList.itemRenderer = <(index: number, item: fgui.GComponent) => void>this.renderListensListItem.bind(this);
         this.listensObj.onClick(() => { this.listensObj.visible = false; }, this);
         this.listensObjList.setVirtual();
     }
@@ -419,8 +404,7 @@ export class RoomView {
         // const meldMap = {}
         this.meldOpsPanel = this.unityViewNode.getChild("meldOpsPanel").asCom;
         this.multiOpsObj = this.meldOpsPanel.getChild("list").asList;
-        // tslint:disable-next-line: no-unsafe-any
-        this.multiOpsObj.itemRenderer = this.renderMultiOpsListItem.bind(this);
+        this.multiOpsObj.itemRenderer = <(index: number, item: fgui.GComponent) => void>this.renderMultiOpsListItem.bind(this);
         this.multiOpsObj.on(fgui.Event.CLICK_ITEM, (onClickItem: fgui.GObject) => { this.onMeldOpsClick(onClickItem.name); }, this);
     }
 

@@ -21,7 +21,7 @@ const enum EffectsDef {
     Pong = "Effect_zi_peng",
     Kong = "Effect_zi_gang",
     Ting = "ting",
-    WinChuck = "Effrct_zi_dianpao", //被点炮
+    WinChuck = "Effect_zi_dianpao", //被点炮
     WinDraw = "Effect_zi_zimo", //自摸
     DrawCard = "Effect_zi_zhua"
 }

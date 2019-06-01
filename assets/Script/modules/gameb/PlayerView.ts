@@ -1001,7 +1001,8 @@ export class PlayerView {
     //特效播放
     //播放补花效果，并等待结束
     public async playDrawFlowerAnimation(): Promise<void> {
-        await this.playerOperationEffect("Effect_zi_buhua", true);
+        await this.playerOperationEffect("Effect_zi_buhua");
+        await this.room.coWaitSeconds(0.5);
     }
 
     public async playerOperationEffect(effectName: string, isCo?: boolean): Promise<void> {

@@ -248,6 +248,7 @@ export class RoomView {
         disbandView.updateView(msgDisbandNotify);
 
     }
+
     //解散房间按钮点击事件
     // private onDissolveClick(): void {
     //     // const msg = "确实要申请解散房间吗？";

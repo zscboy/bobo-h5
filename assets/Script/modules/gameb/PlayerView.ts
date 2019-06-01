@@ -1007,9 +1007,9 @@ export class PlayerView {
 
     public async playerOperationEffect(effectName: string, isWait?: boolean): Promise<void> {
         if (isWait) {
-            await this.room.getRoomHost().animationMgr.coPlay(`lobby/prefabs/${effectName}`, this.aniPos.node);
+            await this.room.getRoomHost().animationMgr.coPlay(`lobby/prefabs/mahjong/${effectName}`, this.aniPos.node);
         } else {
-            this.room.getRoomHost().animationMgr.play(`lobby/prefabs/${effectName}`, this.aniPos.node);
+            this.room.getRoomHost().animationMgr.play(`lobby/prefabs/mahjong/${effectName}`, this.aniPos.node);
         }
     }
 

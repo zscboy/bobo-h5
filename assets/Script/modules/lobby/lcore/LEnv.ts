@@ -10,7 +10,7 @@ export namespace LEnv {
     export const gameWebsocketMonkey = "/game/{0}/ws/monkey";
     export const gameWebsocketPlay = "/game/{0}/ws/play";
     export const rootURL = "http://121.196.210.106:30002"; // tslint:disable-line:no-http-string
-    export const gameHost = "ws://localhost:3001"; // tslint:disable-line:no-http-string
+    export const gameHost = "ws://121.196.210.106:30003"; // tslint:disable-line:no-http-string
     export const quicklyLogin = "/lobby/uuid/quicklyLogin";
     export const accountLogin = "/lobby/uuid/accountLogin";
     export const wxLogin = "/lobby/uuid/wxLogin";

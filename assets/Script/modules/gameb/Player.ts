@@ -287,7 +287,7 @@ export class Player {
 
         //播放对应音效
         this.playOperationSound(SoundDef.Chow);
-        await this.playerView.coPlayerOperationEffect(EffectsDef.Chow);
+        await this.playerView.playerOperationEffect(EffectsDef.Chow);
     }
 
     //播放碰牌动画
@@ -300,7 +300,7 @@ export class Player {
 
         //播放对应音效
         this.playOperationSound(SoundDef.Pong);
-        await this.playerView.coPlayerOperationEffect(EffectsDef.Pong);
+        await this.playerView.playerOperationEffect(EffectsDef.Pong);
     }
 
     //播放明杠动画
@@ -313,7 +313,7 @@ export class Player {
 
         //播放对应音效
         this.playOperationSound(SoundDef.Kong);
-        await this.playerView.coPlayerOperationEffect(EffectsDef.Kong);
+        await this.playerView.playerOperationEffect(EffectsDef.Kong);
     }
 
     //播放暗杠动画
@@ -326,7 +326,7 @@ export class Player {
 
         //播放对应音效
         this.playOperationSound(SoundDef.Kong);
-        await this.playerView.coPlayerOperationEffect(EffectsDef.Kong);
+        await this.playerView.playerOperationEffect(EffectsDef.Kong);
     }
 
     //播放加杠动画
@@ -339,7 +339,7 @@ export class Player {
 
         //播放对应音效
         this.playOperationSound(SoundDef.Kong);
-        await this.playerView.coPlayerOperationEffect(EffectsDef.Kong);
+        await this.playerView.playerOperationEffect(EffectsDef.Kong);
     }
 
     //播放抓牌
@@ -351,7 +351,7 @@ export class Player {
         }
         //播放对应音效
         // this.playOperationSound(SoundDef.DrawCard)
-        await this.playerView.coPlayerOperationEffect(EffectsDef.DrawCard);
+        await this.playerView.playerOperationEffect(EffectsDef.DrawCard);
     }
 
     //播放自摸
@@ -363,21 +363,21 @@ export class Player {
         // if this.playerView.viewChairID == 2 or this.playerView.viewChairID == 4 {
         //effect = dfConfig.EFF_DEFINE.SUB_ZI_ZIMO.. "2"
         //}
-        await this.playerView.coPlayerOperationEffect(EffectsDef.WinDraw);
+        await this.playerView.playerOperationEffect(EffectsDef.WinDraw);
     }
 
     //播放点炮
     public async playDianPaoAnimation(): Promise<void> {
         //播放对应音效
         this.playOperationSound(SoundDef.WinChuck);
-        await this.playerView.coPlayerOperationEffect(EffectsDef.WinChuck);
+        await this.playerView.playerOperationEffect(EffectsDef.WinChuck);
     }
 
     //播放吃铳
     public async playChiChongAnimation(): Promise<void> {
         //播放对应音效
         this.playOperationSound(SoundDef.WinChuck);
-        await this.playerView.coPlayerOperationEffect(EffectsDef.WinChuck);
+        await this.playerView.playerOperationEffect(EffectsDef.WinChuck);
     }
 
     //播放起手听牌特效

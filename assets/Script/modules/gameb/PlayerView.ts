@@ -198,10 +198,8 @@ export class PlayerView {
     //操作按钮
     public initOperationButtons(): void {
         this.buttonList = this.operationPanel.getChild("buttonList").asList;
-        // tslint:disable-next-line: no-unsafe-any
-        this.buttonList.itemRenderer = this.renderButtonListItem.bind(this);
-        // tslint:disable-next-line: no-unsafe-any
-        this.buttonList.itemProvider = this.itemProviderButtonList.bind(this);
+        this.buttonList.itemRenderer = <(index: number, item: fgui.GComponent) => void>this.renderButtonListItem.bind(this);
+        this.buttonList.itemProvider = <(index: number) => string>this.itemProviderButtonList.bind(this);
         this.buttonList.on(fgui.Event.CLICK_ITEM, (onClickItem: fgui.GObject) => { this.onClickBtn(onClickItem.name); }, this);
 
         this.operationButtonsRoot = this.operationPanel;
@@ -533,6 +531,11 @@ export class PlayerView {
         if (waitDiscardReAction) {
             this.player.waitDiscardReAction = true;
         } else {
+            this.room.getRoomHost().component.scheduleOnce(
+                () => {
+                    discardTips.visible = false;
+                },
+                1);
             // this.myView.DelayRun(
             //     1,
             //     function () {
@@ -998,11 +1001,15 @@ export class PlayerView {
     //特效播放
     //播放补花效果，并等待结束
     public async playDrawFlowerAnimation(): Promise<void> {
-        await this.coPlayerOperationEffect("Effect_zi_buhua");
+        await this.playerOperationEffect("Effect_zi_buhua", true);
     }
 
-    public async coPlayerOperationEffect(effectName: string): Promise<void> {
-        await this.room.getRoomHost().animationMgr.coPlay(`lobby/prefabs/${effectName}`, this.aniPos.node);
+    public async playerOperationEffect(effectName: string, isCo?: boolean): Promise<void> {
+        if (isCo) {
+            await this.room.getRoomHost().animationMgr.coPlay(`lobby/prefabs/${effectName}`, this.aniPos.node);
+        } else {
+            this.room.getRoomHost().animationMgr.play(`lobby/prefabs/${effectName}`, this.aniPos.node);
+        }
     }
 
     //特效道具播放

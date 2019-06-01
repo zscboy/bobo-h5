@@ -1005,8 +1005,8 @@ export class PlayerView {
         await this.room.coWaitSeconds(0.5);
     }
 
-    public async playerOperationEffect(effectName: string, isCo?: boolean): Promise<void> {
-        if (isCo) {
+    public async playerOperationEffect(effectName: string, isWait?: boolean): Promise<void> {
+        if (isWait) {
             await this.room.getRoomHost().animationMgr.coPlay(`lobby/prefabs/${effectName}`, this.aniPos.node);
         } else {
             this.room.getRoomHost().animationMgr.play(`lobby/prefabs/${effectName}`, this.aniPos.node);

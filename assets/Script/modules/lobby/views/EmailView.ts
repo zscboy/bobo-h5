@@ -58,7 +58,7 @@ export class EmailView extends cc.Component {
         this.initView();
 
         this.lobbyView = <LobbyViewInterface>this.getComponent("LobbyView");
-        this.onMessageFunc = this.lobbyView.on(`${proto.lobby.MessageCode.OPMail}`, this.onMessage);
+        this.onMessageFunc = this.lobbyView.on(`${proto.lobby.MessageCode.OPMail}`, this.onMessage, this);
     }
 
     protected onDestroy(): void {

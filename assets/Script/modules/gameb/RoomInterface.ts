@@ -133,4 +133,10 @@ export interface RoomInterface {
     switchBg(index: number): void;
 
     onDissolveClicked(): void;
+
+    sendDisbandAgree(agree: boolean): void;
+
+    getPlayerInfoByChairID(chairID: number): PlayerInfo;
+
+    getMyPlayerInfo(): PlayerInfo;
 }

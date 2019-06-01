@@ -6,9 +6,6 @@ import { GameSubRecordView } from "./GameSubRecordView";
  * 战绩界面
  */
 export class GameRecordView extends cc.Component {
-
-    // 为了能在 render 函数中取this
-    private static instance: GameRecordView;
     private view: fgui.GComponent;
     private win: fgui.Window;
     private eventTarget: cc.EventTarget;
@@ -35,8 +32,6 @@ export class GameRecordView extends cc.Component {
         this.win = win;
         this.win.show();
 
-        GameRecordView.instance = this;
-
         this.initView();
     }
 
@@ -56,21 +51,24 @@ export class GameRecordView extends cc.Component {
         closeBtn.onClick(this.onCloseClick, this);
 
         this.recordList = this.view.getChild("list").asList;
-        this.recordList.itemRenderer = this.renderListItem;
+        this.recordList.itemRenderer = (index: number, item: fgui.GObject) => {
+            this.renderListItem(index, item);
+        };
 
         this.recordList.setVirtual();
 
         this.loadGameRecord();
+
+        //this.recordList.numItems = 1;
     }
 
     private renderListItem(index: number, obj: fgui.GObject): void {
 
         const replayRoom = this.replayRooms[index];
 
-        obj.onClick(() => {
-            GameRecordView.instance.goSubRecordView(replayRoom);
-            // tslint:disable-next-line:align
-        }, this);
+        obj.offClick(this.goSubRecordView, this);
+        obj.onClick(this.goSubRecordView, this);
+        obj.data = index;
 
         let text = "未知麻将";
         const roomType = replayRoom.recordRoomType;
@@ -178,9 +176,10 @@ export class GameRecordView extends cc.Component {
         this.recordList.numItems = this.replayRooms === undefined ? 0 : this.replayRooms.length;
     }
 
-    private goSubRecordView(replayRoom: proto.lobby.MsgReplayRoom): void {
-
+    private goSubRecordView(ev: fgui.Event): void {
+        const index = <number>ev.initiator.data;
         const subView = this.addComponent(GameSubRecordView);
+        const replayRoom = this.replayRooms[index];
         subView.updateData(replayRoom);
     }
 

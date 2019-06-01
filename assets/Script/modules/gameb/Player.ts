@@ -840,6 +840,13 @@ export class Player {
         return true;
     }
 
+    /**
+     * name
+     */
+    public getPlayInfo(): PlayerInfo {
+        return this.playerInfo;
+    }
+
     public updateReadyHandList(readyHandList: number[]): void {
         this.readyHandList = readyHandList;
         if (this.readyHandList != null && this.readyHandList.length > 0) {

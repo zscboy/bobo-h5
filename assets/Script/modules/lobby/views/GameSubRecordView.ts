@@ -6,8 +6,6 @@ import { proto } from "../proto/protoLobby";
  */
 export class GameSubRecordView extends cc.Component {
 
-    // 为了能在 render 函数中取this
-    private static instance: GameSubRecordView;
     private view: fgui.GComponent;
     private win: fgui.Window;
     private eventTarget: cc.EventTarget;
@@ -61,8 +59,6 @@ export class GameSubRecordView extends cc.Component {
         this.win = win;
         this.win.show();
 
-        GameSubRecordView.instance = this;
-
         this.initView();
     }
 
@@ -82,7 +78,9 @@ export class GameSubRecordView extends cc.Component {
         closeBtn.onClick(this.onCloseClick, this);
 
         this.recordList = this.view.getChild("list").asList;
-        this.recordList.itemRenderer = this.renderListItem;
+        this.recordList.itemRenderer = (index: number, item: fgui.GObject) => {
+            this.renderListItem(index, item);
+        };
         this.recordList.setVirtual();
 
     }
@@ -106,15 +104,13 @@ export class GameSubRecordView extends cc.Component {
         }
 
         const playBtn = this.view.getChild("playBtn");
-        playBtn.onClick(() => {
-            GameSubRecordView.instance.enterReplayRoom(record);
-            // tslint:disable-next-line:align
-        }, this);
-
+        playBtn.offClick(this.enterReplayRoom, this);
+        playBtn.onClick(this.enterReplayRoom, this);
     }
 
-    private enterReplayRoom(record: proto.lobby.IMsgReplayRecordSummary): void {
-
+    private enterReplayRoom(ev: fgui.Event): void {
+        // const index = <number>ev.initiator.data;
+        // const record = this.replayRoom.records[index];
         const recordCfg = this.replayRoom;
         let modName;
         if (recordCfg.recordRoomType === 1) {

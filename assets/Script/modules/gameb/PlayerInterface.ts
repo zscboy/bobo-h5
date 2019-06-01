@@ -43,4 +43,6 @@ export interface PlayerInterface {
     onPlayerInfoClick: Function;
     isMe(): boolean;
     onPlayerDiscardTile(tileID: number): void;
+
+    // getPlayInfo(): PlayerInfo;
 }

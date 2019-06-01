@@ -245,6 +245,8 @@ export class RoomView {
             disbandView = this.room.getRoomHost().component.addComponent(DisbandView);
         }
 
+        disbandView.saveRoomView(this.room);
+
         disbandView.updateView(msgDisbandNotify);
 
     }

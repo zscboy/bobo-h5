@@ -11,7 +11,6 @@
     "Canvas Renderer",
     "Renderer Texture",
     "Dynamic Atlas",
-    "ParticleSystem",
     "TiledMap",
     "Spine Skeleton",
     "DragonBones",
@@ -30,7 +29,6 @@
     "WebView",
     "Audio",
     "AudioSource",
-    "Animation",
     "Collider",
     "Action",
     "Physics",
@@ -65,6 +63,5 @@
     "width": 960
   },
   "use-customize-simulator": true,
-  "use-project-simulator-setting": false,
-  "start-scene": "current"
+  "use-project-simulator-setting": false
 }

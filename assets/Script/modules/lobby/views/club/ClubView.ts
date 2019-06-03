@@ -150,6 +150,13 @@ export class ClubView extends cc.Component {
 
         this.content = this.view.getChild("content").asCom;
 
+        const recordBtn = this.view.getChild("applyRecordBtn");
+
+        recordBtn.onClick(() => {
+            this.addComponent(ApplyRecordView);
+            // tslint:disable-next-line:align
+        }, this);
+
         this.clubPage = this.content.getChild("clubPage");
         this.noClubPage = this.content.getChild("noClubPage");
 
@@ -175,13 +182,6 @@ export class ClubView extends cc.Component {
 
         joinClubBtn.onClick(() => {
             this.addComponent(JoinClubView);
-            // tslint:disable-next-line:align
-        }, this);
-
-        const recordBtn = this.noClubPage.asCom.getChild("recordBtn");
-
-        recordBtn.onClick(() => {
-            this.addComponent(ApplyRecordView);
             // tslint:disable-next-line:align
         }, this);
 

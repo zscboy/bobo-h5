@@ -14,12 +14,21 @@
       "trimType": "auto",
       "trimThreshold": 1,
       "rotated": false,
+<<<<<<< HEAD
       "offsetX": -1,
       "offsetY": 1.5,
       "trimX": 0,
       "trimY": 0,
       "width": 2046,
       "height": 1021,
+=======
+      "offsetX": -2,
+      "offsetY": 359.5,
+      "trimX": 0,
+      "trimY": 0,
+      "width": 2044,
+      "height": 1329,
+>>>>>>> afa0fa8709979d8fd49b0469bc110bc2b5c769fd
       "rawWidth": 2048,
       "rawHeight": 1024,
       "borderTop": 0,

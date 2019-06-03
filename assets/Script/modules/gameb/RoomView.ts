@@ -4,6 +4,7 @@ import { DisbandView } from "./DisbandView";
 import { PlayerView } from "./PlayerView";
 import { proto } from "./proto/protoGame";
 import { RoomInterface, TingPai } from "./RoomInterface";
+import { RoomRuleView } from "./RoomRuleView";
 import { SettingView } from "./SettingView";
 import { TileImageMounter } from "./TileImageMounter";
 const mjproto = proto.mahjong;
@@ -277,6 +278,15 @@ export class RoomView {
     //     // )
     // }
 
+    private onRoomRuleBtnClick(): void {
+        let roomRuleView = this.component.getComponent(RoomRuleView);
+
+        if (roomRuleView === undefined || roomRuleView == null) {
+            roomRuleView = this.component.addComponent(RoomRuleView);
+        }
+        roomRuleView.updateView(this.room.roomInfo.roomConfig);
+    }
+
     private onSettingBtnClick(): void {
         // Logger.debug("onSettingBtnClick---------------");
         const settingView = this.component.addComponent(SettingView);
@@ -315,15 +325,16 @@ export class RoomView {
         chatBtn.onClick(this.onChatBtnClick, this);
 
         const settingBtn = this.unityViewNode.getChild("settingBtn");
+        settingBtn.onClick(this.onSettingBtnClick, this);
 
         const infoBtn = this.unityViewNode.getChild("guizeBtn");
-        infoBtn.visible = true;
+        //infoBtn.visible = true;
+        infoBtn.onClick(this.onRoomRuleBtnClick, this);
 
         this.readyButton = this.unityViewNode.getChild("ready").asButton;
         this.readyButton.visible = false;
         this.readyButton.onClick(this.room.onReadyButtonClick, this.room);
 
-        settingBtn.onClick(this.onSettingBtnClick, this);
     }
 
     private initOtherView(): void {

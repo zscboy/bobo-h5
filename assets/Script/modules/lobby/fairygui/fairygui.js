@@ -7151,7 +7151,8 @@ window.__extends = (this && this.__extends) || (function () {
                 this.updateLayout();
         };
         GLoader.prototype.handleGrayedChanged = function () {
-            this._content.setState(this._grayed ? cc.Sprite.State.GRAY : cc.Sprite.State.NORMAL);
+            // this._content.setState(this._grayed ? cc.Sprite.State.GRAY : cc.Sprite.State.NORMAL);
+            fgui.GImage.switchGrayMaterial(this._grayed, this._content);
         };
         GLoader.prototype.hitTest = function (globalPt) {
             if (this._touchDisabled || !this._touchable || !this._node.activeInHierarchy)
@@ -7270,7 +7271,8 @@ window.__extends = (this && this.__extends) || (function () {
             this._content.setPlaySettings(start, end, times, endAt, endCallback, callbackObj);
         };
         GMovieClip.prototype.handleGrayedChanged = function () {
-            this._content.setState(this._grayed ? cc.Sprite.State.GRAY : cc.Sprite.State.NORMAL);
+            // this._content.setState(this._grayed ? cc.Sprite.State.GRAY : cc.Sprite.State.NORMAL);
+            fgui.GImage.switchGrayMaterial(this._grayed, this._content);
         };
         GMovieClip.prototype.constructFromResource = function () {
             this.sourceWidth = this.packageItem.width;

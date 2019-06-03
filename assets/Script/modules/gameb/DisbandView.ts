@@ -127,6 +127,7 @@ export class DisbandView extends cc.Component {
     }
 
     protected onDestroy(): void {
+        Logger.debug("DisbandView.onDestroy");
 
         this.eventTarget.emit("destroy");
         this.win.hide();

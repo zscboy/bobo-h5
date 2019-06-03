@@ -81,7 +81,6 @@ export interface RoomInterface {
     ownerID: string;
     roomNumber: string;
     handStartted: number;
-    disbandLocked: boolean;
     markup: number;
     bankerChairID: number;
     isContinuousBanker: boolean;

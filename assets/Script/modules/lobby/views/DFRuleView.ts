@@ -37,19 +37,19 @@ export class DFRuleView {
     private priceCfg: object = null;
     private recordKey: string = "GZRule";
 
-    private readonly rules: {[key: string]: string | number | boolean} = {
-            ["roomType"]: 1,
-            ["playerNumAcquired"]: 4,
-            ["payNum"]: 24,
-            ["payType"]: 0,
-            ["handNum"]: 4,
-            ["doubleScoreWhenSelfDrawn"]: true,
-            ["doubleScoreWhenContinuousBanker"]: true,
-            ["doubleScoreWhenZuoYuanZi"]: true,
-            ["fengDingType"]: 0,
-            ["dunziPointType"]: 0,
-            //--游戏模块
-            ["modName"]: "gameb"
+    private readonly rules: { [key: string]: string | number | boolean } = {
+        ["roomType"]: 1,
+        ["playerNumAcquired"]: 4,
+        ["payNum"]: 24,
+        ["payType"]: 0,
+        ["handNum"]: 4,
+        ["doubleScoreWhenSelfDrawn"]: true,
+        ["doubleScoreWhenContinuousBanker"]: true,
+        ["doubleScoreWhenZuoYuanZi"]: true,
+        ["fengDingType"]: 0,
+        ["dunziPointType"]: 0,
+        //--游戏模块
+        ["modName"]: "gameb"
     };
 
     public destroy(): void {
@@ -68,7 +68,7 @@ export class DFRuleView {
         createRoomBtn.onClick(this.onCreateRoomBtnClick, this);
     }
 
-    public updatePriceCfg(priceCfgs: {[key: string]: object}): void {
+    public updatePriceCfg(priceCfgs: { [key: string]: object }): void {
         if (priceCfgs !== null) {
             const roomType = this.rules[`roomType`];
             this.priceCfg = priceCfgs[`${roomType}`];
@@ -100,11 +100,11 @@ export class DFRuleView {
         this.togglePays[0] = this.view.getChild("ownerPayButton").asButton;
         this.togglePays[1] = this.view.getChild("aapPayButton").asButton;
 
-        this.togglePays[0] .getChild("title").text = "房主支付";
-        this.togglePays[1] .getChild("title").text = "AA支付";
+        this.togglePays[0].getChild("title").text = "房主支付";
+        this.togglePays[1].getChild("title").text = "AA支付";
 
-        this.togglePays[0] .onClick(this.updateComsumer, this);
-        this.togglePays[1] .onClick(this.updateComsumer, this);
+        this.togglePays[0].onClick(this.updateComsumer, this);
+        this.togglePays[1].onClick(this.updateComsumer, this);
 
         // 人数
         this.togglePlayerNums[0] = this.view.getChild("2Player").asButton;
@@ -150,15 +150,15 @@ export class DFRuleView {
             Logger.debug("jsnoStr:", jsonStr);
             if (jsonStr !== "") {
                 try {
-                    const config = <{[key: string]: boolean | number}>JSON.parse(jsonStr);
+                    const config = <{ [key: string]: boolean | number }>JSON.parse(jsonStr);
                     this.toggleRoundCounts[<number>config[1]].selected = true;
                     this.togglePays[<number>config[2]].selected = true;
                     this.togglePlayerNums[<number>config[3]].selected = true;
                     this.toggleFengDingTypes[<number>config[4]].selected = true;
                     this.toggleDunziPointTypes[<number>config[5]].selected = true;
                     this.toggleZMJF.selected = <boolean>config[6];
-                    this.toggleLZJF.selected = <boolean> config[7];
-                    this.toggleJYZ.selected = <boolean> config[8];
+                    this.toggleLZJF.selected = <boolean>config[7];
+                    this.toggleJYZ.selected = <boolean>config[8];
                 } catch (e) {
                     Logger.error("parse config error:", e);
                     // 如果解析不了，则清理数据
@@ -168,7 +168,7 @@ export class DFRuleView {
         }
     }
 
-    private getConfigTable(): {[key: string]: {[key: number]: number}} {
+    private getConfigTable(): { [key: string]: { [key: number]: number } } {
         return {
             ["playerNumAcquired"]: {
                 [0]: 2,
@@ -236,6 +236,9 @@ export class DFRuleView {
         const fengdingIndex = this.getToggleIndex(this.toggleFengDingTypes);
         rules[`fengDingType`] = configTable[`fengDingType`][fengdingIndex];
 
+        const dunziIndex = this.getToggleIndex(this.toggleDunziPointTypes);
+        rules[`dunziPointType`] = configTable[`dunziPointType`][dunziIndex];
+
         rules[`doubleScoreWhenSelfDrawn`] = this.toggleZMJF.selected;
         rules[`doubleScoreWhenContinuousBanker`] = this.toggleLZJF.selected;
         rules[`doubleScoreWhenZuoYuanZi`] = this.toggleJYZ.selected;
@@ -258,20 +261,20 @@ export class DFRuleView {
 
         Logger.debug(`key: ${key}`);
 
-        const priceCfg = <{[key: string]: object}>this.priceCfg;
-        const activityPriceCfg =  <{[key: string]: object}>priceCfg.activityPriceCfg;
+        const priceCfg = <{ [key: string]: object }>this.priceCfg;
+        const activityPriceCfg = <{ [key: string]: object }>priceCfg.activityPriceCfg;
         if (activityPriceCfg !== null) {
-            const discountCfg = <{[key: string]: number}> activityPriceCfg.discountCfg;
+            const discountCfg = <{ [key: string]: number }>activityPriceCfg.discountCfg;
 
             return discountCfg[key];
         }
 
-        const originalPriceCfg = <{[key: string]: number}> priceCfg.originalPriceCfg;
+        const originalPriceCfg = <{ [key: string]: number }>priceCfg.originalPriceCfg;
         if (originalPriceCfg !== null) {
             return originalPriceCfg[key];
         }
 
-        return  0;
+        return 0;
     }
 
     private onCreateRoomBtnClick(): void {

@@ -7,6 +7,7 @@ import { proto } from "../proto/protoLobby";
 import { ClubView } from "./club/ClubView";
 import { EmailView } from "./EmailView";
 import { GameRecordView } from "./GameRecordView";
+import { JoinRoom } from "./JoinRoom";
 import { NewRoomView } from "./NewRoomView";
 import { UserInfoView } from "./UserInfoView";
 const { ccclass } = cc._decorator;
@@ -124,7 +125,7 @@ export class LobbyView extends cc.Component {
     }
     private onFriendClick(): void {
         const myUser = { userID: "6" };
-        const roomInfo = { roomID: "monkey-room", roomNumber: "monkey-room" };
+        const roomInfo = { roomID: "monkey-room", roomNumber: "monkey-room", roomConfig: "" };
 
         const params: GameModuleLaunchArgs = {
             jsonString: "",
@@ -162,7 +163,7 @@ export class LobbyView extends cc.Component {
     }
 
     private onJoinRoom(): void {
-        // TODO:
+        this.addComponent(JoinRoom);
     }
 
     private onCreateRoom(): void {

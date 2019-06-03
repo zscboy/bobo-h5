@@ -393,6 +393,7 @@ export class GameModule extends cc.Component implements GameModuleInterface {
         const roomInfo = {
             roomID: "",
             roomNumber: msgHandRecord.roomNumber,
+            roomConfig: msgAccLoadReplayRecord.roomJSONConfig,
             gameServerURL: "",
             state: 1,
             config: msgHandRecord.roomConfigID,

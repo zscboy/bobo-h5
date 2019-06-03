@@ -1,6 +1,6 @@
 {
   "ver": "2.3.0",
-  "uuid": "681863d6-31d7-4099-9eff-4a695a4362d5",
+  "uuid": "d1f02509-d325-435c-afb1-e54f23ce73b9",
   "type": "sprite",
   "wrapMode": "clamp",
   "filterMode": "bilinear",
@@ -9,8 +9,8 @@
   "subMetas": {
     "dafeng_atlas0_1": {
       "ver": "1.0.4",
-      "uuid": "24ecbaed-a44b-4312-ade1-bea843196f2d",
-      "rawTextureUuid": "681863d6-31d7-4099-9eff-4a695a4362d5",
+      "uuid": "223cbcad-0fbb-44fa-9682-f9d5eb6b638b",
+      "rawTextureUuid": "d1f02509-d325-435c-afb1-e54f23ce73b9",
       "trimType": "auto",
       "trimThreshold": 1,
       "rotated": false,

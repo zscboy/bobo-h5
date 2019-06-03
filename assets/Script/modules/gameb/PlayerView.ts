@@ -537,21 +537,23 @@ export class PlayerView {
             begin = 0;
         }
 
+        let lastD;
+        let lastT;
         //i计数器对应tilesDiscarded列表
         for (let i = begin; i < tileCount; i++) {
-            const d = discards[i % dCount];
-            const tileID = tilesDiscard[i];
-            TileImageMounter.mountTileImage(d, tileID);
-            d.visible = true;
+            lastD = discards[i % dCount];
+            lastT = tilesDiscard[i];
+            TileImageMounter.mountTileImage(lastD, lastT);
+            lastD.visible = true;
         }
 
         //如果是新打出的牌，给加一个箭头
         if (newDiscard) {
-            const d = discards[tileCount - 1 % dCount];
-            this.room.setArrowByParent(d);
+            // const d = discards[tileCount - 1 % dCount];
+            this.room.setArrowByParent(lastD);
 
             //放大打出去的牌
-            this.enlargeDiscarded(tilesDiscard[tileCount - 1], waitDiscardReAction);
+            this.enlargeDiscarded(lastT, waitDiscardReAction);
         }
     }
 
@@ -1117,7 +1119,9 @@ export class PlayerView {
     }
 
     //设置灰度
-    public setGray(obj: fgui.GObject): void {
+    public setGray(obj: fgui.GComponent): void {
+        Logger.debug("设置灰度: ", obj);
+        obj.grayed = true;
         // if btn != null {
         //const hImg = btn. Find("hua")
         //const imageA = btn. GetComponent("Image")
@@ -1128,7 +1132,8 @@ export class PlayerView {
     }
 
     //恢复灰度
-    public clearGray(obj: fgui.GObject): void {
+    public clearGray(obj: fgui.GComponent): void {
+        obj.grayed = false;
         // if btn != null {
         //const hImg = btn. Find("hua")
         //const imageA = btn. GetComponent("Image")

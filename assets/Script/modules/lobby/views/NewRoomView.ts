@@ -132,7 +132,7 @@ export class NewRoomView extends cc.Component {
 
         const myUserID = DataStore.getString("userID", "");
         const myUser = { userID: myUserID };
-        const myRoomInfo = { roomID: roomInfo.roomID, roomNumber: roomInfo.roomNumber };
+        const myRoomInfo = { roomID: roomInfo.roomID, roomNumber: roomInfo.roomNumber, roomConfig: roomInfo.config };
         const roomConfig = roomInfo.config;
         const roomConfigJSON = <{ [key: string]: boolean | number | string }>JSON.parse(roomConfig);
         const modName = <string>roomConfigJSON[`modName`];

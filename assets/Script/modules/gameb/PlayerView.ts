@@ -86,6 +86,7 @@ export class PlayerView {
     private btnHanders: { [key: string]: Function };
     private roomHost: RoomHost;
     private roomHostTimeElapsed: number;
+    private dragHand: fgui.GComponent; //拖牌时 克隆的牌
 
     public constructor(viewUnityNode: fgui.GComponent, viewChairID: number, room: RoomInterface) {
         this.room = room;
@@ -172,6 +173,7 @@ export class PlayerView {
             handsClickCtrls[i] = cc;
 
             if (isMe) {
+                this.dragHand = myHandTilesNode.getChild("dragHand").asCom;
                 card.onClick(
                     () => {
                         this.onHandTileBtnClick(i);
@@ -824,7 +826,7 @@ export class PlayerView {
 
             return;
         }
-        if (clickCtrl.readyHandList != null && clickCtrl.readyHandList.length > 0) {
+        if (clickCtrl.readyHandList !== undefined && clickCtrl.readyHandList !== null && clickCtrl.readyHandList.length > 0) {
             //如果此牌可以听
             const tingP: TingPai[] = [];
             for (let i = 0; i < clickCtrl.readyHandList.length; i += 2) {
@@ -886,7 +888,7 @@ export class PlayerView {
             return;
         }
 
-        if (clickCtrl.readyHandList != null && clickCtrl.readyHandList.length > 0) {
+        if (clickCtrl.readyHandList !== undefined && clickCtrl.readyHandList !== null && clickCtrl.readyHandList.length > 0) {
             //如果此牌可以听
             const tingP: TingPai[] = [];
             for (let i = 0; i < clickCtrl.readyHandList.length; i += 2) {
@@ -987,6 +989,9 @@ export class PlayerView {
                 return;
             }
             this.restoreHandsPositionAndClickCount(index);
+            this.dragHand.visible = true;
+            TileImageMounter.mountTileImage(this.dragHand, this.handsClickCtrls[index].tileID);
+            this.dragHand.getChild("ting").visible = this.handsClickCtrls[index].t.visible;
             attachEffect(dragGo);
         };
         const moveFunction = () => {
@@ -996,6 +1001,7 @@ export class PlayerView {
 
                 return;
             }
+            this.dragHand.setPosition(dragGo.x, dragGo.y);
             //obj.position = pos
         };
         const endFunction = () => {
@@ -1004,6 +1010,7 @@ export class PlayerView {
             }
             //拖牌结束立即不显示
             dragGo.visible = false;
+            this.dragHand.visible = false;
             detachEffect();
             if (pointIsInRect(dragGo.x, dragGo.y)) {
                 dragGo.visible = true;

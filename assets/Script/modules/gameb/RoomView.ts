@@ -35,9 +35,14 @@ export class RoomView {
     private multiOpsDataList: proto.mahjong.IMsgMeldTile[];
     private arrowObj: fgui.GObject;
     private actionMsg: proto.mahjong.MsgPlayerAction;
+    private leftTime: number;
+    private leftTimerCB: Function;
+    private component: cc.Component;
+
     public constructor(room: RoomInterface, view: fgui.GComponent) {
         this.room = room;
         this.unityViewNode = view;
+        this.component = room.getRoomHost().component;
 
         const playerViews: PlayerView[] = [];
         for (let i = 1; i <= 4; i++) {
@@ -96,29 +101,32 @@ export class RoomView {
     }
 
     public startDiscardCountdown(): void {
-        //清理定时器
-        // this.unityViewNode.StopTimer("roomViewCountDown");
+        if (this.leftTimerCB === undefined) {
+            this.leftTimerCB = <Function>this.countDownCallBack.bind(this);
+        }
 
-        // this.leftTime = 0;
+        //清理定时器
+        this.component.unschedule(this.leftTimerCB);
+        this.leftTime = 1;
         //起定时器
-        //     this.unityViewNode.StartTimer(
-        //         "roomViewCountDown",
-        //         1,
-        //         0,
-        //         function () {
-        //             this.leftTime = this.leftTime + 1
-        //             this.countDownText.text = this.leftTime
-        //             if this.leftTime >= 999 {
-        //                 this.unityViewNode: StopTimer("roomViewCountDown");
-        //             }
-        //         },
-        //         this.leftTime;
-        // )
+        this.component.schedule(
+            this.leftTimerCB,
+            1,
+            cc.macro.REPEAT_FOREVER,
+            1);
+    }
+
+    public countDownCallBack(): void {
+        this.leftTime += 1;
+        this.countDownText.text = `${this.leftTime}`;
+        if (this.leftTime >= 999) {
+            this.component.unschedule(this.leftTimerCB);
+        }
     }
 
     public stopDiscardCountdown(): void {
         //清理定时器
-        // this.unityViewNode: StopTimer("roomViewCountDown");
+        this.component.unschedule(this.leftTimerCB);
         this.countDownText.text = "";
     }
 
@@ -239,10 +247,10 @@ export class RoomView {
     public updateDisbandVoteView(msgDisbandNotify: proto.mahjong.MsgDisbandNotify): void {
         //
 
-        let disbandView = this.room.getRoomHost().component.getComponent(DisbandView);
+        let disbandView = this.component.getComponent(DisbandView);
 
         if (disbandView === undefined || disbandView == null) {
-            disbandView = this.room.getRoomHost().component.addComponent(DisbandView);
+            disbandView = this.component.addComponent(DisbandView);
         }
 
         disbandView.saveRoomView(this.room);
@@ -250,6 +258,7 @@ export class RoomView {
         disbandView.updateView(msgDisbandNotify);
 
     }
+
     //解散房间按钮点击事件
     // private onDissolveClick(): void {
     //     // const msg = "确实要申请解散房间吗？";
@@ -266,7 +275,7 @@ export class RoomView {
 
     private onSettingBtnClick(): void {
         // Logger.debug("onSettingBtnClick---------------");
-        const settingView = this.room.getRoomHost().component.addComponent(SettingView);
+        const settingView = this.component.addComponent(SettingView);
         settingView.saveRoomView(this.room);
     }
 
@@ -279,9 +288,9 @@ export class RoomView {
             Logger.debug("load === null");
         }
 
-        let chatView = this.room.getRoomHost().component.getComponent(ChatView);
+        let chatView = this.component.getComponent(ChatView);
         if (chatView === null) {
-            chatView = this.room.getRoomHost().component.addComponent(ChatView);
+            chatView = this.component.addComponent(ChatView);
         }
 
         chatView.show(load);
@@ -387,8 +396,7 @@ export class RoomView {
         this.listensObj = this.unityViewNode.getChild("listensPanel").asCom;
         this.listensObjList = this.listensObj.getChild("list").asList;
         this.listensObjNum = this.listensObj.getChild("num");
-        // tslint:disable-next-line: no-unsafe-any
-        this.listensObjList.itemRenderer = this.renderListensListItem.bind(this);
+        this.listensObjList.itemRenderer = <(index: number, item: fgui.GComponent) => void>this.renderListensListItem.bind(this);
         this.listensObj.onClick(() => { this.listensObj.visible = false; }, this);
         this.listensObjList.setVirtual();
     }
@@ -406,8 +414,7 @@ export class RoomView {
         // const meldMap = {}
         this.meldOpsPanel = this.unityViewNode.getChild("meldOpsPanel").asCom;
         this.multiOpsObj = this.meldOpsPanel.getChild("list").asList;
-        // tslint:disable-next-line: no-unsafe-any
-        this.multiOpsObj.itemRenderer = this.renderMultiOpsListItem.bind(this);
+        this.multiOpsObj.itemRenderer = <(index: number, item: fgui.GComponent) => void>this.renderMultiOpsListItem.bind(this);
         this.multiOpsObj.on(fgui.Event.CLICK_ITEM, (onClickItem: fgui.GObject) => { this.onMeldOpsClick(onClickItem.name); }, this);
     }
 

@@ -13,13 +13,13 @@ export class ClickCtrl {
     public readyHandList: number[];
 }
 export enum ButtonDef {
-    Chow = "ui.//dafeng/chi_button",
-    Pong = "ui.//dafeng/peng_button",
-    Kong = "ui.//dafeng/gang_button",
-    Ting = "ui.//dafeng/ting_button",
-    Skip = "ui.//dafeng/guo_button",
-    Hu = "ui.//dafeng/hu_button",
-    Zhua = "ui.//dafeng/zhua_button"
+    Chow = "Effect_zi_ts_chi",
+    Pong = "Effect_zi_ts_peng",
+    Kong = "Effect_zi_ts_gang",
+    Ting = "Effect_zi_ts_ting",
+    Skip = "Effect_zi_ts_guo",
+    Hu = "Effect_zi_ts_hu",
+    Zhua = "Effect_zi_ts_zhua"
 }
 /**
  * player 接口

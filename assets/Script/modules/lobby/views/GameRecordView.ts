@@ -140,10 +140,10 @@ export class GameRecordView extends cc.Component {
         const tk = DataStore.getString("token", "");
         const loadGameRecordUrl = `${LEnv.rootURL}${LEnv.lrproom}?&rt=1&tk=${tk}`;
         Logger.debug("loadGameRecord loadGameRecordUrl:", loadGameRecordUrl);
-        Dialog.showDialog("正在加载战绩......");
+        // Dialog.showDialog("正在加载战绩......");
 
         HTTP.hGet(this.eventTarget, loadGameRecordUrl, (xhr: XMLHttpRequest, err: string) => {
-            Dialog.hideDialog();
+            // Dialog.hideDialog();
 
             let errMsg;
             if (err !== null) {

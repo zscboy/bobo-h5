@@ -484,5 +484,18 @@ export class Room {
         //
         this.roomView.switchBg(index);
     }
-    //
+
+    /**
+     * 挂起若干秒
+     * @param seconds 秒数
+     */
+    public async coWaitSeconds(seconds: number): Promise<void> {
+        return new Promise<void>((resovle) => {
+            this.host.component.scheduleOnce(
+                () => {
+                    resovle();
+                },
+                seconds);
+        });
+    }
 }

@@ -73,6 +73,7 @@ export class AnimationMgr {
                 n.removeFromParent();
                 mountNode.addChild(n);
                 mountNode.active = true;
+                n.active = true;
 
                 animation.off(cc.Animation.EventType.FINISHED);
                 animation.stop();
@@ -88,7 +89,7 @@ export class AnimationMgr {
 
     public getAnimationHolder(prefabName: string, onCompleted: (error: Error, holder: AnimationHolder) => void): void {
         const holder = this.map[prefabName];
-        if (holder !== undefined) {
+        if (holder !== undefined && holder.node.isValid) {
             onCompleted(null, holder);
         } else {
             this.loader.loadPrefab(prefabName, (error, res) => {

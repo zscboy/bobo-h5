@@ -36,7 +36,9 @@ export class GameOverResultView extends cc.Component {
 
     public showView(room: RoomInterface, msgGameOver: proto.mahjong.IMsgGameOver): void {
         // -- 提高消息队列的优先级为1
-        // room.host.mq:blockNormal()
+        if (!room.isReplayMode()) {
+            room.getRoomHost().blockNormal();
+        }
         const loader = room.getRoomHost().loader;
         loader.fguiAddPackage("gameb/dafeng");
         const viewObj = fgui.UIPackage.createObject("dafeng", "game_over").asCom;
@@ -229,7 +231,9 @@ export class GameOverResultView extends cc.Component {
     //玩家点击返回按钮
     private onCloseButtonClick(): void {
         // -- 降低消息队列的优先级为0
-        this.room.getRoomHost().unblockNormal();
+        if (!this.room.isReplayMode()) {
+            this.room.getRoomHost().unblockNormal();
+        }
         this.unityViewNode = null;
         this.destroy();
         this.win.hide();

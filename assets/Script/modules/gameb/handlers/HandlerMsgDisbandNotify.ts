@@ -1,3 +1,4 @@
+import { Logger } from "../../lobby/lcore/LCoreExports";
 import { proto } from "../proto/protoGame";
 import { RoomInterface } from "../RoomInterface";
 
@@ -6,16 +7,12 @@ import { RoomInterface } from "../RoomInterface";
  */
 export namespace HandlerMsgDisbandNotify {
     export const onMsg = async (msgData: ByteBuffer, room: RoomInterface): Promise<void> => {
-
-        room.disbandLocked = false;
+        Logger.debug("HandlerMsgDisbandNotify");
         const msgDisbandNotify = proto.mahjong.MsgDisbandNotify.decode(msgData);
-        const mjproto2 = proto.mahjong.DisbandState;
+        // const mjproto2 = proto.mahjong.DisbandState;
         // msgDisbandNotify:ParseFromString(msgData)
 
-        if (msgDisbandNotify.disbandState === mjproto2.Waiting) {
-            //保存到room到，以便重复点击申请解散按钮进而显示
-            room.disbandLocked = true;
-            room.updateDisbandVoteView(msgDisbandNotify);
-        }
+        //保存到room到，以便重复点击申请解散按钮进而显示
+        room.updateDisbandVoteView(msgDisbandNotify);
     };
 }

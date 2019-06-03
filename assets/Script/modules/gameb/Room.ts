@@ -71,7 +71,6 @@ export class Room {
     public tilesInWall: number;
     public myPlayer: Player;
     public msgDisbandNotify: proto.mahjong.MsgDisbandNotify;
-    public disbandLocked: boolean;
     public constructor(myUser: UserInfo, roomInfo: RoomInfo, host: RoomHost) {
         this.myUser = myUser;
         this.roomInfo = roomInfo;
@@ -220,18 +219,7 @@ export class Room {
 
     //处理玩家申请解散请求
     public onDissolveClicked(): void {
-        if (this.disbandLocked && this.msgDisbandNotify != null) {
-            //上次发送的，或者现在已经有了解散请求正在处理
-            // if this.msgDisbandNotify == null {
-            //     //如果上次发的包还没收到回复，则特殊处理 (2017-10-24 mufan)
-            //     //点击解散房间，出现（放开那少年） 挂
-            //     return
-            // }
-            this.updateDisbandVoteView(this.msgDisbandNotify);
-        } else {
-            this.sendMsg(proto.mahjong.MessageCode.OPDisbandRequest);
-            this.disbandLocked = true;
-        }
+        this.sendMsg(proto.mahjong.MessageCode.OPDisbandRequest);
     }
 
     //更新解散处理界面

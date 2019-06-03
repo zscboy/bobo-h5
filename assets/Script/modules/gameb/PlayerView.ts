@@ -176,7 +176,7 @@ export class PlayerView {
                     },
                     this
                 );
-                // this.onDrag(card, i)
+                this.onDrag(card, i);
             }
         }
 
@@ -881,95 +881,93 @@ export class PlayerView {
 
     //拖动出牌事件
     public onDrag(dragGo: fgui.GObject, index: number): void {
-        // const startPos = { x: dragGo.x, y: dragGo.y };
-        // let enable = false;
-        // let clickCtrl: ClickCtrl = new ClickCtrl()
-        //const siblingIndex
-        // dragGo.draggable = true
-        // const x1 = dragGo.x - dragGo.width * 0.5
-        // const x2 = dragGo.x + dragGo.width * 0.5
-        // const y1 = dragGo.y - dragGo.height * 0.5
-        // const y2 = dragGo.y + dragGo.height * 0.5
-        // const rect = [x1, x2, y1, y2]
+        const startPos = { x: dragGo.x, y: dragGo.y };
+        let enable = false;
+        let clickCtrl: ClickCtrl = new ClickCtrl();
+        dragGo.draggable = true;
+        const x1 = dragGo.x - dragGo.width * 0.5;
+        const x2 = dragGo.x + dragGo.width * 0.5;
+        const y1 = dragGo.y - dragGo.height * 0.5;
+        const y2 = dragGo.y + dragGo.height * 0.5;
+        const rect = [x1, x2, y1, y2];
         //可否拖动
-        // function dragable() {
-        //     //print("llwant, drag able")
-        //     const player = this.player
-        //     if (player === null) {
-        //         return false
-        //     }
-        //     const handsClickCtrls = this.handsClickCtrls
-        //     clickCtrl = handsClickCtrls[index]
-        //     return clickCtrl.isDiscardable && !player.waitSkip
-        // }
+        const dragable = () => {
+            //print("llwant, drag able")
+            const player = this.player;
+            if (player === null) {
+                return false;
+            }
+            const handsClickCtrls = this.handsClickCtrls;
+            clickCtrl = handsClickCtrls[index];
+
+            return clickCtrl.isDiscardable && !player.waitSkip;
+        };
         //检测拖动范围时候合法
-        // function pointIsInRect(x: number, y: number) {
-        //     if (rect === null) {
-        //         return false
-        //     }
-        //     if (x > rect[0] && x < rect[1] && y > rect[2] && y < rect[3]) {
-        //         return true
-        //     } else {
-        //         return false
-        //     }
-        // }
+        const pointIsInRect = (x: number, y: number) => {
+            if (rect === null) {
+                return false;
+            }
+            if (x > rect[0] && x < rect[1] && y > rect[2] && y < rect[3]) {
+                return true;
+            } else {
+                return false;
+            }
+        };
         //附加拖动效果
-        // function attachEffect(obj: fgui.GObject) {
-        //     this.dragEffect. SetParent(obj)
-        //     this.dragEffect.localPosition = Vector3(0, 0, 0)
-        //     this.dragEffect.visible = true
-        // }
+        const attachEffect = (obj: fgui.GObject) => {
+            // this.dragEffect.SetParent(obj);
+            // this.dragEffect.localPosition = Vector3(0, 0, 0)
+            // this.dragEffect.visible = true
+        };
         //去掉拖动效果
-        // function detachEffect() {
-        //     this.dragEffect.visible = false
-        // }
-        // dragGo.onDragStart.Set(
-        //     function () {
-        //         enable = dragable()
-        //         //关闭拖动特效
-        //         detachEffect()
-        //         if (!enable) {
-        //             return
-        //         }
-        //         this.restoreHandPositionAndClickCount(index)
-        //         attachEffect(dragGo)
-        //     }
-        // )
-        // dragGo.onDragMove.Set(
-        //     function () {
-        //         if (!enable) {
-        //             dragGo.x = startPos.x
-        //             dragGo.y = startPos.y
-        //             return
-        //         }
-        //         //obj.position = pos
-        //     }
-        // )
-        // dragGo.onDragEnd.Set(
-        //     function () {
-        //         if (!enable) {
-        //             return
-        //         }
-        //         //拖牌结束立即不显示
-        //         dragGo.visible = false
-        //         detachEffect()
-        //         if (pointIsInRect(dragGo.x, dragGo.y)) {
-        //             dragGo.visible = true
-        //             dragGo.x = startPos.x
-        //             dragGo.y = startPos.y
-        //         } else {
-        //             //重置打出的牌位置（TODO：需要测试当网络不好的情况下onPlayerDiscardTile发送数据失败，界面刷新情况）
-        //             dragGo.visible = false
-        //             dragGo.x = startPos.x
-        //             dragGo.y = startPos.y
-        //             //判断可否出牌
-        //             if (!this.player.waitSkip) {
-        //                 this.player.onPlayerDiscardTile(clickCtrl.tileID)
-        //                 this.clearAllowedActionsView()
-        //             }
-        //         }
-        //     }
-        // )
+        const detachEffect = () => {
+            // this.dragEffect.visible = false
+        };
+        const stratFunction = () => {
+            enable = dragable();
+            //关闭拖动特效
+            detachEffect();
+            if (!enable) {
+                return;
+            }
+            this.restoreHandPositionAndClickCount(index);
+            attachEffect(dragGo);
+        };
+        const moveFunction = () => {
+            if (!enable) {
+                dragGo.x = startPos.x;
+                dragGo.y = startPos.y;
+
+                return;
+            }
+            //obj.position = pos
+        };
+        const endFunction = () => {
+            if (!enable) {
+                return;
+            }
+            //拖牌结束立即不显示
+            dragGo.visible = false;
+            detachEffect();
+            if (pointIsInRect(dragGo.x, dragGo.y)) {
+                dragGo.visible = true;
+                dragGo.x = startPos.x;
+                dragGo.y = startPos.y;
+            } else {
+                //重置打出的牌位置（TODO：需要测试当网络不好的情况下onPlayerDiscardTile发送数据失败，界面刷新情况）
+                dragGo.visible = false;
+                dragGo.x = startPos.x;
+                dragGo.y = startPos.y;
+                //判断可否出牌
+                if (!this.player.waitSkip) {
+                    this.player.onPlayerDiscardTile(clickCtrl.tileID);
+                    this.clearAllowedActionsView(false);
+                }
+            }
+        };
+        dragGo.on(fgui.Event.DRAG_START, stratFunction, this);
+        dragGo.on(fgui.Event.DRAG_MOVE, moveFunction, this);
+        dragGo.on(fgui.Event.DRAG_END, endFunction, this);
     }
 
     //还原所有手牌到它初始化时候的位置，并把clickCount重置为0

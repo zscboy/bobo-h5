@@ -867,8 +867,8 @@ export class Player {
         // playerInfoView.showUserInfoView(self.playerInfo, pos, self:isMe() == false)
 
         const roomHost = this.host.getRoomHost();
-        if (roomHost.loader === null) {
-            Logger.debug("roomHost.loader === null");
+        if (roomHost === null) {
+            Logger.debug("roomHost === null");
         }
 
         let playerInfoView = roomHost.component.getComponent(PlayerInfoView);
@@ -876,6 +876,6 @@ export class Player {
             playerInfoView = roomHost.component.addComponent(PlayerInfoView);
         }
 
-        playerInfoView.showUserInfoView(roomHost.loader, this.playerInfo, pos, this.isMe() === false);
+        playerInfoView.showUserInfoView(roomHost, this.playerInfo, pos, this.isMe() === false);
     }
 }

@@ -25,8 +25,12 @@ interface PlayerInfo {
     clubIDs?: string[];
     dan?: number;
 }
+
+interface RoomHost {
+    loader: GResLoader;
+}
 /**
- * 战绩界面
+ * 玩家信息
  */
 export class PlayerInfoView extends cc.Component {
     private view: fgui.GComponent = null;
@@ -38,7 +42,7 @@ export class PlayerInfoView extends cc.Component {
     private nameText: fgui.GTextField;
     private idText: fgui.GTextField;
 
-    private onMessageFunc: Function;
+    private onMessageFunc: Function = null;
     private ipText: fgui.GTextField;
     private xinNumText: fgui.GTextField;
     private zuanNumText: fgui.GTextField;
@@ -50,41 +54,40 @@ export class PlayerInfoView extends cc.Component {
     private dataList: PropData[];
     private dataListForOpponents: PropData[];
 
-    public showUserInfoView(loader: GResLoader, playerInfo: PlayerInfo, pos: cc.Vec2, isOther: boolean): void {
-        if (this.view !== null) {
-            // this.room = room;
-            this.playerInfo = playerInfo;
-            this.isOther = isOther;
-            this.updateView();
-            fgui.GRoot.inst.showPopup(this.view);
-            this.view.setPosition(pos.x, pos.y);
+    // private roomHost: RoomHost;
 
-            return;
+    public showUserInfoView(roomHost: RoomHost, playerInfo: PlayerInfo, pos: cc.Vec2, isOther: boolean): void {
+        if (this.view === null) {
+            const loader = roomHost.loader;
+            loader.fguiAddPackage("lobby/fui_player_info/lobby_player_info");
+            const view = fgui.UIPackage.createObject("lobby_player_info", "player_info_view").asCom;
+            this.view = view;
+            this.initView();
+
+            if (this.onMessageFunc === null) {
+                this.lobbyView = <LobbyViewInterface>this.node.getParent().getComponent("LobbyView");
+                this.onMessageFunc = this.lobbyView.on(`${proto.lobby.MessageCode.OPChat}`, this.onMessage, this);
+            }
+
+            Logger.debug("showUserInfoView view is nil");
         }
 
-        Logger.debug("showUserInfoView view is nil");
-
-        loader.fguiAddPackage("lobby/fui_player_info/lobby_player_info");
-        const view = fgui.UIPackage.createObject("lobby_player_info", "player_info_view").asCom;
-        this.view = view;
-
-        this.initView();
-
-        // this.room = room;
+        // this.roomHost = roomHost;
         this.playerInfo = playerInfo;
         this.isOther = isOther;
+
         this.updateView();
+
         fgui.GRoot.inst.showPopup(this.view);
         this.view.setPosition(pos.x, pos.y);
-
-        this.lobbyView = <LobbyViewInterface>this.node.getParent().getComponent("LobbyView");
-        if (this.lobbyView !== null) {
-            this.onMessageFunc = this.lobbyView.on(`${proto.lobby.MessageCode.OPChat}`, this.onMessage, this);
-        }
     }
 
     protected onDestroy(): void {
-        this.lobbyView.off(`${proto.lobby.MessageCode.OPChat}`, this.onMessageFunc);
+        if (this.onMessageFunc !== null) {
+            this.lobbyView.off(`${proto.lobby.MessageCode.OPChat}`, this.onMessageFunc);
+            this.onMessageFunc = null;
+        }
+
         this.view.dispose();
     }
 
@@ -108,11 +111,6 @@ export class PlayerInfoView extends cc.Component {
         };
 
         this.propList.on(fgui.Event.CLICK_ITEM, this.onPropListItemClick, this);
-        // this.propList.onClickItem:Add(
-        //     function(onClickItem)
-        //         self.room:sendDonate(onClickItem.data.name)
-        //     end
-        // )
 
         this.propList.setVirtual();
 
@@ -185,6 +183,8 @@ export class PlayerInfoView extends cc.Component {
     }
 
     private onPropListItemClick(clickItem: fgui.GObject): void {
+        Logger.debug(`clickItem.data.name:${clickItem.asCom.name}, num:${parseInt(clickItem.asCom.name, 10)}`);
+        // this.roomHost.sendDonate(parseInt(clickItem.asCom.name, 10), this.playerInfo.chairID);
         // this.room.sendDonate(onClickItem.data.name);
     }
 

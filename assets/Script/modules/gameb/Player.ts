@@ -740,7 +740,7 @@ export class Player {
 
             this.playerView.clearAllowedActionsView(discardAble);
             //重置手牌位置
-            this.playerView.restoreHandPositionAndClickCount(-1);
+            this.playerView.restoreHandsPositionAndClickCount(-1);
             //设置一个标志，表示已经点击了动作按钮（吃碰杠胡过）
             this.waitSkip = false;
         }

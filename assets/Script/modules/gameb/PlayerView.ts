@@ -1,4 +1,4 @@
-import { Logger } from "../lobby/lcore/LCoreExports";
+import { Dialog, Logger } from "../lobby/lcore/LCoreExports";
 import { ButtonDef, ClickCtrl, PlayerInterface } from "./PlayerInterface";
 import { proto } from "./proto/protoGame";
 import { RoomHost, RoomInterface, TingPai } from "./RoomInterface";
@@ -85,6 +85,7 @@ export class PlayerView {
     private discardTipsTile: fgui.GComponent;
     private btnHanders: { [key: string]: Function };
     private roomHost: RoomHost;
+    private roomHostTimeElapsed: number;
 
     public constructor(viewUnityNode: fgui.GComponent, viewChairID: number, room: RoomInterface) {
         this.room = room;
@@ -165,6 +166,7 @@ export class PlayerView {
             handsOriginPos[i] = new PosCtrl(card.x, card.y);
             const cc = new ClickCtrl();
             cc.clickCount = 0;
+            cc.doubleTimeEclipse = 0;
             cc.h = card;
             cc.t = card.getChild("ting");
             handsClickCtrls[i] = cc;
@@ -715,7 +717,7 @@ export class PlayerView {
         }
 
         //恢复所有牌的位置，由于点击手牌时会把手牌向上移动
-        this.restoreHandPositionAndClickCount(-1);
+        this.restoreHandsPositionAndClickCount(-1);
 
         let begin = 0;
         let endd = tileCountInHand;
@@ -807,6 +809,58 @@ export class PlayerView {
     //处理玩家点击手牌按钮
     public onHandTileBtnClick(index: number): void {
         const handsClickCtrls = this.handsClickCtrls;
+        const clickCtrl = handsClickCtrls[index];
+        const player = this.player;
+        if (!clickCtrl.isDiscardable) {
+            //不可以出牌
+            if (clickCtrl.isGray) {
+                if (!this.alreadyShowNonDiscardAbleTips) {
+                    Dialog.prompt("本轮不能出与该牌组合的牌，请选择其他牌");
+                    this.alreadyShowNonDiscardAbleTips = true;
+                }
+            }
+
+            return;
+        }
+        if (clickCtrl.readyHandList != null && clickCtrl.readyHandList.length > 0) {
+            //如果此牌可以听
+            const tingP: TingPai[] = [];
+            for (let i = 0; i < clickCtrl.readyHandList.length; i += 2) {
+                tingP.push(new TingPai(clickCtrl.readyHandList[i], 1, clickCtrl.readyHandList[i + 1]));
+            }
+            this.room.showTingDataView(tingP);
+        } else {
+            this.room.hideTingDataView();
+        }
+        if (clickCtrl.doubleTimeEclipse === 0) {
+            clickCtrl.doubleTimeEclipse = 1;
+            this.roomHostTimeElapsed = this.roomHost.timeElapsed;
+            //第一次点击 弹起
+            this.restoreHandsPositionAndClickCount(index);
+            this.moveHandUp(index);
+
+            return;
+        }
+        if (this.roomHost.timeElapsed - this.roomHostTimeElapsed <= 1) {
+            clickCtrl.doubleTimeEclipse = 0;
+            //双击 直接出牌
+            //判断可否出牌
+            if (player.waitSkip) {
+                this.restoreHandsPositionAndClickCount(-1);
+                this.room.hideTingDataView();
+            } else {
+                player.onPlayerDiscardTile(clickCtrl.tileID);
+                this.clearAllowedActionsView(false);
+            }
+        } else {
+            clickCtrl.doubleTimeEclipse = 0;
+            //第二次点击 缩回去
+            this.restoreHandPositionAndClickCount(index);
+        }
+    }
+    //处理玩家点击手牌按钮
+    public onHandTileBtnClick2(index: number): void {
+        const handsClickCtrls = this.handsClickCtrls;
 
         const player = this.player;
         if (player === null) {
@@ -846,14 +900,14 @@ export class PlayerView {
 
         clickCtrl.clickCount = clickCtrl.clickCount + 1;
         if (clickCtrl.clickCount === 1) {
-            this.restoreHandPositionAndClickCount(index);
+            this.restoreHandsPositionAndClickCount(index);
             this.moveHandUp(index);
         }
 
         if (clickCtrl.clickCount === 2) {
             //判断可否出牌
             if (player.waitSkip) {
-                this.restoreHandPositionAndClickCount(-1);
+                this.restoreHandsPositionAndClickCount(-1);
                 this.room.hideTingDataView();
             } else {
                 player.onPlayerDiscardTile(clickCtrl.tileID);
@@ -930,7 +984,7 @@ export class PlayerView {
             if (!enable) {
                 return;
             }
-            this.restoreHandPositionAndClickCount(index);
+            this.restoreHandsPositionAndClickCount(index);
             attachEffect(dragGo);
         };
         const moveFunction = () => {
@@ -971,7 +1025,7 @@ export class PlayerView {
     }
 
     //还原所有手牌到它初始化时候的位置，并把clickCount重置为0
-    public restoreHandPositionAndClickCount(index: number): void {
+    public restoreHandsPositionAndClickCount(index: number): void {
         for (let i = 0; i < 14; i++) {
             if (i !== index) {
                 const clickCtrl = this.handsClickCtrls[i];
@@ -979,8 +1033,18 @@ export class PlayerView {
                 const h = clickCtrl.h;
                 h.y = originPos.y;
                 clickCtrl.clickCount = 0;
+                clickCtrl.doubleTimeEclipse = 0;
             }
         }
+    }
+    //还原某个手牌到它初始化时候的位置，并把clickCount重置为0
+    public restoreHandPositionAndClickCount(i: number): void {
+        const clickCtrl = this.handsClickCtrls[i];
+        const originPos = this.handsOriginPos[i];
+        const h = clickCtrl.h;
+        h.y = originPos.y;
+        clickCtrl.clickCount = 0;
+        clickCtrl.doubleTimeEclipse = 0;
     }
 
     //隐藏听牌标志
@@ -1077,5 +1141,4 @@ export class PlayerView {
     public getUserInfoPos(): fgui.GObject {
         return this.userInfoPos;
     }
-
 }

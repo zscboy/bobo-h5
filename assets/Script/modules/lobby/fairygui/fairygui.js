@@ -4394,18 +4394,10 @@ window.__extends = (this && this.__extends) || (function () {
             else if (this.packageItem.scaleByTile)
                 this._content.type = cc.Sprite.Type.TILED;
             this._content.spriteFrame = this.packageItem.asset;
-            if (this._grayed) {
-                (this._content).setMaterial(0, cc.Material.getBuiltinMaterial('2d-gray-sprite'));
-            } else {
-                (this._content).setMaterial(0, cc.Material.getBuiltinMaterial('2d-sprite'));
-            }
+            GImage.switchGrayMaterial(this._grayed, this._content);
         };
         GImage.prototype.handleGrayedChanged = function () {
-            if (this._grayed) {
-                (this._content).setMaterial(0, cc.Material.getBuiltinMaterial('2d-gray-sprite'));
-            } else {
-                (this._content).setMaterial(0, cc.Material.getBuiltinMaterial('2d-sprite'));
-            }
+            GImage.switchGrayMaterial(this._grayed, this._content);
         };
         GImage.prototype.setup_beforeAdd = function (buffer, beginPos) {
             _super.prototype.setup_beforeAdd.call(this, buffer, beginPos);
@@ -4419,6 +4411,25 @@ window.__extends = (this && this.__extends) || (function () {
                 this._content.fillClockwise = buffer.readBool();
                 this._content.fillAmount = buffer.readFloat();
             }
+        };
+        GImage.switchGrayMaterial = function (useGrayMaterial, renderComp) {
+            var material;
+            if (useGrayMaterial) {
+                material = this._graySpriteMaterial;
+                if (!material) {
+                    material = cc.Material.getBuiltinMaterial('gray-sprite');
+                }
+                material = this._graySpriteMaterial = cc.Material.getInstantiatedMaterial(material, renderComp);
+            } else {
+                material = this._spriteMaterial;
+                if (!material) {
+                    material = cc.Material.getBuiltinMaterial('sprite', renderComp);
+                }
+                material = this._spriteMaterial = cc.Material.getInstantiatedMaterial(material, renderComp);
+                material.define('USE_TEXTURE', true);
+            }
+            material = cc.Material.getInstantiatedMaterial(material, renderComp);
+            renderComp.setMaterial(0, material);
         };
         return GImage;
     }(fgui.GObject));

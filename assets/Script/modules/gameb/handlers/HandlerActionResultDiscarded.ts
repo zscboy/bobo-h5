@@ -16,20 +16,21 @@ export namespace HandlerActionResultDiscarded {
         if (!isMe || room.isReplayMode()) {
             player.discardOutTileID(discardTileId);
         }
+        if (isMe) {
 
+            return;
+        }
         //清理吃牌界面
         room.cleanUI();
         //加到打出牌列表
         player.addDicardedTile(discardTileId);
         player.discarded2UI(true, actionResultMsg.waitDiscardReAction);
 
-        //logError("chatIsOn : "..tostring(Sound.GetToggle("chatIsOn")))
+        // if (isMe) {
+
+        //     return;
+        // }
         //如果打出去的牌是在本人的听牌列表中，要做一个减法
-        if (isMe) {
-
-            return;
-        }
-
         const readyHandList = me.readyHandList;
         if (readyHandList !== undefined && readyHandList.length > 0) {
             for (let i = 0; i < me.readyHandList.length; i += 2) {

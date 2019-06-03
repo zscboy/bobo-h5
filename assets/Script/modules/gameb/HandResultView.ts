@@ -107,7 +107,7 @@ export class HandResultView extends cc.Component {
             if (myPlayer.playerScore.score > 0) {
                 en = "Effect_jiemian_shengli";
             } else {
-                en = "Effect_jiemian_shengli";
+                en = "Effect_jiemian_shibai";
             }
         } else {
             en = "Effect_jiemian_huangzhuang";

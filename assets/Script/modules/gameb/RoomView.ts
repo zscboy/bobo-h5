@@ -33,7 +33,7 @@ export class RoomView {
     private multiOpsObj: fgui.GList;
     private listensDataList: TingPai[];
     private multiOpsDataList: proto.mahjong.IMsgMeldTile[];
-    private arrowObj: fgui.GObject;
+    private arrowObj: cc.Node;
     private actionMsg: proto.mahjong.MsgPlayerAction;
     private leftTime: number;
     private leftTimerCB: Function;
@@ -165,21 +165,25 @@ export class RoomView {
     }
     //显示出牌提示箭头
     public setArrowByParent(btn: fgui.GComponent): void {
-        if (btn == null) {
+        if (btn === null) {
             //隐藏出牌提示箭头
             if (this.arrowObj !== undefined && this.arrowObj !== null) {
-                this.arrowObj.visible = false;
+                this.arrowObj.active = false;
             }
 
             return;
         }
         const pos = btn.getChild("pos");
-        const x = pos.x;
-        const y = pos.y;
-        Logger.debug("ss", x, y);
-        // this.arrowObj = animation.play("animations/Effects_UI_jiantou.prefab", btn, x, y, true);
+        const op = {
+            onCreate: (n: cc.Node) => {
+                // n.scale = pos.node.scale;
+                // n.active = true;
+                this.arrowObj = n;
+            }
+        };
+        this.room.getRoomHost().animationMgr.play(`lobby/prefabs/mahjong/Effect_jiantou`, pos.node, op);
         // this.arrowObj.wrapper.scale = pos.scale;
-        // this.arrowObj.setVisible(true);
+        // this.arrowObj.visible = true;
     }
     public setJiaJiaZhuang(): void {
         Logger.debug("家家庄");

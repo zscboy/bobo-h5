@@ -545,7 +545,7 @@ export class PlayerView {
 
         //如果是新打出的牌，给加一个箭头
         if (newDiscard) {
-            const d = discards[tileCount % dCount];
+            const d = discards[tileCount - 1 % dCount];
             this.room.setArrowByParent(d);
 
             //放大打出去的牌

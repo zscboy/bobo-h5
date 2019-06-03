@@ -408,20 +408,6 @@ export class Player {
         //}
     }
 
-    //播放吃碰杠胡听音效
-    public playOperationSound(str: string): void {
-        Logger.debug("播放吃碰杠胡听音效: ", str);
-        //const soundName = ""
-        // if this.gender == 1 {
-        //soundName = directory.. "/boy/"..effectName
-        // else
-        //soundName = directory.. "/girl/"..effectName
-        //}
-        //dfCompatibleAPI. soundPlay(soundName)
-        //执行音效
-        //dfCompatibleAPI. soundPlay("effect/"..SoundDef.Common)
-    }
-
     //绑定playerView
     //主要是关联playerView，以及显示playerVIew
     public bindView(playerView: PlayerView): void {
@@ -487,11 +473,6 @@ export class Player {
         //}
     }
 
-    public myDiscardAction(tileID: number): void {
-        this.discardOutTileID(tileID);
-        this.playerView.enlargeDiscarded(tileID, true);
-    }
-
     public onBankerReadyHandClicked(): boolean {
         //检查是否选择了牌打出去
         const handsClickCtrls = this.playerView.handsClickCtrls;
@@ -499,7 +480,7 @@ export class Player {
             const clickCtrl = handsClickCtrls[i];
             if (clickCtrl.clickCount === 1) {
                 //检查选择了的牌是否可以听
-                if (clickCtrl.readyHandList != null && clickCtrl.readyHandList.length > 0) {
+                if (clickCtrl.readyHandList !== undefined && clickCtrl.readyHandList !== null && clickCtrl.readyHandList.length > 0) {
                     //如果此牌可以听
                     //发送打牌的消息包，把flag设置1，服务器就知道庄家选择了打牌并且听牌
                     const actionMsg = new proto.mahjong.MsgPlayerAction();
@@ -688,16 +669,6 @@ export class Player {
 
         this.playerView.clearAllowedActionsView(false);
     }
-    public selectMeldFromMeldsForAction(ms: proto.mahjong.IMsgMeldTile[], ty: number): proto.mahjong.IMsgMeldTile[] {
-        const r: proto.mahjong.IMsgMeldTile[] = [];
-        for (const m of ms) {
-            if (m.meldType === ty) {
-                r.push(m);
-            }
-        }
-
-        return r;
-    }
 
     //玩家选择了胡牌
     //当上下文是allowedActionMsg时，表示自摸胡牌
@@ -769,15 +740,10 @@ export class Player {
 
             this.playerView.clearAllowedActionsView(discardAble);
             //重置手牌位置
-            this.playerView.restoreHandPositionAndClickCount(-1);
+            this.playerView.restoreHandsPositionAndClickCount(-1);
             //设置一个标志，表示已经点击了动作按钮（吃碰杠胡过）
             this.waitSkip = false;
         }
-    }
-
-    public sendActionMsg(actionMsg: proto.mahjong.MsgPlayerAction): void {
-        const actionMsgBuf = proto.mahjong.MsgPlayerAction.encode(actionMsg);
-        this.host.sendActionMsg(actionMsgBuf);
     }
 
     //执行自动打牌操作
@@ -816,6 +782,7 @@ export class Player {
     public onPlayerDiscardTile(tileID: number): boolean {
         //const host = this.host
         if (this.allowedActionMsg != null) {
+            this.discardToDeskOfMe(tileID);
             const actionMsg = new proto.mahjong.MsgPlayerAction();
             actionMsg.qaIndex = this.allowedActionMsg.qaIndex;
             actionMsg.action = mjproto.ActionType.enumActionType_DISCARD;
@@ -850,7 +817,7 @@ export class Player {
 
     public updateReadyHandList(readyHandList: number[]): void {
         this.readyHandList = readyHandList;
-        if (this.readyHandList != null && this.readyHandList.length > 0) {
+        if (this.readyHandList !== undefined && this.readyHandList !== null && this.readyHandList.length > 0) {
             this.playerView.checkReadyHandBtn.visible = true;
         } else {
             this.playerView.checkReadyHandBtn.visible = false;
@@ -877,5 +844,48 @@ export class Player {
         }
 
         playerInfoView.showUserInfoView(roomHost, this.playerInfo, pos, this.isMe() === false);
+    }
+
+    //播放吃碰杠胡听音效
+    private playOperationSound(str: string): void {
+        Logger.debug("播放吃碰杠胡听音效: ", str);
+        //const soundName = ""
+        // if this.gender == 1 {
+        //soundName = directory.. "/boy/"..effectName
+        // else
+        //soundName = directory.. "/girl/"..effectName
+        //}
+        //dfCompatibleAPI. soundPlay(soundName)
+        //执行音效
+        //dfCompatibleAPI. soundPlay("effect/"..SoundDef.Common)
+    }
+
+    private myDiscardAction(tileID: number): void {
+        this.discardOutTileID(tileID);
+        this.playerView.enlargeDiscarded(tileID, true);
+    }
+    private selectMeldFromMeldsForAction(ms: proto.mahjong.IMsgMeldTile[], ty: number): proto.mahjong.IMsgMeldTile[] {
+        const r: proto.mahjong.IMsgMeldTile[] = [];
+        for (const m of ms) {
+            if (m.meldType === ty) {
+                r.push(m);
+            }
+        }
+
+        return r;
+    }
+
+    private discardToDeskOfMe(discardTileId: number): void {
+        //自己打出去的牌 先显示到桌面  服务器回复之后 就不再操作桌面了
+        //清理吃牌界面
+        this.host.cleanUI();
+        //加到打出牌列表
+        this.addDicardedTile(discardTileId);
+        this.discarded2UI(true, false);
+    }
+
+    private sendActionMsg(actionMsg: proto.mahjong.MsgPlayerAction): void {
+        const actionMsgBuf = proto.mahjong.MsgPlayerAction.encode(actionMsg);
+        this.host.sendActionMsg(actionMsgBuf);
     }
 }

@@ -2,9 +2,11 @@ import { GResLoader } from "./LDataType";
 import { Logger } from "./Logger";
 
 type AnimationPlayFinished = (error: Error) => void;
+type AnimationCreated = (n: cc.Node) => void;
 
 export interface AnimationPlayOptions {
     onFinished?: AnimationPlayFinished;
+    onCreate?: AnimationCreated;
 }
 
 interface AnimationHolder {
@@ -49,9 +51,14 @@ export class AnimationMgr {
     }
 
     public play(prefabName: string, mountNode: cc.Node, options?: AnimationPlayOptions): void {
+        const hasCallback = options !== undefined &&
+            options.onFinished !== undefined && options.onFinished !== null;
+
+        const hasCreateNotify = options !== undefined &&
+            options.onCreate !== undefined && options.onCreate !== null;
+
         const cb = (error: Error) => {
-            if (options !== undefined &&
-                options.onFinished !== undefined && options.onFinished !== null) {
+            if (hasCallback) {
                 options.onFinished(error);
             }
         };
@@ -75,14 +82,20 @@ export class AnimationMgr {
                 mountNode.active = true;
                 n.active = true;
 
+                if (hasCreateNotify) {
+                    options.onCreate(n);
+                }
+
                 animation.off(cc.Animation.EventType.FINISHED);
                 animation.stop();
                 animation.play();
 
-                animation.on(cc.Animation.EventType.FINISHED, () => {
-                    Logger.debug("AnimationMgr.play FINISHED:", prefabName);
-                    cb(null);
-                });
+                if (hasCallback) {
+                    animation.on(cc.Animation.EventType.FINISHED, () => {
+                        Logger.debug("AnimationMgr.play FINISHED:", prefabName);
+                        cb(null);
+                    });
+                }
             }
         });
     }

@@ -33,6 +33,7 @@ export class GameOverResultView extends cc.Component {
     private maxChucker: number = 0;
     private maxChuckerIndexs: ViewGroup[];
     private contentGroup: ViewGroup[];
+    private aniPos: fgui.GObject;
 
     public showView(room: RoomInterface, msgGameOver: proto.mahjong.IMsgGameOver): void {
         // -- 提高消息队列的优先级为1
@@ -67,7 +68,7 @@ export class GameOverResultView extends cc.Component {
         // const x = this.aniPos.x
         // const y = this.aniPos.y
         // animation.play("animations/Effects_jiemian_paijvzongjiesuan.prefab", this.unityViewNode, x, y, true)
-
+        this.room.getRoomHost().animationMgr.play(`lobby/prefabs/mahjong/Effect_zi_jiesuan`, this.aniPos.node);
         //日期时间
         // const date = os.date("%Y-%m-%d %H:%M:%S")
         // this.textTime.text = date
@@ -189,7 +190,7 @@ export class GameOverResultView extends cc.Component {
         //房间信息
         this.textRoomNumber = this.unityViewNode.getChild("roomNumber");
         //特效位置节点
-        // this.aniPos = self.unityViewNode:GetChild("aniPos")
+        this.aniPos = this.unityViewNode.getChild("aniPos");
         const contentGroup: ViewGroup[] = [];
         for (let i = 0; i < 4; i++) {
             const contentGroupData = new ViewGroup();

@@ -8,6 +8,7 @@ export class ClickCtrl {
     public tileID: number;
     public h: fgui.GComponent;
     public clickCount: number;
+    public doubleTimeEclipse: number;
     public t: fgui.GObject;
     public isGray: boolean;
     public readyHandList: number[];

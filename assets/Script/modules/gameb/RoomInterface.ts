@@ -7,6 +7,7 @@ import { proto } from "./proto/protoGame";
  * Room host
  */
 export interface RoomHost {
+    timeElapsed: number;
     animationMgr: AnimationMgr;
     room: RoomInterface;
     quit: Function;

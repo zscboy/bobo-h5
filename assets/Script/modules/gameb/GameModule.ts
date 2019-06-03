@@ -21,6 +21,8 @@ export class GameModule extends cc.Component implements GameModuleInterface {
 
     public loader: GResLoader;
 
+    public timeElapsed: number = 0;
+
     private view: fgui.GComponent;
 
     private ws: WS;
@@ -111,6 +113,10 @@ export class GameModule extends cc.Component implements GameModuleInterface {
         this.view.dispose();
 
         this.lm.returnFromGame();
+    }
+
+    protected update(dt: number): void {
+        this.timeElapsed += dt;
     }
 
     private async tryEnterRoom(

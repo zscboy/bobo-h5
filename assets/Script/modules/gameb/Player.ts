@@ -480,7 +480,7 @@ export class Player {
             const clickCtrl = handsClickCtrls[i];
             if (clickCtrl.clickCount === 1) {
                 //检查选择了的牌是否可以听
-                if (clickCtrl.readyHandList != null && clickCtrl.readyHandList.length > 0) {
+                if (clickCtrl.readyHandList !== undefined && clickCtrl.readyHandList !== null && clickCtrl.readyHandList.length > 0) {
                     //如果此牌可以听
                     //发送打牌的消息包，把flag设置1，服务器就知道庄家选择了打牌并且听牌
                     const actionMsg = new proto.mahjong.MsgPlayerAction();
@@ -817,7 +817,7 @@ export class Player {
 
     public updateReadyHandList(readyHandList: number[]): void {
         this.readyHandList = readyHandList;
-        if (this.readyHandList != null && this.readyHandList.length > 0) {
+        if (this.readyHandList !== undefined && this.readyHandList !== null && this.readyHandList.length > 0) {
             this.playerView.checkReadyHandBtn.visible = true;
         } else {
             this.playerView.checkReadyHandBtn.visible = false;

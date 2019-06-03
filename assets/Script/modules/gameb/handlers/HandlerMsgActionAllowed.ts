@@ -8,6 +8,13 @@ import { RoomInterface } from "../RoomInterface";
  * 响应服务器请求客户端动作
  */
 export namespace HandlerMsgActionAllowed {
+    export const showButton = (needShowOperationButtons: boolean, p: Player, buttonMap: string[]): void => {
+        if (needShowOperationButtons) {
+            p.waitSkip = true; //这个标志用来判断可否出牌，当点击了动作按钮之后flagsAction会设置为true，这时候才可以出牌
+            p.playerView.showButton(buttonMap);
+        }
+    };
+
     const processMyAllowedActions =
         (msg: proto.mahjong.MsgAllowPlayerAction, p: Player): void => {
             const actions = msg.allowedActions;
@@ -88,7 +95,7 @@ export namespace HandlerMsgActionAllowed {
                             if (discardAbleTile !== undefined) {
                                 handsClickCtrl.isDiscardable = true;
                                 let readyHandList = discardAbleTile.readyHandList;
-                                if (readyHandList === undefined || readyHandList.length === 0) { //加入可听列表，空表示不可听
+                                if (readyHandList === undefined || readyHandList === null || readyHandList.length === 0) { //加入可听列表，空表示不可听
                                     readyHandList = [];
                                 }
                                 handsClickCtrl.t.visible = readyHandList.length > 0;
@@ -102,10 +109,7 @@ export namespace HandlerMsgActionAllowed {
                     }
                 }
             }
-            if (needShowOperationButtons) {
-                p.waitSkip = true; //这个标志用来判断可否出牌，当点击了动作按钮之后flagsAction会设置为true，这时候才可以出牌
-                playerView.showButton(buttonMap);
-            }
+            showButton(needShowOperationButtons, p, buttonMap);
         };
     export const onMsg = async (msgData: ByteBuffer, room: RoomInterface): Promise<void> => {
         const allowedActionMsg = proto.mahjong.MsgAllowPlayerAction.decode(msgData);

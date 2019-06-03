@@ -32,7 +32,7 @@ export namespace HandlerActionResultDiscarded {
         // }
         //如果打出去的牌是在本人的听牌列表中，要做一个减法
         const readyHandList = me.readyHandList;
-        if (readyHandList !== undefined && readyHandList.length > 0) {
+        if (readyHandList !== undefined && readyHandList !== null && readyHandList.length > 0) {
             for (let i = 0; i < me.readyHandList.length; i += 2) {
                 if (readyHandList[i] === discardTileId) {
                     if (readyHandList[i + 1] > 1) {

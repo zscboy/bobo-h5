@@ -7,7 +7,10 @@ interface PropData {
     num: number;
     id: number;
 }
-
+interface RoomHost {
+    loader: GResLoader;
+    // sendDonate(donateId: number, toChairID: number): void;
+}
 interface PlayerInfo {
     userID: string;
     chairID: number;
@@ -26,9 +29,6 @@ interface PlayerInfo {
     dan?: number;
 }
 
-interface RoomHost {
-    loader: GResLoader;
-}
 /**
  * 玩家信息
  */

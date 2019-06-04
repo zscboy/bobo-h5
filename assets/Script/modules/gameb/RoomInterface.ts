@@ -17,6 +17,7 @@ export interface RoomHost {
     component: cc.Component;
     loader: GResLoader;
     sendBinary(buf: ByteBuffer): void;
+    // sendDonate(donateId: number, toChairID: number): void;
 }
 
 /**

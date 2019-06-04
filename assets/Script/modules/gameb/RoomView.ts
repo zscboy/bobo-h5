@@ -431,6 +431,12 @@ export class RoomView {
         this.multiOpsObj = this.meldOpsPanel.getChild("list").asList;
         this.multiOpsObj.itemRenderer = <(index: number, item: fgui.GComponent) => void>this.renderMultiOpsListItem.bind(this);
         this.multiOpsObj.on(fgui.Event.CLICK_ITEM, (onClickItem: fgui.GObject) => { this.onMeldOpsClick(onClickItem.name); }, this);
+        const cancelBtn = this.meldOpsPanel.getChild("cancelBtn");
+        const cancelOnClick = () => {
+            this.meldOpsPanel.visible = false;
+            this.playerViews[1].showButton([]);
+        };
+        cancelBtn.onClick(cancelOnClick, this);
     }
 
     private renderMultiOpsListItem(index: number, obj: fgui.GComponent): void {

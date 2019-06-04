@@ -18,10 +18,6 @@ export class MemberManagerView extends cc.Component {
     private memberApplyPage: fgui.GComponent;
     private memberDeletePage: fgui.GComponent;
 
-    private recordList: fgui.GList;
-
-    private records: proto.club.MsgClubLoadEventsReply[] = [];
-
     public getEventTarget(): cc.EventTarget {
         return this.eventTarget;
     }
@@ -40,7 +36,7 @@ export class MemberManagerView extends cc.Component {
         const loader = lm.loader;
         loader.fguiAddPackage("lobby/fui_club/lobby_club");
 
-        const view = fgui.UIPackage.createObject("lobby_club", "applyRecord").asCom;
+        const view = fgui.UIPackage.createObject("lobby_club", "memberManager").asCom;
         this.view = view;
 
         const win = new fgui.Window();
@@ -86,10 +82,6 @@ export class MemberManagerView extends cc.Component {
         Logger.debug(this.memberListPage);
         Logger.debug(this.memberApplyPage);
         Logger.debug(this.memberDeletePage);
-        this.recordList.itemRenderer = (index: number, item: fgui.GObject) => {
-            this.renderPhraseListItem(index, item);
-        };
-        this.recordList.setVirtual();
 
     }
 
@@ -106,19 +98,15 @@ export class MemberManagerView extends cc.Component {
         //
     }
 
-    private renderPhraseListItem(index: number, obj: fgui.GObject): void {
-
-        const record = this.records[index];
-        Logger.debug(record);
-
-    }
+    // private renderPhraseListItem(index: number, obj: fgui.GObject): void {
+    //     //
+    // }
 
     private loadMember(): void {
         //
 
         const tk = DataStore.getString("token", "");
         const loadEmailUrl = `${LEnv.rootURL}${LEnv.loadClubMembers}?&tk=${tk}&clubID=${this.clubInfo.baseInfo.clubID}`;
-        const msg: string = "正在拉取记录...";
 
         const cb = (xhr: XMLHttpRequest, err: string) => {
             //
@@ -126,7 +114,7 @@ export class MemberManagerView extends cc.Component {
             this.updateApplyList();
         };
 
-        this.clubRequest(loadEmailUrl, msg, cb);
+        this.clubRequest(loadEmailUrl, cb);
 
     }
 
@@ -135,7 +123,6 @@ export class MemberManagerView extends cc.Component {
 
         const tk = DataStore.getString("token", "");
         const loadEmailUrl = `${LEnv.rootURL}${LEnv.loadClubEvents}?&tk=${tk}&clubID=${this.clubInfo.baseInfo.clubID}&cursor=${0}`;
-        const msg: string = "正在拉取记录...";
 
         const cb = (xhr: XMLHttpRequest, err: string) => {
             //
@@ -143,7 +130,7 @@ export class MemberManagerView extends cc.Component {
             this.updateApplyList();
         };
 
-        this.clubRequest(loadEmailUrl, msg, cb);
+        this.clubRequest(loadEmailUrl, cb);
 
     }
 
@@ -157,13 +144,9 @@ export class MemberManagerView extends cc.Component {
      * @param msg 滚动圈弹的信息
      * @param cb 回调
      */
-    private clubRequest(url: string, msg: string, cb: Function): void {
+    private clubRequest(url: string, cb: Function): void {
         if (url === null) {
             return null;
-        }
-
-        if (msg !== null) {
-            Dialog.showDialog(msg);
         }
 
         Logger.debug("emailRequest url = ", url);

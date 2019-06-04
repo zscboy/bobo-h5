@@ -181,8 +181,6 @@ export class EmailView extends cc.Component {
     private loadEmail(): void {
         const tk = DataStore.getString("token", "");
         const loadEmailUrl = `${LEnv.rootURL}${LEnv.loadMails}?&rt=1&tk=${tk}`;
-        const msg = "正在拉取邮件......";
-
         const cb = (xhr: XMLHttpRequest, err: string) => {
 
             let errMsg;
@@ -203,7 +201,7 @@ export class EmailView extends cc.Component {
 
         };
 
-        this.emailRequest(loadEmailUrl, msg, cb);
+        this.emailRequest(loadEmailUrl, cb);
 
     }
 
@@ -264,7 +262,7 @@ export class EmailView extends cc.Component {
             }
         };
 
-        this.emailRequest(setReadEmailUrl, null, cb);
+        this.emailRequest(setReadEmailUrl, cb);
 
     }
 
@@ -296,7 +294,7 @@ export class EmailView extends cc.Component {
             }
         };
 
-        this.emailRequest(setReadEmailUrl, null, cb);
+        this.emailRequest(setReadEmailUrl, cb);
     }
 
     /**
@@ -305,14 +303,10 @@ export class EmailView extends cc.Component {
      * @param msg 滚动圈弹的信息
      * @param cb 回调
      */
-    private emailRequest(url: string, msg: string, cb: Function): void {
+    private emailRequest(url: string, cb: Function): void {
         if (url === null) {
             return null;
         }
-
-        // if (msg !== null) {
-        //     Dialog.showDialog(msg);
-        // }
 
         Logger.debug("emailRequest url = ", url);
 

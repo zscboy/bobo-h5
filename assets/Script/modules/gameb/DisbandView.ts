@@ -100,7 +100,7 @@ export class DisbandView extends cc.Component {
                     this.showButtons(false);
 
                     return;
-                } else {
+            } else {
                     this.myCountDown.visible = false;
                     this.showButtons(true);
                 }

@@ -81,14 +81,13 @@ export class ApplyRecordView extends cc.Component {
 
         const tk = DataStore.getString("token", "");
         const loadEmailUrl = `${LEnv.rootURL}${LEnv.loadClubEvents}?&tk=${tk}`;
-        const msg: string = "正在拉取记录...";
 
         const cb = (xhr: XMLHttpRequest, err: string) => {
             //
 
         };
 
-        this.clubRequest(loadEmailUrl, msg, cb);
+        this.clubRequest(loadEmailUrl, cb);
 
     }
 
@@ -98,13 +97,9 @@ export class ApplyRecordView extends cc.Component {
      * @param msg 滚动圈弹的信息
      * @param cb 回调
      */
-    private clubRequest(url: string, msg: string, cb: Function): void {
+    private clubRequest(url: string, cb: Function): void {
         if (url === null) {
             return null;
-        }
-
-        if (msg !== null) {
-            Dialog.showDialog(msg);
         }
 
         Logger.debug("emailRequest url = ", url);

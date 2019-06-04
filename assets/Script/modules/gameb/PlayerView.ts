@@ -1119,8 +1119,7 @@ export class PlayerView {
 
     //特效道具播放
     public playerDonateEffect(effectName: string): void {
-        // const pos = this.head.headView
-        // animation.play("animations/" + effectName + ".prefab", this.myView, pos.x, pos.y)
+        // this.roomHost.animationMgr.play(`lobby/prefabs/mahjong/${effectName}`, this.head.headView.node);
     }
     //起手听特效播放
     public playReadyHandEffect(): void {

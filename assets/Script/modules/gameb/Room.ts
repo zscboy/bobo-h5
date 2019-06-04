@@ -312,11 +312,10 @@ export class Room {
 
     // 显示道具动画
     public showDonate(msgDonate: proto.mahjong.MsgDonate): void {
-        // logger.debug("显示道具动画 msgDonate : ", msgDonate)
+        // Logger.debug("显示道具动画 msgDonate : ", msgDonate);
         if (msgDonate != null) {
             const itemID = msgDonate.itemID;
             const oCurOpObj = this.roomView.donateMoveObj;
-
             const fromPlayer = this.getPlayerByChairID(msgDonate.fromChairID);
             const toPlayer = this.getPlayerByChairID(msgDonate.toChairID);
             if (fromPlayer == null || toPlayer == null) {
@@ -324,13 +323,8 @@ export class Room {
 
                 return;
             }
-            const fromX = fromPlayer.playerView.head.headView.x;
-            const fromY = fromPlayer.playerView.head.headView.y;
-            // const toX = toPlayer.playerView.head.headView.x;
-            // const toY = toPlayer.playerView.head.headView.y;
-            // logger.debug("目标位置 toX : ", toX, " ; toY : ", toY)
-            oCurOpObj.setPosition(fromX, fromY);
-            oCurOpObj.visible = true;
+            const fromPos = fromPlayer.playerView.head.headView.node.position;
+            const toPos = toPlayer.playerView.head.headView.node.position;
             let sprite = "";
             let effobjSUB = "";
             // const sound = null
@@ -369,30 +363,30 @@ export class Room {
                 }
             ];
 
-            const fn = handTypeMap[itemID + 1];
+            const fn = handTypeMap[itemID - 1];
             fn();
             if (sprite == null || effobjSUB == null) {
                 Logger.debug("llwant, sprite || effobjSUB is null...");
 
                 return;
             }
+            oCurOpObj.node.position = fromPos;
             oCurOpObj.url = `ui://lobby_player_info/${sprite}`;
+            oCurOpObj.visible = true;
             //飞动画
-            // oCurOpObj.TweenMove({ x = toX, y = toY }, 1);
-            // this.roomView.unityViewNode: DelayRun(
-            //     1,
-            //     function () {
-            //         //飞完之后的回调
-            //         //飞完之后 关闭oCurOpObj
-            //         oCurOpObj.visible = false
-            //         //播放特效
-            //         toPlayer.playerView.playerDonateEffect(effobjSUB)
-            //         //播放声音
-            //         // if sound != null {
-            //         // dfCompatibleAPI:soundPlay("daoju/" .. sound)
-            //         // }
-            //     }
-            // )
+            const moveAnimation = cc.moveTo(2, toPos);
+            oCurOpObj.node.runAction(moveAnimation);
+            const callBack = () => {
+                //飞完之后 关闭oCurOpObj
+                oCurOpObj.visible = false;
+                //播放特效
+                toPlayer.playerView.playerDonateEffect(effobjSUB);
+                //播放声音
+                // if sound != null {
+                // dfCompatibleAPI:soundPlay("daoju/" .. sound)
+                // }
+            };
+            this.getRoomHost().component.scheduleOnce(callBack, 2);
         }
     }
     //roomview 接口

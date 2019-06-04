@@ -7,14 +7,18 @@ import { RoomInterface } from "./RoomInterface";
 export class SettingView extends cc.Component {
 
     private view: fgui.GComponent;
-    private win: fgui.Window;
-
     private eventTarget: cc.EventTarget;
 
     private room: RoomInterface;
 
-    public saveRoomView(room: RoomInterface): void {
+    public showView(room: RoomInterface): void {
         this.room = room;
+        if (this.view !== null) {
+            // this.room = room;
+            fgui.GRoot.inst.showPopup(this.view);
+            this.view.setPosition(0, 0);
+
+        }
     }
 
     protected onLoad(): void {
@@ -24,21 +28,13 @@ export class SettingView extends cc.Component {
         const view = fgui.UIPackage.createObject("dafeng", "setting").asCom;
         this.view = view;
 
-        const win = new fgui.Window();
-        win.contentPane = view;
-        win.modal = true;
-
-        this.win = win;
-        this.win.show();
-
         this.initView();
     }
 
     protected onDestroy(): void {
 
         this.eventTarget.emit("destroy");
-        this.win.hide();
-        this.win.dispose();
+        this.view.dispose();
     }
 
     private onCloseClick(): void {

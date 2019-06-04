@@ -286,7 +286,7 @@ export class RoomView {
     private onSettingBtnClick(): void {
         // Logger.debug("onSettingBtnClick---------------");
         const settingView = this.component.addComponent(SettingView);
-        settingView.saveRoomView(this.room);
+        settingView.showView(this.room);
     }
 
     /**

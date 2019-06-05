@@ -1,4 +1,4 @@
-import { DataStore, Dialog, HTTP, LEnv, LobbyModuleInterface, Logger } from "../../lcore/LCoreExports";
+import { DataStore, HTTP, LEnv, LobbyModuleInterface, Logger } from "../../lcore/LCoreExports";
 import { proto } from "../../proto/protoLobby";
 
 const { ccclass } = cc._decorator;
@@ -65,7 +65,7 @@ export class ApplyRecordView extends cc.Component {
         };
         this.recordList.setVirtual();
 
-        //拉取邮件
+        //拉取记录
         this.loadRecord();
     }
 
@@ -102,10 +102,9 @@ export class ApplyRecordView extends cc.Component {
             return null;
         }
 
-        Logger.debug("emailRequest url = ", url);
+        Logger.debug("clubRequest url = ", url);
 
         HTTP.hGet(this.eventTarget, url, (xhr: XMLHttpRequest, err: string) => {
-            Dialog.hideDialog();
             cb(xhr, err);
         });
     }

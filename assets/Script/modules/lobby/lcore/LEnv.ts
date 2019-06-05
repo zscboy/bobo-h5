@@ -45,6 +45,8 @@ export namespace LEnv {
 
     export const loadClubRooms = "/lobby/uuid/loadClubRooms";
 
+    export const deleteMembers = "/lobby/uuid/loadClubRooms";
+
     export const cfmt = (str: string, ...args: any[]): string => { // tslint:disable-line:no-any
         return str.replace(/{(\d+)}/g, (match, n) => {
             return (typeof args[n]) !== "undefined"

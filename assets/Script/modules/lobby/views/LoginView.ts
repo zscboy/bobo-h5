@@ -156,13 +156,18 @@ export class LoginView extends cc.Component {
     public showLoginErrMsg(errCode: number): void {
         const lobby = proto.lobby;
         const errMsgMap: { [key: string]: string } = {
-            [lobby.LoginError.ErrParamWechatCodeIsEmpty]: "获取微信code失败",
-            [lobby.LoginError.ErrLoadWechatUserInfoFailed]: "获取微信用户信息失败",
+            [lobby.LoginError.ErrLoginSuccess]: "成功",
+            [lobby.LoginError.ErrParamDecode]: "微信登录,参数解码失败",
+            [lobby.LoginError.ErrParamInvalidCode]: "微信登录,无效的code",
+            [lobby.LoginError.ErrParamInvalidEncrypteddata]: "微信登录,无效的encrypteddata",
+            [lobby.LoginError.ErrParamInvalidIv]: "微信登录,无效的Iv",
+            [lobby.LoginError.ErrWxAuthFailed]: "微信登录,code认证失败",
+            [lobby.LoginError.ErrDecodeUserInfoFailed]: "微信登录，解码用户信息失败",
             [lobby.LoginError.ErrParamAccountIsEmpty]: "输入账号不能为空",
             [lobby.LoginError.ErrParamPasswordIsEmpty]: "输入密码不能为空",
             [lobby.LoginError.ErrAccountNotExist]: "输入账号不存在",
             [lobby.LoginError.ErrAccountNotSetPassword]: "账号没有设置密码，不能登录",
-            [lobby.LoginError.ErrPasswordNotMatch]: "账号没有设置密码，不能登录"
+            [lobby.LoginError.ErrPasswordNotMatch]: "密码不匹配，不能登录"
         };
 
         let errMsg = errMsgMap[errCode];

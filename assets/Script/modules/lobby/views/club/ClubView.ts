@@ -338,10 +338,10 @@ export class ClubView extends cc.Component {
     private updateSelectedClub(selectedClub: proto.club.IMsgClubInfo): void {
         this.selectedClub = selectedClub;
 
-        this.loadClubMembers(selectedClub.baseInfo.clubID);
+        this.loadClubRooms(selectedClub.baseInfo.clubID);
     }
 
-    private loadClubMembers(clubId: string): void {
+    private loadClubRooms(clubId: string): void {
         const tk = DataStore.getString("token", "");
         const loadEmailUrl = `${LEnv.rootURL}${LEnv.loadClubRooms}?&tk=${tk}&clubID=${clubId}`;
 
@@ -418,10 +418,9 @@ export class ClubView extends cc.Component {
             return null;
         }
 
-        Logger.debug("emailRequest url = ", url);
+        Logger.debug("clubRequest url = ", url);
 
         HTTP.hGet(this.eventTarget, url, (xhr: XMLHttpRequest, err: string) => {
-            Dialog.hideDialog();
             cb(xhr, err);
         });
     }

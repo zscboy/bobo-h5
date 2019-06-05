@@ -140,10 +140,9 @@ export class CreateClubView extends cc.Component {
             return null;
         }
 
-        Logger.debug("emailRequest url = ", url);
+        Logger.debug("clubRequest url = ", url);
 
         HTTP.hGet(this.eventTarget, url, (xhr: XMLHttpRequest, err: string) => {
-            Dialog.hideDialog();
             cb(xhr, err);
         });
     }

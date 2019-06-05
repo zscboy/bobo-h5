@@ -143,7 +143,6 @@ export class GameRecordView extends cc.Component {
         // Dialog.showDialog("正在加载战绩......");
 
         HTTP.hGet(this.eventTarget, loadGameRecordUrl, (xhr: XMLHttpRequest, err: string) => {
-            // Dialog.hideDialog();
 
             let errMsg;
             if (err !== null) {

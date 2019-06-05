@@ -49,8 +49,7 @@ export namespace LEnv {
 
     export const loadClubRooms = "/lobby/uuid/loadClubRooms";
 
-    // tslint:disable-next-line:no-any
-    export const cfmt = (str: string, ...args: any[]): string => {
+    export const cfmt = (str: string, ...args: any[]): string => { // tslint:disable-line:no-any
         return str.replace(/{(\d+)}/g, (match, n) => {
             return (typeof args[n]) !== "undefined"
                 ? args[n]  // tslint:disable-line:no-unsafe-any

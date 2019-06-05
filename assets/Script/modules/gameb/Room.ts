@@ -316,6 +316,7 @@ export class Room {
         if (msgDonate != null) {
             const itemID = msgDonate.itemID;
             const oCurOpObj = this.roomView.donateMoveObj;
+            // this.roomView.donateMoveObj.node.clone .cloneNode();
             const fromPlayer = this.getPlayerByChairID(msgDonate.fromChairID);
             const toPlayer = this.getPlayerByChairID(msgDonate.toChairID);
             if (fromPlayer == null || toPlayer == null) {
@@ -331,35 +332,35 @@ export class Room {
             const handTypeMap = [
                 () => {
                     sprite = "dj_meigui";
-                    effobjSUB = "Effects_daojv_hua";
+                    effobjSUB = "Effect_baojv_hua";
                 },
                 () => {
                     sprite = "dj_ganbei";
-                    effobjSUB = "Effects_daojv_jiubei";
+                    effobjSUB = "Effect_daojv_jiubei";
                 },
                 () => {
                     sprite = "dj_jd";
-                    effobjSUB = "Effects_daojv_jidan";
+                    effobjSUB = "Effect_daojv_jidan";
                 },
                 () => {
                     sprite = "dj_tuoxie";
-                    effobjSUB = "Effects_daojv_tuoxie";
+                    effobjSUB = "Effect_daojv_tuoxie";
                 },
                 () => {
                     sprite = "dj_qj";
-                    effobjSUB = "Effects_daojv_quanji";
+                    effobjSUB = "Effect_daojv_quanji";
                 },
                 () => {
                     sprite = "dj_bb";
-                    effobjSUB = "Effects_daojv_shiren";
+                    effobjSUB = "Effect_daojv_shiren";
                 },
                 () => {
                     sprite = "dj_hj";
-                    effobjSUB = "Effects_daojv_hongjiu";
+                    effobjSUB = "Effect_daojv_hongjiu";
                 },
                 () => {
                     sprite = "dj_mmd";
-                    effobjSUB = "Effects_daojv_zui";
+                    effobjSUB = "Effect_daojv_zui";
                 }
             ];
 
@@ -374,7 +375,7 @@ export class Room {
             oCurOpObj.url = `ui://lobby_player_info/${sprite}`;
             oCurOpObj.visible = true;
             //飞动画
-            const moveAnimation = cc.moveTo(2, toPos);
+            const moveAnimation = cc.moveTo(1, toPos);
             oCurOpObj.node.runAction(moveAnimation);
             const callBack = () => {
                 //飞完之后 关闭oCurOpObj
@@ -386,7 +387,7 @@ export class Room {
                 // dfCompatibleAPI:soundPlay("daoju/" .. sound)
                 // }
             };
-            this.getRoomHost().component.scheduleOnce(callBack, 2);
+            this.getRoomHost().component.scheduleOnce(callBack, 1);
         }
     }
     //roomview 接口

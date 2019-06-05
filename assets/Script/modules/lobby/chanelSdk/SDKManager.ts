@@ -1,7 +1,6 @@
+import { Enum, LEnv } from "../lcore/LCoreExports";
 import { SDKInterface } from "./SDKInterface";
 import { WeiXinSDK } from "./wxSdk/WeiXinSDK";
-import { Enum } from "../common/Enum";
-import { LEnv } from "../lobby/lcore/LEnv";
 
 /**
  * sdk管理器

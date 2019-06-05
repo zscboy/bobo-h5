@@ -1,8 +1,7 @@
-import { SDKManager } from "../../chanelSdk/SDKManager";
-import { DataStore, Dialog, HTTP, LEnv, LobbyModuleInterface, Logger } from "../lcore/LCoreExports";
+import { SDKManager } from "../chanelSdk/ChanelSdkExports";
+import { DataStore, Dialog, Enum, HTTP, LEnv, LobbyModuleInterface, Logger } from "../lcore/LCoreExports";
 import { proto } from "../proto/protoLobby";
 import { LobbyView } from "./LobbyView";
-import { Enum } from "../../common/Enum";
 
 const { ccclass } = cc._decorator;
 
@@ -186,15 +185,21 @@ export class LoginView extends cc.Component {
     public showLoginErrMsg(errCode: number): void {
         const lobby = proto.lobby;
         const errMsgMap: { [key: string]: string } = {
+
+            [lobby.LoginError.ErrLoginSuccess]: "成功",
+            [lobby.LoginError.ErrParamDecode]: "解码参数失败",
+            [lobby.LoginError.ErrDecodeUserInfoFailed]: "解码用户信息失败",
+
             [lobby.LoginError.ErrParamInvalidCode]: "不合法的微信code",
             [lobby.LoginError.ErrParamInvalidEncrypteddata]: "不合法的微信encrypteddata",
             [lobby.LoginError.ErrParamInvalidIv]: "不合法的微信iv",
             [lobby.LoginError.ErrWxAuthFailed]: "微信认证失败",
+
             [lobby.LoginError.ErrParamAccountIsEmpty]: "输入账号不能为空",
             [lobby.LoginError.ErrParamPasswordIsEmpty]: "输入密码不能为空",
             [lobby.LoginError.ErrAccountNotExist]: "输入账号不存在",
             [lobby.LoginError.ErrAccountNotSetPassword]: "账号没有设置密码，不能登录",
-            [lobby.LoginError.ErrPasswordNotMatch]: "账号没有设置密码，不能登录"
+            [lobby.LoginError.ErrPasswordNotMatch]: "密码不匹配，不能登录"
         };
 
         let errMsg = errMsgMap[errCode];

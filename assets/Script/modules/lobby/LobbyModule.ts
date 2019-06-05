@@ -21,6 +21,8 @@ export class LobbyModule extends cc.Component implements LobbyModuleInterface {
     private gameLoader: GResLoaderImpl;
     private view: fgui.GObject;
 
+    private loginView: LoginView;
+
     public cleanupGRoot(): void {
         const children = fgui.GRoot.inst._children;
         const wins: fgui.Window[] = [];
@@ -114,17 +116,32 @@ export class LobbyModule extends cc.Component implements LobbyModuleInterface {
         this.loader = new GResLoaderImpl("lobby");
         Dialog.initDialogs(this.loader);
 
-        // 加载大厅的所有资源，显示加载进度
-        this.loader.loadResDir("lobby", (error) => {
-            Logger.debug(`lobby load, error:${error}`);
+        //优先加载login资源，用于显示loading
+        this.loader.loadResDir("Lauch", (error) => {
+            Logger.debug(`Lauch load, error:${error}`);
             if (error == null) {
-                this.onResLoadedCompleted();
+                this.loginView = this.addComponent(LoginView);
+                this.loadLobbyRes();
             }
         });
     }
 
-    protected onResLoadedCompleted(): void {
-        // 资源加载完成
-        this.addComponent(LoginView);
+    // 加载大厅的所有资源，显示加载进度
+    private loadLobbyRes(): void {
+        this.loader.loadResDir(
+            "lobby",
+            (error) => {
+                Logger.debug(`lobby load, error:${error}`);
+                if (error == null) {
+                    this.onResLoadedCompleted();
+                }
+            },
+            (progress) => {
+                this.loginView.updateProgressBar(progress);
+            });
+    }
+
+    private onResLoadedCompleted(): void {
+        this.loginView.updateCompleted();
     }
 }

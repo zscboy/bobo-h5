@@ -24,7 +24,7 @@ export class LoginView extends cc.Component {
     public showLoginView(): void {
         const lm = <LobbyModuleInterface>this.getComponent("LobbyModule");
         const loader = lm.loader;
-        loader.fguiAddPackage("lobby/fui_login/lobby_login");
+        loader.fguiAddPackage("Lauch/fui_login/lobby_login");
         const view = fgui.UIPackage.createObject("lobby_login", "login").asCom;
 
         const win = new fgui.Window();
@@ -48,6 +48,10 @@ export class LoginView extends cc.Component {
         } else {
             console.log('not wx platform');
         }
+    }
+
+    public updateProgressBar(progress: number): void {
+        this.progressBar.value = progress * 100;
     }
 
     public initView(): void {
@@ -78,7 +82,6 @@ export class LoginView extends cc.Component {
         this.loginBtn.visible = false;
         this.weixinButton.visible = false;
         this.progressBar.value = 0;
-        this.progressBar.visible = false;
 
         this.loginBtn.onClick(this.onLoginClick, this);
 
@@ -86,7 +89,7 @@ export class LoginView extends cc.Component {
 
         // local progress = progressView.new(this)
         // progressView: updateView(this)
-        this.updateCompleted();
+        // this.updateCompleted();
     }
 
     public updateCompleted(): void {

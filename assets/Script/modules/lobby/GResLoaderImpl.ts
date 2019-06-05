@@ -19,11 +19,14 @@ export class GResLoaderImpl implements GResLoader {
         this.loadedPackages[packageName] = true;
     }
 
-    public loadResDir(dir: string, onCompleted: (error: Error) => void): void {
+    public loadResDir(dir: string, onCompleted: (error: Error) => void, onProgress?: (progress: number) => void): void {
         cc.loader.loadResDir(
             dir,
             (completedCount, totalCount, _) => {
                 Logger.debug(`GResLoader load progress:${completedCount}/${totalCount}`);
+                if (onProgress !== null && onProgress !== undefined) {
+                    onProgress(completedCount / totalCount);
+                }
             },
             (error, _, urls) => {
                 Logger.debug(`GResLoader load, error:${error}`);

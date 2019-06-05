@@ -986,4 +986,22 @@ export namespace proto {
 		}
 
 	}
+	export namespace zjmahjong {
+		enum GreatWinType {
+			None = 0,
+			PureSame = 1,
+			SevenPair = 2,
+			GreatSevenPair = 4,
+			Thirteen = 8,
+			RobKong = 16,
+			Heaven = 32,
+			AfterConcealedKong = 64,
+			AfterExposedKong = 128,
+			FinalDraw = 256,
+			PongPong = 512,
+			AllWind = 1024,
+			AfterKong = 2048,
+		}
+
+	}
 }

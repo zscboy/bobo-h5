@@ -1,3 +1,4 @@
+import { Logger } from "../../lcore/LCoreExports";
 import { SDKInterface } from "../SDKInterface";
 
 /**
@@ -15,13 +16,13 @@ export class WeiXinSDK extends SDKInterface {
                 if (code !== '' && code !== null && code !== undefined) {
                     const wxCode = 'wechatLCode';
                     this.mDataMap[wxCode] = res.code;
-                    console.log('wechatLCode is', code);
+                    Logger.debug('wechatLCode is', code);
                     const xxCb: getUserInfoOpts = {
                         withCredentials: true,
 
                         // tslint:disable-next-line:no-any
                         success: (userRes: any) => {
-                            console.log('wx useRes', userRes);
+                            Logger.debug('wx useRes', userRes);
                             const wxUserInfoStr = 'wxUserInfo';
                             this.mDataMap[wxUserInfoStr] = userRes;
                             cb(true);
@@ -29,7 +30,7 @@ export class WeiXinSDK extends SDKInterface {
 
                         // tslint:disable-next-line:no-any
                         fail: (err: any) => {
-                            console.error("wx getUserInfo err:", err);
+                            Logger.error("wx getUserInfo err:", err);
                             cb(false);
                         }
                     };
@@ -40,7 +41,7 @@ export class WeiXinSDK extends SDKInterface {
                 }
             },
             fail: res => {
-                console.error('wx login error', res);
+                Logger.error("wx login error", res);
                 cb(false);
             }
         });

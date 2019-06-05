@@ -1,4 +1,4 @@
-import { Enum, LEnv } from "../lcore/LCoreExports";
+import { Enum, LEnv, Logger } from "../lcore/LCoreExports";
 import { SDKInterface } from "./SDKInterface";
 import { WeiXinSDK } from "./wxSdk/WeiXinSDK";
 
@@ -29,7 +29,7 @@ export class SDKManager {
         this.mChannelType = LEnv.chanelType;
 
         if (this.mChannelType === undefined) {
-            console.error("-------渠道信息异常！");
+            Logger.error("-------渠道信息异常！");
 
             return false;
         }
@@ -43,7 +43,8 @@ export class SDKManager {
         }
 
         if (this.mInterface === null) {
-            console.warn("-------没有接入SDK！");
+
+            Logger.error("-------没有接入SDK！");
 
             return true;
         }
@@ -56,7 +57,7 @@ export class SDKManager {
     // tslint:disable-next-line:no-any
     public login(params?: any): void {
         if (!this.mIsInit) {
-            console.error("-------login sdk no init.");
+            Logger.error("-------login sdk no init.");
 
             return;
         }

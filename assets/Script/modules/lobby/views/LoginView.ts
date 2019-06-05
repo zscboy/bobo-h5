@@ -43,10 +43,10 @@ export class LoginView extends cc.Component {
             if (LEnv.chanelType === Enum.CHANNEL_TYPE.WEIXIN) {
                 this.createWxBtn();
             } else {
-                console.log('not wx channel');
+                Logger.debug('not wx channel');
             }
         } else {
-            console.log('not wx platform');
+            Logger.debug('not wx platform');
         }
     }
 
@@ -104,7 +104,9 @@ export class LoginView extends cc.Component {
     }
 
     public onWeixinBtnClick(): void {
-        Logger.debug("onWeixinBtnClick");
+        if (cc.sys.platform !== cc.sys.WECHAT_GAME || LEnv.chanelType !== Enum.CHANNEL_TYPE.WEIXIN) {
+            Logger.debug('not wx env');
+        }
     }
 
     public quicklyLogin(): void {
@@ -262,13 +264,13 @@ export class LoginView extends cc.Component {
     }
     private wxLogin(result: boolean): void {
         if (!result) {
-            console.error('wxlogin error');
+            Logger.error("wxlogin error");
             this.button.show();
 
             return;
         } else {
             const wxLoginUrl = `${LEnv.rootURL}${LEnv.wxLogin}`;
-            console.info('wxloginUrl', wxLoginUrl);
+            Logger.debug('wxloginUrl', wxLoginUrl);
 
             const wxCodeStr = 'wechatLCode';
             const wxUserInfoStr = 'wxUserInfo';

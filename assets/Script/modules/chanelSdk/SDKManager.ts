@@ -1,7 +1,7 @@
 import { SDKInterface } from "./SDKInterface";
-
 import { WeiXinSDK } from "./wxSdk/WeiXinSDK";
 import { Enum } from "../common/Enum";
+import { LEnv } from "../lobby/lcore/LEnv";
 
 /**
  * sdk管理器
@@ -27,7 +27,7 @@ export class SDKManager {
      * 初始化sdk
      */
     public initSDK(): boolean {
-        this.mChannelType = Enum.CHANNEL_TYPE.WEIXIN;
+        this.mChannelType = LEnv.chanelType;
 
         if (this.mChannelType === undefined) {
             console.error("-------渠道信息异常！");

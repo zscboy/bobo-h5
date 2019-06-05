@@ -39,6 +39,7 @@ export class LoginView extends cc.Component {
 
         this.win.show();
 
+        SDKManager.instance.initSDK();
         if (cc.sys.platform === cc.sys.WECHAT_GAME) {
             if (LEnv.chanelType === Enum.CHANNEL_TYPE.WEIXIN) {
                 this.createWxBtn();
@@ -219,11 +220,8 @@ export class LoginView extends cc.Component {
 
     private createWxBtn(): void {
         const btnSize = cc.size(this.weixinButton.width, this.weixinButton.height);
-        console.error(btnSize);
         const frameSize = cc.view.getFrameSize();
         const winSize = cc.winSize;
-        console.error(frameSize);
-        console.error(winSize);
         const scaleX = frameSize.width / winSize.width;
         const scaleY = frameSize.height / winSize.height;
         const scale = scaleX < scaleY ? scaleX : scaleY;
@@ -231,7 +229,6 @@ export class LoginView extends cc.Component {
         const top = this.weixinButton.y * scale;
         const width = btnSize.width * scale;
         const height = btnSize.height * scale;
-        console.error(left, top, width, height);
         this.button = wx.createUserInfoButton({
             type: 'text',
             text: '',
@@ -250,15 +247,15 @@ export class LoginView extends cc.Component {
             }
         });
 
-        // tslint:disable-next-line:no-any
-        this.button.onTap(async (res: any) => {
+        this.button.onTap((res: getUserInfoRes) => {
             this.button.hide();
-            SDKManager.instance.login(this.wxLogin);
+            SDKManager.instance.login(this.wxLogin.bind(this));
         });
     }
     private wxLogin(result: boolean): void {
         if (!result) {
             console.error('wxlogin error');
+            this.button.show();
 
             return;
         } else {

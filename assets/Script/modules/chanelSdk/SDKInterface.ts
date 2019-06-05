@@ -11,7 +11,7 @@ export class SDKInterface {
     }
 
     // tslint:disable-next-line:no-any
-    public login(params: any): void {
+    public login(params?: any): void {
         return;
     }
 

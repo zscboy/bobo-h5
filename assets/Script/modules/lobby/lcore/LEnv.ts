@@ -9,14 +9,14 @@ export namespace LEnv {
     export const updateDownload = "http://localhost:8080"; // tslint:disable-line:no-http-string
     export const gameWebsocketMonkey = "/game/{0}/ws/monkey";
     export const gameWebsocketPlay = "/game/{0}/ws/play";
-    export const rootURL = "http://121.196.210.106:30002"; // tslint:disable-line:no-http-string
-    export const gameHost = "ws://121.196.210.106:30003"; // tslint:disable-line:no-http-string
+    export const rootURL = "https://dfh5-develop.qianz.com:30000"; // tslint:disable-line:no-http-string
+    export const gameHost = "wss://dfh5-develop.qianz.com:30000"; // tslint:disable-line:no-http-string
     export const quicklyLogin = "/lobby/uuid/quicklyLogin";
     export const accountLogin = "/lobby/uuid/accountLogin";
     export const wxLogin = "/lobby/uuid/wxLogin";
     export const register = "/lobby/uuid/register";
     export const chat = "/lobby/uuid/chat";
-    export const lobbyWebsocket = "ws://121.196.210.106:30002/lobby/uuid/ws";
+    export const lobbyWebsocket = "wss://dfh5-develop.qianz.com:30000/lobby/uuid/ws";
 
     // -- 创建房间
     export const createRoom = "/lobby/uuid/createRoom";
@@ -45,7 +45,7 @@ export namespace LEnv {
 
     export const loadClubRooms = "/lobby/uuid/loadClubRooms";
 
-    export const cfmt = (str: string, ...args: any[]): string => { // tslint:disable-line:no-any
+    export const cfmt = (str: string, ...args: any[]): string => { // stslint:disable-line:no-any
         return str.replace(/{(\d+)}/g, (match, n) => {
             return (typeof args[n]) !== "undefined"
                 ? args[n]  // tslint:disable-line:no-unsafe-any

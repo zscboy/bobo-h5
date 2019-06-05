@@ -127,7 +127,7 @@ export class NewRoomView extends cc.Component {
         Logger.debug("enterGame");
 
         this.win.hide();
-        this.win.dispose();
+        // this.win.dispose();
         this.destroy();
 
         const myUserID = DataStore.getString("userID", "");

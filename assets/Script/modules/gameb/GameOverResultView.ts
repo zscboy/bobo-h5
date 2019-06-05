@@ -93,11 +93,11 @@ export class GameOverResultView extends cc.Component {
         //头像
     }
     //设置大赢家标志
-    private setDYJView(c: ViewGroup): void {
+    private setDYJEffect(c: ViewGroup): void {
         //大赢家动效
-        // if c ~= nil {
-        // animation.play("animations/Effects_jiemian_dayingjia.prefab", c.group, c.aniPos.x, c.aniPos.y, true)
-        // }
+        if (c !== null) {
+            this.room.getRoomHost().animationMgr.play(`lobby/prefabs/mahjong/Effect_zi_dayingjia`, c.aniPos.node);
+        }
     }
     //更新玩家分数信息
     private updatePlayerScoreData(playerStat: proto.mahjong.IMsgGameOverPlayerStat, c: ViewGroup): void {
@@ -105,19 +105,17 @@ export class GameOverResultView extends cc.Component {
         const chucker = playerStat.chuckerCounter;
         if (score > this.maxScore) {
             this.maxScoreIndexs = [];
-            this.maxScoreIndexs[0] = c;
+            this.maxScoreIndexs.push(c);
             this.maxScore = score;
         } else if (score === this.maxScore) {
-            const n = this.maxScoreIndexs.length;
-            this.maxScoreIndexs[n] = c;
+            this.maxScoreIndexs.push(c);
         }
         if (score < this.maxChucker) {
             this.maxChuckerIndexs = [];
-            this.maxChuckerIndexs[0] = c;
+            this.maxChuckerIndexs.push(c);
             this.maxChucker = score;
         } else if (score === this.maxChucker) {
-            const n = this.maxChuckerIndexs.length;
-            this.maxChuckerIndexs[n] = c;
+            this.maxChuckerIndexs.push(c);
         }
 
         if (score >= 0) {
@@ -177,7 +175,7 @@ export class GameOverResultView extends cc.Component {
                 }
                 if (this.maxScore > 0 && this.maxScoreIndexs !== undefined) {
                     for (const maxScoreIndex of this.maxScoreIndexs) {
-                        this.setDYJView(maxScoreIndex);
+                        this.setDYJEffect(maxScoreIndex);
                     }
                 }
             }

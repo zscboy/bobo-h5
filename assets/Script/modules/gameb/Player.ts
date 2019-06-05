@@ -843,7 +843,7 @@ export class Player {
             playerInfoView = roomHost.component.addComponent(PlayerInfoView);
         }
 
-        playerInfoView.showUserInfoView(roomHost, this.playerInfo, pos, this.isMe() === false);
+        playerInfoView.showUserInfoView(roomHost.loader, this.host, this.playerInfo, pos, this.isMe() === false);
     }
 
     //播放吃碰杠胡听音效

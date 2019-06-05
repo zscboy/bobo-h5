@@ -7,7 +7,9 @@ interface PropData {
     num: number;
     id: number;
 }
-
+interface RoomInterface {
+    sendDonate(donateId: number, toChairID: number): void;
+}
 interface PlayerInfo {
     userID: string;
     chairID: number;
@@ -26,9 +28,6 @@ interface PlayerInfo {
     dan?: number;
 }
 
-interface RoomHost {
-    loader: GResLoader;
-}
 /**
  * 玩家信息
  */
@@ -54,11 +53,10 @@ export class PlayerInfoView extends cc.Component {
     private dataList: PropData[];
     private dataListForOpponents: PropData[];
 
-    // private roomHost: RoomHost;
+    private room: RoomInterface;
 
-    public showUserInfoView(roomHost: RoomHost, playerInfo: PlayerInfo, pos: cc.Vec2, isOther: boolean): void {
+    public showUserInfoView(loader: GResLoader, room: RoomInterface, playerInfo: PlayerInfo, pos: cc.Vec2, isOther: boolean): void {
         if (this.view === null) {
-            const loader = roomHost.loader;
             loader.fguiAddPackage("lobby/fui_player_info/lobby_player_info");
             const view = fgui.UIPackage.createObject("lobby_player_info", "player_info_view").asCom;
             this.view = view;
@@ -72,7 +70,7 @@ export class PlayerInfoView extends cc.Component {
             Logger.debug("showUserInfoView view is nil");
         }
 
-        // this.roomHost = roomHost;
+        this.room = room;
         this.playerInfo = playerInfo;
         this.isOther = isOther;
 
@@ -184,7 +182,8 @@ export class PlayerInfoView extends cc.Component {
 
     private onPropListItemClick(clickItem: fgui.GObject): void {
         Logger.debug(`clickItem.data.name:${clickItem.asCom.name}, num:${parseInt(clickItem.asCom.name, 10)}`);
-        // this.roomHost.sendDonate(parseInt(clickItem.asCom.name, 10), this.playerInfo.chairID);
+        this.room.sendDonate(parseInt(clickItem.asCom.name, 10), this.playerInfo.chairID);
+        fgui.GRoot.inst.hidePopup(this.view);
         // this.room.sendDonate(onClickItem.data.name);
     }
 

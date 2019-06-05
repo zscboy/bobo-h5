@@ -268,16 +268,18 @@ export class PlayerView {
 
     //显示操作按钮
     public showButton(map: string[]): void {
-        this.buttonDataList = map;
-        this.buttonList.numItems = map.length;
-        this.buttonList.resizeToFit(map.length);
+        if (map !== undefined && map.length > 0) {
+            this.buttonDataList = map;
+            this.buttonList.numItems = map.length;
+            this.buttonList.resizeToFit(map.length);
+        }
         this.operationButtonsRoot.visible = true;
     }
 
     //隐藏所有操作按钮
     public hideOperationButtons(): void {
         //先隐藏掉所有按钮
-        this.showButton([]);
+        // this.showButton([]);
         //隐藏根节点
         this.operationButtonsRoot.visible = false;
     }
@@ -845,7 +847,7 @@ export class PlayerView {
 
             return;
         }
-        if (this.roomHost.timeElapsed - this.roomHostTimeElapsed <= 1) {
+        if (this.roomHost.timeElapsed - this.roomHostTimeElapsed <= 0.5) {
             clickCtrl.doubleTimeEclipse = 0;
             //双击 直接出牌
             //判断可否出牌
@@ -1117,8 +1119,7 @@ export class PlayerView {
 
     //特效道具播放
     public playerDonateEffect(effectName: string): void {
-        // const pos = this.head.headView
-        // animation.play("animations/" + effectName + ".prefab", this.myView, pos.x, pos.y)
+        // this.roomHost.animationMgr.play(`lobby/prefabs/mahjong/${effectName}`, this.head.headView.node);
     }
     //起手听特效播放
     public playReadyHandEffect(): void {

@@ -141,4 +141,5 @@ export interface RoomInterface {
     getPlayerInfoByChairID(chairID: number): PlayerInfo;
 
     getMyPlayerInfo(): PlayerInfo;
+    sendDonate(donateId: number, toChairID: number): void;
 }

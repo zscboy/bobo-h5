@@ -312,86 +312,82 @@ export class Room {
 
     // 显示道具动画
     public showDonate(msgDonate: proto.mahjong.MsgDonate): void {
-        // logger.debug("显示道具动画 msgDonate : ", msgDonate)
-        // if (msgDonate != null) {
-        //     const itemID = msgDonate.itemID
-        //     const oCurOpObj = this.roomView.donateMoveObj
+        // Logger.debug("显示道具动画 msgDonate : ", msgDonate);
+        if (msgDonate != null) {
+            const itemID = msgDonate.itemID;
+            const oCurOpObj = this.roomView.donateMoveObj;
+            const fromPlayer = this.getPlayerByChairID(msgDonate.fromChairID);
+            const toPlayer = this.getPlayerByChairID(msgDonate.toChairID);
+            if (fromPlayer == null || toPlayer == null) {
+                Logger.debug("llwant, fromPlayer || toPlayer is null...");
 
-        //     const fromPlayer = this.getPlayerByChairID(msgDonate.fromChairID)
-        //     const toPlayer = this.getPlayerByChairID(msgDonate.toChairID)
-        //     if (fromPlayer == null || toPlayer == null) {
-        //         Logger.debug("llwant, fromPlayer || toPlayer is null...")
-        //         return
-        //     }
-        //     const fromX = fromPlayer.playerView.head.headView.x
-        //     const fromY = fromPlayer.playerView.head.headView.y
-        //     const toX = toPlayer.playerView.head.headView.x
-        //     const toY = toPlayer.playerView.head.headView.y
-        //     // logger.debug("目标位置 toX : ", toX, " ; toY : ", toY)
-        //     oCurOpObj.setPosition(fromX, fromY)
-        //     oCurOpObj.visible = true
-        //     let sprite = null
-        //     let effobjSUB = null
-        //     // const sound = null
-        //     const handTypeMap = {
-        //         [1]: function () {
-        //             sprite = "dj_meigui"
-        //             effobjSUB = "Effects_daojv_hua"
-        //         },
-        //         [2]: function () {
-        //             sprite = "dj_ganbei"
-        //             effobjSUB = "Effects_daojv_jiubei"
-        //         },
-        //         [3]: function () {
-        //             sprite = "dj_jd"
-        //             effobjSUB = "Effects_daojv_jidan"
-        //         },
-        //         [4]: function () {
-        //             sprite = "dj_tuoxie"
-        //             effobjSUB = "Effects_daojv_tuoxie"
-        //         },
-        //         [5]: function () {
-        //             sprite = "dj_qj"
-        //             effobjSUB = "Effects_daojv_quanji"
-        //         },
-        //         [6]: function () {
-        //             sprite = "dj_bb"
-        //             effobjSUB = "Effects_daojv_shiren"
-        //         },
-        //         [7]: function () {
-        //             sprite = "dj_hj"
-        //             effobjSUB = "Effects_daojv_hongjiu"
-        //         },
-        //         [8]: function () {
-        //             sprite = "dj_mmd"
-        //             effobjSUB = "Effects_daojv_zui"
-        //         }
-        //     }
+                return;
+            }
+            const fromPos = fromPlayer.playerView.head.headView.node.position;
+            const toPos = toPlayer.playerView.head.headView.node.position;
+            let sprite = "";
+            let effobjSUB = "";
+            // const sound = null
+            const handTypeMap = [
+                () => {
+                    sprite = "dj_meigui";
+                    effobjSUB = "Effects_daojv_hua";
+                },
+                () => {
+                    sprite = "dj_ganbei";
+                    effobjSUB = "Effects_daojv_jiubei";
+                },
+                () => {
+                    sprite = "dj_jd";
+                    effobjSUB = "Effects_daojv_jidan";
+                },
+                () => {
+                    sprite = "dj_tuoxie";
+                    effobjSUB = "Effects_daojv_tuoxie";
+                },
+                () => {
+                    sprite = "dj_qj";
+                    effobjSUB = "Effects_daojv_quanji";
+                },
+                () => {
+                    sprite = "dj_bb";
+                    effobjSUB = "Effects_daojv_shiren";
+                },
+                () => {
+                    sprite = "dj_hj";
+                    effobjSUB = "Effects_daojv_hongjiu";
+                },
+                () => {
+                    sprite = "dj_mmd";
+                    effobjSUB = "Effects_daojv_zui";
+                }
+            ];
 
-        //     const fn = handTypeMap[itemID]
-        //     fn()
-        //     if (sprite == null || effobjSUB == null) {
-        //         Logger.debug("llwant, sprite || effobjSUB is null...")
-        //         return
-        //     }
-        //     oCurOpObj.url = "ui://lobby_player_info/"..sprite
-        //     //飞动画
-        //     oCurOpObj.TweenMove({ x = toX, y = toY }, 1)
-        //     this.roomView.unityViewNode: DelayRun(
-        //         1,
-        //         function () {
-        //             //飞完之后的回调
-        //             //飞完之后 关闭oCurOpObj
-        //             oCurOpObj.visible = false
-        //             //播放特效
-        //             toPlayer.playerView.playerDonateEffect(effobjSUB)
-        //             //播放声音
-        //             // if sound != null {
-        //             // dfCompatibleAPI:soundPlay("daoju/" .. sound)
-        //             // }
-        //         }
-        //     )
-        // }
+            const fn = handTypeMap[itemID - 1];
+            fn();
+            if (sprite == null || effobjSUB == null) {
+                Logger.debug("llwant, sprite || effobjSUB is null...");
+
+                return;
+            }
+            oCurOpObj.node.position = fromPos;
+            oCurOpObj.url = `ui://lobby_player_info/${sprite}`;
+            oCurOpObj.visible = true;
+            //飞动画
+            const moveAnimation = cc.moveTo(2, toPos);
+            oCurOpObj.node.runAction(moveAnimation);
+            const callBack = () => {
+                //飞完之后 关闭oCurOpObj
+                oCurOpObj.visible = false;
+                //播放特效
+                toPlayer.playerView.playerDonateEffect(effobjSUB);
+                //播放声音
+                // if sound != null {
+                // dfCompatibleAPI:soundPlay("daoju/" .. sound)
+                // }
+            };
+            this.getRoomHost().component.scheduleOnce(callBack, 2);
+        }
     }
     //roomview 接口
     public setArrowByParent(d: fgui.GComponent): void {

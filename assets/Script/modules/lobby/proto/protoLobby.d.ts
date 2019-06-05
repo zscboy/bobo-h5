@@ -75,7 +75,7 @@ export namespace proto {
 			public content: ByteBuffer;
 			constructor(properties?: club.IMsgClubReply);
 			public static encode(message: MsgClubReply): ByteBuffer;
-			public static decode(reader: Uint8Array|ByteBuffer): MsgClubReply;
+			public static decode(reader: Uint8Array | ByteBuffer): MsgClubReply;
 		}
 
 		interface IMsgClubDisplayInfo {
@@ -92,7 +92,7 @@ export namespace proto {
 			public avatarID: number;
 			constructor(properties?: club.IMsgClubDisplayInfo);
 			public static encode(message: MsgClubDisplayInfo): ByteBuffer;
-			public static decode(reader: Uint8Array|ByteBuffer): MsgClubDisplayInfo;
+			public static decode(reader: Uint8Array | ByteBuffer): MsgClubDisplayInfo;
 		}
 
 		interface IMsgClubMemberInfo {
@@ -107,7 +107,7 @@ export namespace proto {
 			public online: boolean;
 			constructor(properties?: club.IMsgClubMemberInfo);
 			public static encode(message: MsgClubMemberInfo): ByteBuffer;
-			public static decode(reader: Uint8Array|ByteBuffer): MsgClubMemberInfo;
+			public static decode(reader: Uint8Array | ByteBuffer): MsgClubMemberInfo;
 		}
 
 		interface IMsgClubBaseInfo {
@@ -122,7 +122,7 @@ export namespace proto {
 			public clubID: string;
 			constructor(properties?: club.IMsgClubBaseInfo);
 			public static encode(message: MsgClubBaseInfo): ByteBuffer;
-			public static decode(reader: Uint8Array|ByteBuffer): MsgClubBaseInfo;
+			public static decode(reader: Uint8Array | ByteBuffer): MsgClubBaseInfo;
 		}
 
 		interface IMsgCubOperGenericReply {
@@ -135,7 +135,7 @@ export namespace proto {
 			public extra: string;
 			constructor(properties?: club.IMsgCubOperGenericReply);
 			public static encode(message: MsgCubOperGenericReply): ByteBuffer;
-			public static decode(reader: Uint8Array|ByteBuffer): MsgCubOperGenericReply;
+			public static decode(reader: Uint8Array | ByteBuffer): MsgCubOperGenericReply;
 		}
 
 		interface IMsgClubInfo {
@@ -168,7 +168,7 @@ export namespace proto {
 			public createTime: number;
 			constructor(properties?: club.IMsgClubInfo);
 			public static encode(message: MsgClubInfo): ByteBuffer;
-			public static decode(reader: Uint8Array|ByteBuffer): MsgClubInfo;
+			public static decode(reader: Uint8Array | ByteBuffer): MsgClubInfo;
 		}
 
 		interface IMsgClubLoadMyClubsReply {
@@ -179,7 +179,7 @@ export namespace proto {
 			public clubs: club.IMsgClubInfo[];
 			constructor(properties?: club.IMsgClubLoadMyClubsReply);
 			public static encode(message: MsgClubLoadMyClubsReply): ByteBuffer;
-			public static decode(reader: Uint8Array|ByteBuffer): MsgClubLoadMyClubsReply;
+			public static decode(reader: Uint8Array | ByteBuffer): MsgClubLoadMyClubsReply;
 		}
 
 		interface IMsgClubLoadUpdateReply {
@@ -192,7 +192,7 @@ export namespace proto {
 			public clubIDsRemoved: string[];
 			constructor(properties?: club.IMsgClubLoadUpdateReply);
 			public static encode(message: MsgClubLoadUpdateReply): ByteBuffer;
-			public static decode(reader: Uint8Array|ByteBuffer): MsgClubLoadUpdateReply;
+			public static decode(reader: Uint8Array | ByteBuffer): MsgClubLoadUpdateReply;
 		}
 
 		interface IMsgClubLoadMembersReply {
@@ -205,7 +205,7 @@ export namespace proto {
 			public cursor: number;
 			constructor(properties?: club.IMsgClubLoadMembersReply);
 			public static encode(message: MsgClubLoadMembersReply): ByteBuffer;
-			public static decode(reader: Uint8Array|ByteBuffer): MsgClubLoadMembersReply;
+			public static decode(reader: Uint8Array | ByteBuffer): MsgClubLoadMembersReply;
 		}
 
 		interface IMsgCreateClubReply {
@@ -216,7 +216,7 @@ export namespace proto {
 			public clubInfo: club.IMsgClubInfo;
 			constructor(properties?: club.IMsgCreateClubReply);
 			public static encode(message: MsgCreateClubReply): ByteBuffer;
-			public static decode(reader: Uint8Array|ByteBuffer): MsgCreateClubReply;
+			public static decode(reader: Uint8Array | ByteBuffer): MsgCreateClubReply;
 		}
 
 		interface IMsgClubEvent {
@@ -245,7 +245,7 @@ export namespace proto {
 			public approvalResult: number;
 			constructor(properties?: club.IMsgClubEvent);
 			public static encode(message: MsgClubEvent): ByteBuffer;
-			public static decode(reader: Uint8Array|ByteBuffer): MsgClubEvent;
+			public static decode(reader: Uint8Array | ByteBuffer): MsgClubEvent;
 		}
 
 		interface IMsgClubLoadEventsReply {
@@ -258,7 +258,7 @@ export namespace proto {
 			public cursor: number;
 			constructor(properties?: club.IMsgClubLoadEventsReply);
 			public static encode(message: MsgClubLoadEventsReply): ByteBuffer;
-			public static decode(reader: Uint8Array|ByteBuffer): MsgClubLoadEventsReply;
+			public static decode(reader: Uint8Array | ByteBuffer): MsgClubLoadEventsReply;
 		}
 
 		interface IMsgClubRoomInfo {
@@ -279,7 +279,7 @@ export namespace proto {
 			public roomUUID: string;
 			constructor(properties?: club.IMsgClubRoomInfo);
 			public static encode(message: MsgClubRoomInfo): ByteBuffer;
-			public static decode(reader: Uint8Array|ByteBuffer): MsgClubRoomInfo;
+			public static decode(reader: Uint8Array | ByteBuffer): MsgClubRoomInfo;
 		}
 
 		interface IMsgClubLoadRoomsReply {
@@ -294,7 +294,7 @@ export namespace proto {
 			public totalRoomCount: number;
 			constructor(properties?: club.IMsgClubLoadRoomsReply);
 			public static encode(message: MsgClubLoadRoomsReply): ByteBuffer;
-			public static decode(reader: Uint8Array|ByteBuffer): MsgClubLoadRoomsReply;
+			public static decode(reader: Uint8Array | ByteBuffer): MsgClubLoadRoomsReply;
 		}
 
 		interface IMsgClubFundEvent {
@@ -313,7 +313,7 @@ export namespace proto {
 			public total: number;
 			constructor(properties?: club.IMsgClubFundEvent);
 			public static encode(message: MsgClubFundEvent): ByteBuffer;
-			public static decode(reader: Uint8Array|ByteBuffer): MsgClubFundEvent;
+			public static decode(reader: Uint8Array | ByteBuffer): MsgClubFundEvent;
 		}
 
 		interface IMsgClubLoadFundEventsReply {
@@ -326,7 +326,7 @@ export namespace proto {
 			public cursor: number;
 			constructor(properties?: club.IMsgClubLoadFundEventsReply);
 			public static encode(message: MsgClubLoadFundEventsReply): ByteBuffer;
-			public static decode(reader: Uint8Array|ByteBuffer): MsgClubLoadFundEventsReply;
+			public static decode(reader: Uint8Array | ByteBuffer): MsgClubLoadFundEventsReply;
 		}
 
 		interface IMsgClubLoadReplayRoomsReply {
@@ -339,7 +339,7 @@ export namespace proto {
 			public cursor: number;
 			constructor(properties?: club.IMsgClubLoadReplayRoomsReply);
 			public static encode(message: MsgClubLoadReplayRoomsReply): ByteBuffer;
-			public static decode(reader: Uint8Array|ByteBuffer): MsgClubLoadReplayRoomsReply;
+			public static decode(reader: Uint8Array | ByteBuffer): MsgClubLoadReplayRoomsReply;
 		}
 
 	}
@@ -487,7 +487,7 @@ export namespace proto {
 			public Data: ByteBuffer;
 			constructor(properties?: lobby.ILobbyMessage);
 			public static encode(message: LobbyMessage): ByteBuffer;
-			public static decode(reader: Uint8Array|ByteBuffer): LobbyMessage;
+			public static decode(reader: Uint8Array | ByteBuffer): LobbyMessage;
 		}
 
 		interface IMsgCreateRoomReq {
@@ -498,7 +498,7 @@ export namespace proto {
 			public config: string;
 			constructor(properties?: lobby.IMsgCreateRoomReq);
 			public static encode(message: MsgCreateRoomReq): ByteBuffer;
-			public static decode(reader: Uint8Array|ByteBuffer): MsgCreateRoomReq;
+			public static decode(reader: Uint8Array | ByteBuffer): MsgCreateRoomReq;
 		}
 
 		interface IUserProfile {
@@ -513,7 +513,7 @@ export namespace proto {
 			public nickName: string;
 			constructor(properties?: lobby.IUserProfile);
 			public static encode(message: UserProfile): ByteBuffer;
-			public static decode(reader: Uint8Array|ByteBuffer): UserProfile;
+			public static decode(reader: Uint8Array | ByteBuffer): UserProfile;
 		}
 
 		interface IRoomInfo {
@@ -544,7 +544,7 @@ export namespace proto {
 			public moduleCfg: string;
 			constructor(properties?: lobby.IRoomInfo);
 			public static encode(message: RoomInfo): ByteBuffer;
-			public static decode(reader: Uint8Array|ByteBuffer): RoomInfo;
+			public static decode(reader: Uint8Array | ByteBuffer): RoomInfo;
 		}
 
 		interface IMsgCreateRoomRsp {
@@ -561,7 +561,7 @@ export namespace proto {
 			public diamond: number;
 			constructor(properties?: lobby.IMsgCreateRoomRsp);
 			public static encode(message: MsgCreateRoomRsp): ByteBuffer;
-			public static decode(reader: Uint8Array|ByteBuffer): MsgCreateRoomRsp;
+			public static decode(reader: Uint8Array | ByteBuffer): MsgCreateRoomRsp;
 		}
 
 		interface IMsgDeleteRoomReply {
@@ -572,7 +572,7 @@ export namespace proto {
 			public result: number;
 			constructor(properties?: lobby.IMsgDeleteRoomReply);
 			public static encode(message: MsgDeleteRoomReply): ByteBuffer;
-			public static decode(reader: Uint8Array|ByteBuffer): MsgDeleteRoomReply;
+			public static decode(reader: Uint8Array | ByteBuffer): MsgDeleteRoomReply;
 		}
 
 		interface IMsgChat {
@@ -593,7 +593,7 @@ export namespace proto {
 			public id: string;
 			constructor(properties?: lobby.IMsgChat);
 			public static encode(message: MsgChat): ByteBuffer;
-			public static decode(reader: Uint8Array|ByteBuffer): MsgChat;
+			public static decode(reader: Uint8Array | ByteBuffer): MsgChat;
 		}
 
 		interface IMsgLoadUnreadChatReply {
@@ -606,7 +606,7 @@ export namespace proto {
 			public cursor: number;
 			constructor(properties?: lobby.IMsgLoadUnreadChatReply);
 			public static encode(message: MsgLoadUnreadChatReply): ByteBuffer;
-			public static decode(reader: Uint8Array|ByteBuffer): MsgLoadUnreadChatReply;
+			public static decode(reader: Uint8Array | ByteBuffer): MsgLoadUnreadChatReply;
 		}
 
 		interface IMsgSetReadChat {
@@ -617,7 +617,7 @@ export namespace proto {
 			public ids: number[];
 			constructor(properties?: lobby.IMsgSetReadChat);
 			public static encode(message: MsgSetReadChat): ByteBuffer;
-			public static decode(reader: Uint8Array|ByteBuffer): MsgSetReadChat;
+			public static decode(reader: Uint8Array | ByteBuffer): MsgSetReadChat;
 		}
 
 		interface IRoomIDList {
@@ -628,7 +628,7 @@ export namespace proto {
 			public roomIDs: string[];
 			constructor(properties?: lobby.IRoomIDList);
 			public static encode(message: RoomIDList): ByteBuffer;
-			public static decode(reader: Uint8Array|ByteBuffer): RoomIDList;
+			public static decode(reader: Uint8Array | ByteBuffer): RoomIDList;
 		}
 
 		interface IMsgLoadRoomListRsp {
@@ -643,7 +643,7 @@ export namespace proto {
 			public retMsg: string;
 			constructor(properties?: lobby.IMsgLoadRoomListRsp);
 			public static encode(message: MsgLoadRoomListRsp): ByteBuffer;
-			public static decode(reader: Uint8Array|ByteBuffer): MsgLoadRoomListRsp;
+			public static decode(reader: Uint8Array | ByteBuffer): MsgLoadRoomListRsp;
 		}
 
 		interface IMsgUpdateUserInfo {
@@ -654,7 +654,7 @@ export namespace proto {
 			public location: string;
 			constructor(properties?: lobby.IMsgUpdateUserInfo);
 			public static encode(message: MsgUpdateUserInfo): ByteBuffer;
-			public static decode(reader: Uint8Array|ByteBuffer): MsgUpdateUserInfo;
+			public static decode(reader: Uint8Array | ByteBuffer): MsgUpdateUserInfo;
 		}
 
 		interface IRoomCost {
@@ -667,7 +667,7 @@ export namespace proto {
 			public pay: number;
 			constructor(properties?: lobby.IRoomCost);
 			public static encode(message: RoomCost): ByteBuffer;
-			public static decode(reader: Uint8Array|ByteBuffer): RoomCost;
+			public static decode(reader: Uint8Array | ByteBuffer): RoomCost;
 		}
 
 		interface IMsgRequestRoomInfo {
@@ -678,7 +678,7 @@ export namespace proto {
 			public roomNumber: string;
 			constructor(properties?: lobby.IMsgRequestRoomInfo);
 			public static encode(message: MsgRequestRoomInfo): ByteBuffer;
-			public static decode(reader: Uint8Array|ByteBuffer): MsgRequestRoomInfo;
+			public static decode(reader: Uint8Array | ByteBuffer): MsgRequestRoomInfo;
 		}
 
 		interface IMsgRequestRoomInfoRsp {
@@ -693,7 +693,7 @@ export namespace proto {
 			public retMsg: string;
 			constructor(properties?: lobby.IMsgRequestRoomInfoRsp);
 			public static encode(message: MsgRequestRoomInfoRsp): ByteBuffer;
-			public static decode(reader: Uint8Array|ByteBuffer): MsgRequestRoomInfoRsp;
+			public static decode(reader: Uint8Array | ByteBuffer): MsgRequestRoomInfoRsp;
 		}
 
 		interface IMsgUpdateRoomState {
@@ -712,7 +712,7 @@ export namespace proto {
 			public lastActiveTime: number;
 			constructor(properties?: lobby.IMsgUpdateRoomState);
 			public static encode(message: MsgUpdateRoomState): ByteBuffer;
-			public static decode(reader: Uint8Array|ByteBuffer): MsgUpdateRoomState;
+			public static decode(reader: Uint8Array | ByteBuffer): MsgUpdateRoomState;
 		}
 
 		interface IMsgUpdateRoomList {
@@ -723,7 +723,7 @@ export namespace proto {
 			public roomInfos: lobby.IRoomInfo[];
 			constructor(properties?: lobby.IMsgUpdateRoomList);
 			public static encode(message: MsgUpdateRoomList): ByteBuffer;
-			public static decode(reader: Uint8Array|ByteBuffer): MsgUpdateRoomList;
+			public static decode(reader: Uint8Array | ByteBuffer): MsgUpdateRoomList;
 		}
 
 		interface IMsgRequestUserScoreInfo {
@@ -736,7 +736,7 @@ export namespace proto {
 			public gameID: string;
 			constructor(properties?: lobby.IMsgRequestUserScoreInfo);
 			public static encode(message: MsgRequestUserScoreInfo): ByteBuffer;
-			public static decode(reader: Uint8Array|ByteBuffer): MsgRequestUserScoreInfo;
+			public static decode(reader: Uint8Array | ByteBuffer): MsgRequestUserScoreInfo;
 		}
 
 		interface IMsgRequestUserScoreInfoRsp {
@@ -755,7 +755,7 @@ export namespace proto {
 			public retMsg: string;
 			constructor(properties?: lobby.IMsgRequestUserScoreInfoRsp);
 			public static encode(message: MsgRequestUserScoreInfoRsp): ByteBuffer;
-			public static decode(reader: Uint8Array|ByteBuffer): MsgRequestUserScoreInfoRsp;
+			public static decode(reader: Uint8Array | ByteBuffer): MsgRequestUserScoreInfoRsp;
 		}
 
 		interface IMsgLoadUserHeadIconURI {
@@ -766,7 +766,7 @@ export namespace proto {
 			public userIDs: string[];
 			constructor(properties?: lobby.IMsgLoadUserHeadIconURI);
 			public static encode(message: MsgLoadUserHeadIconURI): ByteBuffer;
-			public static decode(reader: Uint8Array|ByteBuffer): MsgLoadUserHeadIconURI;
+			public static decode(reader: Uint8Array | ByteBuffer): MsgLoadUserHeadIconURI;
 		}
 
 		interface IMsgHeadIconInfo {
@@ -781,7 +781,7 @@ export namespace proto {
 			public headIconURI: string;
 			constructor(properties?: lobby.IMsgHeadIconInfo);
 			public static encode(message: MsgHeadIconInfo): ByteBuffer;
-			public static decode(reader: Uint8Array|ByteBuffer): MsgHeadIconInfo;
+			public static decode(reader: Uint8Array | ByteBuffer): MsgHeadIconInfo;
 		}
 
 		interface IMsgLoadUserHeadIconURIReply {
@@ -796,7 +796,7 @@ export namespace proto {
 			public retMsg: string;
 			constructor(properties?: lobby.IMsgLoadUserHeadIconURIReply);
 			public static encode(message: MsgLoadUserHeadIconURIReply): ByteBuffer;
-			public static decode(reader: Uint8Array|ByteBuffer): MsgLoadUserHeadIconURIReply;
+			public static decode(reader: Uint8Array | ByteBuffer): MsgLoadUserHeadIconURIReply;
 		}
 
 		interface IMsgUpdateUserDiamond {
@@ -807,7 +807,7 @@ export namespace proto {
 			public diamond: Long;
 			constructor(properties?: lobby.IMsgUpdateUserDiamond);
 			public static encode(message: MsgUpdateUserDiamond): ByteBuffer;
-			public static decode(reader: Uint8Array|ByteBuffer): MsgUpdateUserDiamond;
+			public static decode(reader: Uint8Array | ByteBuffer): MsgUpdateUserDiamond;
 		}
 
 		interface IMsgAccReplayRoom {
@@ -820,7 +820,7 @@ export namespace proto {
 			public recordRoomType: number;
 			constructor(properties?: lobby.IMsgAccReplayRoom);
 			public static encode(message: MsgAccReplayRoom): ByteBuffer;
-			public static decode(reader: Uint8Array|ByteBuffer): MsgAccReplayRoom;
+			public static decode(reader: Uint8Array | ByteBuffer): MsgAccReplayRoom;
 		}
 
 		interface IMsgAccLoadReplayRoomsReply {
@@ -835,7 +835,7 @@ export namespace proto {
 			public totalCursor: number;
 			constructor(properties?: lobby.IMsgAccLoadReplayRoomsReply);
 			public static encode(message: MsgAccLoadReplayRoomsReply): ByteBuffer;
-			public static decode(reader: Uint8Array|ByteBuffer): MsgAccLoadReplayRoomsReply;
+			public static decode(reader: Uint8Array | ByteBuffer): MsgAccLoadReplayRoomsReply;
 		}
 
 		interface IMsgAccLoadReplayRecord {
@@ -848,7 +848,7 @@ export namespace proto {
 			public roomJSONConfig: string;
 			constructor(properties?: lobby.IMsgAccLoadReplayRecord);
 			public static encode(message: MsgAccLoadReplayRecord): ByteBuffer;
-			public static decode(reader: Uint8Array|ByteBuffer): MsgAccLoadReplayRecord;
+			public static decode(reader: Uint8Array | ByteBuffer): MsgAccLoadReplayRecord;
 		}
 
 		interface IUserInfo {
@@ -877,7 +877,7 @@ export namespace proto {
 			public diamond: Long;
 			constructor(properties?: lobby.IUserInfo);
 			public static encode(message: UserInfo): ByteBuffer;
-			public static decode(reader: Uint8Array|ByteBuffer): UserInfo;
+			public static decode(reader: Uint8Array | ByteBuffer): UserInfo;
 		}
 
 		interface IMsgWxLogin {
@@ -892,7 +892,7 @@ export namespace proto {
 			public iv: string;
 			constructor(properties?: lobby.IMsgWxLogin);
 			public static encode(message: MsgWxLogin): ByteBuffer;
-			public static decode(reader: Uint8Array|ByteBuffer): MsgWxLogin;
+			public static decode(reader: Uint8Array | ByteBuffer): MsgWxLogin;
 		}
 
 		interface IMsgLoginReply {
@@ -907,7 +907,7 @@ export namespace proto {
 			public userInfo: lobby.IUserInfo;
 			constructor(properties?: lobby.IMsgLoginReply);
 			public static encode(message: MsgLoginReply): ByteBuffer;
-			public static decode(reader: Uint8Array|ByteBuffer): MsgLoginReply;
+			public static decode(reader: Uint8Array | ByteBuffer): MsgLoginReply;
 		}
 
 		interface IClientInfo {
@@ -936,7 +936,7 @@ export namespace proto {
 			public network: string;
 			constructor(properties?: lobby.IClientInfo);
 			public static encode(message: ClientInfo): ByteBuffer;
-			public static decode(reader: Uint8Array|ByteBuffer): ClientInfo;
+			public static decode(reader: Uint8Array | ByteBuffer): ClientInfo;
 		}
 
 		interface IMsgRegisterReply {
@@ -949,7 +949,7 @@ export namespace proto {
 			public token: string;
 			constructor(properties?: lobby.IMsgRegisterReply);
 			public static encode(message: MsgRegisterReply): ByteBuffer;
-			public static decode(reader: Uint8Array|ByteBuffer): MsgRegisterReply;
+			public static decode(reader: Uint8Array | ByteBuffer): MsgRegisterReply;
 		}
 
 		interface IMsgQuicklyLoginReply {
@@ -966,7 +966,7 @@ export namespace proto {
 			public userInfo: lobby.IUserInfo;
 			constructor(properties?: lobby.IMsgQuicklyLoginReply);
 			public static encode(message: MsgQuicklyLoginReply): ByteBuffer;
-			public static decode(reader: Uint8Array|ByteBuffer): MsgQuicklyLoginReply;
+			public static decode(reader: Uint8Array | ByteBuffer): MsgQuicklyLoginReply;
 		}
 
 		interface IMsgWebsocketConnectReply {
@@ -977,7 +977,7 @@ export namespace proto {
 			public result: number;
 			constructor(properties?: lobby.IMsgWebsocketConnectReply);
 			public static encode(message: MsgWebsocketConnectReply): ByteBuffer;
-			public static decode(reader: Uint8Array|ByteBuffer): MsgWebsocketConnectReply;
+			public static decode(reader: Uint8Array | ByteBuffer): MsgWebsocketConnectReply;
 		}
 
 		interface IMsgReplayPlayerInfo {
@@ -1000,7 +1000,7 @@ export namespace proto {
 			public avatarID: number;
 			constructor(properties?: lobby.IMsgReplayPlayerInfo);
 			public static encode(message: MsgReplayPlayerInfo): ByteBuffer;
-			public static decode(reader: Uint8Array|ByteBuffer): MsgReplayPlayerInfo;
+			public static decode(reader: Uint8Array | ByteBuffer): MsgReplayPlayerInfo;
 		}
 
 		interface IMsgReplayPlayerScoreSummary {
@@ -1015,7 +1015,7 @@ export namespace proto {
 			public winType: number;
 			constructor(properties?: lobby.IMsgReplayPlayerScoreSummary);
 			public static encode(message: MsgReplayPlayerScoreSummary): ByteBuffer;
-			public static decode(reader: Uint8Array|ByteBuffer): MsgReplayPlayerScoreSummary;
+			public static decode(reader: Uint8Array | ByteBuffer): MsgReplayPlayerScoreSummary;
 		}
 
 		interface IMsgReplayRecordSummary {
@@ -1034,7 +1034,7 @@ export namespace proto {
 			public startTime: number;
 			constructor(properties?: lobby.IMsgReplayRecordSummary);
 			public static encode(message: MsgReplayRecordSummary): ByteBuffer;
-			public static decode(reader: Uint8Array|ByteBuffer): MsgReplayRecordSummary;
+			public static decode(reader: Uint8Array | ByteBuffer): MsgReplayRecordSummary;
 		}
 
 		interface IMsgReplayRoom {
@@ -1057,7 +1057,7 @@ export namespace proto {
 			public ownerUserID: string;
 			constructor(properties?: lobby.IMsgReplayRoom);
 			public static encode(message: MsgReplayRoom): ByteBuffer;
-			public static decode(reader: Uint8Array|ByteBuffer): MsgReplayRoom;
+			public static decode(reader: Uint8Array | ByteBuffer): MsgReplayRoom;
 		}
 
 		interface IMailAttachments {
@@ -1072,7 +1072,7 @@ export namespace proto {
 			public isReceive: boolean;
 			constructor(properties?: lobby.IMailAttachments);
 			public static encode(message: MailAttachments): ByteBuffer;
-			public static decode(reader: Uint8Array|ByteBuffer): MailAttachments;
+			public static decode(reader: Uint8Array | ByteBuffer): MailAttachments;
 		}
 
 		interface IMsgMail {
@@ -1093,7 +1093,7 @@ export namespace proto {
 			public timeStamp: Long;
 			constructor(properties?: lobby.IMsgMail);
 			public static encode(message: MsgMail): ByteBuffer;
-			public static decode(reader: Uint8Array|ByteBuffer): MsgMail;
+			public static decode(reader: Uint8Array | ByteBuffer): MsgMail;
 		}
 
 		interface IMsgLoadMail {
@@ -1106,7 +1106,7 @@ export namespace proto {
 			public cursor: number;
 			constructor(properties?: lobby.IMsgLoadMail);
 			public static encode(message: MsgLoadMail): ByteBuffer;
-			public static decode(reader: Uint8Array|ByteBuffer): MsgLoadMail;
+			public static decode(reader: Uint8Array | ByteBuffer): MsgLoadMail;
 		}
 
 	}

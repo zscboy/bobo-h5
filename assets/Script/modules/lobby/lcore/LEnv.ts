@@ -1,8 +1,12 @@
+import { Enum } from "../../common/Enum";
+
 /**
  * lobby 配置
  */
 export namespace LEnv {
     export const VER_STR: string = "v1.0.0";
+
+    export const chanelType = Enum.CHANNEL_TYPE.WEIXIN;
 
     // updateQuery = "/lobby/upgrade/query",
     export const updateQuery: string = "/lobby/uuid/upgradeQuery";

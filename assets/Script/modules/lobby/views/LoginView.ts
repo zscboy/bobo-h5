@@ -1,6 +1,8 @@
+import { SDKManager } from "../../chanelSdk/SDKManager";
 import { DataStore, Dialog, HTTP, LEnv, LobbyModuleInterface, Logger } from "../lcore/LCoreExports";
 import { proto } from "../proto/protoLobby";
 import { LobbyView } from "./LobbyView";
+import { Enum } from "../../common/Enum";
 
 const { ccclass } = cc._decorator;
 
@@ -18,6 +20,8 @@ export class LoginView extends cc.Component {
 
     private eventTarget: cc.EventTarget;
 
+    private button: UserInfoButton = null;
+
     public showLoginView(): void {
         const lm = <LobbyModuleInterface>this.getComponent("LobbyModule");
         const loader = lm.loader;
@@ -34,6 +38,17 @@ export class LoginView extends cc.Component {
         this.initView();
 
         this.win.show();
+
+        SDKManager.instance.initSDK();
+        if (cc.sys.platform === cc.sys.WECHAT_GAME) {
+            if (LEnv.chanelType === Enum.CHANNEL_TYPE.WEIXIN) {
+                this.createWxBtn();
+            } else {
+                console.log('not wx channel');
+            }
+        } else {
+            console.log('not wx platform');
+        }
     }
 
     public initView(): void {
@@ -87,7 +102,7 @@ export class LoginView extends cc.Component {
     }
 
     public onWeixinBtnClick(): void {
-        //
+        Logger.debug("onWeixinBtnClick");
     }
 
     public quicklyLogin(): void {
@@ -129,6 +144,21 @@ export class LoginView extends cc.Component {
         });
     }
 
+    public saveWxLoginReply(wxLoginReply: proto.lobby.MsgLoginReply): void {
+        DataStore.setItem("token", wxLoginReply.token);
+
+        const userInfo = wxLoginReply.userInfo;
+        DataStore.setItem("userID", userInfo.userID);
+        DataStore.setItem("nickName", userInfo.nickName);
+        DataStore.setItem("gender", userInfo.gender);
+        DataStore.setItem("province", userInfo.province);
+        DataStore.setItem("city", userInfo.city);
+        DataStore.setItem("diamond", userInfo.diamond);
+        DataStore.setItem("country", userInfo.country);
+        DataStore.setItem("headImgUrl", userInfo.headImgUrl);
+        DataStore.setItem("phone", userInfo.phone);
+    }
+
     public saveQuicklyLoginReply(quicklyLoginReply: proto.lobby.MsgQuicklyLoginReply): void {
         DataStore.setItem("account", quicklyLoginReply.account);
         DataStore.setItem("token", quicklyLoginReply.token);
@@ -156,13 +186,16 @@ export class LoginView extends cc.Component {
     public showLoginErrMsg(errCode: number): void {
         const lobby = proto.lobby;
         const errMsgMap: { [key: string]: string } = {
+
             [lobby.LoginError.ErrLoginSuccess]: "成功",
-            [lobby.LoginError.ErrParamDecode]: "微信登录,参数解码失败",
-            [lobby.LoginError.ErrParamInvalidCode]: "微信登录,无效的code",
-            [lobby.LoginError.ErrParamInvalidEncrypteddata]: "微信登录,无效的encrypteddata",
-            [lobby.LoginError.ErrParamInvalidIv]: "微信登录,无效的Iv",
-            [lobby.LoginError.ErrWxAuthFailed]: "微信登录,code认证失败",
-            [lobby.LoginError.ErrDecodeUserInfoFailed]: "微信登录，解码用户信息失败",
+            [lobby.LoginError.ErrParamDecode]: "解码参数失败",
+            [lobby.LoginError.ErrDecodeUserInfoFailed]: "解码用户信息失败",
+
+            [lobby.LoginError.ErrParamInvalidCode]: "不合法的微信code",
+            [lobby.LoginError.ErrParamInvalidEncrypteddata]: "不合法的微信encrypteddata",
+            [lobby.LoginError.ErrParamInvalidIv]: "不合法的微信iv",
+            [lobby.LoginError.ErrWxAuthFailed]: "微信认证失败",
+
             [lobby.LoginError.ErrParamAccountIsEmpty]: "输入账号不能为空",
             [lobby.LoginError.ErrParamPasswordIsEmpty]: "输入密码不能为空",
             [lobby.LoginError.ErrAccountNotExist]: "输入账号不存在",
@@ -189,5 +222,98 @@ export class LoginView extends cc.Component {
     protected onLoad(): void {
         // 构建一个event target用于发出destroy事件
         this.eventTarget = new cc.EventTarget();
+    }
+
+    private createWxBtn(): void {
+        const btnSize = cc.size(this.weixinButton.width, this.weixinButton.height);
+        const frameSize = cc.view.getFrameSize();
+        const winSize = cc.winSize;
+        const scaleX = frameSize.width / winSize.width;
+        const scaleY = frameSize.height / winSize.height;
+        const scale = scaleX < scaleY ? scaleX : scaleY;
+        const left = this.weixinButton.x * scale;
+        const top = this.weixinButton.y * scale;
+        const width = btnSize.width * scale;
+        const height = btnSize.height * scale;
+        this.button = wx.createUserInfoButton({
+            type: 'text',
+            text: '',
+            style: {
+                left: left,
+                top: top,
+                width: width,
+                height: height,
+                lineHeight: 0,
+                // backgroundColor: '#000000',
+                // borderColor: '#ff0000',
+                // color: '#ffffff',
+                textAlign: 'center',
+                fontSize: 16,
+                borderRadius: 4
+            }
+        });
+
+        this.button.onTap((res: getUserInfoRes) => {
+            this.button.hide();
+            SDKManager.instance.login(this.wxLogin.bind(this));
+        });
+    }
+    private wxLogin(result: boolean): void {
+        if (!result) {
+            console.error('wxlogin error');
+            this.button.show();
+
+            return;
+        } else {
+            const wxLoginUrl = `${LEnv.rootURL}${LEnv.wxLogin}`;
+            console.info('wxloginUrl', wxLoginUrl);
+
+            const wxCodeStr = 'wechatLCode';
+            const wxUserInfoStr = 'wxUserInfo';
+            const wxCode = <string>SDKManager.instance.getDataMap()[wxCodeStr];
+            const wxUserData = <getUserInfoRes>SDKManager.instance.getDataMap()[wxUserInfoStr];
+
+            const wxLoginReq = new proto.lobby.MsgWxLogin();
+            wxLoginReq.code = wxCode;
+            wxLoginReq.iv = wxUserData.iv;
+            wxLoginReq.encrypteddata = wxUserData.encryptedData;
+            const body = proto.lobby.MsgWxLogin.encode(wxLoginReq).toArrayBuffer();
+
+            HTTP.hPost(
+                this.eventTarget,
+                wxLoginUrl,
+                (xhr: XMLHttpRequest, err: string) => {
+                    let errMsg = null;
+                    if (err !== null) {
+                        errMsg = `登录错误，错误码:${err}`;
+                    } else {
+                        errMsg = HTTP.hError(xhr);
+                        if (errMsg === null) {
+                            const data = <Uint8Array>xhr.response;
+                            // proto 解码登录结果
+                            const wxLoginReply = proto.lobby.MsgLoginReply.decode(data);
+                            if (wxLoginReply.result === 0) {
+                                Logger.debug("wx login ok, switch to lobbyview");
+                                this.saveWxLoginReply(wxLoginReply);
+                                this.showLobbyView();
+                            } else {
+                                // TODO: show error msg
+                                Logger.debug("wx login error, errCode:", wxLoginReply.result);
+                                this.showLoginErrMsg(wxLoginReply.result);
+                            }
+                        }
+                    }
+
+                    if (errMsg !== null) {
+                        Logger.debug("wx login failed:", errMsg);
+                        // 显示错误对话框
+                        Dialog.showDialog(errMsg, () => {
+                            //
+                        });
+                    }
+                },
+                "arraybuffer",
+                body);
+        }
     }
 }

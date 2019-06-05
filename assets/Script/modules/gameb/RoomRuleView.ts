@@ -6,7 +6,6 @@ import { Logger } from "../lobby/lcore/LCoreExports";
 export class RoomRuleView extends cc.Component {
 
     private view: fgui.GComponent;
-    private win: fgui.Window;
 
     private eventTarget: cc.EventTarget;
 
@@ -58,6 +57,12 @@ export class RoomRuleView extends cc.Component {
             this.view.getChild("jyz").asButton.selected = jinYuanZi;
         }
 
+        if (this.view !== null) {
+            // this.room = room;
+            fgui.GRoot.inst.showPopup(this.view);
+            this.view.setPosition(0, 0);
+        }
+
     }
 
     protected onLoad(): void {
@@ -67,22 +72,12 @@ export class RoomRuleView extends cc.Component {
         const view = fgui.UIPackage.createObject("dafeng", "room_rule_view").asCom;
         this.view = view;
 
-        const win = new fgui.Window();
-        win.contentPane = view;
-        win.modal = true;
-
-        this.win = win;
-        this.win.show();
-
         this.initView();
     }
 
     protected onDestroy(): void {
-        Logger.debug("onDestroy--------------------");
         this.eventTarget.emit("destroy");
-        this.win.hide();
-        this.win.dispose();
-        Logger.debug("onDestroy--------------------done");
+        this.view.dispose();
     }
 
     private onCloseClick(): void {

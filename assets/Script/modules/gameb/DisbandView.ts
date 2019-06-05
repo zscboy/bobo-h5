@@ -9,7 +9,6 @@ import { RoomInterface } from "./RoomInterface";
 export class DisbandView extends cc.Component {
 
     private view: fgui.GComponent;
-    private win: fgui.Window;
 
     private eventTarget: cc.EventTarget;
 
@@ -35,11 +34,19 @@ export class DisbandView extends cc.Component {
         //
         Logger.debug("msgDisbandNotify = ", msgDisbandNotify);
 
+        if (this.view !== null) {
+            // this.room = room;
+            if (this.view.visible === false) {
+                this.view.visible = true;
+                fgui.GRoot.inst.showPopup(this.view);
+                this.view.setPosition(0, 0);
+            }
+        }
+
         //先更新所有文字信息，例如谁同意，谁拒绝之类
         this.updateTexts(msgDisbandNotify);
 
         // 更新按钮
-
         const disbandStateEnum = proto.mahjong.DisbandState;
         const isReject = msgDisbandNotify.disbandState === disbandStateEnum.DoneWithOtherReject;
         const isTimeout = msgDisbandNotify.disbandState === disbandStateEnum.DoneWithWaitReplyTimeout;
@@ -93,7 +100,7 @@ export class DisbandView extends cc.Component {
                     this.showButtons(false);
 
                     return;
-                } else {
+            } else {
                     this.myCountDown.visible = false;
                     this.showButtons(true);
                 }
@@ -113,25 +120,15 @@ export class DisbandView extends cc.Component {
 
         const view = fgui.UIPackage.createObject("dafeng", "disband_room").asCom;
         this.view = view;
-
-        Logger.debug(this.view);
-
-        const win = new fgui.Window();
-        win.contentPane = view;
-        win.modal = true;
-
-        this.win = win;
-        this.win.show();
+        this.view.visible = false;
 
         this.initView();
     }
 
     protected onDestroy(): void {
-        Logger.debug("DisbandView.onDestroy");
-
         this.eventTarget.emit("destroy");
-        this.win.hide();
-        this.win.dispose();
+        this.view.dispose();
+
     }
 
     private disbandCountDown(): void {

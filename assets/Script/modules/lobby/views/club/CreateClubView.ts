@@ -1,5 +1,6 @@
 import { DataStore, Dialog, HTTP, LEnv, LobbyModuleInterface, Logger } from "../../lcore/LCoreExports";
 import { proto } from "../../proto/protoLobby";
+import { ClubRequestError } from "./ClubRequestError";
 
 const { ccclass } = cc._decorator;
 /**
@@ -53,18 +54,18 @@ export class CreateClubView extends cc.Component {
         const closeBtn = this.view.getChild("closeBtn");
         closeBtn.onClick(this.onCloseClick, this);
 
-        const comfirmBtn = this.view.getChild("comfirmBtn");
+        const confirmBtn = this.view.getChild("confirmBtn");
         const needDiamond = this.view.getChild("needDiamond");
 
-        comfirmBtn.onClick(() => {
-            this.onComfirmBtnClick();
+        confirmBtn.onClick(() => {
+            this.onConfirmBtnClick();
             // tslint:disable-next-line:align
         }, this);
 
         needDiamond.text = "9999";
     }
 
-    private onComfirmBtnClick(): void {
+    private onConfirmBtnClick(): void {
         const inputField = this.view.getChild("inputField");
         const clubName = inputField.text;
 
@@ -96,8 +97,7 @@ export class CreateClubView extends cc.Component {
     private createClub(clubName: string): void {
         Logger.debug("createClub clubName = ", clubName);
         const tk = DataStore.getString("token", "");
-        const loadEmailUrl = `${LEnv.rootURL}${LEnv.createClub}?&tk=${tk}&&clname==${clubName}`;
-        const msg: string = null;
+        const loadEmailUrl = `${LEnv.rootURL}${LEnv.createClub}?&tk=${tk}&&clname=${clubName}`;
 
         const cb = (xhr: XMLHttpRequest, err: string) => {
             //
@@ -110,12 +110,15 @@ export class CreateClubView extends cc.Component {
 
             if (msgClubReply.replyCode === proto.club.ClubReplyCode.RCOperation) {
                 clubRsp = proto.club.MsgCreateClubReply.decode(msgClubReply.content);
+                this.updateViewClubList(clubRsp.clubInfo);
+            } else if (msgClubReply.replyCode === proto.club.ClubReplyCode.RCError) {
+                const msgCubOperGenericReply = proto.club.MsgCubOperGenericReply.decode(msgClubReply.content);
+                ClubRequestError.showErrMsg(msgCubOperGenericReply.errorCode);
             }
 
-            this.updateViewClubList(clubRsp.clubInfo);
         };
 
-        this.clubRequest(loadEmailUrl, msg, cb);
+        this.clubRequest(loadEmailUrl, cb);
 
     }
 
@@ -132,13 +135,9 @@ export class CreateClubView extends cc.Component {
      * @param msg 滚动圈弹的信息
      * @param cb 回调
      */
-    private clubRequest(url: string, msg: string, cb: Function): void {
+    private clubRequest(url: string, cb: Function): void {
         if (url === null) {
             return null;
-        }
-
-        if (msg !== null) {
-            Dialog.showDialog(msg);
         }
 
         Logger.debug("emailRequest url = ", url);

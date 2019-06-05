@@ -56,6 +56,8 @@ export class LobbyModule extends cc.Component implements LobbyModuleInterface {
         // 任何时刻只有一个子游戏
         if (this.gameNode !== undefined) {
             Logger.error("switch to game failed, there is a game running:", this.gameNode.name);
+
+            return;
         }
 
         // 隐藏大厅窗口

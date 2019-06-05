@@ -447,13 +447,17 @@ export namespace proto {
 
 		enum LoginError {
 			ErrLoginSuccess = 0,
-			ErrParamWechatCodeIsEmpty = 1,
-			ErrLoadWechatUserInfoFailed = 2,
-			ErrParamAccountIsEmpty = 3,
-			ErrParamPasswordIsEmpty = 4,
-			ErrAccountNotExist = 5,
-			ErrAccountNotSetPassword = 6,
-			ErrPasswordNotMatch = 7,
+			ErrParamDecode = 1,
+			ErrParamInvalidCode = 2,
+			ErrParamInvalidEncrypteddata = 3,
+			ErrParamInvalidIv = 4,
+			ErrWxAuthFailed = 5,
+			ErrDecodeUserInfoFailed = 6,
+			ErrParamAccountIsEmpty = 7,
+			ErrParamPasswordIsEmpty = 8,
+			ErrAccountNotExist = 9,
+			ErrAccountNotSetPassword = 10,
+			ErrPasswordNotMatch = 11,
 		}
 
 		enum RegisterError {
@@ -874,6 +878,21 @@ export namespace proto {
 			constructor(properties?: lobby.IUserInfo);
 			public static encode(message: UserInfo): ByteBuffer;
 			public static decode(reader: Uint8Array|ByteBuffer): UserInfo;
+		}
+
+		interface IMsgWxLogin {
+			code: string;
+			encrypteddata: string;
+			iv: string;
+		}
+
+		class MsgWxLogin implements IMsgWxLogin {
+			public code: string;
+			public encrypteddata: string;
+			public iv: string;
+			constructor(properties?: lobby.IMsgWxLogin);
+			public static encode(message: MsgWxLogin): ByteBuffer;
+			public static decode(reader: Uint8Array|ByteBuffer): MsgWxLogin;
 		}
 
 		interface IMsgLoginReply {

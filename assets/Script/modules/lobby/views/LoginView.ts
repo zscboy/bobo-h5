@@ -1,8 +1,7 @@
-import { SDKManager } from "../../chanelSdk/SDKManager";
-import { DataStore, Dialog, HTTP, LEnv, LobbyModuleInterface, Logger } from "../lcore/LCoreExports";
+import { SDKManager } from "../chanelSdk/ChanelSdkExports";
+import { DataStore, Dialog, Enum, HTTP, LEnv, LobbyModuleInterface, Logger } from "../lcore/LCoreExports";
 import { proto } from "../proto/protoLobby";
 import { LobbyView } from "./LobbyView";
-import { Enum } from "../../common/Enum";
 
 const { ccclass } = cc._decorator;
 

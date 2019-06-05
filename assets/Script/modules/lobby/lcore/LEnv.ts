@@ -1,4 +1,4 @@
-import { Enum } from "../../common/Enum";
+import { Enum } from "./Enum";
 
 /**
  * lobby 配置
@@ -6,7 +6,7 @@ import { Enum } from "../../common/Enum";
 export namespace LEnv {
     export const VER_STR: string = "v1.0.0";
 
-    export const chanelType = Enum.CHANNEL_TYPE.WEIXIN;
+    export const chanelType: Enum.CHANNEL_TYPE = Enum.CHANNEL_TYPE.WEIXIN;
 
     // updateQuery = "/lobby/upgrade/query",
     export const updateQuery: string = "/lobby/uuid/upgradeQuery";
@@ -49,7 +49,8 @@ export namespace LEnv {
 
     export const loadClubRooms = "/lobby/uuid/loadClubRooms";
 
-    export const cfmt = (str: string, ...args: any[]): string => { // stslint:disable-line:no-any
+    // tslint:disable-next-line:no-any
+    export const cfmt = (str: string, ...args: any[]): string => {
         return str.replace(/{(\d+)}/g, (match, n) => {
             return (typeof args[n]) !== "undefined"
                 ? args[n]  // tslint:disable-line:no-unsafe-any

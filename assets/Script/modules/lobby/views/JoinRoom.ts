@@ -172,7 +172,8 @@ export class JoinRoom extends cc.Component {
             jsonString: "",
             userInfo: myUser,
             roomInfo: myRoomInfo,
-            uuid: "uuid"
+            uuid: "uuid",
+            record: null
         };
 
         const lobbyModuleInterface = <LobbyModuleInterface>this.getComponent("LobbyModule");

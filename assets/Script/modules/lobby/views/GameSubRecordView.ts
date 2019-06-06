@@ -15,30 +15,75 @@ export class GameSubRecordView extends cc.Component {
     private eventTarget: cc.EventTarget;
     private replayRoom: proto.lobby.MsgReplayRoom;
 
+    private lobbyModule: LobbyModuleInterface;
+
     private recordList: fgui.GList;
 
+    private onGameRecordShowFunc: Function;
+
     public updateData(replayRoom: proto.lobby.MsgReplayRoom): void {
-        Logger.debug("onUpdate-----------------------------");
 
         this.replayRoom = replayRoom;
         const replayPlayerInfos = replayRoom.players;
+
+        let text = "未知麻将";
+        const roomType = replayRoom.recordRoomType;
+        switch (roomType) {
+            case 1:
+                text = "大丰麻将";
+                break;
+            case 3:
+                text = "东台麻将";
+                break;
+            case 8:
+                text = "关张";
+                break;
+            case 9:
+                text = "7王523";
+                break;
+            case 11:
+                text = "斗地主";
+                break;
+
+            default:
+        }
+
+        const rountText = `${replayRoom.records.length} 局`;
+        const gameName = this.view.asCom.getChild("gameName");
+        gameName.text = `${text} ${rountText}`;
+
+        const roomNumber = this.view.asCom.getChild("roomNumber");
+        roomNumber.text = `${replayRoom.roomNumber} ${"号 房间"}`;
+
+        const dateText = this.view.asCom.getChild("time");
+
+        const date = new Date(replayRoom.startTime * 1000);
+        const month = date.getMonth() < 9 ? `0${date.getMonth() + 1} ` : `${date.getMonth() + 1} `;
+        const day = date.getDay() < 10 ? `0${date.getDay()} ` : `${date.getDay()} `;
+        const hour = date.getHours() < 10 ? `0${date.getHours()} ` : `${date.getHours()} `;
+        const minute = date.getMinutes() < 10 ? `0${date.getMinutes()} ` : `${date.getMinutes()} `;
+
+        dateText.text = `${date.getFullYear()} /${month}/${day} ${hour}: ${minute} `;
 
         let name;
         let label;
         let userID;
 
+        let player: proto.lobby.IMsgReplayPlayerInfo;
+
         for (let i = 0; i < replayPlayerInfos.length; i++) {
 
-            name = replayPlayerInfos[i].nick;
-            userID = replayPlayerInfos[i].userID;
-            label = this.view.getChild(`player${i + 1}`);
+            player = replayPlayerInfos[i];
+            name = player.nick;
+            userID = player.userID;
+            label = this.view.getChild(`playName${i + 1}`);
 
-            if (name !== "") {
-                label.text = name;
-            } else {
-                label.text = userID;
+            const nick = name === "" ? userID : name;
+            label.text = `${nick}`;
+            this.view.getChild(`owner${i + 1}`).visible = false;
+            if (player.userID === replayRoom.ownerUserID) {
+                this.view.getChild(`owner${i + 1}`).visible = true;
             }
-
         }
 
         this.updateList();
@@ -46,7 +91,6 @@ export class GameSubRecordView extends cc.Component {
     }
 
     protected onLoad(): void {
-        Logger.debug("onLoad----------------------------------");
         this.eventTarget = new cc.EventTarget();
 
         const lm = <LobbyModuleInterface>this.getComponent("LobbyModule");
@@ -68,15 +112,19 @@ export class GameSubRecordView extends cc.Component {
 
     protected onDestroy(): void {
 
+        if (this.lobbyModule !== null) {
+            this.lobbyModule.eventTarget.off("onGameRecordShow", this.onGameRecordShowFunc);
+        }
+
         this.eventTarget.emit("destroy");
         this.win.hide();
         this.win.dispose();
     }
 
     private onCloseClick(): void {
-        const lobbyModule = <LobbyModuleInterface> this.getComponent("LobbyModule");
+        const lobbyModule = <LobbyModuleInterface>this.getComponent("LobbyModule");
         if (lobbyModule !== null) {
-          lobbyModule.eventTarget.emit(`onGameRecordShow`);
+            lobbyModule.eventTarget.emit(`onGameRecordShow`);
         }
 
         this.destroy();
@@ -92,17 +140,36 @@ export class GameSubRecordView extends cc.Component {
         };
         this.recordList.setVirtual();
 
+        this.lobbyModule = <LobbyModuleInterface>this.getComponent("LobbyModule");
+        if (this.lobbyModule !== null) {
+            this.onGameRecordShowFunc = this.lobbyModule.eventTarget.on(`onGameRecordShow`, this.onGameRecordShow, this);
+        }
+
+    }
+
+    private onGameRecordShow(): void {
+        if (this.win !== null) {
+            this.win.show();
+        }
     }
 
     private renderListItem(index: number, obj: fgui.GObject): void {
 
         const record = this.replayRoom.records[index];
 
-        const roomNumber = obj.asCom.getChild("roundText");
-        roomNumber.text = `${index}`;
+        const roundText = obj.asCom.getChild("roundText");
+        const roundIndex = index + 1;
+        const roundIndexStr = roundIndex < 10 ? `0${roundIndex} ` : `${roundIndex} `;
 
-        const date = obj.asCom.getChild("time");
-        date.text = ``;
+        roundText.text = `${roundIndexStr}`;
+
+        const dateText = obj.asCom.getChild("time");
+
+        const date = new Date(record.startTime * 1000);
+        const hour = date.getHours() < 10 ? `0${date.getHours()} ` : `${date.getHours()} `;
+        const minute = date.getMinutes() < 10 ? `0${date.getMinutes()} ` : `${date.getMinutes()} `;
+        const second = date.getSeconds() < 10 ? `0${date.getSeconds()} ` : `${date.getSeconds()} `;
+        dateText.text = `${hour}: ${minute}:${second} `;
 
         let label;
 
@@ -125,8 +192,6 @@ export class GameSubRecordView extends cc.Component {
     }
 
     private enterReplayRoom(record: proto.lobby.MsgAccLoadReplayRecord): void {
-        // const index = <number>ev.initiator.data;
-        // const record = this.replayRoom.records[index];
         const recordCfg = this.replayRoom;
         let modName;
         if (recordCfg.recordRoomType === 1) {
@@ -138,7 +203,7 @@ export class GameSubRecordView extends cc.Component {
         }
 
         this.win.hide();
-        this.destroy();
+        //this.destroy();
 
         const myUserID = DataStore.getString("userID", "");
         const myUser = { userID: myUserID };
@@ -147,7 +212,7 @@ export class GameSubRecordView extends cc.Component {
             jsonString: "replay",
             userInfo: myUser,
             roomInfo: null,
-            uuid : "",
+            uuid: "",
             record: record
         };
 

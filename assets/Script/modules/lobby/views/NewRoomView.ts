@@ -51,6 +51,8 @@ export class NewRoomView extends cc.Component {
                         const data = <Uint8Array>xhr.response;
                         // proto 解码登录结果
                         const msgCreateRoomRsp = proto.lobby.MsgCreateRoomRsp.decode(data);
+
+                        Logger.debug("msgCreateRoomRsp:", msgCreateRoomRsp);
                         if (msgCreateRoomRsp.result === proto.lobby.MsgError.ErrSuccess) {
                             this.enterGame(msgCreateRoomRsp.roomInfo);
                         } else if (msgCreateRoomRsp.result === proto.lobby.MsgError.ErrUserInOtherRoom) {
@@ -148,7 +150,7 @@ export class NewRoomView extends cc.Component {
             jsonString: "",
             userInfo: myUser,
             roomInfo: myRoomInfo,
-            uuid: "uuid"
+            uuid: roomInfo.gameServerID
         };
 
         const lobbyModuleInterface = <LobbyModuleInterface>this.getComponent("LobbyModule");
@@ -172,12 +174,11 @@ export class NewRoomView extends cc.Component {
                 } else {
                     errMsg = HTTP.hError(xhr);
                     if (errMsg === null) {
-                        const data = <Uint8Array>xhr.response;
-                        const dataString = new TextDecoder("utf-8").decode(data);
+                        const dataString = <string>String.fromCharCode.apply(null, new Uint8Array(<ArrayBuffer>xhr.response));
                         const priceCfgs = <{ [key: string]: object }>JSON.parse(dataString);
                         this.dfRuleView.updatePriceCfg(priceCfgs);
                         this.zjmjRuleVIew.updatePriceCfg(priceCfgs);
-                        Logger.debug("price:", dataString);
+
                     }
                 }
 

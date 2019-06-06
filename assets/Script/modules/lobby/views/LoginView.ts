@@ -1,3 +1,4 @@
+import { WeiXinSDK } from "../chanelSdk/wxSdk/WeiXinSDkExports";
 import { DataStore, Dialog, HTTP, LEnv, LobbyModuleInterface, Logger } from "../lcore/LCoreExports";
 import { proto } from "../proto/protoLobby";
 import { LobbyView } from "./LobbyView";
@@ -18,10 +19,12 @@ export class LoginView extends cc.Component {
 
     private eventTarget: cc.EventTarget;
 
+    private button: UserInfoButton = null;
+
     public showLoginView(): void {
         const lm = <LobbyModuleInterface>this.getComponent("LobbyModule");
         const loader = lm.loader;
-        loader.fguiAddPackage("lobby/fui_login/lobby_login");
+        loader.fguiAddPackage("Lauch/fui_login/lobby_login");
         const view = fgui.UIPackage.createObject("lobby_login", "login").asCom;
 
         const win = new fgui.Window();
@@ -34,6 +37,16 @@ export class LoginView extends cc.Component {
         this.initView();
 
         this.win.show();
+
+        if (cc.sys.platform === cc.sys.WECHAT_GAME) {
+            this.createWxBtn();
+        } else {
+            Logger.debug('not wx platform');
+        }
+    }
+
+    public updateProgressBar(progress: number): void {
+        this.progressBar.value = progress * 100;
     }
 
     public initView(): void {
@@ -64,7 +77,6 @@ export class LoginView extends cc.Component {
         this.loginBtn.visible = false;
         this.weixinButton.visible = false;
         this.progressBar.value = 0;
-        this.progressBar.visible = false;
 
         this.loginBtn.onClick(this.onLoginClick, this);
 
@@ -72,7 +84,7 @@ export class LoginView extends cc.Component {
 
         // local progress = progressView.new(this)
         // progressView: updateView(this)
-        this.updateCompleted();
+        // this.updateCompleted();
     }
 
     public updateCompleted(): void {
@@ -87,7 +99,9 @@ export class LoginView extends cc.Component {
     }
 
     public onWeixinBtnClick(): void {
-        //
+        if (cc.sys.platform !== cc.sys.WECHAT_GAME) {
+            Logger.debug('not wx env');
+        }
     }
 
     public quicklyLogin(): void {
@@ -129,6 +143,21 @@ export class LoginView extends cc.Component {
         });
     }
 
+    public saveWxLoginReply(wxLoginReply: proto.lobby.MsgLoginReply): void {
+        DataStore.setItem("token", wxLoginReply.token);
+
+        const userInfo = wxLoginReply.userInfo;
+        DataStore.setItem("userID", userInfo.userID);
+        DataStore.setItem("nickName", userInfo.nickName);
+        DataStore.setItem("gender", userInfo.gender);
+        DataStore.setItem("province", userInfo.province);
+        DataStore.setItem("city", userInfo.city);
+        DataStore.setItem("diamond", userInfo.diamond);
+        DataStore.setItem("country", userInfo.country);
+        DataStore.setItem("headImgUrl", userInfo.headImgUrl);
+        DataStore.setItem("phone", userInfo.phone);
+    }
+
     public saveQuicklyLoginReply(quicklyLoginReply: proto.lobby.MsgQuicklyLoginReply): void {
         DataStore.setItem("account", quicklyLoginReply.account);
         DataStore.setItem("token", quicklyLoginReply.token);
@@ -156,13 +185,21 @@ export class LoginView extends cc.Component {
     public showLoginErrMsg(errCode: number): void {
         const lobby = proto.lobby;
         const errMsgMap: { [key: string]: string } = {
-            [lobby.LoginError.ErrParamWechatCodeIsEmpty]: "获取微信code失败",
-            [lobby.LoginError.ErrLoadWechatUserInfoFailed]: "获取微信用户信息失败",
+
+            [lobby.LoginError.ErrLoginSuccess]: "成功",
+            [lobby.LoginError.ErrParamDecode]: "解码参数失败",
+            [lobby.LoginError.ErrDecodeUserInfoFailed]: "解码用户信息失败",
+
+            [lobby.LoginError.ErrParamInvalidCode]: "不合法的微信code",
+            [lobby.LoginError.ErrParamInvalidEncrypteddata]: "不合法的微信encrypteddata",
+            [lobby.LoginError.ErrParamInvalidIv]: "不合法的微信iv",
+            [lobby.LoginError.ErrWxAuthFailed]: "微信认证失败",
+
             [lobby.LoginError.ErrParamAccountIsEmpty]: "输入账号不能为空",
             [lobby.LoginError.ErrParamPasswordIsEmpty]: "输入密码不能为空",
             [lobby.LoginError.ErrAccountNotExist]: "输入账号不存在",
             [lobby.LoginError.ErrAccountNotSetPassword]: "账号没有设置密码，不能登录",
-            [lobby.LoginError.ErrPasswordNotMatch]: "账号没有设置密码，不能登录"
+            [lobby.LoginError.ErrPasswordNotMatch]: "密码不匹配，不能登录"
         };
 
         let errMsg = errMsgMap[errCode];
@@ -184,5 +221,98 @@ export class LoginView extends cc.Component {
     protected onLoad(): void {
         // 构建一个event target用于发出destroy事件
         this.eventTarget = new cc.EventTarget();
+    }
+
+    private createWxBtn(): void {
+        const btnSize = cc.size(this.weixinButton.width, this.weixinButton.height);
+        const frameSize = cc.view.getFrameSize();
+        const winSize = cc.winSize;
+        const scaleX = frameSize.width / winSize.width;
+        const scaleY = frameSize.height / winSize.height;
+        const scale = scaleX < scaleY ? scaleX : scaleY;
+        const left = this.weixinButton.x * scale;
+        const top = this.weixinButton.y * scale;
+        const width = btnSize.width * scale;
+        const height = btnSize.height * scale;
+        this.button = wx.createUserInfoButton({
+            type: 'text',
+            text: '',
+            style: {
+                left: left,
+                top: top,
+                width: width,
+                height: height,
+                lineHeight: 0,
+                // backgroundColor: '#000000',
+                // borderColor: '#ff0000',
+                // color: '#ffffff',
+                textAlign: 'center',
+                fontSize: 16,
+                borderRadius: 4
+            }
+        });
+
+        this.button.onTap((res: getUserInfoRes) => {
+            this.button.hide();
+            WeiXinSDK.login(<Function>this.wxLogin.bind(this));
+        });
+    }
+    private wxLogin(result: boolean): void {
+        if (!result) {
+            Logger.error("wxlogin error");
+            this.button.show();
+
+            return;
+        } else {
+            const wxLoginUrl = `${LEnv.rootURL}${LEnv.wxLogin}`;
+            Logger.debug('wxloginUrl', wxLoginUrl);
+
+            const wxCodeStr = 'wechatLCode';
+            const wxUserInfoStr = 'wxUserInfo';
+            const wxCode = <string>WeiXinSDK.getWxDataMap()[wxCodeStr];
+            const wxUserData = <getUserInfoRes>WeiXinSDK.getWxDataMap()[wxUserInfoStr];
+
+            const wxLoginReq = new proto.lobby.MsgWxLogin();
+            wxLoginReq.code = wxCode;
+            wxLoginReq.iv = wxUserData.iv;
+            wxLoginReq.encrypteddata = wxUserData.encryptedData;
+            const body = proto.lobby.MsgWxLogin.encode(wxLoginReq).toArrayBuffer();
+
+            HTTP.hPost(
+                this.eventTarget,
+                wxLoginUrl,
+                (xhr: XMLHttpRequest, err: string) => {
+                    let errMsg = null;
+                    if (err !== null) {
+                        errMsg = `登录错误，错误码:${err}`;
+                    } else {
+                        errMsg = HTTP.hError(xhr);
+                        if (errMsg === null) {
+                            const data = <Uint8Array>xhr.response;
+                            // proto 解码登录结果
+                            const wxLoginReply = proto.lobby.MsgLoginReply.decode(data);
+                            if (wxLoginReply.result === 0) {
+                                Logger.debug("wx login ok, switch to lobbyview");
+                                this.saveWxLoginReply(wxLoginReply);
+                                this.showLobbyView();
+                            } else {
+                                // TODO: show error msg
+                                Logger.debug("wx login error, errCode:", wxLoginReply.result);
+                                this.showLoginErrMsg(wxLoginReply.result);
+                            }
+                        }
+                    }
+
+                    if (errMsg !== null) {
+                        Logger.debug("wx login failed:", errMsg);
+                        // 显示错误对话框
+                        Dialog.showDialog(errMsg, () => {
+                            //
+                        });
+                    }
+                },
+                "arraybuffer",
+                body);
+        }
     }
 }

@@ -251,10 +251,8 @@ export class Player {
     //把花牌列表显示到界面上
     public flower2UI(): void {
         //先取消所有花牌显示
-        const playerView = this.playerView;
-        playerView.hideFlowers();
-
-        playerView.showFlowers();
+        this.playerView.hideFlowers();
+        this.playerView.showFlowers();
     }
 
     //把打出的牌列表显示到界面上
@@ -414,12 +412,6 @@ export class Player {
         this.playerView = playerView;
         playerView.player = this;
         playerView.initCardLists();
-        // if this.nick != null {
-        //playerView.head.nameText.text = ""..this.nick
-        //}
-
-        //playerView.head.root.visible = true
-        //playerView.tilesRoot.visible = true
 
         playerView.showHeadImg();
         playerView.showOwner();

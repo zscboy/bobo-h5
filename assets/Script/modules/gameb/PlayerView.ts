@@ -1,4 +1,5 @@
 import { Dialog, Logger } from "../lobby/lcore/LCoreExports";
+import { GameRules } from "./GameRules";
 import { ButtonDef, ClickCtrl, PlayerInterface } from "./PlayerInterface";
 import { proto } from "./proto/protoGame";
 import { RoomHost, RoomInterface, TingPai } from "./RoomInterface";
@@ -235,6 +236,9 @@ export class PlayerView {
 
     //隐藏花牌列表
     public hideFlowers(): void {
+        if (!GameRules.haveFlower(this.room.roomType)) {
+            return;
+        }
         if (this.flowers != null) {
             for (const f of this.flowers) {
                 f.visible = false;
@@ -246,6 +250,9 @@ export class PlayerView {
 
     //显示花牌，注意花牌需要是平放的
     public showFlowers(): void {
+        if (!GameRules.haveFlower(this.room.roomType)) {
+            return;
+        }
         const tilesFlower = this.player.tilesFlower;
         const flowers = this.flowers;
 
@@ -327,12 +334,6 @@ export class PlayerView {
                     discardTips.visible = false;
                 },
                 1);
-            // this.myView.DelayRun(
-            //     1,
-            //     function () {
-            //         discardTips.visible = false
-            //     }
-            // )
         }
     }
 
@@ -419,7 +420,6 @@ export class PlayerView {
     }
 
     public mountConcealedKongTileImage(t: fgui.GComponent, tileID: number): void {
-        //const player = this.player
         //tileID === mjproto.mjproto.enumTid_MAX表示该牌需要暗牌显示
         if (tileID === mjproto.TileID.enumTid_MAX) {
             // TileImageMounter.mountMeldDisableImage(t, tileID, this.viewChairID)
@@ -826,7 +826,7 @@ export class PlayerView {
 
             return;
         }
-        if (this.roomHost.timeElapsed - this.roomHostTimeElapsed <= 0.5) {
+        if (this.roomHost.timeElapsed - this.roomHostTimeElapsed <= 1) {
             clickCtrl.doubleTimeEclipse = 0;
             //双击 直接出牌
             //判断可否出牌

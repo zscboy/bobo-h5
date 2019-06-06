@@ -198,8 +198,8 @@ export class GameSubRecordView extends cc.Component {
             //大丰麻将
             modName = "gameb";
         } else if (recordCfg.recordRoomType === 21) {
-            //关张
-            modName = "gamea";
+            //湛江
+            modName = "gameb";
         }
 
         this.win.hide();

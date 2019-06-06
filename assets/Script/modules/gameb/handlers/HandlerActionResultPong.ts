@@ -23,7 +23,7 @@ export namespace HandlerActionResultPong {
         player.addMeld(actionMeld);
         //如果newFlowers有内容，则需要刷新暗杠列表
         const newFlowers = actionResultMsg.newFlowers;
-        if (newFlowers !== null && newFlowers.length > 0) {
+        if (newFlowers !== undefined && newFlowers !== null && newFlowers.length > 0) {
             player.refreshConcealedMelds(newFlowers);
         }
 

@@ -269,9 +269,10 @@ export class GameModule extends cc.Component implements GameModuleInterface {
 
     private createRoom(
         myUser: UserInfo,
-        roomInfo: RoomInfo): void {
+        roomInfo: RoomInfo,
+        rePlay?: Replay): void {
         //
-        this.mRoom = new Room(myUser, roomInfo, this);
+        this.mRoom = new Room(myUser, roomInfo, this, rePlay);
         this.mRoom.loadRoomView(this.view);
     }
 
@@ -405,7 +406,7 @@ export class GameModule extends cc.Component implements GameModuleInterface {
 
         const replay = new Replay(this, msgHandRecord);
         // 新建room和绑定roomView
-        this.createRoom(this.user, roomInfo);
+        this.createRoom(this.user, roomInfo, replay);
 
         await replay.gogogo();
 

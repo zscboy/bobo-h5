@@ -21,6 +21,7 @@ import { HandResultView } from "./HandResultView";
 import { Player } from "./Player";
 import { PlayerInterface } from "./PlayerInterface";
 import { proto } from "./proto/protoGame";
+import { Replay } from "./Replay";
 import { PlayerInfo, RoomHost, RoomInterface, TingPai } from "./RoomInterface";
 import { RoomView } from "./RoomView";
 
@@ -67,15 +68,16 @@ export class Room {
     public isContinuousBanker: boolean;
     public roomView: RoomView;
     public players: { [key: string]: Player } = {};
-    public replay: boolean;
+    public replay: Replay;
     public tilesInWall: number;
     public myPlayer: Player;
     public msgDisbandNotify: proto.mahjong.MsgDisbandNotify;
     public readonly roomType: number;
-    public constructor(myUser: UserInfo, roomInfo: RoomInfo, host: RoomHost) {
+    public constructor(myUser: UserInfo, roomInfo: RoomInfo, host: RoomHost, rePlay?: Replay) {
         this.myUser = myUser;
         this.roomInfo = roomInfo;
         this.host = host;
+        this.replay = rePlay;
 
         const roomConfigJSON = <{ [key: string]: boolean | number | string }>JSON.parse(roomInfo.roomConfig);
         // Logger.debug("roomConfigJSON ---------------------------------------------", roomConfigJSON);
@@ -395,7 +397,7 @@ export class Room {
         return this.myUser.userID === userID;
     }
     public isReplayMode(): boolean {
-        return this.replay;
+        return this.replay !== undefined;
     }
 
     public getBankerChairID(): number {

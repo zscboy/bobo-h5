@@ -84,6 +84,14 @@ const IS_CONTINUOUS_BANKER: { [key: number]: string } = {
 const FAKE_WIN_SCORE: { [key: number]: string } = {
     [ROOM_TYPE.DaFeng]: "包牌"
 };
+//fakeList 得分类型
+const FAKE_LIST: { [key: number]: string } = {
+    [ROOM_TYPE.DaFeng]: "报听"
+};
+//fakeList 是否显示出来
+const FAKE_LIST_BOOLEAN: { [key: number]: boolean } = {
+    [ROOM_TYPE.ZhanJiang]: true
+};
 //大胡附加得分 trimGreatWinPoints
 const TRIM_GREAT_WIN_POINTS: { [key: number]: string } = {
     [ROOM_TYPE.DaFeng]: "辣子数 +"
@@ -92,11 +100,31 @@ const TRIM_GREAT_WIN_POINTS: { [key: number]: string } = {
 const BASE_WIN_SCORE: { [key: number]: string } = {
     [ROOM_TYPE.DaFeng]: "基本分"
 };
+
 /**
  *  游戏差异类
  */
 export namespace GameRules {
+    //是否要把FakeList 显示出来 （湛江麻将的马牌就需要显示）
+    export const haveFakeListOfTitles = (gameType: number): boolean => {
+        const boo = FAKE_LIST_BOOLEAN[gameType];
+        if (boo !== undefined) {
+            return boo;
+        }
 
+        return false;
+    };
+    //获取fakeList字符串
+    export const getFakeListStrs = (gameType: number, playerScores: proto.mahjong.IMsgPlayerScore): string => {
+        if (playerScores.fakeList !== undefined && playerScores.fakeList.length > 0) {
+            const str = FAKE_LIST[gameType];
+            if (str !== undefined) {
+                return str;
+            }
+        }
+
+        return "";
+    };
     //获取大胡类型字符串
     export const getGreatWinStrs = (gameType: number, greatWin: proto.mahjong.IMsgPlayerScoreGreatWin): string => {
         if (greatWin === undefined || greatWin === null) {

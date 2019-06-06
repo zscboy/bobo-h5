@@ -2,6 +2,7 @@ import { GameRules } from "./GameRules";
 import { Player } from "./Player";
 import { proto } from "./proto/protoGame";
 import { RoomInterface } from "./RoomInterface";
+import { RoomRuleView } from "./RoomRuleView";
 import { TileImageMounter } from "./TileImageMounter";
 
 const mjproto = proto.mahjong;
@@ -86,6 +87,8 @@ export class HandResultView extends cc.Component {
         const againBtn = this.unityViewNode.getChild("againBtn");
         againBtn.onClick(this.onAgainButtonClick, this);
         const shanreBtn = this.unityViewNode.getChild("shanreBtn");
+        const infoBtn = this.unityViewNode.getChild("guizeBtn");
+        infoBtn.onClick(this.onRoomRuleBtnClick, this);
         // shanreBtn.onClick(this.onShareButtonClick, this);
 
         if (room.isReplayMode()) {
@@ -239,9 +242,7 @@ export class HandResultView extends cc.Component {
                 textScore = `${textScore}家家庄x2  `;
             }
         }
-        // if (playerScores.fakeList !== null && playerScores.fakeList.length > 0) {
-        //     textScore = `${textScore}报听  `;
-        // }
+        textScore = `${textScore}${GameRules.getFakeListStrs(this.room.roomType, playerScores)}  `;
         c.textPlayerScore.text = textScore;
     }
     //更新显示数据
@@ -262,7 +263,7 @@ export class HandResultView extends cc.Component {
                 //分数详情
                 this.updatePlayerScoreData(player, c);
                 //马牌
-                if (playerScores.fakeList !== undefined) {
+                if (GameRules.haveFakeListOfTitles(this.room.roomType) && playerScores.fakeList !== undefined) {
                     for (const fake of playerScores.fakeList) {
                         fakeList.push(fake);
                     }
@@ -373,6 +374,15 @@ export class HandResultView extends cc.Component {
             group.visible = false;
         }
         this.contentGroup = contentGroup;
+    }
+
+    private onRoomRuleBtnClick(): void {
+        let roomRuleView = this.getComponent(RoomRuleView);
+
+        if (roomRuleView === undefined || roomRuleView == null) {
+            roomRuleView = this.addComponent(RoomRuleView);
+        }
+        roomRuleView.updateView(this.room.roomInfo.roomConfig);
     }
     // 玩家点击“继续”按钮，注意如果牌局结束，此按钮是“大结算”
     private onAgainButtonClick(): void {

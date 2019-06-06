@@ -416,15 +416,17 @@ export class PlayerView {
             TileImageMounter.mountMeldEnableImage(t3, msgMeld.tile1, this.viewChairID);
             TileImageMounter.mountMeldEnableImage(t4, msgMeld.tile1, this.viewChairID);
             this.setMeldTileDirection(false, t4, viewChairID, this.viewChairID);
-        }
-    }
-
-    public mountConcealedKongTileImage(t: fgui.GComponent, tileID: number): void {
-        //tileID === mjproto.mjproto.enumTid_MAX表示该牌需要暗牌显示
-        if (tileID === mjproto.TileID.enumTid_MAX) {
-            // TileImageMounter.mountMeldDisableImage(t, tileID, this.viewChairID)
-        } else {
-            TileImageMounter.mountMeldEnableImage(t, tileID, this.viewChairID);
+        } else if (meldType === mtProto.enumMeldTypeConcealedKong) {
+            const t4 = meldView.getChild("n4").asCom; //这个是暗牌显示 用于别的玩家暗杠
+            const t0 = meldView.getChild("n0").asCom; //这个是明牌显示 自己暗杠 或者 回播的时候用的
+            if (msgMeld.tile1 === undefined || msgMeld.tile1 >= mjproto.TileID.enumTid_MAX) {
+                t4.visible = true;
+                t0.visible = false;
+            } else {
+                t4.visible = false;
+                t0.visible = true;
+                TileImageMounter.mountMeldEnableImage(t0, msgMeld.tile1, this.viewChairID);
+            }
         }
     }
 

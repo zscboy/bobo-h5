@@ -125,7 +125,11 @@ export class LobbyView extends cc.Component {
     }
     private onFriendClick(): void {
         const myUser = { userID: "6" };
-        const roomInfo = { roomID: "monkey-room", roomNumber: "monkey-room", roomConfig: "" };
+        const roomConfigObj = {
+            roomType: 1
+        };
+
+        const roomInfo = { roomID: "monkey-room", roomNumber: "monkey-room", roomConfig: JSON.stringify(roomConfigObj) };
 
         const params: GameModuleLaunchArgs = {
             jsonString: "",

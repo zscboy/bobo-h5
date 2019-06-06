@@ -3,6 +3,7 @@ import { proto } from "../proto/protoLobby";
 import { DFRuleView } from "./DFRuleView";
 import { LobbyError } from "./LobbyError";
 import { RunFastRuleView } from "./RunFastRuleView";
+import { ZJMJRuleView } from "./ZJMJRuleView";
 
 const { ccclass } = cc._decorator;
 
@@ -19,6 +20,8 @@ export class NewRoomView extends cc.Component {
     private runFastRuleView: RunFastRuleView;
 
     private dfRuleView: DFRuleView;
+
+    private zjmjRuleVIew: ZJMJRuleView;
 
     public getView(): fgui.GComponent {
         return this.view;
@@ -48,6 +51,8 @@ export class NewRoomView extends cc.Component {
                         const data = <Uint8Array>xhr.response;
                         // proto 解码登录结果
                         const msgCreateRoomRsp = proto.lobby.MsgCreateRoomRsp.decode(data);
+
+                        Logger.debug("msgCreateRoomRsp:", msgCreateRoomRsp);
                         if (msgCreateRoomRsp.result === proto.lobby.MsgError.ErrSuccess) {
                             this.enterGame(msgCreateRoomRsp.roomInfo);
                         } else if (msgCreateRoomRsp.result === proto.lobby.MsgError.ErrUserInOtherRoom) {
@@ -98,6 +103,7 @@ export class NewRoomView extends cc.Component {
     protected onDestroy(): void {
         this.runFastRuleView.destroy();
         this.dfRuleView.destroy();
+        this.zjmjRuleVIew.destroy();
 
         this.eventTarget.emit("destroy");
 
@@ -115,6 +121,9 @@ export class NewRoomView extends cc.Component {
 
         this.dfRuleView = new DFRuleView();
         this.dfRuleView.bindView(this);
+
+        this.zjmjRuleVIew = new ZJMJRuleView();
+        this.zjmjRuleVIew.bindView(this);
 
         this.loadRoomPrice();
     }
@@ -141,7 +150,7 @@ export class NewRoomView extends cc.Component {
             jsonString: "",
             userInfo: myUser,
             roomInfo: myRoomInfo,
-            uuid: "uuid"
+            uuid: roomInfo.gameServerID
         };
 
         const lobbyModuleInterface = <LobbyModuleInterface>this.getComponent("LobbyModule");
@@ -168,6 +177,8 @@ export class NewRoomView extends cc.Component {
                         const dataString = <string>String.fromCharCode.apply(null, new Uint8Array(<ArrayBuffer>xhr.response));
                         const priceCfgs = <{ [key: string]: object }>JSON.parse(dataString);
                         this.dfRuleView.updatePriceCfg(priceCfgs);
+                        this.zjmjRuleVIew.updatePriceCfg(priceCfgs);
+
                     }
                 }
 

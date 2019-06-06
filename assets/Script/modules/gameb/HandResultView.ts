@@ -2,6 +2,7 @@ import { GameRules } from "./GameRules";
 import { Player } from "./Player";
 import { proto } from "./proto/protoGame";
 import { RoomInterface } from "./RoomInterface";
+import { RoomRuleView } from "./RoomRuleView";
 import { TileImageMounter } from "./TileImageMounter";
 
 const mjproto = proto.mahjong;
@@ -86,6 +87,8 @@ export class HandResultView extends cc.Component {
         const againBtn = this.unityViewNode.getChild("againBtn");
         againBtn.onClick(this.onAgainButtonClick, this);
         const shanreBtn = this.unityViewNode.getChild("shanreBtn");
+        const infoBtn = this.unityViewNode.getChild("guizeBtn");
+        infoBtn.onClick(this.onRoomRuleBtnClick, this);
         // shanreBtn.onClick(this.onShareButtonClick, this);
 
         if (room.isReplayMode()) {
@@ -371,6 +374,15 @@ export class HandResultView extends cc.Component {
             group.visible = false;
         }
         this.contentGroup = contentGroup;
+    }
+
+    private onRoomRuleBtnClick(): void {
+        let roomRuleView = this.getComponent(RoomRuleView);
+
+        if (roomRuleView === undefined || roomRuleView == null) {
+            roomRuleView = this.addComponent(RoomRuleView);
+        }
+        roomRuleView.updateView(this.room.roomInfo.roomConfig);
     }
     // 玩家点击“继续”按钮，注意如果牌局结束，此按钮是“大结算”
     private onAgainButtonClick(): void {

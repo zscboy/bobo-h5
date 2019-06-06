@@ -395,7 +395,7 @@ export class RoomView {
             this.windTile.visible = false;
 
             this.roundMarkView.visible = true;
-            this.clearWaitingPlayer();
+            // this.clearWaitingPlayer();
             this.showRoomNumber();
         };
 

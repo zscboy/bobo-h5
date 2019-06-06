@@ -43,10 +43,6 @@ export class ZJMJRuleView {
 
     private toggleTH5B: fgui.GButton;
     private toggle13Y10B: fgui.GButton;
-    private toggleBMRKJ: fgui.GButton;
-
-    private toggleJZHD: fgui.GButton;
-    private toggleJTIP: fgui.GButton;
 
     private consumeText: fgui.GObject;
     private priceCfg: object = null;
@@ -77,11 +73,6 @@ export class ZJMJRuleView {
 
         ["heavenX5"]: true, // 天胡5倍
         ["thirteenOrphanX10"]: true, // 十三幺10倍
-        ["bmrkj"]: true, // 不满人开局
-
-        ["jzhd"]: true, // 禁止互动
-        ["jyip"]: true, // 禁止同IP
-
         //--游戏模块
         ["modName"]: "gameb"
     };
@@ -194,10 +185,6 @@ export class ZJMJRuleView {
 
         this.toggleTH5B = this.view.getChild("tianhu5bei").asButton;
         this.toggle13Y10B = this.view.getChild("13yao10bei").asButton;
-        this.toggleBMRKJ = this.view.getChild("bumanrenkaiju").asButton;
-
-        this.toggleJZHD = this.view.getChild("jinyonghudong").asButton;
-        this.toggleJTIP = this.view.getChild("jintongIP").asButton;
 
         // 设置文字
         this.toggleQFP.getChild("title").text = "去风牌";
@@ -214,10 +201,7 @@ export class ZJMJRuleView {
 
         this.toggleTH5B.getChild("title").text = "天胡5倍";
         this.toggle13Y10B.getChild("title").text = "13幺10倍";
-        this.toggleBMRKJ.getChild("title").text = "不满人开局";
 
-        this.toggleJZHD.getChild("title").text = "禁用互动功能";
-        this.toggleJTIP.getChild("title").text = "禁同IP";
     }
 
     private initFengding(): void {
@@ -253,6 +237,7 @@ export class ZJMJRuleView {
                     this.togglePlayerNums[<number>config[3]].selected = true;
                     this.toggleDifenTypes[<number>config[4]].selected = true;
                     this.toggleXuanMaTypes[<number>config[5]].selected = true;
+                    this.toggleFengDingTypes[<number>config[17]].selected = true;
 
                     this.toggleQFP.selected = <boolean>config[6];
                     this.toggleBSJ.selected = <boolean>config[7];
@@ -268,12 +253,6 @@ export class ZJMJRuleView {
 
                     this.toggleTH5B.selected = <boolean>config[15];
                     this.toggle13Y10B.selected = <boolean>config[16];
-                    this.toggleBMRKJ.selected = <boolean>config[17];
-
-                    this.toggleJZHD.selected = <boolean>config[18];
-                    this.toggleJTIP.selected = <boolean>config[19];
-
-                    this.toggleFengDingTypes[<number>config[20]].selected = true;
 
                 } catch (e) {
                     Logger.error("parse config error:", e);
@@ -374,10 +353,6 @@ export class ZJMJRuleView {
 
         rules[`heavenX5`] = this.toggleTH5B.selected;
         rules[`thirteenOrphanX10`] = this.toggle13Y10B.selected;
-        rules[`bmrkj`] = this.toggleBMRKJ.selected;
-
-        rules[`jzhd`] = this.toggleJZHD.selected;
-        rules[`jyip`] = this.toggleJTIP.selected;
 
         return JSON.stringify(rules);
     }
@@ -474,12 +449,8 @@ export class ZJMJRuleView {
 
         key[15] = this.toggleTH5B.selected;
         key[16] = this.toggle13Y10B.selected;
-        key[17] = this.toggleBMRKJ.selected;
 
-        key[18] = this.toggleJZHD.selected;
-        key[19] = this.toggleJTIP.selected;
-
-        key[20] = this.getToggleIndex(this.toggleFengDingTypes);
+        key[17] = this.getToggleIndex(this.toggleFengDingTypes);
 
         const jsonString = JSON.stringify(key);
         DataStore.setItem(this.recordKey, jsonString);

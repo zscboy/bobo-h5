@@ -1,5 +1,5 @@
-import { SDKManager } from "../chanelSdk/ChanelSdkExports";
-import { DataStore, Dialog, Enum, HTTP, LEnv, LobbyModuleInterface, Logger } from "../lcore/LCoreExports";
+import { WeiXinSDK } from "../chanelSdk/wxSdk/WeiXinSDkExports";
+import { DataStore, Dialog, HTTP, LEnv, LobbyModuleInterface, Logger } from "../lcore/LCoreExports";
 import { proto } from "../proto/protoLobby";
 import { LobbyView } from "./LobbyView";
 
@@ -38,15 +38,10 @@ export class LoginView extends cc.Component {
 
         this.win.show();
 
-        SDKManager.instance.initSDK();
         if (cc.sys.platform === cc.sys.WECHAT_GAME) {
-            if (LEnv.chanelType === Enum.CHANNEL_TYPE.WEIXIN) {
-                this.createWxBtn();
-            } else {
-                console.log('not wx channel');
-            }
+            this.createWxBtn();
         } else {
-            console.log('not wx platform');
+            Logger.debug('not wx platform');
         }
     }
 
@@ -104,7 +99,9 @@ export class LoginView extends cc.Component {
     }
 
     public onWeixinBtnClick(): void {
-        Logger.debug("onWeixinBtnClick");
+        if (cc.sys.platform !== cc.sys.WECHAT_GAME) {
+            Logger.debug('not wx env');
+        }
     }
 
     public quicklyLogin(): void {
@@ -257,23 +254,23 @@ export class LoginView extends cc.Component {
 
         this.button.onTap((res: getUserInfoRes) => {
             this.button.hide();
-            SDKManager.instance.login(this.wxLogin.bind(this));
+            WeiXinSDK.login(<Function>this.wxLogin.bind(this));
         });
     }
     private wxLogin(result: boolean): void {
         if (!result) {
-            console.error('wxlogin error');
+            Logger.error("wxlogin error");
             this.button.show();
 
             return;
         } else {
             const wxLoginUrl = `${LEnv.rootURL}${LEnv.wxLogin}`;
-            console.info('wxloginUrl', wxLoginUrl);
+            Logger.debug('wxloginUrl', wxLoginUrl);
 
             const wxCodeStr = 'wechatLCode';
             const wxUserInfoStr = 'wxUserInfo';
-            const wxCode = <string>SDKManager.instance.getDataMap()[wxCodeStr];
-            const wxUserData = <getUserInfoRes>SDKManager.instance.getDataMap()[wxUserInfoStr];
+            const wxCode = <string>WeiXinSDK.getWxDataMap()[wxCodeStr];
+            const wxUserData = <getUserInfoRes>WeiXinSDK.getWxDataMap()[wxUserInfoStr];
 
             const wxLoginReq = new proto.lobby.MsgWxLogin();
             wxLoginReq.code = wxCode;

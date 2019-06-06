@@ -1,35 +1,32 @@
-import { SDKInterface } from "../SDKInterface";
+import { Logger } from "../../lcore/LCoreExports";
 
 /**
  * 微信sdk
  */
-export class WeiXinSDK extends SDKInterface {
-    public init(): boolean {
-        return true;
-    }
+export namespace WeiXinSDK {
 
-    public login(cb: Function): void {
+    // tslint:disable-next-line:no-any
+    const mDataMap: { [key: string]: any } = {};
+
+    export const login = (cb: Function): void => {
         wx.login({
             success: res => {
                 const code = res.code;
                 if (code !== '' && code !== null && code !== undefined) {
-                    const wxCode = 'wechatLCode';
-                    this.mDataMap[wxCode] = res.code;
-                    console.log('wechatLCode is', code);
+                    const wxCode: string = 'wechatLCode';
+                    mDataMap[wxCode] = res.code;
                     const xxCb: getUserInfoOpts = {
                         withCredentials: true,
 
                         // tslint:disable-next-line:no-any
                         success: (userRes: any) => {
-                            console.log('wx useRes', userRes);
-                            const wxUserInfoStr = 'wxUserInfo';
-                            this.mDataMap[wxUserInfoStr] = userRes;
+                            const wxUserInfoStr: string = 'wxUserInfo';
+                            mDataMap[wxUserInfoStr] = userRes;
                             cb(true);
                         },
 
-                        // tslint:disable-next-line:no-any
-                        fail: (err: any) => {
-                            console.error("wx getUserInfo err:", err);
+                        fail: (err: Error) => {
+                            Logger.error("wx getUserInfo err:", err);
                             cb(false);
                         }
                     };
@@ -40,9 +37,14 @@ export class WeiXinSDK extends SDKInterface {
                 }
             },
             fail: res => {
-                console.error('wx login error', res);
+                Logger.error("wx login error", res);
                 cb(false);
             }
         });
-    }
+    };
+
+    // tslint:disable-next-line:no-any
+    export const getWxDataMap = (): { [key: string]: any } => {
+        return mDataMap;
+    };
 }

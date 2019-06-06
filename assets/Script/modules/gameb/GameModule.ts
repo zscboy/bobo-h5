@@ -1,8 +1,8 @@
 // tslint:disable-next-line:max-line-length
 import {
     AnimationMgr, DataStore, Dialog, GameModuleInterface,
-    GameModuleLaunchArgs, GResLoader, LEnv, LobbyModuleInterface, Logger,
-    MsgQueue, MsgType, RoomInfo, UserInfo, WS
+    GameModuleLaunchArgs, GResLoader, LEnv,
+    LobbyModuleInterface, Logger, MsgQueue, MsgType, RoomInfo, UserInfo, WS
 } from "../lobby/lcore/LCoreExports";
 import { proto } from "./proto/protoGame";
 import { Replay } from "./Replay";
@@ -72,7 +72,8 @@ export class GameModule extends cc.Component implements GameModuleInterface {
 
         if (args.jsonString === "replay") {
             // TODO: use correct parameters
-            await this.tryEnterReplayRoom(null, null, null);
+            const chairID = 0;
+            await this.tryEnterReplayRoom(args.userInfo.userID, args.record, chairID);
         } else {
             await this.tryEnterRoom(args.uuid, args.userInfo, args.roomInfo);
         }

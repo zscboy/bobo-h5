@@ -14,6 +14,10 @@ export class GameRecordView extends cc.Component {
 
     private recordList: fgui.GList;
 
+    private lobbyModule: LobbyModuleInterface;
+
+    private onGameRecordShowFunc: Function;
+
     protected onLoad(): void {
 
         this.eventTarget = new cc.EventTarget();
@@ -36,6 +40,9 @@ export class GameRecordView extends cc.Component {
     }
 
     protected onDestroy(): void {
+        if (this.lobbyModule !== null) {
+            this.lobbyModule.eventTarget.off("onGameRecordShow", this.onGameRecordShowFunc);
+        }
 
         this.eventTarget.emit("destroy");
         this.win.hide();
@@ -59,7 +66,17 @@ export class GameRecordView extends cc.Component {
 
         this.loadGameRecord();
 
+        this.lobbyModule = <LobbyModuleInterface>this.getComponent("LobbyModule");
+        if (this.lobbyModule !== null) {
+            this.onGameRecordShowFunc = this.lobbyModule.eventTarget.on(`onGameRecordShow`, this.onGameRecordShow, this);
+        }
         //this.recordList.numItems = 1;
+    }
+
+    private onGameRecordShow(): void {
+        if (this.win !== null) {
+            this.win.show();
+        }
     }
 
     private renderListItem(index: number, obj: fgui.GObject): void {
@@ -108,13 +125,11 @@ export class GameRecordView extends cc.Component {
         const minute = date.getMinutes() < 10 ? `0${date.getMinutes()} ` : `${date.getMinutes()} `;
 
         dateText.text = `${date.getFullYear()} /${month}/${day} ${hour}: ${minute} `;
+
         let nameText;
         let playerScoreText;
-
         let winnerImg;
-
         let winnerSore = 0;
-
         let finalWinnerImg;
 
         // const ownerUserID = replayRoom.ownerUserID;
@@ -200,6 +215,7 @@ export class GameRecordView extends cc.Component {
         const subView = this.addComponent(GameSubRecordView);
         const replayRoom = this.replayRooms[index];
         subView.updateData(replayRoom);
+        this.win.hide();
     }
 
 }

@@ -1,6 +1,10 @@
-import { LobbyModuleInterface, Logger } from "../lcore/LCoreExports";
+import { DataStore, Dialog, GameModuleLaunchArgs, HTTP, LEnv, LobbyModuleInterface, Logger } from "../lcore/LCoreExports";
 import { proto } from "../proto/protoLobby";
 
+// interface GameRecordInterface {
+//     destoryMySelf: Function;
+
+// }
 /**
  * 战绩界面
  */
@@ -11,30 +15,75 @@ export class GameSubRecordView extends cc.Component {
     private eventTarget: cc.EventTarget;
     private replayRoom: proto.lobby.MsgReplayRoom;
 
+    private lobbyModule: LobbyModuleInterface;
+
     private recordList: fgui.GList;
 
+    private onGameRecordShowFunc: Function;
+
     public updateData(replayRoom: proto.lobby.MsgReplayRoom): void {
-        Logger.debug("onUpdate-----------------------------");
 
         this.replayRoom = replayRoom;
         const replayPlayerInfos = replayRoom.players;
+
+        let text = "未知麻将";
+        const roomType = replayRoom.recordRoomType;
+        switch (roomType) {
+            case 1:
+                text = "大丰麻将";
+                break;
+            case 3:
+                text = "东台麻将";
+                break;
+            case 8:
+                text = "关张";
+                break;
+            case 9:
+                text = "7王523";
+                break;
+            case 11:
+                text = "斗地主";
+                break;
+
+            default:
+        }
+
+        const rountText = `${replayRoom.records.length} 局`;
+        const gameName = this.view.asCom.getChild("gameName");
+        gameName.text = `${text} ${rountText}`;
+
+        const roomNumber = this.view.asCom.getChild("roomNumber");
+        roomNumber.text = `${replayRoom.roomNumber} ${"号 房间"}`;
+
+        const dateText = this.view.asCom.getChild("time");
+
+        const date = new Date(replayRoom.startTime * 1000);
+        const month = date.getMonth() < 9 ? `0${date.getMonth() + 1} ` : `${date.getMonth() + 1} `;
+        const day = date.getDay() < 10 ? `0${date.getDay()} ` : `${date.getDay()} `;
+        const hour = date.getHours() < 10 ? `0${date.getHours()} ` : `${date.getHours()} `;
+        const minute = date.getMinutes() < 10 ? `0${date.getMinutes()} ` : `${date.getMinutes()} `;
+
+        dateText.text = `${date.getFullYear()} /${month}/${day} ${hour}: ${minute} `;
 
         let name;
         let label;
         let userID;
 
+        let player: proto.lobby.IMsgReplayPlayerInfo;
+
         for (let i = 0; i < replayPlayerInfos.length; i++) {
 
-            name = replayPlayerInfos[i].nick;
-            userID = replayPlayerInfos[i].userID;
-            label = this.view.getChild(`player${i + 1}`);
+            player = replayPlayerInfos[i];
+            name = player.nick;
+            userID = player.userID;
+            label = this.view.getChild(`playName${i + 1}`);
 
-            if (name !== "") {
-                label.text = name;
-            } else {
-                label.text = userID;
+            const nick = name === "" ? userID : name;
+            label.text = `${nick}`;
+            this.view.getChild(`owner${i + 1}`).visible = false;
+            if (player.userID === replayRoom.ownerUserID) {
+                this.view.getChild(`owner${i + 1}`).visible = true;
             }
-
         }
 
         this.updateList();
@@ -42,7 +91,6 @@ export class GameSubRecordView extends cc.Component {
     }
 
     protected onLoad(): void {
-        Logger.debug("onLoad----------------------------------");
         this.eventTarget = new cc.EventTarget();
 
         const lm = <LobbyModuleInterface>this.getComponent("LobbyModule");
@@ -64,12 +112,21 @@ export class GameSubRecordView extends cc.Component {
 
     protected onDestroy(): void {
 
+        if (this.lobbyModule !== null) {
+            this.lobbyModule.eventTarget.off("onGameRecordShow", this.onGameRecordShowFunc);
+        }
+
         this.eventTarget.emit("destroy");
         this.win.hide();
         this.win.dispose();
     }
 
     private onCloseClick(): void {
+        const lobbyModule = <LobbyModuleInterface>this.getComponent("LobbyModule");
+        if (lobbyModule !== null) {
+            lobbyModule.eventTarget.emit(`onGameRecordShow`);
+        }
+
         this.destroy();
     }
 
@@ -83,17 +140,36 @@ export class GameSubRecordView extends cc.Component {
         };
         this.recordList.setVirtual();
 
+        this.lobbyModule = <LobbyModuleInterface>this.getComponent("LobbyModule");
+        if (this.lobbyModule !== null) {
+            this.onGameRecordShowFunc = this.lobbyModule.eventTarget.on(`onGameRecordShow`, this.onGameRecordShow, this);
+        }
+
+    }
+
+    private onGameRecordShow(): void {
+        if (this.win !== null) {
+            this.win.show();
+        }
     }
 
     private renderListItem(index: number, obj: fgui.GObject): void {
 
         const record = this.replayRoom.records[index];
 
-        const roomNumber = obj.asCom.getChild("roundText");
-        roomNumber.text = `${index}`;
+        const roundText = obj.asCom.getChild("roundText");
+        const roundIndex = index + 1;
+        const roundIndexStr = roundIndex < 10 ? `0${roundIndex} ` : `${roundIndex} `;
 
-        const date = obj.asCom.getChild("time");
-        date.text = ``;
+        roundText.text = `${roundIndexStr}`;
+
+        const dateText = obj.asCom.getChild("time");
+
+        const date = new Date(record.startTime * 1000);
+        const hour = date.getHours() < 10 ? `0${date.getHours()} ` : `${date.getHours()} `;
+        const minute = date.getMinutes() < 10 ? `0${date.getMinutes()} ` : `${date.getMinutes()} `;
+        const second = date.getSeconds() < 10 ? `0${date.getSeconds()} ` : `${date.getSeconds()} `;
+        dateText.text = `${hour}: ${minute}:${second} `;
 
         let label;
 
@@ -104,25 +180,72 @@ export class GameSubRecordView extends cc.Component {
         }
 
         const playBtn = obj.asCom.getChild("playBtn");
-        playBtn.offClick(this.enterReplayRoom, this);
-        playBtn.onClick(this.enterReplayRoom, this);
+
+        playBtn.offClick(this.onPlayBtnClick, this);
+        playBtn.onClick(this.onPlayBtnClick, this);
+        playBtn.data = record.recordUUID;
     }
 
-    private enterReplayRoom(ev: fgui.Event): void {
-        // const index = <number>ev.initiator.data;
-        // const record = this.replayRoom.records[index];
+    private onPlayBtnClick(ev: fgui.Event): void {
+        const recordID = <string>ev.initiator.data;
+        this.loadRecord(recordID);
+    }
+
+    private enterReplayRoom(record: proto.lobby.MsgAccLoadReplayRecord): void {
         const recordCfg = this.replayRoom;
         let modName;
         if (recordCfg.recordRoomType === 1) {
             //大丰麻将
-            modName = "gamea";
-        } else if (recordCfg.recordRoomType === 8) {
-            //关张
             modName = "gameb";
+        } else if (recordCfg.recordRoomType === 21) {
+            //关张
+            modName = "gamea";
         }
 
-        Logger.debug("enterReplayRoom modName = ", modName);
+        this.win.hide();
+        //this.destroy();
 
+        const myUserID = DataStore.getString("userID", "");
+        const myUser = { userID: myUserID };
+
+        const params: GameModuleLaunchArgs = {
+            jsonString: "replay",
+            userInfo: myUser,
+            roomInfo: null,
+            uuid: "",
+            record: record
+        };
+
+        const lobbyModuleInterface = <LobbyModuleInterface>this.getComponent("LobbyModule");
+        lobbyModuleInterface.switchToGame(params, modName);
+
+    }
+
+    private loadRecord(recordID: string): void {
+        const tk = DataStore.getString("token", "");
+        const loadGameRecordUrl = `${LEnv.rootURL}${LEnv.lrprecord}?&rt=1&tk=${tk}&rid=${recordID}`;
+        Logger.debug("loadRecord loadGameRecordUrl:", loadGameRecordUrl);
+        // Dialog.showDialog("正在加载战绩......");
+
+        HTTP.hGet(this.eventTarget, loadGameRecordUrl, (xhr: XMLHttpRequest, err: string) => {
+
+            let errMsg;
+            if (err !== null) {
+                errMsg = `错误码:${err}`;
+                Dialog.showDialog(errMsg);
+
+            } else {
+                errMsg = HTTP.hError(xhr);
+
+                if (errMsg === null) {
+                    const data = <Uint8Array>xhr.response;
+                    const record = proto.lobby.MsgAccLoadReplayRecord.decode(data);
+                    Logger.debug("record:", record);
+                    this.enterReplayRoom(record);
+                }
+            }
+
+        });
     }
 
     private updateList(): void {

@@ -2,6 +2,12 @@
  * 一些公用数据类型
  */
 
+export class Record {
+    public replayRecordBytes: ByteBuffer;
+    public roomJSONConfig: string;
+
+}
+
 /**
  * 当前用户信息
  */
@@ -29,6 +35,7 @@ export interface GResLoader {
  */
 export interface LobbyModuleInterface {
     loader: GResLoader;
+    eventTarget: cc.EventTarget;
     returnFromGame(): void;
     switchToGame(args: GameModuleLaunchArgs, moduleName: string): void;
 }
@@ -43,6 +50,8 @@ export interface GameModuleLaunchArgs {
     jsonString: string;
     loader?: GResLoader;
     lm?: LobbyModuleInterface;
+
+    record: Record;
 }
 
 /**

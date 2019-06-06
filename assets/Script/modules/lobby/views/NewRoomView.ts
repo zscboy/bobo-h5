@@ -150,7 +150,8 @@ export class NewRoomView extends cc.Component {
             jsonString: "",
             userInfo: myUser,
             roomInfo: myRoomInfo,
-            uuid: roomInfo.gameServerID
+            uuid: roomInfo.gameServerID,
+            record: null
         };
 
         const lobbyModuleInterface = <LobbyModuleInterface>this.getComponent("LobbyModule");

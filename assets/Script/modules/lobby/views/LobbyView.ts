@@ -135,7 +135,8 @@ export class LobbyView extends cc.Component {
             jsonString: "",
             userInfo: myUser,
             roomInfo: roomInfo,
-            uuid: "uuid"
+            uuid: "uuid",
+            record: null
         };
 
         this.lm.switchToGame(params, "gameb");

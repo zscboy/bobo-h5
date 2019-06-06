@@ -1,6 +1,10 @@
 import { DataStore, Dialog, GameModuleLaunchArgs, HTTP, LEnv, LobbyModuleInterface, Logger } from "../lcore/LCoreExports";
 import { proto } from "../proto/protoLobby";
 
+// interface GameRecordInterface {
+//     destoryMySelf: Function;
+
+// }
 /**
  * 战绩界面
  */
@@ -70,6 +74,11 @@ export class GameSubRecordView extends cc.Component {
     }
 
     private onCloseClick(): void {
+        const lobbyModule = <LobbyModuleInterface> this.getComponent("LobbyModule");
+        if (lobbyModule !== null) {
+          lobbyModule.eventTarget.emit(`onGameRecordShow`);
+        }
+
         this.destroy();
     }
 
@@ -105,14 +114,13 @@ export class GameSubRecordView extends cc.Component {
 
         const playBtn = obj.asCom.getChild("playBtn");
 
-        // playBtn.offClick(this.onPlayBtnClick, this);
-        // playBtn.onClick(this.onPlayBtnClick, this);
-        playBtn.onClick(() => {
-            this.onPlayBtnClick(record.recordUUID);
-        },              this);
+        playBtn.offClick(this.onPlayBtnClick, this);
+        playBtn.onClick(this.onPlayBtnClick, this);
+        playBtn.data = record.recordUUID;
     }
 
-    private onPlayBtnClick(recordID: string): void {
+    private onPlayBtnClick(ev: fgui.Event): void {
+        const recordID = <string>ev.initiator.data;
         this.loadRecord(recordID);
     }
 
@@ -129,19 +137,11 @@ export class GameSubRecordView extends cc.Component {
             modName = "gamea";
         }
 
-        // Logger.debug("enterReplayRoom modName = ", modName);
-        Logger.debug("enterGame");
-
         this.win.hide();
-        this.win.dispose();
         this.destroy();
 
         const myUserID = DataStore.getString("userID", "");
         const myUser = { userID: myUserID };
-        // const myRoomInfo = { roomID: roomInfo.roomID, roomNumber: roomInfo.roomNumber, roomConfig: roomInfo.config };
-        // const roomConfig = roomInfo.config;
-        // const roomConfigJSON = <{ [key: string]: boolean | number | string }>JSON.parse(roomConfig);
-        // const modName = <string>roomConfigJSON[`modName`];
 
         const params: GameModuleLaunchArgs = {
             jsonString: "replay",
@@ -175,7 +175,7 @@ export class GameSubRecordView extends cc.Component {
                 if (errMsg === null) {
                     const data = <Uint8Array>xhr.response;
                     const record = proto.lobby.MsgAccLoadReplayRecord.decode(data);
-                    Logger.debug("record");
+                    Logger.debug("record:", record);
                     this.enterReplayRoom(record);
                 }
             }

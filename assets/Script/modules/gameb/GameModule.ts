@@ -411,31 +411,4 @@ export class GameModule extends cc.Component implements GameModuleInterface {
 
         this.backToLobby();
     }
-
-    // private loadRecord(recordID: string): void {
-    //     const tk = DataStore.getString("token", "");
-    //     const loadGameRecordUrl = `${LEnv.rootURL}${LEnv.lrprecord}?&rt=1&tk=${tk}&rid=${recordID}`;
-    //     Logger.debug("loadRecord loadGameRecordUrl:", loadGameRecordUrl);
-    //     // Dialog.showDialog("正在加载战绩......");
-
-    //     HTTP.hGet(this.eventTarget, loadGameRecordUrl, (xhr: XMLHttpRequest, err: string) => {
-
-    //         let errMsg;
-    //         if (err !== null) {
-    //             errMsg = `错误码:${err}`;
-    //             Dialog.showDialog(errMsg);
-
-    //         } else {
-    //             errMsg = HTTP.hError(xhr);
-
-    //             if (errMsg === null) {
-
-    //                 const data = <Uint8Array>xhr.response;
-    //                 const record = proto.lobby.MsgAccLoadReplayRecord.decode(data);
-    //             }
-    //         }
-
-    //     });
-    // }
-
 }

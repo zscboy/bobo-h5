@@ -67,9 +67,9 @@ export class Player {
 
     }
 
-    public isMyUserId(userID: string): boolean {
-        return this.userID === userID;
-    }
+    // public isMyUserId(userID: string): boolean {
+    //     return this.userID === userID;
+    // }
 
     public resetForNewHand(): void {
         //玩家打出的牌列表
@@ -436,21 +436,6 @@ export class Player {
     }
 
     public updateByPlayerInfo(playerInfo: proto.mahjong.IMsgPlayerInfo): void {
-        //TODO. 更新用户状态
-        // const player = this
-        // player.gender = playerInfo.gender
-        // player.headIconURI = playerInfo.headIconURI
-        // player.ip = playerInfo.ip
-        // player.location = playerInfo.location
-        // player.dfHands = playerInfo.dfHands
-        // player.diamond = playerInfo.diamond
-        // player.charm = playerInfo.charm
-        // player.avatarID = playerInfo.avatarID
-        // if this. isMe() && not this.host. isReplayMode() {
-        //const singleton = acc
-        //singleton.charm = playerInfo.charm
-        //g_dataModule. GetUserData(). SetCharm(playerInfo.charm)
-        //}
         this.state = playerInfo.state;
         this.playerInfo = new PlayerInfo(playerInfo);
     }

@@ -28,6 +28,7 @@ export class WS {
     private events: Message[] = [];
     private rolling: boolean = false;
     private pp: PingPong;
+    private isBlobDataType: boolean;
 
     public constructor(url: string, mq: MsgQueue, host: WebsocketHost, pp: PingPong) {
         this.mq = mq;
@@ -77,34 +78,60 @@ export class WS {
         const mx = this.events.shift();
         if (mx.mt === MsgType.wsData) {
             const blob = mx.data;
-            // 由于需要异步转换为array buffer，因此需要阻塞其他事件，确保有序
-            const fileReader = new FileReader();
-            fileReader.onloadend = () => {
-                try {
-                    const arrayBuffer = <ArrayBuffer>fileReader.result;
-                    const gmsg = <MessageView>this.pp.decode(new Uint8Array(arrayBuffer));
-                    if (gmsg.Ops === this.pp.pingCmd) {
-                        // ping
-                        const msgEcho = {
-                            Ops: this.pp.pongCmd,
-                            Data: gmsg.Data
-                        };
-                        const bufEcho = (<ByteBuffer>this.pp.encode(msgEcho)).toArrayBuffer();
-                        this.ww.onPing(bufEcho);
-                    } else if (gmsg.Ops === this.pp.pongCmd) {
-                        // pong
-                        this.ww.onPong(gmsg.Data.toArrayBuffer());
-                    } else {
-                        this.mq.pushWebsocketBinaryEvent(gmsg);
+
+            const fn = (ar: ArrayBuffer) => {
+                const gmsg = <MessageView>this.pp.decode(new Uint8Array(ar));
+                if (gmsg.Ops === this.pp.pingCmd) {
+                    // ping
+                    const msgEcho = {
+                        Ops: this.pp.pongCmd,
+                        Data: gmsg.Data
+                    };
+                    const bufEcho = (<ByteBuffer>this.pp.encode(msgEcho)).toArrayBuffer();
+                    this.ww.onPing(bufEcho);
+                } else if (gmsg.Ops === this.pp.pongCmd) {
+                    // pong
+                    this.ww.onPong(gmsg.Data.toArrayBuffer());
+                } else {
+                    this.mq.pushWebsocketBinaryEvent(gmsg);
+                }
+            };
+
+            if (this.isBlobDataType === undefined) {
+                if (blob instanceof ArrayBuffer) {
+                    this.isBlobDataType = false;
+                } else if (blob instanceof Blob) {
+                    this.isBlobDataType = true;
+                } else {
+                    Logger.error("WS unknown received data type:", typeof blob);
+                }
+            }
+
+            if (this.isBlobDataType) {
+                // 由于需要异步转换为array buffer，因此需要阻塞其他事件，确保有序
+                const fileReader = new FileReader();
+                fileReader.onloadend = () => {
+                    try {
+                        const arrayBuffer = <ArrayBuffer>fileReader.result;
+
+                        fn(arrayBuffer);
+                    } catch (e) {
+                        Logger.error(e);
                     }
+
+                    this.comp.scheduleOnce(nextRoll);
+                };
+
+                fileReader.readAsArrayBuffer(<Blob>blob);
+            } else {
+                try {
+                    fn(<ArrayBuffer><any>blob); // tslint:disable-line:no-any
                 } catch (e) {
                     Logger.error(e);
                 }
 
                 this.comp.scheduleOnce(nextRoll);
-            };
-
-            fileReader.readAsArrayBuffer(<Blob>blob);
+            }
         } else {
             this.mq.pushMessage(mx);
             this.comp.scheduleOnce(nextRoll);

@@ -94,24 +94,23 @@ export class DisbandView extends cc.Component {
                             this.unschedule(this.disbandCountDown);
                         }
 
+                        Logger.debug("disabnd countdown for others");
                         this.myCountDown.visible = true;
                         //为他人倒计时
                         this.isForMe = false;
                         this.schedule(this.disbandCountDown, 1, cc.macro.REPEAT_FOREVER);
-
                     }
 
                     this.showButtons(false);
-
-                    return;
                 } else {
-                    this.myCountDown.visible = false;
+                    Logger.debug("disabnd countdown for me");
+                    this.myCountDown.visible = true;
                     this.showButtons(true);
-                }
 
-                //为自己倒计时
-                this.isForMe = true;
-                this.schedule(this.disbandCountDown, 1, cc.macro.REPEAT_FOREVER);
+                    //为自己倒计时
+                    this.isForMe = true;
+                    this.schedule(this.disbandCountDown, 1, cc.macro.REPEAT_FOREVER);
+                }
 
             }
         }
@@ -127,7 +126,9 @@ export class DisbandView extends cc.Component {
         this.view.visible = false;
 
         this.initView();
+    }
 
+    protected start(): void {
         this.updateView();
     }
 
@@ -169,15 +170,8 @@ export class DisbandView extends cc.Component {
         }
     }
     private showButtons(show: boolean): void {
-        if (show) {
-            this.refuseBtn.visible = show;
-            this.agreeBtn.visible = show;
-        } else {
-            this.refuseBtn.touchable = false;
-            this.agreeBtn.touchable = false;
-
-            // this.agreeBtn.grayed = true;
-        }
+        this.refuseBtn.visible = show;
+        this.agreeBtn.visible = show;
     }
 
     private initView(): void {

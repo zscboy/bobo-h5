@@ -10,7 +10,7 @@ export class GameRecordView extends cc.Component {
     private win: fgui.Window;
     private eventTarget: cc.EventTarget;
 
-    private replayRooms: proto.lobby.MsgReplayRoom[];
+    private replayRooms: proto.lobby.MsgReplayRoom[] = [];
 
     private recordList: fgui.GList;
 

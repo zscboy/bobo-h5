@@ -1,6 +1,5 @@
 import { DataStore, Dialog, HTTP, LEnv, LobbyModuleInterface, Logger } from "../lcore/LCoreExports";
 import { proto } from "../proto/protoLobby";
-import { LobbyViewInterface } from "./LobbyViewInterface";
 
 /**
  * 邮件页面
@@ -26,7 +25,7 @@ export class EmailView extends cc.Component {
 
     private onMessageFunc: Function;
 
-    private lobbyView: LobbyViewInterface;
+    private lobbyModule: LobbyModuleInterface;
 
     protected onMessage(data: ByteBuffer): void {
         Logger.debug("EmailView.onMessage");
@@ -53,12 +52,12 @@ export class EmailView extends cc.Component {
 
         this.initView();
 
-        this.lobbyView = <LobbyViewInterface>this.getComponent("LobbyView");
-        this.onMessageFunc = this.lobbyView.on(`${proto.lobby.MessageCode.OPMail}`, this.onMessage, this);
+        this.lobbyModule = <LobbyModuleInterface>this.getComponent("LobbyModule");
+        this.onMessageFunc = this.lobbyModule.eventTarget.on(`${proto.lobby.MessageCode.OPMail}`, this.onMessage, this);
     }
 
     protected onDestroy(): void {
-        this.lobbyView.off(`${proto.lobby.MessageCode.OPMail}`, this.onMessageFunc);
+        this.lobbyModule.eventTarget.off(`${proto.lobby.MessageCode.OPMail}`, this.onMessageFunc);
 
         this.eventTarget.emit("destroy");
         this.win.hide();

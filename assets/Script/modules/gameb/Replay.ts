@@ -123,7 +123,7 @@ export class Replay {
         this.host.component.schedule(
             cb,
             this.speed,
-            0);
+            cc.macro.REPEAT_FOREVER);
 
         this.timerCb = cb;
     }
@@ -247,6 +247,8 @@ export class Replay {
                 }
             }
         }
+
+        this.actionStep = this.actionStep + 1;
     }
 
     public async doAction(srAction: proto.mahjong.ISRAction, actionlist: proto.mahjong.ISRAction[]): Promise<void> {

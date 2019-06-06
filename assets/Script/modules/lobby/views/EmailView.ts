@@ -311,7 +311,7 @@ export class EmailView extends cc.Component {
         Logger.debug("emailRequest url = ", url);
 
         HTTP.hGet(this.eventTarget, url, (xhr: XMLHttpRequest, err: string) => {
-            // Dialog.hideDialog();
+
             cb(xhr, err);
         });
     }

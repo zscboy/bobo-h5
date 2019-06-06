@@ -3,6 +3,7 @@ import { proto } from "../proto/protoLobby";
 import { DFRuleView } from "./DFRuleView";
 import { LobbyError } from "./LobbyError";
 import { RunFastRuleView } from "./RunFastRuleView";
+import { ZJMJRuleView } from "./ZJMJRuleView";
 
 const { ccclass } = cc._decorator;
 
@@ -19,6 +20,8 @@ export class NewRoomView extends cc.Component {
     private runFastRuleView: RunFastRuleView;
 
     private dfRuleView: DFRuleView;
+
+    private zjmjRuleVIew: ZJMJRuleView;
 
     public getView(): fgui.GComponent {
         return this.view;
@@ -98,6 +101,7 @@ export class NewRoomView extends cc.Component {
     protected onDestroy(): void {
         this.runFastRuleView.destroy();
         this.dfRuleView.destroy();
+        this.zjmjRuleVIew.destroy();
 
         this.eventTarget.emit("destroy");
 
@@ -115,6 +119,9 @@ export class NewRoomView extends cc.Component {
 
         this.dfRuleView = new DFRuleView();
         this.dfRuleView.bindView(this);
+
+        this.zjmjRuleVIew = new ZJMJRuleView();
+        this.zjmjRuleVIew.bindView(this);
 
         this.loadRoomPrice();
     }
@@ -169,6 +176,7 @@ export class NewRoomView extends cc.Component {
                         const dataString = new TextDecoder("utf-8").decode(data);
                         const priceCfgs = <{ [key: string]: object }>JSON.parse(dataString);
                         this.dfRuleView.updatePriceCfg(priceCfgs);
+                        this.zjmjRuleVIew.updatePriceCfg(priceCfgs);
                         Logger.debug("price:", dataString);
                     }
                 }

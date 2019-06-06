@@ -1,3 +1,5 @@
+import { proto } from "../proto/protoLobby";
+
 /**
  * 一些公用数据类型
  */
@@ -43,6 +45,8 @@ export interface GameModuleLaunchArgs {
     jsonString: string;
     loader?: GResLoader;
     lm?: LobbyModuleInterface;
+
+    record: proto.lobby.MsgAccLoadReplayRecord;
 }
 
 /**

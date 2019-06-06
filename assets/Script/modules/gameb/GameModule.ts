@@ -1,8 +1,8 @@
 // tslint:disable-next-line:max-line-length
 import {
     AnimationMgr, DataStore, Dialog, GameModuleInterface,
-    GameModuleLaunchArgs, GResLoader, LEnv, LobbyModuleInterface, Logger,
-    MsgQueue, MsgType, RoomInfo, UserInfo, WS
+    GameModuleLaunchArgs, GResLoader, LEnv,
+    LobbyModuleInterface, Logger, MsgQueue, MsgType, RoomInfo, UserInfo, WS
 } from "../lobby/lcore/LCoreExports";
 import { proto } from "./proto/protoGame";
 import { Replay } from "./Replay";
@@ -72,7 +72,8 @@ export class GameModule extends cc.Component implements GameModuleInterface {
 
         if (args.jsonString === "replay") {
             // TODO: use correct parameters
-            await this.tryEnterReplayRoom(null, null, null);
+            const chairID = 0;
+            await this.tryEnterReplayRoom(args.userInfo.userID, args.record, chairID);
         } else {
             await this.tryEnterRoom(args.uuid, args.userInfo, args.roomInfo);
         }
@@ -410,4 +411,31 @@ export class GameModule extends cc.Component implements GameModuleInterface {
 
         this.backToLobby();
     }
+
+    // private loadRecord(recordID: string): void {
+    //     const tk = DataStore.getString("token", "");
+    //     const loadGameRecordUrl = `${LEnv.rootURL}${LEnv.lrprecord}?&rt=1&tk=${tk}&rid=${recordID}`;
+    //     Logger.debug("loadRecord loadGameRecordUrl:", loadGameRecordUrl);
+    //     // Dialog.showDialog("正在加载战绩......");
+
+    //     HTTP.hGet(this.eventTarget, loadGameRecordUrl, (xhr: XMLHttpRequest, err: string) => {
+
+    //         let errMsg;
+    //         if (err !== null) {
+    //             errMsg = `错误码:${err}`;
+    //             Dialog.showDialog(errMsg);
+
+    //         } else {
+    //             errMsg = HTTP.hError(xhr);
+
+    //             if (errMsg === null) {
+
+    //                 const data = <Uint8Array>xhr.response;
+    //                 const record = proto.lobby.MsgAccLoadReplayRecord.decode(data);
+    //             }
+    //         }
+
+    //     });
+    // }
+
 }

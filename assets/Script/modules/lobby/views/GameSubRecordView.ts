@@ -1,4 +1,4 @@
-import { LobbyModuleInterface, Logger } from "../lcore/LCoreExports";
+import { DataStore, Dialog, GameModuleLaunchArgs, HTTP, LEnv, LobbyModuleInterface, Logger } from "../lcore/LCoreExports";
 import { proto } from "../proto/protoLobby";
 
 /**
@@ -104,25 +104,83 @@ export class GameSubRecordView extends cc.Component {
         }
 
         const playBtn = this.view.getChild("playBtn");
-        playBtn.offClick(this.enterReplayRoom, this);
-        playBtn.onClick(this.enterReplayRoom, this);
+
+        // playBtn.offClick(this.onPlayBtnClick, this);
+        // playBtn.onClick(this.onPlayBtnClick, this);
+        playBtn.onClick(() => {
+            this.onPlayBtnClick(record.recordUUID);
+        },              this);
     }
 
-    private enterReplayRoom(ev: fgui.Event): void {
+    private onPlayBtnClick(recordID: string): void {
+        this.loadRecord(recordID);
+    }
+
+    private enterReplayRoom(record: proto.lobby.MsgAccLoadReplayRecord): void {
         // const index = <number>ev.initiator.data;
         // const record = this.replayRoom.records[index];
         const recordCfg = this.replayRoom;
         let modName;
         if (recordCfg.recordRoomType === 1) {
             //大丰麻将
-            modName = "gamea";
-        } else if (recordCfg.recordRoomType === 8) {
-            //关张
             modName = "gameb";
+        } else if (recordCfg.recordRoomType === 21) {
+            //关张
+            modName = "gamea";
         }
 
-        Logger.debug("enterReplayRoom modName = ", modName);
+        // Logger.debug("enterReplayRoom modName = ", modName);
+        Logger.debug("enterGame");
 
+        // this.win.hide();
+        // // this.win.dispose();
+        // this.destroy();
+
+        const myUserID = DataStore.getString("userID", "");
+        const myUser = { userID: myUserID };
+        // const myRoomInfo = { roomID: roomInfo.roomID, roomNumber: roomInfo.roomNumber, roomConfig: roomInfo.config };
+        // const roomConfig = roomInfo.config;
+        // const roomConfigJSON = <{ [key: string]: boolean | number | string }>JSON.parse(roomConfig);
+        // const modName = <string>roomConfigJSON[`modName`];
+
+        const params: GameModuleLaunchArgs = {
+            jsonString: "replay",
+            userInfo: myUser,
+            roomInfo: null,
+            uuid : "",
+            record: record
+        };
+
+        const lobbyModuleInterface = <LobbyModuleInterface>this.getComponent("LobbyModule");
+        lobbyModuleInterface.switchToGame(params, modName);
+
+    }
+
+    private loadRecord(recordID: string): void {
+        const tk = DataStore.getString("token", "");
+        const loadGameRecordUrl = `${LEnv.rootURL}${LEnv.lrprecord}?&rt=1&tk=${tk}&rid=${recordID}`;
+        Logger.debug("loadRecord loadGameRecordUrl:", loadGameRecordUrl);
+        // Dialog.showDialog("正在加载战绩......");
+
+        HTTP.hGet(this.eventTarget, loadGameRecordUrl, (xhr: XMLHttpRequest, err: string) => {
+
+            let errMsg;
+            if (err !== null) {
+                errMsg = `错误码:${err}`;
+                Dialog.showDialog(errMsg);
+
+            } else {
+                errMsg = HTTP.hError(xhr);
+
+                if (errMsg === null) {
+                    const data = <Uint8Array>xhr.response;
+                    const record = proto.lobby.MsgAccLoadReplayRecord.decode(data);
+                    Logger.debug("record:", record);
+                    this.enterReplayRoom(record);
+                }
+            }
+
+        });
     }
 
     private updateList(): void {

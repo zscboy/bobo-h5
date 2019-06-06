@@ -455,7 +455,7 @@ export class Player {
         const handsClickCtrls = this.playerView.handsClickCtrls;
         for (let i = 1; i < 14; i++) {
             const clickCtrl = handsClickCtrls[i];
-            if (clickCtrl.clickCount === 1) {
+            if (!clickCtrl.isNormalState) {
                 //检查选择了的牌是否可以听
                 if (clickCtrl.readyHandList !== undefined && clickCtrl.readyHandList !== null && clickCtrl.readyHandList.length > 0) {
                     //如果此牌可以听

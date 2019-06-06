@@ -27,7 +27,7 @@ export class GameSubRecordView extends cc.Component {
 
             name = replayPlayerInfos[i].nick;
             userID = replayPlayerInfos[i].userID;
-            label = this.view.getChild(`player${i}`);
+            label = this.view.getChild(`player${i + 1}`);
 
             if (name !== "") {
                 label.text = name;
@@ -99,11 +99,11 @@ export class GameSubRecordView extends cc.Component {
 
         for (let i = 0; i < record.playerScores.length; i++) {
 
-            label = obj.asCom.getChild(`score${i}`);
+            label = obj.asCom.getChild(`score${i + 1}`);
             label.text = `${record.playerScores[i].score}`;
         }
 
-        const playBtn = this.view.getChild("playBtn");
+        const playBtn = obj.asCom.getChild("playBtn");
 
         // playBtn.offClick(this.onPlayBtnClick, this);
         // playBtn.onClick(this.onPlayBtnClick, this);
@@ -132,9 +132,9 @@ export class GameSubRecordView extends cc.Component {
         // Logger.debug("enterReplayRoom modName = ", modName);
         Logger.debug("enterGame");
 
-        // this.win.hide();
-        // // this.win.dispose();
-        // this.destroy();
+        this.win.hide();
+        this.win.dispose();
+        this.destroy();
 
         const myUserID = DataStore.getString("userID", "");
         const myUser = { userID: myUserID };
@@ -175,7 +175,7 @@ export class GameSubRecordView extends cc.Component {
                 if (errMsg === null) {
                     const data = <Uint8Array>xhr.response;
                     const record = proto.lobby.MsgAccLoadReplayRecord.decode(data);
-                    Logger.debug("record:", record);
+                    Logger.debug("record");
                     this.enterReplayRoom(record);
                 }
             }

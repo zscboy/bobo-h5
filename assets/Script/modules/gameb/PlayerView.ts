@@ -826,7 +826,7 @@ export class PlayerView {
 
             return;
         }
-        if (this.roomHost.timeElapsed - this.roomHostTimeElapsed <= 0.5) {
+        if (this.roomHost.timeElapsed - this.roomHostTimeElapsed <= 1) {
             clickCtrl.doubleTimeEclipse = 0;
             //双击 直接出牌
             //判断可否出牌

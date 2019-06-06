@@ -1,14 +1,17 @@
 exports.proto = require("protobuf").newBuilder({})['import']({
     "package": null,
     "syntax": "proto2",
-    "messages": [{
+    "messages": [
+        {
             "name": "club",
             "fields": [],
             "syntax": "proto2",
-            "messages": [{
+            "messages": [
+                {
                     "name": "MsgClubReply",
                     "syntax": "proto2",
-                    "fields": [{
+                    "fields": [
+                        {
                             "rule": "required",
                             "type": "int32",
                             "name": "replyCode",
@@ -25,7 +28,8 @@ exports.proto = require("protobuf").newBuilder({})['import']({
                 {
                     "name": "MsgClubDisplayInfo",
                     "syntax": "proto2",
-                    "fields": [{
+                    "fields": [
+                        {
                             "rule": "required",
                             "type": "string",
                             "name": "nick",
@@ -54,7 +58,8 @@ exports.proto = require("protobuf").newBuilder({})['import']({
                 {
                     "name": "MsgClubMemberInfo",
                     "syntax": "proto2",
-                    "fields": [{
+                    "fields": [
+                        {
                             "rule": "required",
                             "type": "string",
                             "name": "userID",
@@ -77,7 +82,8 @@ exports.proto = require("protobuf").newBuilder({})['import']({
                 {
                     "name": "MsgClubBaseInfo",
                     "syntax": "proto2",
-                    "fields": [{
+                    "fields": [
+                        {
                             "rule": "required",
                             "type": "string",
                             "name": "clubNumber",
@@ -100,7 +106,8 @@ exports.proto = require("protobuf").newBuilder({})['import']({
                 {
                     "name": "MsgCubOperGenericReply",
                     "syntax": "proto2",
-                    "fields": [{
+                    "fields": [
+                        {
                             "rule": "required",
                             "type": "int32",
                             "name": "errorCode",
@@ -117,7 +124,8 @@ exports.proto = require("protobuf").newBuilder({})['import']({
                 {
                     "name": "MsgClubInfo",
                     "syntax": "proto2",
-                    "fields": [{
+                    "fields": [
+                        {
                             "rule": "optional",
                             "type": "MsgClubBaseInfo",
                             "name": "baseInfo",
@@ -194,17 +202,20 @@ exports.proto = require("protobuf").newBuilder({})['import']({
                 {
                     "name": "MsgClubLoadMyClubsReply",
                     "syntax": "proto2",
-                    "fields": [{
-                        "rule": "repeated",
-                        "type": "MsgClubInfo",
-                        "name": "clubs",
-                        "id": 1
-                    }]
+                    "fields": [
+                        {
+                            "rule": "repeated",
+                            "type": "MsgClubInfo",
+                            "name": "clubs",
+                            "id": 1
+                        }
+                    ]
                 },
                 {
                     "name": "MsgClubLoadUpdateReply",
                     "syntax": "proto2",
-                    "fields": [{
+                    "fields": [
+                        {
                             "rule": "repeated",
                             "type": "MsgClubInfo",
                             "name": "clubsUpdated",
@@ -221,7 +232,8 @@ exports.proto = require("protobuf").newBuilder({})['import']({
                 {
                     "name": "MsgClubLoadMembersReply",
                     "syntax": "proto2",
-                    "fields": [{
+                    "fields": [
+                        {
                             "rule": "repeated",
                             "type": "MsgClubMemberInfo",
                             "name": "members",
@@ -238,17 +250,20 @@ exports.proto = require("protobuf").newBuilder({})['import']({
                 {
                     "name": "MsgCreateClubReply",
                     "syntax": "proto2",
-                    "fields": [{
-                        "rule": "optional",
-                        "type": "MsgClubInfo",
-                        "name": "clubInfo",
-                        "id": 1
-                    }]
+                    "fields": [
+                        {
+                            "rule": "optional",
+                            "type": "MsgClubInfo",
+                            "name": "clubInfo",
+                            "id": 1
+                        }
+                    ]
                 },
                 {
                     "name": "MsgClubEvent",
                     "syntax": "proto2",
-                    "fields": [{
+                    "fields": [
+                        {
                             "rule": "required",
                             "type": "int32",
                             "name": "evtType",
@@ -313,7 +328,8 @@ exports.proto = require("protobuf").newBuilder({})['import']({
                 {
                     "name": "MsgClubLoadEventsReply",
                     "syntax": "proto2",
-                    "fields": [{
+                    "fields": [
+                        {
                             "rule": "repeated",
                             "type": "MsgClubEvent",
                             "name": "events",
@@ -330,7 +346,8 @@ exports.proto = require("protobuf").newBuilder({})['import']({
                 {
                     "name": "MsgClubRoomInfo",
                     "syntax": "proto2",
-                    "fields": [{
+                    "fields": [
+                        {
                             "rule": "required",
                             "type": "int32",
                             "name": "roomType",
@@ -371,7 +388,8 @@ exports.proto = require("protobuf").newBuilder({})['import']({
                 {
                     "name": "MsgClubLoadRoomsReply",
                     "syntax": "proto2",
-                    "fields": [{
+                    "fields": [
+                        {
                             "rule": "repeated",
                             "type": "MsgClubRoomInfo",
                             "name": "rooms",
@@ -394,7 +412,8 @@ exports.proto = require("protobuf").newBuilder({})['import']({
                 {
                     "name": "MsgClubFundEvent",
                     "syntax": "proto2",
-                    "fields": [{
+                    "fields": [
+                        {
                             "rule": "required",
                             "type": "int32",
                             "name": "evtType",
@@ -429,7 +448,8 @@ exports.proto = require("protobuf").newBuilder({})['import']({
                 {
                     "name": "MsgClubLoadFundEventsReply",
                     "syntax": "proto2",
-                    "fields": [{
+                    "fields": [
+                        {
                             "rule": "repeated",
                             "type": "MsgClubFundEvent",
                             "name": "events",
@@ -446,7 +466,8 @@ exports.proto = require("protobuf").newBuilder({})['import']({
                 {
                     "name": "MsgClubLoadReplayRoomsReply",
                     "syntax": "proto2",
-                    "fields": [{
+                    "fields": [
+                        {
                             "rule": "optional",
                             "type": "bytes",
                             "name": "gZipBytes",
@@ -461,10 +482,12 @@ exports.proto = require("protobuf").newBuilder({})['import']({
                     ]
                 }
             ],
-            "enums": [{
+            "enums": [
+                {
                     "name": "ClubReplyCode",
                     "syntax": "proto2",
-                    "values": [{
+                    "values": [
+                        {
                             "name": "RCNone",
                             "id": 0
                         },
@@ -481,7 +504,8 @@ exports.proto = require("protobuf").newBuilder({})['import']({
                 {
                     "name": "ClubRoleType",
                     "syntax": "proto2",
-                    "values": [{
+                    "values": [
+                        {
                             "name": "CRoleTypeNone",
                             "id": 0
                         },
@@ -502,7 +526,8 @@ exports.proto = require("protobuf").newBuilder({})['import']({
                 {
                     "name": "ClubOperError",
                     "syntax": "proto2",
-                    "values": [{
+                    "values": [
+                        {
                             "name": "CERR_OK",
                             "id": 0
                         },
@@ -623,7 +648,8 @@ exports.proto = require("protobuf").newBuilder({})['import']({
                 {
                     "name": "ClubEventType",
                     "syntax": "proto2",
-                    "values": [{
+                    "values": [
+                        {
                             "name": "CEVT_None",
                             "id": 0
                         },
@@ -660,7 +686,8 @@ exports.proto = require("protobuf").newBuilder({})['import']({
                 {
                     "name": "ClubFundEventType",
                     "syntax": "proto2",
-                    "values": [{
+                    "values": [
+                        {
                             "name": "CFET_None",
                             "id": 0
                         },
@@ -693,10 +720,12 @@ exports.proto = require("protobuf").newBuilder({})['import']({
             "name": "lobby",
             "fields": [],
             "syntax": "proto2",
-            "messages": [{
+            "messages": [
+                {
                     "name": "LobbyMessage",
                     "syntax": "proto2",
-                    "fields": [{
+                    "fields": [
+                        {
                             "rule": "required",
                             "type": "int32",
                             "name": "Ops",
@@ -713,17 +742,20 @@ exports.proto = require("protobuf").newBuilder({})['import']({
                 {
                     "name": "MsgCreateRoomReq",
                     "syntax": "proto2",
-                    "fields": [{
-                        "rule": "required",
-                        "type": "string",
-                        "name": "config",
-                        "id": 1
-                    }]
+                    "fields": [
+                        {
+                            "rule": "required",
+                            "type": "string",
+                            "name": "config",
+                            "id": 1
+                        }
+                    ]
                 },
                 {
                     "name": "UserProfile",
                     "syntax": "proto2",
-                    "fields": [{
+                    "fields": [
+                        {
                             "rule": "required",
                             "type": "string",
                             "name": "userID",
@@ -746,7 +778,8 @@ exports.proto = require("protobuf").newBuilder({})['import']({
                 {
                     "name": "RoomInfo",
                     "syntax": "proto2",
-                    "fields": [{
+                    "fields": [
+                        {
                             "rule": "required",
                             "type": "string",
                             "name": "roomID",
@@ -817,7 +850,8 @@ exports.proto = require("protobuf").newBuilder({})['import']({
                 {
                     "name": "MsgCreateRoomRsp",
                     "syntax": "proto2",
-                    "fields": [{
+                    "fields": [
+                        {
                             "rule": "required",
                             "type": "int32",
                             "name": "result",
@@ -846,17 +880,20 @@ exports.proto = require("protobuf").newBuilder({})['import']({
                 {
                     "name": "MsgDeleteRoomReply",
                     "syntax": "proto2",
-                    "fields": [{
-                        "rule": "required",
-                        "type": "int32",
-                        "name": "result",
-                        "id": 1
-                    }]
+                    "fields": [
+                        {
+                            "rule": "required",
+                            "type": "int32",
+                            "name": "result",
+                            "id": 1
+                        }
+                    ]
                 },
                 {
                     "name": "MsgChat",
                     "syntax": "proto2",
-                    "fields": [{
+                    "fields": [
+                        {
                             "rule": "required",
                             "type": "int32",
                             "name": "scope",
@@ -897,7 +934,8 @@ exports.proto = require("protobuf").newBuilder({})['import']({
                 {
                     "name": "MsgLoadUnreadChatReply",
                     "syntax": "proto2",
-                    "fields": [{
+                    "fields": [
+                        {
                             "rule": "repeated",
                             "type": "MsgChat",
                             "name": "msgs",
@@ -914,27 +952,32 @@ exports.proto = require("protobuf").newBuilder({})['import']({
                 {
                     "name": "MsgSetReadChat",
                     "syntax": "proto2",
-                    "fields": [{
-                        "rule": "repeated",
-                        "type": "int32",
-                        "name": "ids",
-                        "id": 1
-                    }]
+                    "fields": [
+                        {
+                            "rule": "repeated",
+                            "type": "int32",
+                            "name": "ids",
+                            "id": 1
+                        }
+                    ]
                 },
                 {
                     "name": "RoomIDList",
                     "syntax": "proto2",
-                    "fields": [{
-                        "rule": "repeated",
-                        "type": "string",
-                        "name": "roomIDs",
-                        "id": 1
-                    }]
+                    "fields": [
+                        {
+                            "rule": "repeated",
+                            "type": "string",
+                            "name": "roomIDs",
+                            "id": 1
+                        }
+                    ]
                 },
                 {
                     "name": "MsgLoadRoomListRsp",
                     "syntax": "proto2",
-                    "fields": [{
+                    "fields": [
+                        {
                             "rule": "required",
                             "type": "int32",
                             "name": "result",
@@ -957,17 +1000,20 @@ exports.proto = require("protobuf").newBuilder({})['import']({
                 {
                     "name": "MsgUpdateUserInfo",
                     "syntax": "proto2",
-                    "fields": [{
-                        "rule": "required",
-                        "type": "string",
-                        "name": "location",
-                        "id": 1
-                    }]
+                    "fields": [
+                        {
+                            "rule": "required",
+                            "type": "string",
+                            "name": "location",
+                            "id": 1
+                        }
+                    ]
                 },
                 {
                     "name": "RoomCost",
                     "syntax": "proto2",
-                    "fields": [{
+                    "fields": [
+                        {
                             "rule": "required",
                             "type": "uint32",
                             "name": "handNum",
@@ -984,17 +1030,20 @@ exports.proto = require("protobuf").newBuilder({})['import']({
                 {
                     "name": "MsgRequestRoomInfo",
                     "syntax": "proto2",
-                    "fields": [{
-                        "rule": "required",
-                        "type": "string",
-                        "name": "roomNumber",
-                        "id": 1
-                    }]
+                    "fields": [
+                        {
+                            "rule": "required",
+                            "type": "string",
+                            "name": "roomNumber",
+                            "id": 1
+                        }
+                    ]
                 },
                 {
                     "name": "MsgRequestRoomInfoRsp",
                     "syntax": "proto2",
-                    "fields": [{
+                    "fields": [
+                        {
                             "rule": "required",
                             "type": "int32",
                             "name": "result",
@@ -1017,7 +1066,8 @@ exports.proto = require("protobuf").newBuilder({})['import']({
                 {
                     "name": "MsgUpdateRoomState",
                     "syntax": "proto2",
-                    "fields": [{
+                    "fields": [
+                        {
                             "rule": "required",
                             "type": "int32",
                             "name": "state",
@@ -1052,17 +1102,20 @@ exports.proto = require("protobuf").newBuilder({})['import']({
                 {
                     "name": "MsgUpdateRoomList",
                     "syntax": "proto2",
-                    "fields": [{
-                        "rule": "repeated",
-                        "type": "RoomInfo",
-                        "name": "roomInfos",
-                        "id": 1
-                    }]
+                    "fields": [
+                        {
+                            "rule": "repeated",
+                            "type": "RoomInfo",
+                            "name": "roomInfos",
+                            "id": 1
+                        }
+                    ]
                 },
                 {
                     "name": "MsgRequestUserScoreInfo",
                     "syntax": "proto2",
-                    "fields": [{
+                    "fields": [
+                        {
                             "rule": "required",
                             "type": "string",
                             "name": "userID",
@@ -1079,7 +1132,8 @@ exports.proto = require("protobuf").newBuilder({})['import']({
                 {
                     "name": "MsgRequestUserScoreInfoRsp",
                     "syntax": "proto2",
-                    "fields": [{
+                    "fields": [
+                        {
                             "rule": "required",
                             "type": "int32",
                             "name": "maxWinScore",
@@ -1114,17 +1168,20 @@ exports.proto = require("protobuf").newBuilder({})['import']({
                 {
                     "name": "MsgLoadUserHeadIconURI",
                     "syntax": "proto2",
-                    "fields": [{
-                        "rule": "repeated",
-                        "type": "string",
-                        "name": "userIDs",
-                        "id": 1
-                    }]
+                    "fields": [
+                        {
+                            "rule": "repeated",
+                            "type": "string",
+                            "name": "userIDs",
+                            "id": 1
+                        }
+                    ]
                 },
                 {
                     "name": "MsgHeadIconInfo",
                     "syntax": "proto2",
-                    "fields": [{
+                    "fields": [
+                        {
                             "rule": "required",
                             "type": "string",
                             "name": "userID",
@@ -1147,7 +1204,8 @@ exports.proto = require("protobuf").newBuilder({})['import']({
                 {
                     "name": "MsgLoadUserHeadIconURIReply",
                     "syntax": "proto2",
-                    "fields": [{
+                    "fields": [
+                        {
                             "rule": "required",
                             "type": "int32",
                             "name": "result",
@@ -1170,17 +1228,20 @@ exports.proto = require("protobuf").newBuilder({})['import']({
                 {
                     "name": "MsgUpdateUserDiamond",
                     "syntax": "proto2",
-                    "fields": [{
-                        "rule": "required",
-                        "type": "uint64",
-                        "name": "diamond",
-                        "id": 1
-                    }]
+                    "fields": [
+                        {
+                            "rule": "required",
+                            "type": "uint64",
+                            "name": "diamond",
+                            "id": 1
+                        }
+                    ]
                 },
                 {
                     "name": "MsgAccReplayRoom",
                     "syntax": "proto2",
-                    "fields": [{
+                    "fields": [
+                        {
                             "rule": "required",
                             "type": "bytes",
                             "name": "replayRoomBytes",
@@ -1197,7 +1258,8 @@ exports.proto = require("protobuf").newBuilder({})['import']({
                 {
                     "name": "MsgAccLoadReplayRoomsReply",
                     "syntax": "proto2",
-                    "fields": [{
+                    "fields": [
+                        {
                             "rule": "repeated",
                             "type": "MsgAccReplayRoom",
                             "name": "replayRooms",
@@ -1220,7 +1282,8 @@ exports.proto = require("protobuf").newBuilder({})['import']({
                 {
                     "name": "MsgAccLoadReplayRecord",
                     "syntax": "proto2",
-                    "fields": [{
+                    "fields": [
+                        {
                             "rule": "required",
                             "type": "bytes",
                             "name": "replayRecordBytes",
@@ -1237,7 +1300,8 @@ exports.proto = require("protobuf").newBuilder({})['import']({
                 {
                     "name": "UserInfo",
                     "syntax": "proto2",
-                    "fields": [{
+                    "fields": [
+                        {
                             "rule": "required",
                             "type": "string",
                             "name": "userID",
@@ -1300,9 +1364,34 @@ exports.proto = require("protobuf").newBuilder({})['import']({
                     ]
                 },
                 {
+                    "name": "MsgWxLogin",
+                    "syntax": "proto2",
+                    "fields": [
+                        {
+                            "rule": "required",
+                            "type": "string",
+                            "name": "code",
+                            "id": 1
+                        },
+                        {
+                            "rule": "required",
+                            "type": "string",
+                            "name": "encrypteddata",
+                            "id": 2
+                        },
+                        {
+                            "rule": "required",
+                            "type": "string",
+                            "name": "iv",
+                            "id": 3
+                        }
+                    ]
+                },
+                {
                     "name": "MsgLoginReply",
                     "syntax": "proto2",
-                    "fields": [{
+                    "fields": [
+                        {
                             "rule": "required",
                             "type": "int32",
                             "name": "result",
@@ -1325,7 +1414,8 @@ exports.proto = require("protobuf").newBuilder({})['import']({
                 {
                     "name": "ClientInfo",
                     "syntax": "proto2",
-                    "fields": [{
+                    "fields": [
+                        {
                             "rule": "optional",
                             "type": "string",
                             "name": "qMod",
@@ -1390,7 +1480,8 @@ exports.proto = require("protobuf").newBuilder({})['import']({
                 {
                     "name": "MsgRegisterReply",
                     "syntax": "proto2",
-                    "fields": [{
+                    "fields": [
+                        {
                             "rule": "required",
                             "type": "int32",
                             "name": "result",
@@ -1407,7 +1498,8 @@ exports.proto = require("protobuf").newBuilder({})['import']({
                 {
                     "name": "MsgQuicklyLoginReply",
                     "syntax": "proto2",
-                    "fields": [{
+                    "fields": [
+                        {
                             "rule": "required",
                             "type": "int32",
                             "name": "result",
@@ -1436,17 +1528,20 @@ exports.proto = require("protobuf").newBuilder({})['import']({
                 {
                     "name": "MsgWebsocketConnectReply",
                     "syntax": "proto2",
-                    "fields": [{
-                        "rule": "required",
-                        "type": "int32",
-                        "name": "result",
-                        "id": 1
-                    }]
+                    "fields": [
+                        {
+                            "rule": "required",
+                            "type": "int32",
+                            "name": "result",
+                            "id": 1
+                        }
+                    ]
                 },
                 {
                     "name": "MsgReplayPlayerInfo",
                     "syntax": "proto2",
-                    "fields": [{
+                    "fields": [
+                        {
                             "rule": "required",
                             "type": "string",
                             "name": "userID",
@@ -1493,7 +1588,8 @@ exports.proto = require("protobuf").newBuilder({})['import']({
                 {
                     "name": "MsgReplayPlayerScoreSummary",
                     "syntax": "proto2",
-                    "fields": [{
+                    "fields": [
+                        {
                             "rule": "required",
                             "type": "int32",
                             "name": "chairID",
@@ -1516,7 +1612,8 @@ exports.proto = require("protobuf").newBuilder({})['import']({
                 {
                     "name": "MsgReplayRecordSummary",
                     "syntax": "proto2",
-                    "fields": [{
+                    "fields": [
+                        {
                             "rule": "required",
                             "type": "string",
                             "name": "recordUUID",
@@ -1551,7 +1648,8 @@ exports.proto = require("protobuf").newBuilder({})['import']({
                 {
                     "name": "MsgReplayRoom",
                     "syntax": "proto2",
-                    "fields": [{
+                    "fields": [
+                        {
                             "rule": "required",
                             "type": "int32",
                             "name": "recordRoomType",
@@ -1598,7 +1696,8 @@ exports.proto = require("protobuf").newBuilder({})['import']({
                 {
                     "name": "MailAttachments",
                     "syntax": "proto2",
-                    "fields": [{
+                    "fields": [
+                        {
                             "rule": "required",
                             "type": "int32",
                             "name": "type",
@@ -1621,7 +1720,8 @@ exports.proto = require("protobuf").newBuilder({})['import']({
                 {
                     "name": "MsgMail",
                     "syntax": "proto2",
-                    "fields": [{
+                    "fields": [
+                        {
                             "rule": "required",
                             "type": "string",
                             "name": "id",
@@ -1662,7 +1762,8 @@ exports.proto = require("protobuf").newBuilder({})['import']({
                 {
                     "name": "MsgLoadMail",
                     "syntax": "proto2",
-                    "fields": [{
+                    "fields": [
+                        {
                             "rule": "repeated",
                             "type": "MsgMail",
                             "name": "mails",
@@ -1677,10 +1778,12 @@ exports.proto = require("protobuf").newBuilder({})['import']({
                     ]
                 }
             ],
-            "enums": [{
+            "enums": [
+                {
                     "name": "MsgError",
                     "syntax": "proto2",
-                    "values": [{
+                    "values": [
+                        {
                             "name": "ErrSuccess",
                             "id": 0
                         },
@@ -1845,7 +1948,8 @@ exports.proto = require("protobuf").newBuilder({})['import']({
                 {
                     "name": "MessageCode",
                     "syntax": "proto2",
-                    "values": [{
+                    "values": [
+                        {
                             "name": "OPInvalid",
                             "id": 0
                         },
@@ -1878,7 +1982,8 @@ exports.proto = require("protobuf").newBuilder({})['import']({
                 {
                     "name": "RoomType",
                     "syntax": "proto2",
-                    "values": [{
+                    "values": [
+                        {
                             "name": "DafengMJ",
                             "id": 1
                         },
@@ -1943,7 +2048,8 @@ exports.proto = require("protobuf").newBuilder({})['import']({
                 {
                     "name": "OpenRoomType",
                     "syntax": "proto2",
-                    "values": [{
+                    "values": [
+                        {
                             "name": "CreateAndEnter",
                             "id": 1
                         },
@@ -1956,7 +2062,8 @@ exports.proto = require("protobuf").newBuilder({})['import']({
                 {
                     "name": "ChatDataType",
                     "syntax": "proto2",
-                    "values": [{
+                    "values": [
+                        {
                             "name": "Text",
                             "id": 0
                         },
@@ -1977,7 +2084,8 @@ exports.proto = require("protobuf").newBuilder({})['import']({
                 {
                     "name": "ChatScopeType",
                     "syntax": "proto2",
-                    "values": [{
+                    "values": [
+                        {
                             "name": "UniCast",
                             "id": 0
                         },
@@ -1998,7 +2106,8 @@ exports.proto = require("protobuf").newBuilder({})['import']({
                 {
                     "name": "LoginState",
                     "syntax": "proto2",
-                    "values": [{
+                    "values": [
+                        {
                             "name": "Faild",
                             "id": 0
                         },
@@ -2019,52 +2128,72 @@ exports.proto = require("protobuf").newBuilder({})['import']({
                 {
                     "name": "ActivityType",
                     "syntax": "proto2",
-                    "values": [{
-                        "name": "Email",
-                        "id": 1
-                    }]
+                    "values": [
+                        {
+                            "name": "Email",
+                            "id": 1
+                        }
+                    ]
                 },
                 {
                     "name": "LoginError",
                     "syntax": "proto2",
-                    "values": [{
+                    "values": [
+                        {
                             "name": "ErrLoginSuccess",
                             "id": 0
                         },
                         {
-                            "name": "ErrParamWechatCodeIsEmpty",
+                            "name": "ErrParamDecode",
                             "id": 1
                         },
                         {
-                            "name": "ErrLoadWechatUserInfoFailed",
+                            "name": "ErrParamInvalidCode",
                             "id": 2
                         },
                         {
-                            "name": "ErrParamAccountIsEmpty",
+                            "name": "ErrParamInvalidEncrypteddata",
                             "id": 3
                         },
                         {
-                            "name": "ErrParamPasswordIsEmpty",
+                            "name": "ErrParamInvalidIv",
                             "id": 4
                         },
                         {
-                            "name": "ErrAccountNotExist",
+                            "name": "ErrWxAuthFailed",
                             "id": 5
                         },
                         {
-                            "name": "ErrAccountNotSetPassword",
+                            "name": "ErrDecodeUserInfoFailed",
                             "id": 6
                         },
                         {
-                            "name": "ErrPasswordNotMatch",
+                            "name": "ErrParamAccountIsEmpty",
                             "id": 7
+                        },
+                        {
+                            "name": "ErrParamPasswordIsEmpty",
+                            "id": 8
+                        },
+                        {
+                            "name": "ErrAccountNotExist",
+                            "id": 9
+                        },
+                        {
+                            "name": "ErrAccountNotSetPassword",
+                            "id": 10
+                        },
+                        {
+                            "name": "ErrPasswordNotMatch",
+                            "id": 11
                         }
                     ]
                 },
                 {
                     "name": "RegisterError",
                     "syntax": "proto2",
-                    "values": [{
+                    "values": [
+                        {
                             "name": "ErrRegisterSuccess",
                             "id": 0
                         },
@@ -2089,7 +2218,8 @@ exports.proto = require("protobuf").newBuilder({})['import']({
                 {
                     "name": "WebsocketConnectError",
                     "syntax": "proto2",
-                    "values": [{
+                    "values": [
+                        {
                             "name": "ConnectSuccess",
                             "id": 0
                         },
@@ -2102,10 +2232,12 @@ exports.proto = require("protobuf").newBuilder({})['import']({
                 {
                     "name": "MailAttachmentType",
                     "syntax": "proto2",
-                    "values": [{
-                        "name": "Diamond",
-                        "id": 1
-                    }]
+                    "values": [
+                        {
+                            "name": "Diamond",
+                            "id": 1
+                        }
+                    ]
                 }
             ],
             "isNamespace": true

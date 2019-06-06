@@ -76,7 +76,6 @@ export class PlayerView {
     private myView: fgui.GComponent;
     private operationPanel: fgui.GComponent;
     private buttonList: fgui.GList;
-    private operationButtonsRoot: fgui.GComponent;
     private buttonDataList: string[];
 
     private aniPos: fgui.GObject;
@@ -96,97 +95,21 @@ export class PlayerView {
 
         //这里需要把player的chairID转换为游戏视图中的chairID，这是因为，无论当前玩家本人
         //的chair ID是多少，他都是居于正中下方，左手是上家，右手是下家，正中上方是对家
-        const view = viewUnityNode.getChild(`player${viewChairID}`).asCom;
-        this.myView = view;
+        this.myView = viewUnityNode.getChild(`player${viewChairID}`).asCom;
         if (viewChairID === 1) {
             this.operationPanel = viewUnityNode.getChild("operationPanel").asCom;
-
             this.initOperationButtons();
         }
 
         //头像相关
         this.initHeadView();
         //其他UI
-        this.initOtherView(view);
+        this.initOtherView();
         //玩家状态
         this.initPlayerStatus();
 
         //动画挂载点
-        this.aniPos = view.getChild("aniPos");
-    }
-
-    //初始化
-    //花牌列表
-    public initFlowers(): void {
-        const flowers: fgui.GComponent[] = [];
-        const myFlowerTilesNode = this.myView.getChild("flowers").asCom;
-        for (let i = 0; i < 12; i++) {
-            const h = myFlowerTilesNode.getChild(`n${i + 1}`).asCom;
-            flowers[i] = h;
-        }
-        this.flowers = flowers;
-    }
-
-    //明牌列表
-    public initLights(): void {
-        const lights: fgui.GComponent[] = [];
-        const myLightTilesNode = this.myView.getChild("lights").asCom;
-        for (let i = 0; i < 14; i++) {
-            const h = myLightTilesNode.getChild(`n${i + 1}`).asCom;
-            lights[i] = h;
-        }
-        this.lights = lights;
-    }
-
-    //打出的牌列表
-    public initDiscards(): void {
-        const discards: fgui.GComponent[] = [];
-        const myDicardTilesNode = this.myView.getChild("discards").asCom;
-        for (let i = 0; i < 20; i++) {
-            const card = myDicardTilesNode.getChild(`n${i + 1}`).asCom;
-            discards[i] = card;
-        }
-        this.discards = discards;
-    }
-
-    //手牌列表
-    public initHands(): void {
-        const hands: fgui.GComponent[] = [];
-        const handsOriginPos: PosCtrl[] = [];
-        const handsClickCtrls: ClickCtrl[] = [];
-        const myHandTilesNode = this.myView.getChild("hands").asCom;
-        //const resName = ""
-        const isMe = this.viewChairID === 1;
-        for (let i = 0; i < 14; i++) {
-            const card = myHandTilesNode.getChild(`n${i + 1}`).asCom;
-
-            card.name = i.toString(); //把手牌按钮对应的序号记忆，以便点击时可以识别
-            card.visible = false;
-            hands[i] = card;
-
-            handsOriginPos[i] = new PosCtrl(card.x, card.y);
-            const cc = new ClickCtrl();
-            cc.clickCount = 0;
-            cc.doubleTimeEclipse = 0;
-            cc.h = card;
-            cc.t = card.getChild("ting");
-            handsClickCtrls[i] = cc;
-
-            if (isMe) {
-                this.dragHand = myHandTilesNode.getChild("dragHand").asCom;
-                card.onClick(
-                    () => {
-                        this.onHandTileBtnClick(i);
-                    },
-                    this
-                );
-                this.onDrag(card, i);
-            }
-        }
-
-        this.hands = hands;
-        this.handsOriginPos = handsOriginPos; //记忆原始的手牌位置，以便点击手牌时可以往上弹起以及恢复
-        this.handsClickCtrls = handsClickCtrls; // 手牌点击时控制数据结构
+        this.aniPos = this.myView.getChild("aniPos");
     }
 
     public initCardLists(): void {
@@ -200,72 +123,6 @@ export class PlayerView {
         this.initLights();
     }
 
-    // public itemProviderButtonList(index: number): string {
-    //     return this.buttonDataList[index];
-    // }
-    //操作按钮
-    public initOperationButtons(): void {
-        this.buttonList = this.operationPanel.getChild("buttonList").asList;
-        this.buttonList.itemRenderer = <(index: number, item: fgui.GComponent) => void>this.renderButtonListItem.bind(this);
-        // 不设置itemProvider，此时GList就使用编辑器中配置的默认Item
-        // this.buttonList.itemProvider = <(index: number) => string>this.itemProviderButtonList.bind(this);
-        this.buttonList.on(fgui.Event.CLICK_ITEM, (onClickItem: fgui.GObject) => { this.onClickBtn(onClickItem.name); }, this);
-
-        this.operationButtonsRoot = this.operationPanel;
-
-        this.hideOperationButtons();
-
-        //检查听详情 按钮
-        this.checkReadyHandBtn = this.viewUnityNode.getChild("checkReadyHandBtn").asButton;
-        this.checkReadyHandBtn.onClick(this.onCheckReadyHandBtnClick, this);
-    }
-
-    public renderButtonListItem(index: number, obj: fgui.GObject): void {
-        const name = this.buttonDataList[index];
-        obj.name = name;
-        obj.visible = true;
-
-        const node = obj.node;
-        if (node.childrenCount > 0) {
-            node.children.forEach((c) => {
-                c.active = false;
-            });
-        }
-
-        this.roomHost.animationMgr.play(`lobby/prefabs/mahjong/${name}`, node);
-    }
-
-    public onClickBtn(name: string): void {
-        if (this.btnHanders === undefined) {
-            this.btnHanders = {};
-            const btnHanders = this.btnHanders;
-            btnHanders[ButtonDef.Chow] = () => {
-                this.player.onChowBtnClick();
-            };
-            btnHanders[ButtonDef.Kong] = () => {
-                this.player.onKongBtnClick();
-            };
-            btnHanders[ButtonDef.Skip] = () => {
-                this.player.onSkipBtnClick();
-            };
-            btnHanders[ButtonDef.Pong] = () => {
-                this.player.onPongBtnClick();
-            };
-            btnHanders[ButtonDef.Ting] = () => {
-                this.player.onReadyHandBtnClick();
-            };
-            btnHanders[ButtonDef.Hu] = () => {
-                this.player.onWinBtnClick();
-            };
-            btnHanders[ButtonDef.Zhua] = () => {
-                this.player.onFinalDrawBtnClick();
-            };
-        }
-
-        const handler = this.btnHanders[name];
-        handler();
-    }
-
     //显示操作按钮
     public showButton(map: string[]): void {
         if (map !== undefined && map.length > 0) {
@@ -273,7 +130,7 @@ export class PlayerView {
             this.buttonList.numItems = map.length;
             this.buttonList.resizeToFit(map.length);
         }
-        this.operationButtonsRoot.visible = true;
+        this.operationPanel.visible = true;
     }
 
     //隐藏所有操作按钮
@@ -281,112 +138,7 @@ export class PlayerView {
         //先隐藏掉所有按钮
         // this.showButton([]);
         //隐藏根节点
-        this.operationButtonsRoot.visible = false;
-    }
-
-    public initOtherView(view: fgui.GComponent): void {
-
-        // this.aniPos = view.getChild("aniPos")
-        this.userInfoPos = view.getChild("userInfoPos");
-
-        //打出的牌放大显示
-        this.discardTips = view.getChild("discardTip").asCom;
-        this.discardTipsTile = this.discardTips.getChild("card").asCom;
-    }
-
-    //头像周边内容节点
-    public initHeadView(): void {
-
-        const head = new Head();
-
-        head.headView = this.myView.getChild("head").asCom;
-        head.headView.visible = false;
-        head.pos = head.headView.getChild("pos");
-        //ready状态指示
-        head.readyIndicator = this.myView.getChild("ready");
-        head.readyIndicator.visible = false;
-        //听牌标志
-        head.ting = this.myView.getChild("ting");
-        head.ting.visible = false;
-        //房间拥有者标志
-        head.roomOwnerFlag = this.myView.getChild("owner");
-        head.roomOwnerFlag.visible = false;
-
-        //庄家标志
-        head.bankerFlag = this.myView.getChild("zhuang");
-        head.bankerFlag.visible = false;
-        head.continuousBankerFlag = this.myView.getChild("lianzhuang");
-        head.continuousBankerFlag.visible = false;
-
-        head.huaNode = this.myView.getChild("hua");
-        head.huaNode.visible = false;
-        head.huaNodeText = this.myView.getChild("huaText");
-        head.huaNodeText.visible = false;
-
-        //更新庄家UI
-        const updateBanker = (isBanker: boolean, isContinue: boolean): void => {
-            if (isBanker) {
-                if (isContinue) {
-                    head.bankerFlag.visible = false;
-                    head.continuousBankerFlag.visible = true;
-                } else {
-                    head.bankerFlag.visible = true;
-                    head.continuousBankerFlag.visible = false;
-                }
-            } else {
-                head.bankerFlag.visible = false;
-                head.continuousBankerFlag.visible = false;
-            }
-        };
-        head.onUpdateBankerFlag = updateBanker;
-
-        head.hideAll = (): void => {
-            head.headView.visible = false;
-            head.readyIndicator.visible = false;
-            head.ting.visible = false;
-            head.roomOwnerFlag.visible = false;
-            head.bankerFlag.visible = false;
-            head.continuousBankerFlag.visible = false;
-            head.huaNode.visible = false;
-            head.huaNodeText.visible = false;
-        };
-
-        this.head = head;
-    }
-
-    //玩家状态
-    public initPlayerStatus(): void {
-        //起始
-        const onStart = (): void => {
-            this.head.readyIndicator.visible = false;
-            if (this.viewChairID === 1) {
-                this.checkReadyHandBtn.visible = false;
-            }
-        };
-
-        //准备
-        const onReady = (): void => {
-            this.head.readyIndicator.visible = true;
-            this.showOwner();
-        };
-
-        //离线
-        const onLeave = (): void => {
-            this.head.readyIndicator.visible = false;
-        };
-
-        //正在玩
-        const onPlaying = (): void => {
-            this.head.readyIndicator.visible = false;
-            this.showOwner();
-        };
-
-        const status = [];
-        status[mjproto.PlayerState.PSNone] = onStart;
-        status[mjproto.PlayerState.PSReady] = onReady;
-        status[mjproto.PlayerState.PSOffline] = onLeave;
-        status[mjproto.PlayerState.PSPlaying] = onPlaying;
-        this.onUpdateStatus = status;
+        this.operationPanel.visible = false;
     }
 
     //界面操作
@@ -666,28 +418,6 @@ export class PlayerView {
         }
     }
 
-    //设置面子牌的方向
-    public setMeldTileDirection(ischi: boolean, tileObj: fgui.GComponent, dir: number, viewChairID: number): void {
-        if (dir > 0 && viewChairID > 0) {
-            const image = tileObj.getChild("ts").asLoader;
-            if (image != null) {
-                if (ischi) {
-                    image.url = "ui.//dafeng/ts_chi";
-                } else {
-                    const x = dir - viewChairID;
-                    if (x === 1 || x === -3) {
-                        image.url = "ui.//dafeng/ts_xia";
-                    } else if (x === 2 || x === -2) {
-                        image.url = "ui.//dafeng/ts_dui";
-                    } else if (x === 3 || x === -1) {
-                        image.url = "ui.//dafeng/ts_shang";
-                    }
-                }
-                image.visible = true;
-            }
-        }
-    }
-
     public mountConcealedKongTileImage(t: fgui.GComponent, tileID: number): void {
         //const player = this.player
         //tileID === mjproto.mjproto.enumTid_MAX表示该牌需要暗牌显示
@@ -811,59 +541,6 @@ export class PlayerView {
         //隐藏听牌详情界面
         this.room.hideTingDataView();
     }
-
-    //处理玩家点击手牌按钮
-    public onHandTileBtnClick(index: number): void {
-        const handsClickCtrls = this.handsClickCtrls;
-        const clickCtrl = handsClickCtrls[index];
-        const player = this.player;
-        if (!clickCtrl.isDiscardable) {
-            //不可以出牌
-            if (clickCtrl.isGray) {
-                if (!this.alreadyShowNonDiscardAbleTips) {
-                    Dialog.prompt("本轮不能出与该牌组合的牌，请选择其他牌");
-                    this.alreadyShowNonDiscardAbleTips = true;
-                }
-            }
-
-            return;
-        }
-        if (clickCtrl.readyHandList !== undefined && clickCtrl.readyHandList !== null && clickCtrl.readyHandList.length > 0) {
-            //如果此牌可以听
-            const tingP: TingPai[] = [];
-            for (let i = 0; i < clickCtrl.readyHandList.length; i += 2) {
-                tingP.push(new TingPai(clickCtrl.readyHandList[i], 1, clickCtrl.readyHandList[i + 1]));
-            }
-            this.room.showTingDataView(tingP);
-        } else {
-            this.room.hideTingDataView();
-        }
-        if (clickCtrl.doubleTimeEclipse === 0) {
-            clickCtrl.doubleTimeEclipse = 1;
-            this.roomHostTimeElapsed = this.roomHost.timeElapsed;
-            //第一次点击 弹起
-            this.restoreHandsPositionAndClickCount(index);
-            this.moveHandUp(index);
-
-            return;
-        }
-        if (this.roomHost.timeElapsed - this.roomHostTimeElapsed <= 0.5) {
-            clickCtrl.doubleTimeEclipse = 0;
-            //双击 直接出牌
-            //判断可否出牌
-            if (player.waitSkip) {
-                this.restoreHandsPositionAndClickCount(-1);
-                this.room.hideTingDataView();
-            } else {
-                player.onPlayerDiscardTile(clickCtrl.tileID);
-                this.clearAllowedActionsView(false);
-            }
-        } else {
-            clickCtrl.doubleTimeEclipse = 0;
-            //第二次点击 缩回去
-            this.restoreHandPositionAndClickCount(index);
-        }
-    }
     //处理玩家点击手牌按钮
     public onHandTileBtnClick2(index: number): void {
         const handsClickCtrls = this.handsClickCtrls;
@@ -923,8 +600,252 @@ export class PlayerView {
         }
     }
 
+    //还原所有手牌到它初始化时候的位置，并把clickCount重置为0
+    public restoreHandsPositionAndClickCount(index: number): void {
+        for (let i = 0; i < 14; i++) {
+            if (i !== index) {
+                const clickCtrl = this.handsClickCtrls[i];
+                const originPos = this.handsOriginPos[i];
+                const h = clickCtrl.h;
+                h.y = originPos.y;
+                clickCtrl.clickCount = 0;
+                clickCtrl.doubleTimeEclipse = 0;
+            }
+        }
+    }
+
+    //显示玩家头像
+    public showHeadImg(): void {
+        this.head.headView.visible = true;
+        this.head.headView.onClick(this.player.onPlayerInfoClick, this.player);
+    }
+
+    //显示桌主
+    public showOwner(): void {
+        const player = this.player;
+        this.head.roomOwnerFlag.visible = player.isMe();
+    }
+
+    //特效播放
+    //播放补花效果，并等待结束
+    public async playDrawFlowerAnimation(): Promise<void> {
+        await this.playerOperationEffect("Effect_zi_buhua");
+        await this.room.coWaitSeconds(0.5);
+    }
+
+    public async playerOperationEffect(effectName: string, isWait?: boolean): Promise<void> {
+        if (isWait) {
+            await this.roomHost.animationMgr.coPlay(`lobby/prefabs/mahjong/${effectName}`, this.aniPos.node);
+        } else {
+            this.roomHost.animationMgr.play(`lobby/prefabs/mahjong/${effectName}`, this.aniPos.node);
+        }
+    }
+
+    //特效道具播放
+    public playerDonateEffect(effectName: string): void {
+        this.roomHost.animationMgr.play(`lobby/prefabs/donate/${effectName}`, this.head.headView.node);
+    }
+    //起手听特效播放
+    public playReadyHandEffect(): void {
+        //this. playerOperationEffect(dfConfig.EFF_DEFINE.SUB_ZI_TING)
+    }
+
+    //设置灰度
+    public setGray(obj: fgui.GComponent): void {
+        obj.grayed = true;
+    }
+
+    //恢复灰度
+    public clearGray(obj: fgui.GComponent): void {
+        obj.grayed = false;
+    }
+
+    public getUserInfoPos(): fgui.GObject {
+        return this.userInfoPos;
+    }
+
+    private initOtherView(): void {
+
+        // this.aniPos = view.getChild("aniPos")
+        this.userInfoPos = this.myView.getChild("userInfoPos");
+
+        //打出的牌放大显示
+        this.discardTips = this.myView.getChild("discardTip").asCom;
+        this.discardTipsTile = this.discardTips.getChild("card").asCom;
+    }
+
+    //头像周边内容节点
+    private initHeadView(): void {
+
+        const head = new Head();
+
+        head.headView = this.myView.getChild("head").asCom;
+        head.headView.visible = false;
+        head.pos = head.headView.getChild("pos");
+        //ready状态指示
+        head.readyIndicator = this.myView.getChild("ready");
+        head.readyIndicator.visible = false;
+        //听牌标志
+        head.ting = this.myView.getChild("ting");
+        head.ting.visible = false;
+        //房间拥有者标志
+        head.roomOwnerFlag = this.myView.getChild("owner");
+        head.roomOwnerFlag.visible = false;
+
+        //庄家标志
+        head.bankerFlag = this.myView.getChild("zhuang");
+        head.bankerFlag.visible = false;
+        head.continuousBankerFlag = this.myView.getChild("lianzhuang");
+        head.continuousBankerFlag.visible = false;
+
+        head.huaNode = this.myView.getChild("hua");
+        head.huaNode.visible = false;
+        head.huaNodeText = this.myView.getChild("huaText");
+        head.huaNodeText.visible = false;
+
+        //更新庄家UI
+        const updateBanker = (isBanker: boolean, isContinue: boolean): void => {
+            if (isBanker) {
+                if (isContinue) {
+                    head.bankerFlag.visible = false;
+                    head.continuousBankerFlag.visible = true;
+                } else {
+                    head.bankerFlag.visible = true;
+                    head.continuousBankerFlag.visible = false;
+                }
+            } else {
+                head.bankerFlag.visible = false;
+                head.continuousBankerFlag.visible = false;
+            }
+        };
+        head.onUpdateBankerFlag = updateBanker;
+
+        head.hideAll = (): void => {
+            head.headView.visible = false;
+            head.readyIndicator.visible = false;
+            head.ting.visible = false;
+            head.roomOwnerFlag.visible = false;
+            head.bankerFlag.visible = false;
+            head.continuousBankerFlag.visible = false;
+            head.huaNode.visible = false;
+            head.huaNodeText.visible = false;
+        };
+
+        this.head = head;
+    }
+
+    //玩家状态
+    private initPlayerStatus(): void {
+        //起始
+        const onStart = (): void => {
+            this.head.readyIndicator.visible = false;
+            if (this.viewChairID === 1) {
+                this.checkReadyHandBtn.visible = false;
+            }
+        };
+
+        //准备
+        const onReady = (): void => {
+            this.head.readyIndicator.visible = true;
+            this.showOwner();
+        };
+
+        //离线
+        const onLeave = (): void => {
+            this.head.readyIndicator.visible = false;
+        };
+
+        //正在玩
+        const onPlaying = (): void => {
+            this.head.readyIndicator.visible = false;
+            this.showOwner();
+        };
+
+        const status = [];
+        status[mjproto.PlayerState.PSNone] = onStart;
+        status[mjproto.PlayerState.PSReady] = onReady;
+        status[mjproto.PlayerState.PSOffline] = onLeave;
+        status[mjproto.PlayerState.PSPlaying] = onPlaying;
+        this.onUpdateStatus = status;
+    }
+
+    //设置面子牌的方向
+    private setMeldTileDirection(ischi: boolean, tileObj: fgui.GComponent, dir: number, viewChairID: number): void {
+        if (dir > 0 && viewChairID > 0) {
+            const image = tileObj.getChild("ts").asLoader;
+            if (image != null) {
+                if (ischi) {
+                    image.url = "ui.//dafeng/ts_chi";
+                } else {
+                    const x = dir - viewChairID;
+                    if (x === 1 || x === -3) {
+                        image.url = "ui.//dafeng/ts_xia";
+                    } else if (x === 2 || x === -2) {
+                        image.url = "ui.//dafeng/ts_dui";
+                    } else if (x === 3 || x === -1) {
+                        image.url = "ui.//dafeng/ts_shang";
+                    }
+                }
+                image.visible = true;
+            }
+        }
+    }
+
+    //处理玩家点击手牌按钮
+    private onHandTileBtnClick(index: number): void {
+        const handsClickCtrls = this.handsClickCtrls;
+        const clickCtrl = handsClickCtrls[index];
+        const player = this.player;
+        if (!clickCtrl.isDiscardable) {
+            //不可以出牌
+            if (clickCtrl.isGray) {
+                if (!this.alreadyShowNonDiscardAbleTips) {
+                    Dialog.prompt("本轮不能出与该牌组合的牌，请选择其他牌");
+                    this.alreadyShowNonDiscardAbleTips = true;
+                }
+            }
+
+            return;
+        }
+        if (clickCtrl.readyHandList !== undefined && clickCtrl.readyHandList !== null && clickCtrl.readyHandList.length > 0) {
+            //如果此牌可以听
+            const tingP: TingPai[] = [];
+            for (let i = 0; i < clickCtrl.readyHandList.length; i += 2) {
+                tingP.push(new TingPai(clickCtrl.readyHandList[i], 1, clickCtrl.readyHandList[i + 1]));
+            }
+            this.room.showTingDataView(tingP);
+        } else {
+            this.room.hideTingDataView();
+        }
+        if (clickCtrl.doubleTimeEclipse === 0) {
+            clickCtrl.doubleTimeEclipse = 1;
+            this.roomHostTimeElapsed = this.roomHost.timeElapsed;
+            //第一次点击 弹起
+            this.restoreHandsPositionAndClickCount(index);
+            this.moveHandUp(index);
+
+            return;
+        }
+        if (this.roomHost.timeElapsed - this.roomHostTimeElapsed <= 0.5) {
+            clickCtrl.doubleTimeEclipse = 0;
+            //双击 直接出牌
+            //判断可否出牌
+            if (player.waitSkip) {
+                this.restoreHandsPositionAndClickCount(-1);
+                this.room.hideTingDataView();
+            } else {
+                player.onPlayerDiscardTile(clickCtrl.tileID);
+                this.clearAllowedActionsView(false);
+            }
+        } else {
+            clickCtrl.doubleTimeEclipse = 0;
+            //第二次点击 缩回去
+            this.restoreHandPositionAndClickCount(index);
+        }
+    }
+
     //处理玩家点击左下角的“听”按钮
-    public onCheckReadyHandBtnClick(): void {
+    private onCheckReadyHandBtnClick(): void {
         const player = this.player;
         const readyHandList = player.readyHandList;
         if (!this.room.isListensObjVisible() && readyHandList != null && readyHandList.length > 0) {
@@ -940,7 +861,7 @@ export class PlayerView {
     }
 
     //拖动出牌事件
-    public onDrag(dragGo: fgui.GObject, index: number): void {
+    private onDrag(dragGo: fgui.GObject, index: number): void {
         const startPos = { x: dragGo.x, y: dragGo.y };
         let enable = false;
         let clickCtrl: ClickCtrl = new ClickCtrl();
@@ -964,9 +885,6 @@ export class PlayerView {
         };
         //检测拖动范围时候合法
         const pointIsInRect = (x: number, y: number) => {
-            if (rect === null) {
-                return false;
-            }
             if (x > rect[0] && x < rect[1] && y > rect[2] && y < rect[3]) {
                 return true;
             } else {
@@ -1034,22 +952,8 @@ export class PlayerView {
         dragGo.on(fgui.Event.DRAG_MOVE, moveFunction, this);
         dragGo.on(fgui.Event.DRAG_END, endFunction, this);
     }
-
-    //还原所有手牌到它初始化时候的位置，并把clickCount重置为0
-    public restoreHandsPositionAndClickCount(index: number): void {
-        for (let i = 0; i < 14; i++) {
-            if (i !== index) {
-                const clickCtrl = this.handsClickCtrls[i];
-                const originPos = this.handsOriginPos[i];
-                const h = clickCtrl.h;
-                h.y = originPos.y;
-                clickCtrl.clickCount = 0;
-                clickCtrl.doubleTimeEclipse = 0;
-            }
-        }
-    }
     //还原某个手牌到它初始化时候的位置，并把clickCount重置为0
-    public restoreHandPositionAndClickCount(i: number): void {
+    private restoreHandPositionAndClickCount(i: number): void {
         const clickCtrl = this.handsClickCtrls[i];
         const originPos = this.handsOriginPos[i];
         const h = clickCtrl.h;
@@ -1059,7 +963,7 @@ export class PlayerView {
     }
 
     //隐藏听牌标志
-    public hideTing(): void {
+    private hideTing(): void {
         for (let i = 0; i < 14; i++) {
             const clickCtrl = this.handsClickCtrls[i];
             if (clickCtrl != null && clickCtrl.t != null) {
@@ -1069,14 +973,14 @@ export class PlayerView {
     }
 
     //把手牌往上移动30的单位距离
-    public moveHandUp(index: number): void {
+    private moveHandUp(index: number): void {
         const originPos = this.handsOriginPos[index];
         const h = this.handsClickCtrls[index].h;
         h.y = originPos.y - 30;
     }
 
     //让所有的手牌都不可以点击
-    public clearDiscardable(): void {
+    private clearDiscardable(): void {
         if (this.player.isRichi) {
             //如果是听牌状态下，则不再把牌弄回白色（让手牌一直是灰色的）
             return;
@@ -1090,68 +994,138 @@ export class PlayerView {
         }
     }
 
-    //显示玩家头像
-    public showHeadImg(): void {
-        this.head.headView.visible = true;
-        this.head.headView.onClick(this.player.onPlayerInfoClick, this.player);
-    }
-
-    //显示桌主
-    public showOwner(): void {
-        const player = this.player;
-        this.head.roomOwnerFlag.visible = player.isMe();
-    }
-
-    //特效播放
-    //播放补花效果，并等待结束
-    public async playDrawFlowerAnimation(): Promise<void> {
-        await this.playerOperationEffect("Effect_zi_buhua");
-        await this.room.coWaitSeconds(0.5);
-    }
-
-    public async playerOperationEffect(effectName: string, isWait?: boolean): Promise<void> {
-        if (isWait) {
-            await this.roomHost.animationMgr.coPlay(`lobby/prefabs/mahjong/${effectName}`, this.aniPos.node);
-        } else {
-            this.roomHost.animationMgr.play(`lobby/prefabs/mahjong/${effectName}`, this.aniPos.node);
+    //初始化
+    //花牌列表
+    private initFlowers(): void {
+        const flowers: fgui.GComponent[] = [];
+        const myFlowerTilesNode = this.myView.getChild("flowers").asCom;
+        for (let i = 0; i < 12; i++) {
+            const h = myFlowerTilesNode.getChild(`n${i + 1}`).asCom;
+            flowers[i] = h;
         }
+        this.flowers = flowers;
     }
 
-    //特效道具播放
-    public playerDonateEffect(effectName: string): void {
-        // this.roomHost.animationMgr.play(`lobby/prefabs/mahjong/${effectName}`, this.head.headView.node);
-    }
-    //起手听特效播放
-    public playReadyHandEffect(): void {
-        //this. playerOperationEffect(dfConfig.EFF_DEFINE.SUB_ZI_TING)
-    }
-
-    //设置灰度
-    public setGray(obj: fgui.GComponent): void {
-        Logger.debug("设置灰度: ", obj);
-        obj.grayed = true;
-        // if btn != null {
-        //const hImg = btn. Find("hua")
-        //const imageA = btn. GetComponent("Image")
-        //const imageB = hImg. GetComponent("Image")
-        //imageA.color = Color(120 / 255, 122 / 255, 122 / 255, 1)
-        //imageB.color = Color(120 / 255, 122 / 255, 122 / 255, 1)
-        //}
+    //明牌列表
+    private initLights(): void {
+        const lights: fgui.GComponent[] = [];
+        const myLightTilesNode = this.myView.getChild("lights").asCom;
+        for (let i = 0; i < 14; i++) {
+            const h = myLightTilesNode.getChild(`n${i + 1}`).asCom;
+            lights[i] = h;
+        }
+        this.lights = lights;
     }
 
-    //恢复灰度
-    public clearGray(obj: fgui.GComponent): void {
-        obj.grayed = false;
-        // if btn != null {
-        //const hImg = btn. Find("hua")
-        //const imageA = btn. GetComponent("Image")
-        //const imageB = hImg. GetComponent("Image")
-        //imageA.color = Color(1, 1, 1, 1)
-        //imageB.color = Color(1, 1, 1, 1)
-        //}
+    //打出的牌列表
+    private initDiscards(): void {
+        const discards: fgui.GComponent[] = [];
+        const myDicardTilesNode = this.myView.getChild("discards").asCom;
+        for (let i = 0; i < 20; i++) {
+            const card = myDicardTilesNode.getChild(`n${i + 1}`).asCom;
+            discards[i] = card;
+        }
+        this.discards = discards;
     }
 
-    public getUserInfoPos(): fgui.GObject {
-        return this.userInfoPos;
+    //手牌列表
+    private initHands(): void {
+        const hands: fgui.GComponent[] = [];
+        const handsOriginPos: PosCtrl[] = [];
+        const handsClickCtrls: ClickCtrl[] = [];
+        const myHandTilesNode = this.myView.getChild("hands").asCom;
+        //const resName = ""
+        const isMe = this.viewChairID === 1;
+        for (let i = 0; i < 14; i++) {
+            const card = myHandTilesNode.getChild(`n${i + 1}`).asCom;
+
+            card.name = i.toString(); //把手牌按钮对应的序号记忆，以便点击时可以识别
+            card.visible = false;
+            hands[i] = card;
+
+            handsOriginPos[i] = new PosCtrl(card.x, card.y);
+            const cc = new ClickCtrl();
+            cc.clickCount = 0;
+            cc.doubleTimeEclipse = 0;
+            cc.h = card;
+            cc.t = card.getChild("ting");
+            handsClickCtrls[i] = cc;
+
+            if (isMe) {
+                this.dragHand = myHandTilesNode.getChild("dragHand").asCom;
+                card.onClick(
+                    () => {
+                        this.onHandTileBtnClick(i);
+                    },
+                    this
+                );
+                this.onDrag(card, i);
+            }
+        }
+
+        this.hands = hands;
+        this.handsOriginPos = handsOriginPos; //记忆原始的手牌位置，以便点击手牌时可以往上弹起以及恢复
+        this.handsClickCtrls = handsClickCtrls; // 手牌点击时控制数据结构
+    }
+
+    private onClickBtn(name: string): void {
+        if (this.btnHanders === undefined) {
+            this.btnHanders = {};
+            const btnHanders = this.btnHanders;
+            btnHanders[ButtonDef.Chow] = () => {
+                this.player.onChowBtnClick();
+            };
+            btnHanders[ButtonDef.Kong] = () => {
+                this.player.onKongBtnClick();
+            };
+            btnHanders[ButtonDef.Skip] = () => {
+                this.player.onSkipBtnClick();
+            };
+            btnHanders[ButtonDef.Pong] = () => {
+                this.player.onPongBtnClick();
+            };
+            btnHanders[ButtonDef.Ting] = () => {
+                this.player.onReadyHandBtnClick();
+            };
+            btnHanders[ButtonDef.Hu] = () => {
+                this.player.onWinBtnClick();
+            };
+            btnHanders[ButtonDef.Zhua] = () => {
+                this.player.onFinalDrawBtnClick();
+            };
+        }
+
+        const handler = this.btnHanders[name];
+        handler();
+    }
+
+    // public itemProviderButtonList(index: number): string {
+    //     return this.buttonDataList[index];
+    // }
+    //操作按钮
+    private initOperationButtons(): void {
+        this.buttonList = this.operationPanel.getChild("buttonList").asList;
+        this.buttonList.itemRenderer = <(index: number, item: fgui.GComponent) => void>this.renderButtonListItem.bind(this);
+        this.buttonList.on(fgui.Event.CLICK_ITEM, (onClickItem: fgui.GObject) => { this.onClickBtn(onClickItem.name); }, this);
+        this.hideOperationButtons();
+
+        //检查听详情 按钮
+        this.checkReadyHandBtn = this.viewUnityNode.getChild("checkReadyHandBtn").asButton;
+        this.checkReadyHandBtn.onClick(this.onCheckReadyHandBtnClick, this);
+    }
+
+    private renderButtonListItem(index: number, obj: fgui.GObject): void {
+        const name = this.buttonDataList[index];
+        obj.name = name;
+        obj.visible = true;
+
+        const node = obj.node;
+        if (node.childrenCount > 0) {
+            node.children.forEach((c) => {
+                c.active = false;
+            });
+        }
+
+        this.roomHost.animationMgr.play(`lobby/prefabs/mahjong/${name}`, node);
     }
 }

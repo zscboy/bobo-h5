@@ -165,11 +165,9 @@ export class NewRoomView extends cc.Component {
                 } else {
                     errMsg = HTTP.hError(xhr);
                     if (errMsg === null) {
-                        const data = <Uint8Array>xhr.response;
-                        const dataString = new TextDecoder("utf-8").decode(data);
+                        const dataString = <string>String.fromCharCode.apply(null, new Uint8Array(<ArrayBuffer>xhr.response));
                         const priceCfgs = <{ [key: string]: object }>JSON.parse(dataString);
                         this.dfRuleView.updatePriceCfg(priceCfgs);
-                        Logger.debug("price:", dataString);
                     }
                 }
 

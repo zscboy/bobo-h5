@@ -26,11 +26,15 @@ export class DisbandView extends cc.Component {
 
     private agreeBtn: fgui.GButton;
 
-    public saveRoomView(room: RoomInterface): void {
+    private msgDisbandNotify: proto.mahjong.MsgDisbandNotify;
+
+    public saveRoomView(room: RoomInterface, msgDisbandNotify: proto.mahjong.MsgDisbandNotify): void {
         this.room = room;
+        this.msgDisbandNotify = msgDisbandNotify;
     }
 
-    public updateView(msgDisbandNotify: proto.mahjong.MsgDisbandNotify): void {
+    public updateView(): void {
+        const msgDisbandNotify = this.msgDisbandNotify;
         //
         Logger.debug("msgDisbandNotify = ", msgDisbandNotify);
 
@@ -100,7 +104,7 @@ export class DisbandView extends cc.Component {
                     this.showButtons(false);
 
                     return;
-            } else {
+                } else {
                     this.myCountDown.visible = false;
                     this.showButtons(true);
                 }
@@ -123,12 +127,13 @@ export class DisbandView extends cc.Component {
         this.view.visible = false;
 
         this.initView();
+
+        this.updateView();
     }
 
     protected onDestroy(): void {
         this.eventTarget.emit("destroy");
         this.view.dispose();
-
     }
 
     private disbandCountDown(): void {
@@ -176,8 +181,6 @@ export class DisbandView extends cc.Component {
     }
 
     private initView(): void {
-        //
-        Logger.debug(this.room);
         this.myCountDown = this.view.getChild("n9");
         this.myCountDownTxt = this.view.getChild("time");
         this.refuseBtn = this.view.getChild("unagreeBtn").asButton;

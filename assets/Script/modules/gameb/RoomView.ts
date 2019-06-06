@@ -256,12 +256,11 @@ export class RoomView {
 
         if (disbandView === undefined || disbandView == null) {
             disbandView = this.component.addComponent(DisbandView);
+            disbandView.saveRoomView(this.room, msgDisbandNotify);
+        } else {
+            disbandView.saveRoomView(this.room, msgDisbandNotify);
+            disbandView.updateView();
         }
-
-        disbandView.saveRoomView(this.room);
-
-        disbandView.updateView(msgDisbandNotify);
-
     }
 
     //解散房间按钮点击事件

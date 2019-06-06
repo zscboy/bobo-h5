@@ -172,7 +172,7 @@ export class JoinRoom extends cc.Component {
             jsonString: "",
             userInfo: myUser,
             roomInfo: myRoomInfo,
-            uuid: "uuid",
+            uuid: roomInfo.gameServerID,
             record: null
         };
 

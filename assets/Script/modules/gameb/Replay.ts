@@ -63,7 +63,7 @@ export class Replay {
         const mq = new MsgQueue({});
         this.mq = mq;
 
-        this.actionStep = 0;
+        this.actionStep = -1;
 
         this.startStepTimer();
 
@@ -225,7 +225,7 @@ export class Replay {
 
     public async doReplayStep(): Promise<void> {
         const room = this.host.room;
-        if (this.actionStep === 0) {
+        if (this.actionStep === -1) {
             Logger.debug("Replay:doReplayStep, deal");
             // 重置房间
             room.resetForNewHand();

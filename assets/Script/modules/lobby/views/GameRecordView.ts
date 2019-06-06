@@ -92,47 +92,67 @@ export class GameRecordView extends cc.Component {
             default:
         }
 
-        const gameName = obj.asCom.getChild("name");
-        gameName.text = text;
+        const rountText = `${replayRoom.records.length} 局`;
+        const gameName = obj.asCom.getChild("gameName");
+        gameName.text = `${text} ${rountText}`;
 
         const roomNumber = obj.asCom.getChild("roomNumber");
-        roomNumber.text = replayRoom.roomNumber;
+        roomNumber.text = `${replayRoom.roomNumber} ${"号 房间"}`;
 
-        const date = obj.asCom.getChild("time");
+        const dateText = obj.asCom.getChild("time");
 
-        //TODO: format Time
-        date.text = ` ${replayRoom.startTime * 60}`;
+        const date = new Date(replayRoom.startTime * 1000);
+        const month = date.getMonth() < 9 ? `0${date.getMonth() + 1} ` : `${date.getMonth() + 1} `;
+        const day = date.getDay() < 10 ? `0${date.getDay()} ` : `${date.getDay()} `;
+        const hour = date.getHours() < 10 ? `0${date.getHours()} ` : `${date.getHours()} `;
+        const minute = date.getMinutes() < 10 ? `0${date.getMinutes()} ` : `${date.getMinutes()} `;
 
-        const userID = DataStore.getString("userID", "");
+        dateText.text = `${date.getFullYear()} /${month}/${day} ${hour}: ${minute} `;
+        let nameText;
+        let playerScoreText;
 
-        const resultText = obj.asCom.getChild("result");
-        const ownerText = obj.asCom.getChild("owner");
+        let winnerImg;
 
-        const ownerUserID = replayRoom.ownerUserID;
+        let winnerSore = 0;
 
-        let owner;
+        let finalWinnerImg;
 
-        replayRoom.players.forEach(playerInfo => {
+        // const ownerUserID = replayRoom.ownerUserID;
 
-            if (playerInfo.userID === ownerUserID) {
+        for (let i = 0; i < replayRoom.players.length; i++) {
+            const player = replayRoom.players[i];
 
-                if (playerInfo.nick !== "") {
-                    owner = playerInfo.nick;
-                } else {
-                    owner = playerInfo.userID;
-                }
-                ownerText.text = owner;
+            nameText = obj.asCom.getChild(`playerName${i + 1}`);
+
+            const nick = player.nick === "" ? player.userID : player.nick;
+            nameText.text = `${nick}`;
+
+            playerScoreText = obj.asCom.getChild(`playerScore${i + 1}`);
+            if (player.totalScore > 0) {
+                playerScoreText.text = `${+player.totalScore}`;
+                playerScoreText.asTextField.color = new cc.Color().fromHEX("#D52012");
+            } else {
+                playerScoreText.text = `${player.totalScore}`;
+                playerScoreText.asTextField.color = new cc.Color().fromHEX("#359031");
             }
 
-            if (playerInfo.userID === userID) {
+            winnerImg = obj.asCom.getChild(`winner${i + 1}`);
+            winnerImg.visible = false;
 
-                if (playerInfo.totalScore < 0) {
-                    resultText.text = "Win";
-                } else {
-                    resultText.text = "Lose";
-                }
+            if (player.totalScore > winnerSore) {
+                finalWinnerImg = winnerImg;
+                winnerSore = player.totalScore;
             }
-        });
+
+            obj.asCom.getChild(`owner${i + 1}`).visible = false;
+
+            if (player.userID === replayRoom.ownerUserID) {
+                obj.asCom.getChild(`owner${i + 1}`).visible = true;
+            }
+
+        }
+
+        finalWinnerImg.visible = true;
 
     }
 
@@ -146,7 +166,7 @@ export class GameRecordView extends cc.Component {
 
             let errMsg;
             if (err !== null) {
-                errMsg = `错误码:${err}`;
+                errMsg = `错误码: ${err} `;
                 Dialog.showDialog(errMsg);
 
             } else {

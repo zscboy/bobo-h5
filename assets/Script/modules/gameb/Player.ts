@@ -194,7 +194,7 @@ export class Player {
     //利用服务器发下来的暗杠牌组的id列表（明牌）
     //更新本地的暗杠牌组列表
     public refreshConcealedMelds(concealedKongIDs: number[]): void {
-        let i = 1;
+        let i = 0;
         for (const m of this.melds) {
             if (m.meldType === mjproto.MeldType.enumMeldTypeConcealedKong) {
                 m.tile1 = concealedKongIDs[i];

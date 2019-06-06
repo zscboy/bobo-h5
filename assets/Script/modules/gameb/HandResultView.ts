@@ -239,9 +239,7 @@ export class HandResultView extends cc.Component {
                 textScore = `${textScore}家家庄x2  `;
             }
         }
-        // if (playerScores.fakeList !== null && playerScores.fakeList.length > 0) {
-        //     textScore = `${textScore}报听  `;
-        // }
+        textScore = `${textScore}${GameRules.getFakeListStrs(this.room.roomType, playerScores)}  `;
         c.textPlayerScore.text = textScore;
     }
     //更新显示数据
@@ -262,7 +260,7 @@ export class HandResultView extends cc.Component {
                 //分数详情
                 this.updatePlayerScoreData(player, c);
                 //马牌
-                if (playerScores.fakeList !== undefined) {
+                if (GameRules.haveFakeListOfTitles(this.room.roomType) && playerScores.fakeList !== undefined) {
                     for (const fake of playerScores.fakeList) {
                         fakeList.push(fake);
                     }

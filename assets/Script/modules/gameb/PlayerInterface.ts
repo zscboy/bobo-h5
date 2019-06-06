@@ -7,8 +7,8 @@ export class ClickCtrl {
     public isDiscardable: boolean;
     public tileID: number;
     public h: fgui.GComponent;
-    public clickCount: number;
-    public doubleTimeEclipse: number;
+    // public clickCount: number;
+    public isNormalState: boolean;
     public t: fgui.GObject;
     public isGray: boolean;
     public readyHandList: number[];

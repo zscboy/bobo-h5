@@ -1,6 +1,5 @@
-import { GResLoader, Logger } from "../../lcore/LCoreExports";
+import { GResLoader, LobbyModuleInterface, Logger } from "../../lcore/LCoreExports";
 import { proto } from "../../proto/protoLobby";
-import { LobbyViewInterface } from "../LobbyViewInterface";
 
 interface PropData {
     image: string;
@@ -35,7 +34,7 @@ export class PlayerInfoView extends cc.Component {
     private view: fgui.GComponent = null;
     private playerInfo: PlayerInfo;
     private isOther: boolean;
-    private lobbyView: LobbyViewInterface;
+    private lobbyModule: LobbyModuleInterface;
 
     // private room: fgui.GObject;
     private nameText: fgui.GTextField;
@@ -63,8 +62,8 @@ export class PlayerInfoView extends cc.Component {
             this.initView();
 
             if (this.onMessageFunc === null) {
-                this.lobbyView = <LobbyViewInterface>this.node.getParent().getComponent("LobbyView");
-                this.onMessageFunc = this.lobbyView.on(`${proto.lobby.MessageCode.OPChat}`, this.onMessage, this);
+                this.lobbyModule = <LobbyModuleInterface>this.node.getParent().getComponent("LobbyModule");
+                this.onMessageFunc = this.lobbyModule.eventTarget.on(`${proto.lobby.MessageCode.OPChat}`, this.onMessage, this);
             }
 
             Logger.debug("showUserInfoView view is nil");
@@ -82,7 +81,7 @@ export class PlayerInfoView extends cc.Component {
 
     protected onDestroy(): void {
         if (this.onMessageFunc !== null) {
-            this.lobbyView.off(`${proto.lobby.MessageCode.OPChat}`, this.onMessageFunc);
+            this.lobbyModule.eventTarget.off(`${proto.lobby.MessageCode.OPChat}`, this.onMessageFunc);
             this.onMessageFunc = null;
         }
 

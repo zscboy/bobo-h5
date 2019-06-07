@@ -749,17 +749,21 @@ export class PlayerView {
         //准备
         const onReady = (): void => {
             this.head.readyIndicator.visible = true;
+            this.head.headView.grayed = false;
             this.showOwner();
         };
 
         //离线
         const onLeave = (): void => {
             this.head.readyIndicator.visible = false;
+            this.head.headView.grayed = true;
         };
 
         //正在玩
         const onPlaying = (): void => {
             this.head.readyIndicator.visible = false;
+            this.head.headView.grayed = false;
+
             this.showOwner();
         };
 

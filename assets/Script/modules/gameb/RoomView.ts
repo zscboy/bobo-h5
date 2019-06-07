@@ -1,6 +1,7 @@
 import { Logger } from "../lobby/lcore/LCoreExports";
 import { ChatView } from "../lobby/views/chat/ChatExports";
 import { DisbandView } from "./DisbandView";
+import { GameRules } from "./GameRules";
 import { PlayerView } from "./PlayerView";
 import { proto } from "./proto/protoGame";
 import { RoomInterface, TingPai } from "./RoomInterface";
@@ -220,8 +221,11 @@ export class RoomView {
     //设置当前房间所使用的风圈
     public setRoundMask(): void {
         this.wind.visible = true;
-        this.windTile.visible = true;
-        TileImageMounter.mountTileImage(this.windTile, this.room.windFlowerID);
+
+        if (GameRules.haveFlower(this.room.roomType)) {
+            this.windTile.visible = true;
+            TileImageMounter.mountTileImage(this.windTile, this.room.windFlowerID);
+        }
     }
     // 根据玩家的chairID获得相应的playerView
     // 注意服务器的chairID是由0开始

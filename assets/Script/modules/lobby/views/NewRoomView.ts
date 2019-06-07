@@ -1,8 +1,7 @@
 import { DataStore, Dialog, GameModuleLaunchArgs, HTTP, LEnv, LobbyModuleInterface, Logger } from "../lcore/LCoreExports";
 import { proto } from "../proto/protoLobby";
-import { DFRuleView } from "./DFRuleView";
+import { DFRuleView, ZJMJRuleView } from "../ruleviews/RuleViewsExports";
 import { LobbyError } from "./LobbyError";
-import { ZJMJRuleView } from "./ZJMJRuleView";
 
 const { ccclass } = cc._decorator;
 

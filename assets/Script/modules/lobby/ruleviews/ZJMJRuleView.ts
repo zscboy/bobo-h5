@@ -6,6 +6,9 @@ const { ccclass } = cc._decorator;
 
 interface NewRoomViewInterface {
     createRoom: Function;
+    forReview?: boolean;
+    itemsJSON?: { [key: string]: boolean | number };
+
     getView(): fgui.GComponent;
 }
 
@@ -78,7 +81,9 @@ export class ZJMJRuleView {
     };
 
     public destroy(): void {
-        this.saveRule();
+        if (!this.newRoomView.forReview) {
+            this.saveRule();
+        }
     }
 
     public show(): void {
@@ -102,7 +107,13 @@ export class ZJMJRuleView {
         this.initAllView();
 
         const createRoomBtn = this.view.getChild("createRoomButton");
-        createRoomBtn.onClick(this.onCreateRoomBtnClick, this);
+
+        if (this.newRoomView.forReview) {
+            this.initItems(this.newRoomView.itemsJSON);
+            createRoomBtn.visible = false;
+        } else {
+            createRoomBtn.onClick(this.onCreateRoomBtnClick, this);
+        }
     }
 
     public updatePriceCfg(priceCfgs: { [key: string]: object }): void {
@@ -238,40 +249,67 @@ export class ZJMJRuleView {
         this.initOtherRule();
         this.initFengding();
 
+        if (this.newRoomView.forReview) {
+            return;
+        }
+
         if (DataStore.hasKey(this.recordKey)) {
             const jsonStr = DataStore.getString(this.recordKey, "");
             Logger.debug("jsnoStr:", jsonStr);
             if (jsonStr !== "") {
                 try {
                     const config = <{ [key: string]: boolean | number }>JSON.parse(jsonStr);
-                    this.toggleRoundCounts[<number>config[1]].selected = true;
-                    this.togglePays[<number>config[2]].selected = true;
-                    this.togglePlayerNums[<number>config[3]].selected = true;
-                    this.toggleDifenTypes[<number>config[4]].selected = true;
-                    this.toggleXuanMaTypes[<number>config[5]].selected = true;
-                    this.toggleFengDingTypes[<number>config[17]].selected = true;
-
-                    this.toggleQFP.selected = <boolean>config[6];
-                    this.toggleBSJ.selected = <boolean>config[7];
-                    this.toggleG2B.selected = <boolean>config[8];
-
-                    this.toggleLY2B.selected = <boolean>config[9];
-                    this.toggleDZ2B.selected = <boolean>config[10];
-                    this.toggleDZ4B.selected = <boolean>config[11];
-
-                    this.toggleFZ2B.selected = <boolean>config[12];
-                    this.toggleQYS2B.selected = <boolean>config[13];
-                    this.togglePPH2B.selected = <boolean>config[14];
-
-                    this.toggleTH5B.selected = <boolean>config[15];
-                    this.toggle13Y10B.selected = <boolean>config[16];
-
+                    this.initItems(config);
                 } catch (e) {
                     Logger.error("parse config error:", e);
                     // 如果解析不了，则清理数据
                     DataStore.setItem(this.recordKey, "");
                 }
             }
+        }
+    }
+
+    private setToggleIndex(toggles: fgui.GButton[], values: { [key: number]: number }, value: number): void {
+        Object.keys(values).forEach((k) => {
+            const v = values[Number(k)];
+            if (v === value) {
+                toggles[Number(k)].selected = true;
+            }
+        });
+    }
+
+    private initItems(config: { [key: string]: boolean | number }): void {
+        try {
+            const configTable = this.getConfigTable();
+
+            this.setToggleIndex(this.toggleRoundCounts, configTable[`handNum`], <number>config[`handNum`]);
+
+            this.setToggleIndex(this.togglePays, configTable[`payType`], <number>config[`payType`]);
+
+            this.setToggleIndex(this.togglePlayerNums, configTable[`playerNumAcquired`], <number>config[`playerNumAcquired`]);
+
+            this.setToggleIndex(this.toggleDifenTypes, configTable[`baseScoreType`], <number>config[`baseScoreType`]);
+
+            this.setToggleIndex(this.toggleXuanMaTypes, configTable[`HorseNumberType`], <number>config[`HorseNumberType`]);
+
+            this.setToggleIndex(this.toggleFengDingTypes, configTable[`trimType`], <number>config[`trimType`]);
+
+            this.toggleQFP.selected = <boolean>config[`noWind`];
+            this.toggleBSJ.selected = <boolean>config[`afterKongChuckerPayForAll`];
+            this.toggleG2B.selected = <boolean>config[`afterKongX2`];
+
+            this.toggleLY2B.selected = <boolean>config[`finalDrawX2`];
+            this.toggleDZ2B.selected = <boolean>config[`sevenPairX2`];
+            this.toggleDZ4B.selected = <boolean>config[`greatSevenPairX4`];
+
+            this.toggleFZ2B.selected = <boolean>config[`allWindX2`];
+            this.toggleQYS2B.selected = <boolean>config[`pureSameX2`];
+            this.togglePPH2B.selected = <boolean>config[`pongpongX2`];
+
+            this.toggleTH5B.selected = <boolean>config[`heavenX5`];
+            this.toggle13Y10B.selected = <boolean>config[`thirteenOrphanX10`];
+        } catch (e) {
+            Logger.error(e);
         }
     }
 
@@ -435,36 +473,8 @@ export class ZJMJRuleView {
 
     private saveRule(): void {
         Logger.debug("zjmjRuleVIew.saveRule()");
-        const key: { [key: number]: boolean | number } = {};
-        // 局数
-        key[1] = this.getToggleIndex(this.toggleRoundCounts);
-        // 支付
-        key[2] = this.getToggleIndex(this.togglePays);
-        // 人数
-        key[3] = this.getToggleIndex(this.togglePlayerNums);
-        // 封顶
-        key[4] = this.getToggleIndex(this.toggleDifenTypes);
-        // 墩子
-        key[5] = this.getToggleIndex(this.toggleXuanMaTypes);
 
-        key[6] = this.toggleQFP.selected;
-        key[7] = this.toggleBSJ.selected;
-        key[8] = this.toggleG2B.selected;
-
-        key[9] = this.toggleLY2B.selected;
-        key[10] = this.toggleDZ2B.selected;
-        key[11] = this.toggleDZ4B.selected;
-
-        key[12] = this.toggleFZ2B.selected;
-        key[13] = this.toggleQYS2B.selected;
-        key[14] = this.togglePPH2B.selected;
-
-        key[15] = this.toggleTH5B.selected;
-        key[16] = this.toggle13Y10B.selected;
-
-        key[17] = this.getToggleIndex(this.toggleFengDingTypes);
-
-        const jsonString = JSON.stringify(key);
+        const jsonString = this.getRules();
         DataStore.setItem(this.recordKey, jsonString);
     }
 

@@ -154,7 +154,7 @@ export class GameRecordView extends cc.Component {
             winnerImg = obj.asCom.getChild(`winner${i + 1}`);
             winnerImg.visible = false;
 
-            if (player.totalScore > winnerSore) {
+            if (player.totalScore >= winnerSore) {
                 finalWinnerImg = winnerImg;
                 winnerSore = player.totalScore;
             }
@@ -167,8 +167,9 @@ export class GameRecordView extends cc.Component {
 
         }
 
-        finalWinnerImg.visible = true;
-
+        if (finalWinnerImg !== undefined) {
+            finalWinnerImg.visible = true;
+        }
     }
 
     private loadGameRecord(): void {

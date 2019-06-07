@@ -81,11 +81,23 @@ export class ZJMJRuleView {
         this.saveRule();
     }
 
-    public bindView(newRoomView: NewRoomViewInterface): void {
-        const myNewRoomView = newRoomView.getView();
+    public show(): void {
+        this.view.visible = true;
+    }
 
-        this.view = myNewRoomView.getChild("zjmjRoom").asCom;
+    public hide(): void {
+        this.view.visible = false;
+    }
+
+    public bindView(newRoomView: NewRoomViewInterface): void {
         this.newRoomView = newRoomView;
+
+        const view = fgui.UIPackage.createObject("lobby_create_room", "zjmjRoom").asCom;
+        this.view = view;
+        const roomview = newRoomView.getView();
+        const mountpoint = roomview.getChild("mount");
+        view.setPosition(mountpoint.x, mountpoint.y);
+        roomview.addChild(view);
 
         this.initAllView();
 

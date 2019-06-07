@@ -2,10 +2,16 @@ import { DataStore, Dialog, GameModuleLaunchArgs, HTTP, LEnv, LobbyModuleInterfa
 import { proto } from "../proto/protoLobby";
 import { DFRuleView } from "./DFRuleView";
 import { LobbyError } from "./LobbyError";
-import { RunFastRuleView } from "./RunFastRuleView";
 import { ZJMJRuleView } from "./ZJMJRuleView";
 
 const { ccclass } = cc._decorator;
+
+interface RuleView {
+    destroy: Function;
+    updatePriceCfg: Function;
+    show: Function;
+    hide: Function;
+}
 
 /**
  * LoginView 登录界面
@@ -17,11 +23,14 @@ export class NewRoomView extends cc.Component {
 
     private eventTarget: cc.EventTarget;
 
-    private runFastRuleView: RunFastRuleView;
+    // private runFastRuleView: RunFastRuleView;
 
-    private dfRuleView: DFRuleView;
+    // private dfRuleView: DFRuleView;
 
-    private zjmjRuleVIew: ZJMJRuleView;
+    // private zjmjRuleVIew: ZJMJRuleView;
+
+    private ruleViews: { [key: string]: RuleView } = {};
+    private priceCfgs: { [key: string]: object };
 
     public getView(): fgui.GComponent {
         return this.view;
@@ -95,15 +104,14 @@ export class NewRoomView extends cc.Component {
         this.win = win;
 
         this.initView();
-
         this.win.show();
-
     }
 
     protected onDestroy(): void {
-        this.runFastRuleView.destroy();
-        this.dfRuleView.destroy();
-        this.zjmjRuleVIew.destroy();
+        Object.keys(this.ruleViews).forEach((k) => {
+            const rv = this.ruleViews[k];
+            rv.destroy();
+        });
 
         this.eventTarget.emit("destroy");
 
@@ -116,16 +124,56 @@ export class NewRoomView extends cc.Component {
         const closeBtn = this.view.getChild("closeBtn");
         closeBtn.onClick(this.onCloseClick, this);
 
-        this.runFastRuleView = new RunFastRuleView();
-        this.runFastRuleView.bindView(this);
+        const list = this.view.getChild("gamelist").asList;
+        list.on(fgui.Event.CLICK_ITEM, this.onListItemClicked, this);
 
-        this.dfRuleView = new DFRuleView();
-        this.dfRuleView.bindView(this);
-
-        this.zjmjRuleVIew = new ZJMJRuleView();
-        this.zjmjRuleVIew.bindView(this);
+        this.selectItem("btnZJMJ");
 
         this.loadRoomPrice();
+    }
+
+    private onListItemClicked(item: fgui.GObject, evt: fgui.Event): void {
+        const name = item.packageItem.name;
+        this.selectItem(name);
+    }
+
+    private selectItem(name: string): void {
+        let ruleView = this.ruleViews[name];
+        Object.keys(this.ruleViews).forEach((k) => {
+            const rv = this.ruleViews[k];
+            rv.hide();
+        });
+
+        if (ruleView === undefined) {
+            switch (name) {
+                case "btnZJMJ":
+                    const rv1 = new ZJMJRuleView();
+                    rv1.bindView(this);
+                    ruleView = rv1;
+                    break;
+                case "btnDFMJ":
+                    const rv2 = new DFRuleView();
+                    rv2.bindView(this);
+                    ruleView = rv2;
+                    break;
+                case "btnGZ":
+                    break;
+                case "btnDDZ":
+                    break;
+                default:
+            }
+
+            if (ruleView === undefined) {
+                return;
+            }
+
+            this.ruleViews[name] = ruleView;
+            if (this.priceCfgs !== undefined) {
+                ruleView.updatePriceCfg(this.priceCfgs);
+            }
+        }
+
+        ruleView.show();
     }
 
     private onCloseClick(): void {
@@ -177,9 +225,12 @@ export class NewRoomView extends cc.Component {
                     if (errMsg === null) {
                         const dataString = <string>String.fromCharCode.apply(null, new Uint8Array(<ArrayBuffer>xhr.response));
                         const priceCfgs = <{ [key: string]: object }>JSON.parse(dataString);
-                        this.dfRuleView.updatePriceCfg(priceCfgs);
-                        this.zjmjRuleVIew.updatePriceCfg(priceCfgs);
+                        this.priceCfgs = priceCfgs;
 
+                        Object.keys(this.ruleViews).forEach((k) => {
+                            const rv = this.ruleViews[k];
+                            rv.updatePriceCfg(priceCfgs);
+                        });
                     }
                 }
 

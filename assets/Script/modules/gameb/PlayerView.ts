@@ -86,6 +86,8 @@ export class PlayerView {
     private btnHanders: { [key: string]: Function };
     private roomHost: RoomHost;
     private lastClickTime: number;
+    private lastClickIndex: number;
+
     private dragHand: fgui.GComponent; //拖牌时 克隆的牌
 
     public constructor(viewUnityNode: fgui.GComponent, viewChairID: number, room: RoomInterface) {
@@ -829,9 +831,13 @@ export class PlayerView {
 
         let isDoubleClick = false;
 
-        if (this.lastClickTime - prevClickTime <= 0.5) {
+        if (this.lastClickIndex === index &&
+            this.lastClickTime - prevClickTime <= 0.5) {
+            // 快速点击同一张牌时认为是双击
             isDoubleClick = true;
         }
+
+        this.lastClickIndex = index;
 
         if (isDoubleClick) {
             //双击 直接出牌

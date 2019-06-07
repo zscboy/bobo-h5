@@ -71,6 +71,10 @@ export class EmailView extends cc.Component {
     private initView(): void {
         const closeBtn = this.view.getChild("closeBtn");
         closeBtn.onClick(this.onCloseClick, this);
+        const backBtn = this.view.getChild("back");
+        if (backBtn !== null) {
+            backBtn.onClick(this.onCloseClick, this);
+        }
 
         this.emailContent = this.view.getChild("textComponent").asCom.getChild("text");
         this.emailTitle = this.view.getChild("title");

@@ -123,6 +123,10 @@ export class NewRoomView extends cc.Component {
 
         const closeBtn = this.view.getChild("closeBtn");
         closeBtn.onClick(this.onCloseClick, this);
+        const backBtn = this.view.getChild("back");
+        if (backBtn !== null) {
+            backBtn.onClick(this.onCloseClick, this);
+        }
 
         const list = this.view.getChild("gamelist").asList;
         list.on(fgui.Event.CLICK_ITEM, this.onListItemClicked, this);

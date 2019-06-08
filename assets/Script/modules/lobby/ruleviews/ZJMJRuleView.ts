@@ -229,11 +229,13 @@ export class ZJMJRuleView {
 
     private initFengding(): void {
 
-        this.toggleFengDingTypes[0] = this.view.getChild("fengding1").asButton;
-        this.toggleFengDingTypes[1] = this.view.getChild("fengding2").asButton;
+        this.toggleFengDingTypes[0] = this.view.getChild("fengding0").asButton;
+        this.toggleFengDingTypes[1] = this.view.getChild("fengding1").asButton;
+        this.toggleFengDingTypes[2] = this.view.getChild("fengding2").asButton;
 
-        this.toggleFengDingTypes[0].getChild("title").text = "8倍";
-        this.toggleFengDingTypes[1].getChild("title").text = "16倍";
+        this.toggleFengDingTypes[0].getChild("title").text = "不封顶";
+        this.toggleFengDingTypes[1].getChild("title").text = "8倍";
+        this.toggleFengDingTypes[2].getChild("title").text = "16倍";
     }
 
     private initAllView(): void {
@@ -326,9 +328,9 @@ export class ZJMJRuleView {
                 [2]: 66
             },
             ["trimType"]: {
-                [0]: 1,
-                [1]: 2
-
+                [0]: 0,
+                [1]: 1,
+                [2]: 2
             },
             ["HorseNumberType"]: {
                 [0]: 0,

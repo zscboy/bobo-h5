@@ -99,7 +99,7 @@ export class LobbyView extends cc.Component {
     private onFriendClick(): void {
         const myUser = { userID: "6" };
         const roomConfigObj = {
-            roomType: 1
+            roomType: 21
         };
 
         const roomInfo = { roomID: "monkey-room", roomNumber: "monkey-room", roomConfig: JSON.stringify(roomConfigObj) };

@@ -82,7 +82,8 @@ const IS_CONTINUOUS_BANKER: { [key: number]: string } = {
 };
 //fakeWinScore 得分类型
 const FAKE_WIN_SCORE: { [key: number]: string } = {
-    [ROOM_TYPE.DaFeng]: "包牌"
+    [ROOM_TYPE.DaFeng]: "包牌",
+    [ROOM_TYPE.ZhanJiang]: "杠分"
 };
 //fakeList 得分类型
 const FAKE_LIST: { [key: number]: string } = {
@@ -191,7 +192,7 @@ export namespace GameRules {
         if (playerScores.fakeWinScore !== undefined && playerScores.fakeWinScore !== 0) {
             const str = FAKE_WIN_SCORE[gameType];
             if (str !== undefined) {
-                textScore = `${textScore}${str}  `;
+                textScore = `${textScore}${str}${playerScores.fakeWinScore}  `;
             }
         }
         if (playerScores.isContinuousBanker !== undefined && playerScores.isContinuousBanker) {

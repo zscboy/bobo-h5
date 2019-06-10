@@ -86,6 +86,20 @@ export class LobbyModule extends cc.Component implements LobbyModuleInterface {
             moduleName,
             (error) => {
                 Logger.debug(`gamea load, error:${error}`);
+
+                Dialog.hideProgress();
+
+                // 隐藏大厅窗口
+                this.view = fgui.GRoot.inst.getChildAt(0);
+                fgui.GRoot.inst.removeChild(this.view);
+
+                const childrenCount = fgui.GRoot.inst.numChildren;
+                if (childrenCount > 0) {
+                    Logger.fatal("switch to game failed, GRoot numChildren not zero:", childrenCount);
+
+                    return;
+                }
+
                 if (error == null) {
                     switch (moduleName) {
                         case "gameb":
@@ -100,19 +114,6 @@ export class LobbyModule extends cc.Component implements LobbyModuleInterface {
                             break;
                         default:
                     }
-                }
-
-                Dialog.hideProgress();
-
-                // 隐藏大厅窗口
-                this.view = fgui.GRoot.inst.getChildAt(0);
-                fgui.GRoot.inst.removeChild(this.view);
-
-                const childrenCount = fgui.GRoot.inst.numChildren;
-                if (childrenCount > 0) {
-                    Logger.fatal("switch to game failed, GRoot numChildren not zero:", childrenCount);
-
-                    return;
                 }
             },
             (progress) => {

@@ -13,3 +13,4 @@ export * from "./WS";
 export * from "./MsgQueue";
 export * from "./AnimationMgr";
 export * from "./Enum";
+export * from "./SoundMgr";

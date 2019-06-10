@@ -1,19 +1,19 @@
-import { Logger } from "../lobby/lcore/LCoreExports";
+import { Logger, SoundMgr } from "../lobby/lcore/LCoreExports";
 import { PlayerInfoView } from "../lobby/views/playerInfo/PlayerInfoExports";
+import { AgariIndex } from "./AgariIndex";
 import { PlayerView } from "./PlayerView";
 import { proto } from "./proto/protoGame";
 import { PlayerInfo, RoomInterface } from "./RoomInterface";
 // const playerInfoView = require "lobby/scripts/playerInfo/playerInfoView"
 const mjproto = proto.mahjong;
 const enum SoundDef {
-
     Chow = "chi",
     Pong = "peng",
     Kong = "gang",
     Ting = "ting",
     WinChuck = "hu", //被点炮
-    WinDraw = "zimo", //自摸
-    Common = "effect_common"
+    WinDraw = "zimo" //自摸
+    // Common = "effect_common"
 }
 
 //特效文件定义
@@ -285,7 +285,7 @@ export class Player {
         }
 
         //播放对应音效
-        this.playOperationSound(SoundDef.Chow);
+        this.playSound("operate", SoundDef.Chow);
         await this.playerView.playerOperationEffect(EffectsDef.Chow);
     }
 
@@ -298,7 +298,7 @@ export class Player {
         }
 
         //播放对应音效
-        this.playOperationSound(SoundDef.Pong);
+        this.playSound("operate", SoundDef.Pong);
         await this.playerView.playerOperationEffect(EffectsDef.Pong);
     }
 
@@ -311,7 +311,7 @@ export class Player {
         }
 
         //播放对应音效
-        this.playOperationSound(SoundDef.Kong);
+        this.playSound("operate", SoundDef.Kong);
         await this.playerView.playerOperationEffect(EffectsDef.Kong);
     }
 
@@ -324,7 +324,7 @@ export class Player {
         }
 
         //播放对应音效
-        this.playOperationSound(SoundDef.Kong);
+        this.playSound("operate", SoundDef.Kong);
         await this.playerView.playerOperationEffect(EffectsDef.Kong);
     }
 
@@ -337,7 +337,7 @@ export class Player {
         }
 
         //播放对应音效
-        this.playOperationSound(SoundDef.Kong);
+        this.playSound("operate", SoundDef.Kong);
         await this.playerView.playerOperationEffect(EffectsDef.Kong);
     }
 
@@ -349,14 +349,14 @@ export class Player {
             this.playerView.showHandsForMe(true);
         }
         //播放对应音效
-        // this.playOperationSound(SoundDef.DrawCard)
+        // this.playSound("operate",SoundDef.DrawCard)
         await this.playerView.playerOperationEffect(EffectsDef.DrawCard);
     }
 
     //播放自摸
     public async playZiMoAnimation(): Promise<void> {
         //播放对应音效
-        this.playOperationSound(SoundDef.WinDraw);
+        this.playSound("operate", SoundDef.WinDraw);
         //自摸, 1, 3 位置的玩家播放zimo1, 2, 4位置的玩家播放zimo2
         //const effect = dfConfig.EFF_DEFINE.SUB_ZI_ZIMO.. "1"
         // if this.playerView.viewChairID == 2 or this.playerView.viewChairID == 4 {
@@ -368,14 +368,14 @@ export class Player {
     //播放点炮
     public async playDianPaoAnimation(): Promise<void> {
         //播放对应音效
-        this.playOperationSound(SoundDef.WinChuck);
+        this.playSound("operate", SoundDef.WinChuck);
         await this.playerView.playerOperationEffect(EffectsDef.WinChuck);
     }
 
     //播放吃铳
     public async playChiChongAnimation(): Promise<void> {
         //播放对应音效
-        this.playOperationSound(SoundDef.WinChuck);
+        this.playSound("operate", SoundDef.WinChuck);
         await this.playerView.playerOperationEffect(EffectsDef.WinChuck);
     }
 
@@ -383,27 +383,27 @@ export class Player {
     public readyHandEffect(): void {
         //播放对应音效
         //TODO. 没有这个音效，暂时注销 by陈日光
-        this.playOperationSound(SoundDef.Ting);
+        this.playSound("operate", SoundDef.Ting);
         this.playerView.playReadyHandEffect();
     }
 
     //播放读牌音效
-    public playReadTileSound(): void {
-        //const index = agariIndex.tileId2ArtId(tileID)
-        //const id = tonumber(index)
-        // if id >= 51 && id <= 58 {
-        //this. playSound("operate", "hua")
-        // else
-        //const effectName = "tile"..id
-        //     if id == 11 {
-        //math.newrandomseed()
-        //effectName = string.format("tile%d_%d", id, math.random(1, 2, 3))
-        //else if id == 29 {
-        //math.newrandomseed()
-        //effectName = string.format("tile%d_%d", id, math.random(1, 2))
-        //}
-        //this. playSound("tile", effectName)
-        //}
+    public playReadTileSound(tileID: number): void {
+        const index = AgariIndex.tileId2ArtId(tileID);
+        const id = +index;
+        if (id >= 51 && id <= 58) {
+            // this.playSound("operate", "hua")
+        } else {
+            let effectName = `tile${id}`;
+            if (id === 11) {
+                // Math.newrandomseed()
+                effectName = `tile${id}_${1}`; //, id, Math.random(1, 2, 3));
+            } else if (id === 29) {
+                // math.newrandomseed()
+                effectName = `tile${id}_${1}`; // id, math.random(1, 2));
+            }
+            this.playSound("tile", effectName);
+        }
     }
 
     //绑定playerView
@@ -443,56 +443,56 @@ export class Player {
         this.hand2UI(false);
 
         //出牌音效
-        //dfCompatibleAPI. soundPlay("effect/effect_chupai")
+        // dfCompatibleAPI.soundPlay("effect/effect_chupai")
         //播放读牌音效
         // if dfCompatibleAPI. soundGetToggle("readPaiIsOn") {
-        //this. playReadTileSound(tileID)
+        this.playReadTileSound(tileID);
         //}
     }
 
-    public onBankerReadyHandClicked(): boolean {
-        //检查是否选择了牌打出去
-        const handsClickCtrls = this.playerView.handsClickCtrls;
-        for (let i = 1; i < 14; i++) {
-            const clickCtrl = handsClickCtrls[i];
-            if (!clickCtrl.isNormalState) {
-                //检查选择了的牌是否可以听
-                if (clickCtrl.readyHandList !== undefined && clickCtrl.readyHandList !== null && clickCtrl.readyHandList.length > 0) {
-                    //如果此牌可以听
-                    //发送打牌的消息包，把flag设置1，服务器就知道庄家选择了打牌并且听牌
-                    const actionMsg = new proto.mahjong.MsgPlayerAction();
-                    actionMsg.qaIndex = this.allowedActionMsg.qaIndex;
-                    actionMsg.action = mjproto.ActionType.enumActionType_DISCARD;
-                    actionMsg.tile = clickCtrl.tileID;
-                    actionMsg.flags = 1;
+    // public onBankerReadyHandClicked(): boolean {
+    //     //检查是否选择了牌打出去
+    //     const handsClickCtrls = this.playerView.handsClickCtrls;
+    //     for (let i = 1; i < 14; i++) {
+    //         const clickCtrl = handsClickCtrls[i];
+    //         if (!clickCtrl.isNormalState) {
+    //             //检查选择了的牌是否可以听
+    //             if (clickCtrl.readyHandList !== undefined && clickCtrl.readyHandList !== null && clickCtrl.readyHandList.length > 0) {
+    //                 //如果此牌可以听
+    //                 //发送打牌的消息包，把flag设置1，服务器就知道庄家选择了打牌并且听牌
+    //                 const actionMsg = new proto.mahjong.MsgPlayerAction();
+    //                 actionMsg.qaIndex = this.allowedActionMsg.qaIndex;
+    //                 actionMsg.action = mjproto.ActionType.enumActionType_DISCARD;
+    //                 actionMsg.tile = clickCtrl.tileID;
+    //                 actionMsg.flags = 1;
 
-                    //修改：出牌后立即放大打出的牌，一直等待服务器的回复
-                    this.myDiscardAction(clickCtrl.tileID);
+    //                 //修改：出牌后立即放大打出的牌，一直等待服务器的回复
+    //                 this.myDiscardAction(clickCtrl.tileID);
 
-                    const tipsForAction = this.allowedActionMsg.tipsForAction;
-                    for (const t of tipsForAction) {
-                        if (t.targetTile === clickCtrl.tileID) {
-                            const readyHandList = t.readyHandList;
-                            this.updateReadyHandList(readyHandList);
-                            break;
-                        }
-                    }
-                    this.sendActionMsg(actionMsg);
+    //                 const tipsForAction = this.allowedActionMsg.tipsForAction;
+    //                 for (const t of tipsForAction) {
+    //                     if (t.targetTile === clickCtrl.tileID) {
+    //                         const readyHandList = t.readyHandList;
+    //                         this.updateReadyHandList(readyHandList);
+    //                         break;
+    //                     }
+    //                 }
+    //                 this.sendActionMsg(actionMsg);
 
-                    return true;
-                } else {
-                    //TODA 请选择一张可听的牌
-                    //logError("请选择一张可听的牌")
-                    //dfCompatibleAPI. showTip("请选择一张可听的牌")
-                    return false;
-                }
+    //                 return true;
+    //             } else {
+    //                 //TODA 请选择一张可听的牌
+    //                 //logError("请选择一张可听的牌")
+    //                 //dfCompatibleAPI. showTip("请选择一张可听的牌")
+    //                 return false;
+    //             }
 
-                // return false
-            }
-        }
+    //             // return false
+    //         }
+    //     }
 
-        return false;
-    }
+    //     return false;
+    // }
 
     //玩家选择了起手听牌   （选择“听”按钮// > 隐藏所有动作按钮// > 不可听的牌灰度处理// > 接下来打出的牌就是听牌）
     //上下文必然是allowedActionMsg
@@ -822,19 +822,14 @@ export class Player {
 
         playerInfoView.showUserInfoView(roomHost.loader, this.host, this.playerInfo, pos, this.isMe() === false);
     }
-
-    //播放吃碰杠胡听音效
-    private playOperationSound(str: string): void {
-        Logger.debug("播放吃碰杠胡听音效: ", str);
-        //const soundName = ""
-        // if this.gender == 1 {
-        //soundName = directory.. "/boy/"..effectName
-        // else
-        //soundName = directory.. "/girl/"..effectName
-        //}
-        //dfCompatibleAPI. soundPlay(soundName)
-        //执行音效
-        //dfCompatibleAPI. soundPlay("effect/"..SoundDef.Common)
+    private playSound(directory: string, effectName: string): void {
+        let soundName = "";
+        if (this.playerInfo.gender === 1) {
+            soundName = `${directory}/boy/${effectName}`;
+        } else {
+            soundName = `${directory}/girl/${effectName}`;
+        }
+        SoundMgr.playEffectAudio(soundName);
     }
 
     private myDiscardAction(tileID: number): void {

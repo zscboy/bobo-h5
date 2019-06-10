@@ -194,7 +194,7 @@ export class Player {
     //利用服务器发下来的暗杠牌组的id列表（明牌）
     //更新本地的暗杠牌组列表
     public refreshConcealedMelds(concealedKongIDs: number[]): void {
-        let i = 1;
+        let i = 0;
         for (const m of this.melds) {
             if (m.meldType === mjproto.MeldType.enumMeldTypeConcealedKong) {
                 m.tile1 = concealedKongIDs[i];
@@ -251,10 +251,8 @@ export class Player {
     //把花牌列表显示到界面上
     public flower2UI(): void {
         //先取消所有花牌显示
-        const playerView = this.playerView;
-        playerView.hideFlowers();
-
-        playerView.showFlowers();
+        this.playerView.hideFlowers();
+        this.playerView.showFlowers();
     }
 
     //把打出的牌列表显示到界面上
@@ -414,12 +412,6 @@ export class Player {
         this.playerView = playerView;
         playerView.player = this;
         playerView.initCardLists();
-        // if this.nick != null {
-        //playerView.head.nameText.text = ""..this.nick
-        //}
-
-        //playerView.head.root.visible = true
-        //playerView.tilesRoot.visible = true
 
         playerView.showHeadImg();
         playerView.showOwner();
@@ -463,7 +455,7 @@ export class Player {
         const handsClickCtrls = this.playerView.handsClickCtrls;
         for (let i = 1; i < 14; i++) {
             const clickCtrl = handsClickCtrls[i];
-            if (clickCtrl.clickCount === 1) {
+            if (!clickCtrl.isNormalState) {
                 //检查选择了的牌是否可以听
                 if (clickCtrl.readyHandList !== undefined && clickCtrl.readyHandList !== null && clickCtrl.readyHandList.length > 0) {
                     //如果此牌可以听

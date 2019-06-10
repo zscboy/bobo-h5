@@ -1,10 +1,10 @@
+import { GameRules } from "./GameRules";
 import { Player } from "./Player";
 import { proto } from "./proto/protoGame";
 import { RoomInterface } from "./RoomInterface";
+import { RoomRuleView } from "./RoomRuleView";
 import { TileImageMounter } from "./TileImageMounter";
 
-const greatWinType = proto.dfmahjong.GreatWinType;
-const miniWinType = proto.dfmahjong.MiniWinType;
 const mjproto = proto.mahjong;
 
 //面子牌组资源 后缀
@@ -46,6 +46,7 @@ export class HandResultView extends cc.Component {
     private players: Player[];
     private textRoomNumber: fgui.GObject;
     // private textTime: fgui.GObject;
+    private fakes: fgui.GComponent[];
     private aniPos: fgui.GObject;
     private contentGroup: ViewGroup[];
 
@@ -86,6 +87,8 @@ export class HandResultView extends cc.Component {
         const againBtn = this.unityViewNode.getChild("againBtn");
         againBtn.onClick(this.onAgainButtonClick, this);
         const shanreBtn = this.unityViewNode.getChild("shanreBtn");
+        const infoBtn = this.unityViewNode.getChild("guizeBtn");
+        infoBtn.onClick(this.onRoomRuleBtnClick, this);
         // shanreBtn.onClick(this.onShareButtonClick, this);
 
         if (room.isReplayMode()) {
@@ -134,7 +137,18 @@ export class HandResultView extends cc.Component {
         }
         this.textRoomNumber.text = `房号:${roomNumber}`;
     }
+    //马牌列表显示
+    private updateFakeList(titleList: number[]): void {
+        if (titleList.length > 0) {
+            for (let i = 0; i < titleList.length; i++) {
+                const title = titleList[i];
 
+                const oCardObj = this.fakes[i];
+                TileImageMounter.mountTileImage(oCardObj, title);
+                oCardObj.visible = true;
+            }
+        }
+    }
     //更新玩家基本信息
     private updatePlayerInfoData(player: Player, c: ViewGroup): void {
         //名字
@@ -204,55 +218,37 @@ export class HandResultView extends cc.Component {
     private updatePlayerScoreData(player: Player, c: ViewGroup): void {
         const hot = proto.mahjong.HandOverType;
         const playerScores = player.playerScore; //这是在 handleMsgHandOver里面保存进去的
-        let textScore = "";
-        if (playerScores.specialScore !== null && playerScores.specialScore > 0) {
-            textScore = `墩子分 +${playerScores.specialScore} `;
-        }
-        if (playerScores.fakeWinScore !== null && playerScores.fakeWinScore !== 0) {
-            textScore = `${textScore}包牌  `;
-        }
-
-        if (playerScores.isContinuousBanker) {
-            textScore = `${textScore}连庄×${playerScores.continuousBankerMultiple / 10}  `;
-        }
+        let textScore = GameRules.getScoreStrs(this.room.roomType, playerScores);
 
         if (playerScores.winType !== hot.enumHandOverType_None && playerScores.winType !== hot.enumHandOverType_Chucker) {
             const greatWin = playerScores.greatWin;
-            if (greatWin !== null && greatWin.greatWinType !== greatWinType.enumGreatWinType_None) {
+            if (greatWin !== null) { //&& greatWin.greatWinType !== greatWinType.enumGreatWinType_None) {
                 //大胡计分
-                if (greatWin.trimGreatWinPoints !== null && greatWin.trimGreatWinPoints > 0) {
-                    textScore = `${textScore}辣子数 +${greatWin.trimGreatWinPoints / 10}  `;
-                }
-                if (greatWin.baseWinScore !== null && greatWin.baseWinScore > 0) {
-                    textScore = `${textScore}基本分${greatWin.baseWinScore}  `;
-                }
-                const s = this.processGreatWin(greatWin);
-                textScore = `${textScore}${s}  `;
+                const gs = GameRules.getGreatWinScoreStrs(this.room.roomType, greatWin);
+                textScore = `${textScore}${gs}`;
+                const pg = this.processGreatWin(greatWin);
+                textScore = `${textScore}${pg}  `;
             } else {
                 //既然不是大胡，必然是小胡  小胡计分
                 const miniWin = playerScores.miniWin;
-                let tt = "小胡";
-                if (miniWin.miniWinType !== miniWinType.enumMiniWinType_None) {
-                    tt = this.processMiniWin(miniWin);
-                    if (miniWin.miniMultiple !== null && miniWin.miniMultiple > 0) {
-                        textScore = `${textScore}倍数${miniWin.miniMultiple / 10}  `;
-                    }
-                }
+                // let tt = "小胡";
+                // if (miniWin.miniWinType !== miniWinType.enumMiniWinType_None) {
+                const tt = this.processMiniWin(miniWin);
+                // }
                 textScore = `${textScore}${tt}`;
             }
             //这里需要作判断，只有roomType为 大丰的时候  才能显示家家庄
-            if (this.room.markup !== undefined && this.room.markup > 0) {
+            if (GameRules.haveJiaJiaZhuang(this.room.roomType) && this.room.markup !== undefined && this.room.markup > 0) {
                 textScore = `${textScore}家家庄x2  `;
             }
         }
-        // if (playerScores.fakeList !== null && playerScores.fakeList.length > 0) {
-        //     textScore = `${textScore}报听  `;
-        // }
+        textScore = `${textScore}${GameRules.getFakeListStrs(this.room.roomType, playerScores)}  `;
         c.textPlayerScore.text = textScore;
     }
     //更新显示数据
     private updateAllData(): void {
         this.updateRoomData();
+        const fakeList: number[] = [];
         for (let i = 0; i < this.players.length; i++) {
             const player = this.players[i];
             const c = this.contentGroup[i];
@@ -266,6 +262,12 @@ export class HandResultView extends cc.Component {
 
                 //分数详情
                 this.updatePlayerScoreData(player, c);
+                //马牌
+                if (GameRules.haveFakeListOfTitles(this.room.roomType) && playerScores.fakeList !== undefined) {
+                    for (const fake of playerScores.fakeList) {
+                        fakeList.push(fake);
+                    }
+                }
             }
             this.updatePlayerTileData(player, c);
             //分数
@@ -278,99 +280,30 @@ export class HandResultView extends cc.Component {
                 c.textCountLoseT.visible = true;
                 c.textCountT.visible = false;
             }
+            //显示马牌
+            this.updateFakeList(fakeList);
         }
     }
     //处理大胡数据
     private processGreatWin(greatWin: proto.mahjong.IMsgPlayerScoreGreatWin): string {
-        let textScore = "";
-        const gt = greatWin.greatWinType;
-        if (gt === undefined || gt === null) {
-            return textScore;
-        }
-        if ((gt & greatWinType.enumGreatWinType_ChowPongKong) !== 0) {
-            textScore = `${textScore}独钓 `;
-        }
-        if ((gt & greatWinType.enumGreatWinType_FinalDraw) !== 0) {
-            textScore = `${textScore}海底捞月 `;
-        }
-        if ((gt & greatWinType.enumGreatWinType_PongKong) !== 0) {
-            textScore = `${textScore}碰碰胡 `;
-        }
-        if ((gt & greatWinType.enumGreatWinType_PureSame) !== 0) {
-            textScore = `${textScore}清一色 `;
-        }
-        if ((gt & greatWinType.enumGreatWinType_MixedSame) !== 0) {
-            textScore = `${textScore}混一色 `;
-        }
-        if ((gt & greatWinType.enumGreatWinType_ClearFront) !== 0) {
-            textScore = `${textScore}大门清 `;
-        }
-        if ((gt & greatWinType.enumGreatWinType_SevenPair) !== 0) {
-            textScore = `${textScore}七对 `;
-        }
-        if ((gt & greatWinType.enumGreatWinType_GreatSevenPair) !== 0) {
-            textScore = `${textScore}豪华大七对 `;
-        }
-        if ((gt & greatWinType.enumGreatWinType_Heaven) !== 0) {
-            textScore = `${textScore}天胡 `;
-        }
-        if ((gt & greatWinType.enumGreatWinType_AfterConcealedKong) !== 0) {
-            textScore = `${textScore}暗杠胡 `;
-        }
-        if ((gt & greatWinType.enumGreatWinType_AfterExposedKong) !== 0) {
-            textScore = `${textScore}明杠胡 `;
-        }
-        if ((gt & greatWinType.enumGreatWinType_Richi) !== 0) {
-            textScore = `${textScore}起手报听胡牌 `;
-        }
-        if ((gt & greatWinType.enumGreatWinType_PureSameWithFlowerNoMeld) !== 0) {
-            textScore = `${textScore}清一色 `; //清一色，带花但是没有落地
-        }
-        if ((gt & greatWinType.enumGreatWinType_PureSameWithMeld) !== 0) {
-            textScore = `${textScore}清一色 `; //清一色，有落地
-        }
-        if ((gt & greatWinType.enumGreatWinType_MixSameWithFlowerNoMeld) !== 0) {
-            textScore = `${textScore}混一色 `; //混一色，带花但是没有落地
-        }
-        if ((gt & greatWinType.enumGreatWinType_MixSameWithMeld) !== 0) {
-            textScore = `${textScore}混一色 `; //混一色，有落地
-        }
-        if ((gt & greatWinType.enumGreatWinType_PongKongWithFlowerNoMeld) !== 0) {
-            textScore = `${textScore}碰碰胡 `; //碰碰胡，有花没有落地
-        }
-        // if ((gt & greatWinType.enumGreatWinType_RobKong) !== 0) {
-        //     textScore = `${textScore}明杠冲 `; //碰碰胡，有花没有落地
-        // }
-        // if ((gt & greatWinType.enumGreatWinType_OpponentsRichi) !== 0) {
-        //     textScore = `${textScore}报听 `; //碰碰胡，有花没有落地
-        // }
-
-        return textScore;
+        return GameRules.getGreatWinStrs(this.room.roomType, greatWin);
     }
     //处理小胡数据
     private processMiniWin(miniWin: proto.mahjong.IMsgPlayerScoreMiniWin): string {
-        let textScore = "";
-        const gt = miniWin.miniWinType;
-        if (gt === undefined || gt === null) {
-            return textScore;
-        }
-        if ((gt & miniWinType.enumMiniWinType_Continuous_Banker) !== 0) {
-            textScore = `${textScore}连庄 `;
-        }
-        if ((gt & miniWinType.enumMiniWinType_NoFlowers) !== 0) {
-            textScore = `${textScore}无花10花 `;
-        }
-        if ((gt & miniWinType.enumMiniWinType_Kong2Discard) !== 0) {
-            textScore = `${textScore}杠冲 `;
-        }
-        if ((gt & miniWinType.enumMiniWinType_Kong2SelfDraw) !== 0) {
-            textScore = `${textScore}杠开 `;
-        }
-        if ((gt & miniWinType.enumMiniWinType_SecondFrontClear) !== 0) {
-            textScore = `${textScore}小门清 `;
+        return GameRules.getMiniWinStrs(this.room.roomType, miniWin);
+    }
+
+    private initFakes(view: fgui.GComponent): fgui.GComponent[] {
+        const fakes: fgui.GComponent[] = [];
+        const fakeListNode = view.getChild("fakeList").asCom;
+        for (let i = 0; i < 13; i++) {
+            const cname = `n${i + 1}`;
+            const card = fakeListNode.getChild(cname).asCom;
+            card.visible = false;
+            fakes[i] = card;
         }
 
-        return textScore;
+        return fakes;
     }
     private initHands(view: fgui.GComponent): fgui.GComponent[] {
         const hands: fgui.GComponent[] = [];
@@ -391,7 +324,7 @@ export class HandResultView extends cc.Component {
         this.textRoomNumber = this.unityViewNode.getChild("roomNumber");
         //特效位置节点
         this.aniPos = this.unityViewNode.getChild("aniPos");
-
+        this.fakes = this.initFakes(this.unityViewNode);
         const contentGroup: ViewGroup[] = [];
         for (let i = 0; i < 4; i++) {
             const contentGroupData = new ViewGroup();
@@ -441,6 +374,15 @@ export class HandResultView extends cc.Component {
             group.visible = false;
         }
         this.contentGroup = contentGroup;
+    }
+
+    private onRoomRuleBtnClick(): void {
+        let roomRuleView = this.getComponent(RoomRuleView);
+
+        if (roomRuleView === undefined || roomRuleView == null) {
+            roomRuleView = this.addComponent(RoomRuleView);
+        }
+        roomRuleView.updateView(this.room.roomInfo.roomConfig);
     }
     // 玩家点击“继续”按钮，注意如果牌局结束，此按钮是“大结算”
     private onAgainButtonClick(): void {

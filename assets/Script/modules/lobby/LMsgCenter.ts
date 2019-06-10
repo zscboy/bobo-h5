@@ -1,6 +1,5 @@
-import { Logger, MsgQueue, MsgType, WS } from "./lcore/LCoreExports";
+import { LobbyModuleInterface, Logger, MsgQueue, MsgType, WS } from "./lcore/LCoreExports";
 import { proto } from "./proto/protoLobby";
-import { LobbyViewInterface } from "./views/LobbyViewInterface";
 
 /**
  * LMsgCenter 大厅消息中心
@@ -16,14 +15,14 @@ export class LMsgCenter {
 
     private url: string;
 
-    private lobbyViewInterface: LobbyViewInterface;
+    private lobbyModule: LobbyModuleInterface;
 
     private component: cc.Component;
 
-    public constructor(url: string, component: cc.Component, lobbyViewInterface: LobbyViewInterface) {
+    public constructor(url: string, component: cc.Component, lobbyModule: LobbyModuleInterface) {
         this.url = url;
         this.component = component;
-        this.lobbyViewInterface = lobbyViewInterface;
+        this.lobbyModule = lobbyModule;
 
         this.eventTarget = new cc.EventTarget();
     }
@@ -150,8 +149,9 @@ export class LMsgCenter {
         //  else if (op === msgCode.OPChat) {
         //     Logger.debug("dispatchWeboscketMessage, chat msg");
         // }
-
-        this.lobbyViewInterface.dispatchMessage(msg);
+        if (this.lobbyModule !== null) {
+            this.lobbyModule.eventTarget.emit(`${op}`, msg.Data);
+        }
     }
 
 }

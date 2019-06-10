@@ -1,6 +1,7 @@
 import { Logger } from "../lobby/lcore/LCoreExports";
 import { ChatView } from "../lobby/views/chat/ChatExports";
 import { DisbandView } from "./DisbandView";
+import { GameRules } from "./GameRules";
 import { PlayerView } from "./PlayerView";
 import { proto } from "./proto/protoGame";
 import { RoomInterface, TingPai } from "./RoomInterface";
@@ -219,10 +220,13 @@ export class RoomView {
 
     //设置当前房间所使用的风圈
     public setRoundMask(): void {
-        this.wind.visible = true;
-        this.windTile.visible = true;
-        TileImageMounter.mountTileImage(this.windTile, this.room.windFlowerID);
+        if (GameRules.haveFlower(this.room.roomType)) {
+            this.wind.visible = true;
+            this.windTile.visible = true;
+            TileImageMounter.mountTileImage(this.windTile, this.room.windFlowerID);
+        }
     }
+
     // 根据玩家的chairID获得相应的playerView
     // 注意服务器的chairID是由0开始
     public getPlayerViewByChairID(chairID: number, myChairId: number): PlayerView {
@@ -256,12 +260,11 @@ export class RoomView {
 
         if (disbandView === undefined || disbandView == null) {
             disbandView = this.component.addComponent(DisbandView);
+            disbandView.saveRoomView(this.room, msgDisbandNotify);
+        } else {
+            disbandView.saveRoomView(this.room, msgDisbandNotify);
+            disbandView.updateView();
         }
-
-        disbandView.saveRoomView(this.room);
-
-        disbandView.updateView(msgDisbandNotify);
-
     }
 
     //解散房间按钮点击事件
@@ -335,6 +338,13 @@ export class RoomView {
         this.readyButton.visible = false;
         this.readyButton.onClick(this.room.onReadyButtonClick, this.room);
 
+        // 调整微信版本的按钮位置
+        if (CC_WECHATGAME) {
+            Logger.debug("init wechat game button position");
+            settingBtn.setPosition(settingBtn.x, settingBtn.y + 60);
+            infoBtn.setPosition(infoBtn.x, infoBtn.y + 60);
+        }
+
     }
 
     private initOtherView(): void {
@@ -389,7 +399,7 @@ export class RoomView {
             this.windTile.visible = false;
 
             this.roundMarkView.visible = true;
-            this.clearWaitingPlayer();
+            // this.clearWaitingPlayer();
             this.showRoomNumber();
         };
 

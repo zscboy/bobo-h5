@@ -74,6 +74,7 @@ export interface RoomViewInterface {
  * room 接口
  */
 export interface RoomInterface {
+    readonly roomType: number;
     readonly roomInfo: RoomInfo;
     readonly roomView: RoomViewInterface;
 

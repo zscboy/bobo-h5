@@ -21,6 +21,7 @@ import { HandResultView } from "./HandResultView";
 import { Player } from "./Player";
 import { PlayerInterface } from "./PlayerInterface";
 import { proto } from "./proto/protoGame";
+import { Replay } from "./Replay";
 import { PlayerInfo, RoomHost, RoomInterface, TingPai } from "./RoomInterface";
 import { RoomView } from "./RoomView";
 
@@ -67,14 +68,20 @@ export class Room {
     public isContinuousBanker: boolean;
     public roomView: RoomView;
     public players: { [key: string]: Player } = {};
-    public replay: boolean;
+    public replay: Replay;
     public tilesInWall: number;
     public myPlayer: Player;
     public msgDisbandNotify: proto.mahjong.MsgDisbandNotify;
-    public constructor(myUser: UserInfo, roomInfo: RoomInfo, host: RoomHost) {
+    public readonly roomType: number;
+    public constructor(myUser: UserInfo, roomInfo: RoomInfo, host: RoomHost, rePlay?: Replay) {
         this.myUser = myUser;
         this.roomInfo = roomInfo;
         this.host = host;
+        this.replay = rePlay;
+
+        const roomConfigJSON = <{ [key: string]: boolean | number | string }>JSON.parse(roomInfo.roomConfig);
+        // Logger.debug("roomConfigJSON ---------------------------------------------", roomConfigJSON);
+        this.roomType = <number>roomConfigJSON[`roomType`];
     }
 
     public getRoomHost(): RoomHost {
@@ -182,10 +189,6 @@ export class Room {
         if (host == null) {
             return;
         }
-        // const ws = host.ws
-        // if (ws == null) {
-        //     return
-        // }
         const gm = new proto.mahjong.GameMessage();
         gm.Ops = opCode;
 
@@ -206,7 +209,6 @@ export class Room {
     }
 
     //背景声音
-    //参数：backMusicVolume
     public resumeBackMusicVolume(): void {
         //if this:DelayRunCanceled() {
         // if backMusicVolume {
@@ -261,8 +263,6 @@ export class Room {
 
     //关闭吃牌，杠牌，听牌详情
     public cleanUI(): void {
-        // this.roomView.MultiChiOpsObj.visible = false
-        // this.roomView.MultiGangOpsObj.visible = false
         this.roomView.listensObj.visible = false;
         this.roomView.meldOpsPanel.visible = false;
     }
@@ -276,15 +276,11 @@ export class Room {
     }
 
     public loadHandResultView(msgHandOver: proto.mahjong.IMsgHandOver): void {
-        // tslint:disable-next-line:no-unused-expression
-        // new HandResultView(this, msgHandOver);
         const view = this.host.component.addComponent(HandResultView);
         view.showView(this, msgHandOver);
     }
 
     public loadGameOverResultView(msgGameOver: proto.mahjong.IMsgGameOver): void {
-        // tslint:disable-next-line:no-unused-expression
-        // new GameOverResultView(this, msgGameOver);
         const view = this.host.component.addComponent(GameOverResultView);
         view.showView(this, msgGameOver);
     }
@@ -401,7 +397,7 @@ export class Room {
         return this.myUser.userID === userID;
     }
     public isReplayMode(): boolean {
-        return this.replay;
+        return this.replay !== undefined;
     }
 
     public getBankerChairID(): number {

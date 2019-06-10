@@ -1,8 +1,7 @@
-import { DataStore, Dialog, GResLoader, HTTP, LEnv, Logger } from "../../lcore/LCoreExports";
+import { DataStore, Dialog, GResLoader, HTTP, LEnv, LobbyModuleInterface, Logger } from "../../lcore/LCoreExports";
 import { proto } from "../../proto/protoLobby";
 // tslint:disable-next-line:no-require-imports
 import bytebuffer = require("../../protobufjs/bytebuffer");
-import { LobbyViewInterface } from "../LobbyViewInterface";
 
 const phraseMap: {[key: number]: string} = {
     [1]: "快点啊，都等到我花都谢了。。。",
@@ -41,7 +40,7 @@ export class ChatView extends cc.Component {
     private chatText: fgui.GTextInput;
     private eventTarget: cc.EventTarget;
 
-    private lobbyView: LobbyViewInterface;
+    private lobbyModule: LobbyModuleInterface;
 
     private onMessageFunc: Function;
 
@@ -73,9 +72,9 @@ export class ChatView extends cc.Component {
 
         this.userID = DataStore.getString("userID", "");
 
-        this.lobbyView = <LobbyViewInterface> this.node.getParent().getComponent("LobbyView");
-        if (this.lobbyView !== null) {
-          this.onMessageFunc = this.lobbyView.on(`${proto.lobby.MessageCode.OPChat}`, this.onMessage, this);
+        this.lobbyModule = <LobbyModuleInterface> this.node.getParent().getComponent("LobbyModule");
+        if (this.lobbyModule !== null) {
+          this.onMessageFunc = this.lobbyModule.eventTarget.on(`${proto.lobby.MessageCode.OPChat}`, this.onMessage, this);
         }
 
     }
@@ -89,8 +88,8 @@ export class ChatView extends cc.Component {
     }
 
     protected onDestroy(): void {
-        if (this.lobbyView !== null) {
-            this.lobbyView.off(`${proto.lobby.MessageCode.OPChat}`, this.onMessageFunc);
+        if (this.lobbyModule !== null) {
+            this.lobbyModule.eventTarget.off(`${proto.lobby.MessageCode.OPChat}`, this.onMessageFunc);
         }
 
         this.view.dispose();

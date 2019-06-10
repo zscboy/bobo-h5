@@ -23,33 +23,7 @@ export class LobbyView extends cc.Component {
 
     private msgCenter: LMsgCenter;
 
-    private eventTarget: cc.EventTarget;
-
     private onMessageFunc: Function;
-
-    public dispatchMessage(msg: proto.lobby.LobbyMessage): void {
-        const ops = msg.Ops;
-        this.eventTarget.emit(`${ops}`, msg.Data);
-    }
-
-    /**
-     * 注册事件，可以用来收websocket的消息
-     * @param eventName 事件名称
-     * @param callback 事件函数
-     * @param target 事件对象
-     */
-    public on<T extends Function>(eventName: string, callback: T, target?: object): T {
-        return this.eventTarget.on(eventName, callback, target);
-    }
-
-    /**
-     * 关闭事件
-     * @param eventName 事件名称
-     * @param callback 事件函数
-     */
-    public off(eventName: string, callback: Function): void {
-        this.eventTarget.off(eventName, callback);
-    }
 
     public onMessage(data: ByteBuffer): void {
         Logger.debug("LobbyView.onMessage");
@@ -60,7 +34,6 @@ export class LobbyView extends cc.Component {
 
     protected async onLoad(): Promise<void> {
         // 加载大厅界面
-        this.eventTarget = new cc.EventTarget();
 
         const lm = <LobbyModuleInterface>this.getComponent("LobbyModule");
         this.lm = lm;
@@ -78,7 +51,7 @@ export class LobbyView extends cc.Component {
     }
 
     protected onDestroy(): void {
-        this.off(`${proto.lobby.MessageCode.OPUpdateDiamond}`, this.onMessageFunc);
+        this.lm.eventTarget.off(`${proto.lobby.MessageCode.OPUpdateDiamond}`, this.onMessageFunc);
         this.msgCenter.destory();
     }
 
@@ -113,25 +86,30 @@ export class LobbyView extends cc.Component {
         this.initInfoView(userInfo);
         userInfo.onClick(this.openUserInfoView, this);
 
-        this.onMessageFunc = this.on(`${proto.lobby.MessageCode.OPUpdateDiamond}`, this.onMessage, this);
+        this.onMessageFunc = this.lm.eventTarget.on(`${proto.lobby.MessageCode.OPUpdateDiamond}`, this.onMessage, this);
     }
 
     private async startWebSocket(): Promise<void> {
         const tk = DataStore.getString("token", "");
         const webSocketURL = `${LEnv.lobbyWebsocket}?&tk=${tk}`;
 
-        this.msgCenter = new LMsgCenter(webSocketURL, this, this);
+        this.msgCenter = new LMsgCenter(webSocketURL, this, this.lm);
         await this.msgCenter.start();
     }
     private onFriendClick(): void {
         const myUser = { userID: "6" };
-        const roomInfo = { roomID: "monkey-room", roomNumber: "monkey-room", roomConfig: "" };
+        const roomConfigObj = {
+            roomType: 21
+        };
+
+        const roomInfo = { roomID: "monkey-room", roomNumber: "monkey-room", roomConfig: JSON.stringify(roomConfigObj) };
 
         const params: GameModuleLaunchArgs = {
             jsonString: "",
             userInfo: myUser,
             roomInfo: roomInfo,
-            uuid: "uuid"
+            uuid: "uuid",
+            record: null
         };
 
         this.lm.switchToGame(params, "gameb");

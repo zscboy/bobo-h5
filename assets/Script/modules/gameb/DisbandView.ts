@@ -26,11 +26,15 @@ export class DisbandView extends cc.Component {
 
     private agreeBtn: fgui.GButton;
 
-    public saveRoomView(room: RoomInterface): void {
+    private msgDisbandNotify: proto.mahjong.MsgDisbandNotify;
+
+    public saveRoomView(room: RoomInterface, msgDisbandNotify: proto.mahjong.MsgDisbandNotify): void {
         this.room = room;
+        this.msgDisbandNotify = msgDisbandNotify;
     }
 
-    public updateView(msgDisbandNotify: proto.mahjong.MsgDisbandNotify): void {
+    public updateView(): void {
+        const msgDisbandNotify = this.msgDisbandNotify;
         //
         Logger.debug("msgDisbandNotify = ", msgDisbandNotify);
 
@@ -90,24 +94,23 @@ export class DisbandView extends cc.Component {
                             this.unschedule(this.disbandCountDown);
                         }
 
+                        Logger.debug("disabnd countdown for others");
                         this.myCountDown.visible = true;
                         //为他人倒计时
                         this.isForMe = false;
                         this.schedule(this.disbandCountDown, 1, cc.macro.REPEAT_FOREVER);
-
                     }
 
                     this.showButtons(false);
-
-                    return;
-            } else {
-                    this.myCountDown.visible = false;
+                } else {
+                    Logger.debug("disabnd countdown for me");
+                    this.myCountDown.visible = true;
                     this.showButtons(true);
-                }
 
-                //为自己倒计时
-                this.isForMe = true;
-                this.schedule(this.disbandCountDown, 1, cc.macro.REPEAT_FOREVER);
+                    //为自己倒计时
+                    this.isForMe = true;
+                    this.schedule(this.disbandCountDown, 1, cc.macro.REPEAT_FOREVER);
+                }
 
             }
         }
@@ -125,10 +128,13 @@ export class DisbandView extends cc.Component {
         this.initView();
     }
 
+    protected start(): void {
+        this.updateView();
+    }
+
     protected onDestroy(): void {
         this.eventTarget.emit("destroy");
         this.view.dispose();
-
     }
 
     private disbandCountDown(): void {
@@ -164,20 +170,11 @@ export class DisbandView extends cc.Component {
         }
     }
     private showButtons(show: boolean): void {
-        if (show) {
-            this.refuseBtn.visible = show;
-            this.agreeBtn.visible = show;
-        } else {
-            this.refuseBtn.touchable = false;
-            this.agreeBtn.touchable = false;
-
-            // this.agreeBtn.grayed = true;
-        }
+        this.refuseBtn.visible = show;
+        this.agreeBtn.visible = show;
     }
 
     private initView(): void {
-        //
-        Logger.debug(this.room);
         this.myCountDown = this.view.getChild("n9");
         this.myCountDownTxt = this.view.getChild("time");
         this.refuseBtn = this.view.getChild("unagreeBtn").asButton;

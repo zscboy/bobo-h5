@@ -1,4 +1,5 @@
 import { Dialog, Logger } from "../lobby/lcore/LCoreExports";
+import { GameRules } from "./GameRules";
 import { ButtonDef, ClickCtrl, PlayerInterface } from "./PlayerInterface";
 import { proto } from "./proto/protoGame";
 import { RoomHost, RoomInterface, TingPai } from "./RoomInterface";
@@ -84,7 +85,9 @@ export class PlayerView {
     private discardTipsTile: fgui.GComponent;
     private btnHanders: { [key: string]: Function };
     private roomHost: RoomHost;
-    private roomHostTimeElapsed: number;
+    private lastClickTime: number;
+    private lastClickIndex: number;
+
     private dragHand: fgui.GComponent; //拖牌时 克隆的牌
 
     public constructor(viewUnityNode: fgui.GComponent, viewChairID: number, room: RoomInterface) {
@@ -235,6 +238,9 @@ export class PlayerView {
 
     //隐藏花牌列表
     public hideFlowers(): void {
+        if (!GameRules.haveFlower(this.room.roomType)) {
+            return;
+        }
         if (this.flowers != null) {
             for (const f of this.flowers) {
                 f.visible = false;
@@ -246,6 +252,9 @@ export class PlayerView {
 
     //显示花牌，注意花牌需要是平放的
     public showFlowers(): void {
+        if (!GameRules.haveFlower(this.room.roomType)) {
+            return;
+        }
         const tilesFlower = this.player.tilesFlower;
         const flowers = this.flowers;
 
@@ -327,12 +336,6 @@ export class PlayerView {
                     discardTips.visible = false;
                 },
                 1);
-            // this.myView.DelayRun(
-            //     1,
-            //     function () {
-            //         discardTips.visible = false
-            //     }
-            // )
         }
     }
 
@@ -415,16 +418,17 @@ export class PlayerView {
             TileImageMounter.mountMeldEnableImage(t3, msgMeld.tile1, this.viewChairID);
             TileImageMounter.mountMeldEnableImage(t4, msgMeld.tile1, this.viewChairID);
             this.setMeldTileDirection(false, t4, viewChairID, this.viewChairID);
-        }
-    }
-
-    public mountConcealedKongTileImage(t: fgui.GComponent, tileID: number): void {
-        //const player = this.player
-        //tileID === mjproto.mjproto.enumTid_MAX表示该牌需要暗牌显示
-        if (tileID === mjproto.TileID.enumTid_MAX) {
-            // TileImageMounter.mountMeldDisableImage(t, tileID, this.viewChairID)
-        } else {
-            TileImageMounter.mountMeldEnableImage(t, tileID, this.viewChairID);
+        } else if (meldType === mtProto.enumMeldTypeConcealedKong) {
+            const t4 = meldView.getChild("n4").asCom; //这个是暗牌显示 用于别的玩家暗杠
+            const t0 = meldView.getChild("n0").asCom; //这个是明牌显示 自己暗杠 或者 回播的时候用的
+            if (msgMeld.tile1 === undefined || msgMeld.tile1 >= mjproto.TileID.enumTid_MAX) {
+                t4.visible = true;
+                t0.visible = false;
+            } else {
+                t4.visible = false;
+                t0.visible = true;
+                TileImageMounter.mountMeldEnableImage(t0, msgMeld.tile1, this.viewChairID);
+            }
         }
     }
 
@@ -581,23 +585,23 @@ export class PlayerView {
         //播放选牌音效
         //dfCompatibleAPI. soundPlay("effect/effect_xuanpai")
 
-        clickCtrl.clickCount = clickCtrl.clickCount + 1;
-        if (clickCtrl.clickCount === 1) {
-            this.restoreHandsPositionAndClickCount(index);
-            this.moveHandUp(index);
-        }
+        // clickCtrl.clickCount = clickCtrl.clickCount + 1;
+        // if (clickCtrl.clickCount === 1) {
+        //     this.restoreHandsPositionAndClickCount(index);
+        //     this.moveHandUp(index);
+        // }
 
-        if (clickCtrl.clickCount === 2) {
-            //判断可否出牌
-            if (player.waitSkip) {
-                this.restoreHandsPositionAndClickCount(-1);
-                this.room.hideTingDataView();
-            } else {
-                player.onPlayerDiscardTile(clickCtrl.tileID);
-                this.clearAllowedActionsView(false);
-            }
-            //player. onPlayerDiscardTile(clickCtrl.tileID)
-        }
+        // if (clickCtrl.clickCount === 2) {
+        //     //判断可否出牌
+        //     if (player.waitSkip) {
+        //         this.restoreHandsPositionAndClickCount(-1);
+        //         this.room.hideTingDataView();
+        //     } else {
+        //         player.onPlayerDiscardTile(clickCtrl.tileID);
+        //         this.clearAllowedActionsView(false);
+        //     }
+        //     //player. onPlayerDiscardTile(clickCtrl.tileID)
+        // }
     }
 
     //还原所有手牌到它初始化时候的位置，并把clickCount重置为0
@@ -608,8 +612,8 @@ export class PlayerView {
                 const originPos = this.handsOriginPos[i];
                 const h = clickCtrl.h;
                 h.y = originPos.y;
-                clickCtrl.clickCount = 0;
-                clickCtrl.doubleTimeEclipse = 0;
+                // clickCtrl.clickCount = 0;
+                clickCtrl.isNormalState = true;
             }
         }
     }
@@ -747,17 +751,21 @@ export class PlayerView {
         //准备
         const onReady = (): void => {
             this.head.readyIndicator.visible = true;
+            this.head.headView.grayed = false;
             this.showOwner();
         };
 
         //离线
         const onLeave = (): void => {
             this.head.readyIndicator.visible = false;
+            this.head.headView.grayed = true;
         };
 
         //正在玩
         const onPlaying = (): void => {
             this.head.readyIndicator.visible = false;
+            this.head.headView.grayed = false;
+
             this.showOwner();
         };
 
@@ -817,17 +825,21 @@ export class PlayerView {
         } else {
             this.room.hideTingDataView();
         }
-        if (clickCtrl.doubleTimeEclipse === 0) {
-            clickCtrl.doubleTimeEclipse = 1;
-            this.roomHostTimeElapsed = this.roomHost.timeElapsed;
-            //第一次点击 弹起
-            this.restoreHandsPositionAndClickCount(index);
-            this.moveHandUp(index);
 
-            return;
+        const prevClickTime = this.lastClickTime;
+        this.lastClickTime = this.roomHost.timeElapsed;
+
+        let isDoubleClick = false;
+
+        if (this.lastClickIndex === index &&
+            this.lastClickTime - prevClickTime <= 0.5) {
+            // 快速点击同一张牌时认为是双击
+            isDoubleClick = true;
         }
-        if (this.roomHost.timeElapsed - this.roomHostTimeElapsed <= 0.5) {
-            clickCtrl.doubleTimeEclipse = 0;
+
+        this.lastClickIndex = index;
+
+        if (isDoubleClick) {
             //双击 直接出牌
             //判断可否出牌
             if (player.waitSkip) {
@@ -838,9 +850,17 @@ export class PlayerView {
                 this.clearAllowedActionsView(false);
             }
         } else {
-            clickCtrl.doubleTimeEclipse = 0;
-            //第二次点击 缩回去
-            this.restoreHandPositionAndClickCount(index);
+            const prevState = clickCtrl.isNormalState;
+            clickCtrl.isNormalState = !clickCtrl.isNormalState;
+
+            if (prevState) {
+                //第一次点击 弹起
+                this.restoreHandsPositionAndClickCount(index);
+                this.moveHandUp(index);
+            } else {
+                //第二次点击 缩回去
+                this.restoreHandPositionAndClickCount(index);
+            }
         }
     }
 
@@ -958,8 +978,8 @@ export class PlayerView {
         const originPos = this.handsOriginPos[i];
         const h = clickCtrl.h;
         h.y = originPos.y;
-        clickCtrl.clickCount = 0;
-        clickCtrl.doubleTimeEclipse = 0;
+        // clickCtrl.clickCount = 0;
+        clickCtrl.isNormalState = true;
     }
 
     //隐藏听牌标志
@@ -1045,8 +1065,8 @@ export class PlayerView {
 
             handsOriginPos[i] = new PosCtrl(card.x, card.y);
             const cc = new ClickCtrl();
-            cc.clickCount = 0;
-            cc.doubleTimeEclipse = 0;
+            // cc.clickCount = 0;
+            cc.isNormalState = true;
             cc.h = card;
             cc.t = card.getChild("ting");
             handsClickCtrls[i] = cc;

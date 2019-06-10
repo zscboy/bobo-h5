@@ -1,10 +1,16 @@
 import { DataStore, Dialog, GameModuleLaunchArgs, HTTP, LEnv, LobbyModuleInterface, Logger } from "../lcore/LCoreExports";
 import { proto } from "../proto/protoLobby";
-import { DFRuleView } from "./DFRuleView";
+import { DFRuleView, ZJMJRuleView } from "../ruleviews/RuleViewsExports";
 import { LobbyError } from "./LobbyError";
-import { RunFastRuleView } from "./RunFastRuleView";
 
 const { ccclass } = cc._decorator;
+
+interface RuleView {
+    destroy: Function;
+    updatePriceCfg: Function;
+    show: Function;
+    hide: Function;
+}
 
 /**
  * LoginView 登录界面
@@ -16,9 +22,14 @@ export class NewRoomView extends cc.Component {
 
     private eventTarget: cc.EventTarget;
 
-    private runFastRuleView: RunFastRuleView;
+    // private runFastRuleView: RunFastRuleView;
 
-    private dfRuleView: DFRuleView;
+    // private dfRuleView: DFRuleView;
+
+    // private zjmjRuleVIew: ZJMJRuleView;
+
+    private ruleViews: { [key: string]: RuleView } = {};
+    private priceCfgs: { [key: string]: object };
 
     public getView(): fgui.GComponent {
         return this.view;
@@ -48,6 +59,8 @@ export class NewRoomView extends cc.Component {
                         const data = <Uint8Array>xhr.response;
                         // proto 解码登录结果
                         const msgCreateRoomRsp = proto.lobby.MsgCreateRoomRsp.decode(data);
+
+                        Logger.debug("msgCreateRoomRsp:", msgCreateRoomRsp);
                         if (msgCreateRoomRsp.result === proto.lobby.MsgError.ErrSuccess) {
                             this.enterGame(msgCreateRoomRsp.roomInfo);
                         } else if (msgCreateRoomRsp.result === proto.lobby.MsgError.ErrUserInOtherRoom) {
@@ -90,14 +103,14 @@ export class NewRoomView extends cc.Component {
         this.win = win;
 
         this.initView();
-
         this.win.show();
-
     }
 
     protected onDestroy(): void {
-        this.runFastRuleView.destroy();
-        this.dfRuleView.destroy();
+        Object.keys(this.ruleViews).forEach((k) => {
+            const rv = this.ruleViews[k];
+            rv.destroy();
+        });
 
         this.eventTarget.emit("destroy");
 
@@ -109,14 +122,61 @@ export class NewRoomView extends cc.Component {
 
         const closeBtn = this.view.getChild("closeBtn");
         closeBtn.onClick(this.onCloseClick, this);
+        const backBtn = this.view.getChild("back");
+        if (backBtn !== null) {
+            backBtn.onClick(this.onCloseClick, this);
+        }
 
-        this.runFastRuleView = new RunFastRuleView();
-        this.runFastRuleView.bindView(this);
+        const list = this.view.getChild("gamelist").asList;
+        list.on(fgui.Event.CLICK_ITEM, this.onListItemClicked, this);
 
-        this.dfRuleView = new DFRuleView();
-        this.dfRuleView.bindView(this);
+        this.selectItem("btnZJMJ");
 
         this.loadRoomPrice();
+    }
+
+    private onListItemClicked(item: fgui.GObject, evt: fgui.Event): void {
+        const name = item.packageItem.name;
+        this.selectItem(name);
+    }
+
+    private selectItem(name: string): void {
+        let ruleView = this.ruleViews[name];
+        Object.keys(this.ruleViews).forEach((k) => {
+            const rv = this.ruleViews[k];
+            rv.hide();
+        });
+
+        if (ruleView === undefined) {
+            switch (name) {
+                case "btnZJMJ":
+                    const rv1 = new ZJMJRuleView();
+                    rv1.bindView(this);
+                    ruleView = rv1;
+                    break;
+                case "btnDFMJ":
+                    const rv2 = new DFRuleView();
+                    rv2.bindView(this);
+                    ruleView = rv2;
+                    break;
+                case "btnGZ":
+                    break;
+                case "btnDDZ":
+                    break;
+                default:
+            }
+
+            if (ruleView === undefined) {
+                return;
+            }
+
+            this.ruleViews[name] = ruleView;
+            if (this.priceCfgs !== undefined) {
+                ruleView.updatePriceCfg(this.priceCfgs);
+            }
+        }
+
+        ruleView.show();
     }
 
     private onCloseClick(): void {
@@ -141,7 +201,8 @@ export class NewRoomView extends cc.Component {
             jsonString: "",
             userInfo: myUser,
             roomInfo: myRoomInfo,
-            uuid: "uuid"
+            uuid: roomInfo.gameServerID,
+            record: null
         };
 
         const lobbyModuleInterface = <LobbyModuleInterface>this.getComponent("LobbyModule");
@@ -165,11 +226,14 @@ export class NewRoomView extends cc.Component {
                 } else {
                     errMsg = HTTP.hError(xhr);
                     if (errMsg === null) {
-                        const data = <Uint8Array>xhr.response;
-                        const dataString = new TextDecoder("utf-8").decode(data);
+                        const dataString = <string>String.fromCharCode.apply(null, new Uint8Array(<ArrayBuffer>xhr.response));
                         const priceCfgs = <{ [key: string]: object }>JSON.parse(dataString);
-                        this.dfRuleView.updatePriceCfg(priceCfgs);
-                        Logger.debug("price:", dataString);
+                        this.priceCfgs = priceCfgs;
+
+                        Object.keys(this.ruleViews).forEach((k) => {
+                            const rv = this.ruleViews[k];
+                            rv.updatePriceCfg(priceCfgs);
+                        });
                     }
                 }
 

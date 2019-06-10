@@ -52,15 +52,27 @@ export class DFRuleView {
         ["modName"]: "gameb"
     };
 
+    public show(): void {
+        this.view.visible = true;
+    }
+
+    public hide(): void {
+        this.view.visible = false;
+    }
+
     public destroy(): void {
         this.saveRule();
     }
 
     public bindView(newRoomView: NewRoomViewInterface): void {
-        const myNewRoomView = newRoomView.getView();
-
-        this.view = myNewRoomView.getChild("damjRule").asCom;
         this.newRoomView = newRoomView;
+
+        const view = fgui.UIPackage.createObject("lobby_create_room", "mjRoom").asCom;
+        this.view = view;
+        const roomview = newRoomView.getView();
+        const mountpoint = roomview.getChild("mount");
+        view.setPosition(mountpoint.x, mountpoint.y);
+        roomview.addChild(view);
 
         this.initAllView();
 

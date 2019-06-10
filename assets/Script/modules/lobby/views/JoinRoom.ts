@@ -56,9 +56,7 @@ export class JoinRoom extends cc.Component {
 
         for (let i = 0; i < 10; i++) {
             const button = this.view.getChild(`button${i}`);
-            button.onClick(() => {
-                this.onInputButton(i);
-            },             this);
+            button.onClick(() => { this.onInputButton(i); }, this);
         }
 
         this.numbers = [];
@@ -174,7 +172,8 @@ export class JoinRoom extends cc.Component {
             jsonString: "",
             userInfo: myUser,
             roomInfo: myRoomInfo,
-            uuid: "uuid"
+            uuid: roomInfo.gameServerID,
+            record: null
         };
 
         const lobbyModuleInterface = <LobbyModuleInterface>this.getComponent("LobbyModule");

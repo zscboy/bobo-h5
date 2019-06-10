@@ -15,7 +15,7 @@ import { LoginView } from "./views/LoginView";
 @ccclass
 export class LobbyModule extends cc.Component implements LobbyModuleInterface {
     public loader: GResLoaderImpl;
-
+    public eventTarget: cc.EventTarget;
     // 用于挂载子游戏模块的节点，在离开子游戏模块并回到大厅后销毁
     private gameNode: cc.Node;
     private gameLoader: GResLoaderImpl;
@@ -52,6 +52,8 @@ export class LobbyModule extends cc.Component implements LobbyModuleInterface {
             throw new Error(`returnFromGame failed, ui count should be 0, now:${num}`);
         }
         fgui.GRoot.inst.addChild(this.view);
+
+        this.eventTarget.emit(`onGameRecordShow`);
     }
 
     public switchToGame(params: GameModuleLaunchArgs, moduleName: string): void {
@@ -114,6 +116,8 @@ export class LobbyModule extends cc.Component implements LobbyModuleInterface {
 
     protected start(): void {
         this.loader = new GResLoaderImpl("lobby");
+        this.eventTarget = new cc.EventTarget();
+
         Dialog.initDialogs(this.loader);
 
         //优先加载login资源，用于显示loading
@@ -142,6 +146,9 @@ export class LobbyModule extends cc.Component implements LobbyModuleInterface {
     }
 
     private onResLoadedCompleted(): void {
+        // 增加一些房间内用到的大厅package，注意数量不能太多，会影响加载速度
+        this.loader.fguiAddPackage("lobby/fui_create_room/lobby_create_room");
+
         this.loginView.updateCompleted();
     }
 }

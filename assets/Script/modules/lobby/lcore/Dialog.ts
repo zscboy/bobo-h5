@@ -7,8 +7,6 @@ import { Logger } from "./Logger";
 export class Dialog {
     public static inst: Dialog;
 
-    public static progressBar: fgui.GProgressBar;
-
     public loader: GResLoader;
 
     public dlgView: fgui.GComponent;
@@ -179,8 +177,6 @@ export class Dialog {
             win.setPosition(0, 0);
             Dialog.inst.progressBarWin = win;
             Dialog.inst.progressBarView = view;
-
-            this.progressBar = Dialog.inst.progressBarView.getChild("n0").asProgress;
         }
 
         Dialog.inst.progressBarWin.show();
@@ -188,7 +184,8 @@ export class Dialog {
 
     public static updateProgress(progress: number): void {
         if (Dialog.inst.progressBarWin !== undefined) {
-            this.progressBar.value = progress * 100;
+            const progressBar = Dialog.inst.progressBarView.getChild("n0").asProgress;
+            progressBar.value = progress * 100;
         }
     }
 

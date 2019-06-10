@@ -64,13 +64,6 @@ export class LobbyModule extends cc.Component implements LobbyModuleInterface {
             return;
         }
 
-        const childrenCount = fgui.GRoot.inst.numChildren;
-        if (childrenCount > 1) {
-            Logger.fatal("switch to game failed, GRoot numChildren not one:", childrenCount);
-
-            return;
-        }
-
         Dialog.showProgress();
 
         // 资源加载
@@ -114,6 +107,13 @@ export class LobbyModule extends cc.Component implements LobbyModuleInterface {
                 // 隐藏大厅窗口
                 this.view = fgui.GRoot.inst.getChildAt(0);
                 fgui.GRoot.inst.removeChild(this.view);
+
+                const childrenCount = fgui.GRoot.inst.numChildren;
+                if (childrenCount > 0) {
+                    Logger.fatal("switch to game failed, GRoot numChildren not zero:", childrenCount);
+
+                    return;
+                }
             },
             (progress) => {
                 Dialog.updateProgress(progress);

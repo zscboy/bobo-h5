@@ -1,5 +1,5 @@
 
-import { Logger, RoomInfo, UserInfo } from "../lobby/lcore/LCoreExports";
+import { Logger, RoomInfo, SoundMgr, UserInfo } from "../lobby/lcore/LCoreExports";
 import { GameOverResultView } from "./GameOverResultView";
 import { HandlerActionResultNotify } from "./handlers/HandlerActionResultNotify";
 import { HandlerMsg2Lobby } from "./handlers/HandlerMsg2Lobby";
@@ -324,39 +324,47 @@ export class Room {
             const toPos = toPlayer.playerView.head.headView.node.position;
             let sprite = "";
             let effobjSUB = "";
-            // const sound = null
+            let sound = "";
             const handTypeMap = [
                 () => {
                     sprite = "dj_meigui";
                     effobjSUB = "Effect_baojv_hua";
+                    sound = "daoju_hua";
                 },
                 () => {
                     sprite = "dj_ganbei";
                     effobjSUB = "Effect_daojv_jiubei";
+                    sound = "daoju_pijiu";
                 },
                 () => {
                     sprite = "dj_jd";
                     effobjSUB = "Effect_daojv_jidan";
+                    sound = "daoju_jidan";
                 },
                 () => {
                     sprite = "dj_tuoxie";
                     effobjSUB = "Effect_daojv_tuoxie";
+                    sound = "daoju_tuoxie";
                 },
                 () => {
                     sprite = "dj_qj";
                     effobjSUB = "Effect_daojv_quanji";
+                    sound = "daoju_quanji";
                 },
                 () => {
                     sprite = "dj_bb";
                     effobjSUB = "Effect_daojv_shiren";
+                    sound = "daoju_shiren";
                 },
                 () => {
                     sprite = "dj_hj";
                     effobjSUB = "Effect_daojv_hongjiu";
+                    sound = "daoju_hongjiu";
                 },
                 () => {
                     sprite = "dj_mmd";
                     effobjSUB = "Effect_daojv_zui";
+                    sound = "daoju_zui";
                 }
             ];
 
@@ -379,9 +387,9 @@ export class Room {
                 //播放特效
                 toPlayer.playerView.playerDonateEffect(effobjSUB);
                 //播放声音
-                // if sound != null {
-                // dfCompatibleAPI:soundPlay("daoju/" .. sound)
-                // }
+                if (sound !== "") {
+                    SoundMgr.playEffectAudio(`daoju/${sound}`);
+                }
             };
             this.getRoomHost().component.scheduleOnce(callBack, 1);
         }

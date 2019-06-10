@@ -134,6 +134,9 @@ export class GameSubRecordView extends cc.Component {
         const closeBtn = this.view.getChild("closeBtn");
         closeBtn.onClick(this.onCloseClick, this);
 
+        const arrow = this.view.getChild("arrow");
+        arrow.onClick(this.onCloseClick, this);
+
         this.recordList = this.view.getChild("list").asList;
         this.recordList.itemRenderer = (index: number, item: fgui.GObject) => {
             this.renderListItem(index, item);
@@ -176,7 +179,14 @@ export class GameSubRecordView extends cc.Component {
         for (let i = 0; i < record.playerScores.length; i++) {
 
             label = obj.asCom.getChild(`score${i + 1}`);
-            label.text = `${record.playerScores[i].score}`;
+            const score = record.playerScores[i].score;
+            if (score > 0) {
+                label.text = `${+score}`;
+                label.asTextField.color = new cc.Color().fromHEX("#D52012");
+            } else {
+                label.text = `${score}`;
+                label.asTextField.color = new cc.Color().fromHEX("#359031");
+            }
         }
 
         const playBtn = obj.asCom.getChild("playBtn");

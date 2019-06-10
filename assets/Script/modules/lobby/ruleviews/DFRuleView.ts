@@ -5,7 +5,11 @@ import { DataStore, Logger } from "../lcore/LCoreExports";
 const { ccclass } = cc._decorator;
 
 interface NewRoomViewInterface {
-    createRoom: Function;
+
+    updatePrice: Function;
+    forReview?: boolean;
+    itemsJSON?: { [key: string]: boolean | number };
+
     getView(): fgui.GComponent;
 }
 
@@ -16,8 +20,6 @@ interface NewRoomViewInterface {
 export class DFRuleView {
     private view: fgui.GComponent;
     private newRoomView: NewRoomViewInterface;
-
-    // private consumeText: fgui.GObject;
 
     private toggleRoundCounts: fgui.GButton[] = [];
 
@@ -33,7 +35,6 @@ export class DFRuleView {
     private toggleLZJF: fgui.GButton;
     private toggleJYZ: fgui.GButton;
 
-    private consumeText: fgui.GObject;
     private priceCfg: object = null;
     private recordKey: string = "GZRule";
 
@@ -61,7 +62,36 @@ export class DFRuleView {
     }
 
     public destroy(): void {
-        this.saveRule();
+        if (!this.newRoomView.forReview) {
+            this.saveRule();
+        }
+    }
+
+    public updatePriceCfg(priceCfgs: { [key: string]: object }): void {
+        if (priceCfgs !== null) {
+            const roomType = this.rules[`roomType`];
+            this.priceCfg = priceCfgs[`${roomType}`];
+            Logger.debug(`dfmj RuleVIew.updateComsumer roomType:${roomType}, priceCfg:${JSON.stringify(this.priceCfg)}`);
+        }
+
+        this.updateComsumer();
+    }
+
+    public updateComsumer(): void {
+        const configTable = this.getConfigTable();
+
+        const payIndex = this.getToggleIndex(this.togglePays);
+        const payType = configTable[`payType`][payIndex];
+
+        const roundIndex = this.getToggleIndex(this.toggleRoundCounts);
+        const handNum = configTable[`handNum`][roundIndex];
+
+        const playerNumIndex = this.getToggleIndex(this.togglePlayerNums);
+        const playerNumAcquired = configTable[`playerNumAcquired`][playerNumIndex];
+
+        const cost = this.getCost(payType, playerNumAcquired, handNum);
+
+        this.newRoomView.updatePrice(cost);
     }
 
     public bindView(newRoomView: NewRoomViewInterface): void {
@@ -76,24 +106,81 @@ export class DFRuleView {
 
         this.initAllView();
 
-        const createRoomBtn = this.view.getChild("createRoomButton");
-        createRoomBtn.onClick(this.onCreateRoomBtnClick, this);
+        if (this.newRoomView.forReview) {
+            this.initItems(this.newRoomView.itemsJSON);
+        } else {
+            if (DataStore.hasKey(this.recordKey)) {
+                const jsonStr = DataStore.getString(this.recordKey, "");
+                Logger.debug("jsnoStr:", jsonStr);
+                if (jsonStr !== "") {
+                    try {
+                        const config = <{ [key: string]: boolean | number }>JSON.parse(jsonStr);
+                        this.initItems(config);
+                    } catch (e) {
+                        Logger.error("parse config error:", e);
+                        // 如果解析不了，则清理数据
+                        DataStore.setItem(this.recordKey, "");
+                    }
+                }
+            }
+        }
     }
 
-    public updatePriceCfg(priceCfgs: { [key: string]: object }): void {
-        if (priceCfgs !== null) {
-            const roomType = this.rules[`roomType`];
-            this.priceCfg = priceCfgs[`${roomType}`];
-            Logger.debug(`DFRuleView.updateComsumer roomType:${roomType}, priceCfg:${JSON.stringify(this.priceCfg)}`);
-        }
+    public getRules(): string {
+        const configTable = this.getConfigTable();
+        const rules = this.rules;
 
-        this.updateComsumer();
+        const roundIndex = this.getToggleIndex(this.toggleRoundCounts);
+        rules[`handNum`] = configTable[`handNum`][roundIndex];
+
+        const payIndex = this.getToggleIndex(this.togglePays);
+        rules[`payType`] = configTable[`payType`][payIndex];
+
+        const playerNumIndex = this.getToggleIndex(this.togglePlayerNums);
+        rules[`playerNumAcquired`] = configTable[`playerNumAcquired`][playerNumIndex];
+
+        const fengdingIndex = this.getToggleIndex(this.toggleFengDingTypes);
+        rules[`fengDingType`] = configTable[`fengDingType`][fengdingIndex];
+
+        const dunziIndex = this.getToggleIndex(this.toggleDunziPointTypes);
+        rules[`dunziPointType`] = configTable[`dunziPointType`][dunziIndex];
+
+        rules[`doubleScoreWhenSelfDrawn`] = this.toggleZMJF.selected;
+        rules[`doubleScoreWhenContinuousBanker`] = this.toggleLZJF.selected;
+        rules[`doubleScoreWhenZuoYuanZi`] = this.toggleJYZ.selected;
+
+        return JSON.stringify(rules);
+    }
+    private setToggleIndex(toggles: fgui.GButton[], values: { [key: number]: number }, value: number): void {
+        Object.keys(values).forEach((k) => {
+            const v = values[Number(k)];
+            if (v === value) {
+                toggles[Number(k)].selected = true;
+            }
+        });
+    }
+
+    private initItems(config: { [key: string]: boolean | number }): void {
+        try {
+            const configTable = this.getConfigTable();
+
+            this.setToggleIndex(this.toggleRoundCounts, configTable[`handNum`], <number>config[`handNum`]);
+            this.setToggleIndex(this.togglePays, configTable[`payType`], <number>config[`payType`]);
+            this.setToggleIndex(this.togglePlayerNums, configTable[`playerNumAcquired`], <number>config[`playerNumAcquired`]);
+
+            this.setToggleIndex(this.toggleFengDingTypes, configTable[`fengDingType`], <number>config[`fengDingType`]);
+            this.setToggleIndex(this.toggleDunziPointTypes, configTable[`dunziPointType`], <number>config[`dunziPointType`]);
+
+            this.toggleZMJF.selected = <boolean>config[`doubleScoreWhenSelfDrawn`];
+            this.toggleLZJF.selected = <boolean>config[`doubleScoreWhenContinuousBanker`];
+            this.toggleJYZ.selected = <boolean>config[`doubleScoreWhenZuoYuanZi`];
+
+        } catch (e) {
+            Logger.error(e);
+        }
     }
 
     private initAllView(): void {
-        const consume = this.view.getChild("consumeCom").asCom;
-        this.consumeText = consume.getChild("consumeText");
-        this.consumeText.text = '0';
 
         // 局数
         this.toggleRoundCounts[0] = this.view.getChild("round4Button").asButton;
@@ -157,27 +244,6 @@ export class DFRuleView {
         this.toggleLZJF.getChild("title").text = "连庄加分";
         this.toggleJYZ.getChild("title").text = "进园子";
 
-        if (DataStore.hasKey(this.recordKey)) {
-            const jsonStr = DataStore.getString(this.recordKey, "");
-            Logger.debug("jsnoStr:", jsonStr);
-            if (jsonStr !== "") {
-                try {
-                    const config = <{ [key: string]: boolean | number }>JSON.parse(jsonStr);
-                    this.toggleRoundCounts[<number>config[1]].selected = true;
-                    this.togglePays[<number>config[2]].selected = true;
-                    this.togglePlayerNums[<number>config[3]].selected = true;
-                    this.toggleFengDingTypes[<number>config[4]].selected = true;
-                    this.toggleDunziPointTypes[<number>config[5]].selected = true;
-                    this.toggleZMJF.selected = <boolean>config[6];
-                    this.toggleLZJF.selected = <boolean>config[7];
-                    this.toggleJYZ.selected = <boolean>config[8];
-                } catch (e) {
-                    Logger.error("parse config error:", e);
-                    // 如果解析不了，则清理数据
-                    DataStore.setItem(this.recordKey, "");
-                }
-            }
-        }
     }
 
     private getConfigTable(): { [key: string]: { [key: number]: number } } {
@@ -232,31 +298,6 @@ export class DFRuleView {
             }
         };
     }
-    private getRules(): string {
-        const configTable = this.getConfigTable();
-        const rules = this.rules;
-
-        const roundIndex = this.getToggleIndex(this.toggleRoundCounts);
-        rules[`handNum`] = configTable[`handNum`][roundIndex];
-
-        const payIndex = this.getToggleIndex(this.togglePays);
-        rules[`payType`] = configTable[`payType`][payIndex];
-
-        const playerNumIndex = this.getToggleIndex(this.togglePlayerNums);
-        rules[`playerNumAcquired`] = configTable[`playerNumAcquired`][playerNumIndex];
-
-        const fengdingIndex = this.getToggleIndex(this.toggleFengDingTypes);
-        rules[`fengDingType`] = configTable[`fengDingType`][fengdingIndex];
-
-        const dunziIndex = this.getToggleIndex(this.toggleDunziPointTypes);
-        rules[`dunziPointType`] = configTable[`dunziPointType`][dunziIndex];
-
-        rules[`doubleScoreWhenSelfDrawn`] = this.toggleZMJF.selected;
-        rules[`doubleScoreWhenContinuousBanker`] = this.toggleLZJF.selected;
-        rules[`doubleScoreWhenZuoYuanZi`] = this.toggleJYZ.selected;
-
-        return JSON.stringify(rules);
-    }
 
     private getCost(payType: number, playerNum: number, handNum: number): number {
         // Logger.debug("payType:"..payType..", playerNum:"..playerNum..", handNum"..handNum)
@@ -289,10 +330,6 @@ export class DFRuleView {
         return 0;
     }
 
-    private onCreateRoomBtnClick(): void {
-        this.newRoomView.createRoom(this.getRules());
-    }
-
     private getToggleIndex(toggles: fgui.GButton[]): number {
         const len = toggles.length;
         for (let i = 0; i < len; i++) {
@@ -305,44 +342,10 @@ export class DFRuleView {
         return 0;
     }
 
-    private updateComsumer(): void {
-        const configTable = this.getConfigTable();
-
-        const payIndex = this.getToggleIndex(this.togglePays);
-        const payType = configTable[`payType`][payIndex];
-
-        const roundIndex = this.getToggleIndex(this.toggleRoundCounts);
-        const handNum = configTable[`handNum`][roundIndex];
-
-        const playerNumIndex = this.getToggleIndex(this.togglePlayerNums);
-        const playerNumAcquired = configTable[`playerNumAcquired`][playerNumIndex];
-
-        const cost = this.getCost(payType, playerNumAcquired, handNum);
-        this.consumeText.text = `${cost}`;
-
-    }
-
     private saveRule(): void {
-        Logger.debug("DFRuleView.saveRule()");
-        const key: { [key: number]: boolean | number } = {};
-        // 局数
-        key[1] = this.getToggleIndex(this.toggleRoundCounts);
-        // 支付
-        key[2] = this.getToggleIndex(this.togglePays);
-        // 人数
-        key[3] = this.getToggleIndex(this.togglePlayerNums);
-        // 封顶
-        key[4] = this.getToggleIndex(this.toggleFengDingTypes);
-        // 墩子
-        key[5] = this.getToggleIndex(this.toggleDunziPointTypes);
-        // 自摸加分
-        key[6] = this.toggleZMJF.selected;
-        // 连庄加分
-        key[7] = this.toggleLZJF.selected;
-        // 进院子
-        key[8] = this.toggleJYZ.selected;
+        Logger.debug("dfmj RuleVIew.saveRule()");
 
-        const jsonString = JSON.stringify(key);
+        const jsonString = this.getRules();
         DataStore.setItem(this.recordKey, jsonString);
     }
 

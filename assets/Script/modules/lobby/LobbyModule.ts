@@ -64,16 +64,7 @@ export class LobbyModule extends cc.Component implements LobbyModuleInterface {
             return;
         }
 
-        // 隐藏大厅窗口
-        this.view = fgui.GRoot.inst.getChildAt(0);
-        fgui.GRoot.inst.removeChild(this.view);
-
-        const childrenCount = fgui.GRoot.inst.numChildren;
-        if (childrenCount > 0) {
-            Logger.fatal("switch to game failed, GRoot numChildren not zero:", childrenCount);
-
-            return;
-        }
+        Dialog.showProgress();
 
         // 资源加载
         if (this.gameLoader !== undefined && this.gameLoader.name !== moduleName) {
@@ -110,6 +101,22 @@ export class LobbyModule extends cc.Component implements LobbyModuleInterface {
                         default:
                     }
                 }
+
+                Dialog.hideProgress();
+
+                // 隐藏大厅窗口
+                this.view = fgui.GRoot.inst.getChildAt(0);
+                fgui.GRoot.inst.removeChild(this.view);
+
+                const childrenCount = fgui.GRoot.inst.numChildren;
+                if (childrenCount > 0) {
+                    Logger.fatal("switch to game failed, GRoot numChildren not zero:", childrenCount);
+
+                    return;
+                }
+            },
+            (progress) => {
+                Dialog.updateProgress(progress);
             }
         );
     }

@@ -5,7 +5,8 @@ import { DataStore, Logger } from "../lcore/LCoreExports";
 const { ccclass } = cc._decorator;
 
 interface NewRoomViewInterface {
-    createRoom: Function;
+
+    updatePrice: Function;
     forReview?: boolean;
     itemsJSON?: { [key: string]: boolean | number };
 
@@ -47,7 +48,6 @@ export class ZJMJRuleView {
     private toggleTH5B: fgui.GButton;
     private toggle13Y10B: fgui.GButton;
 
-    private consumeText: fgui.GObject;
     private priceCfg: object = null;
     private recordKey: string = "ZJMJRule";
 
@@ -106,14 +106,25 @@ export class ZJMJRuleView {
 
         this.initAllView();
 
-        const createRoomBtn = this.view.getChild("createRoomButton");
-
         if (this.newRoomView.forReview) {
             this.initItems(this.newRoomView.itemsJSON);
-            createRoomBtn.visible = false;
         } else {
-            createRoomBtn.onClick(this.onCreateRoomBtnClick, this);
+            if (DataStore.hasKey(this.recordKey)) {
+                const jsonStr = DataStore.getString(this.recordKey, "");
+                Logger.debug("jsnoStr:", jsonStr);
+                if (jsonStr !== "") {
+                    try {
+                        const config = <{ [key: string]: boolean | number }>JSON.parse(jsonStr);
+                        this.initItems(config);
+                    } catch (e) {
+                        Logger.error("parse config error:", e);
+                        // 如果解析不了，则清理数据
+                        DataStore.setItem(this.recordKey, "");
+                    }
+                }
+            }
         }
+
     }
 
     public updatePriceCfg(priceCfgs: { [key: string]: object }): void {
@@ -124,6 +135,63 @@ export class ZJMJRuleView {
         }
 
         this.updateComsumer();
+    }
+
+    public updateComsumer(): void {
+        const configTable = this.getConfigTable();
+
+        const payIndex = this.getToggleIndex(this.togglePays);
+        const payType = configTable[`payType`][payIndex];
+
+        const roundIndex = this.getToggleIndex(this.toggleRoundCounts);
+        const handNum = configTable[`handNum`][roundIndex];
+
+        const playerNumIndex = this.getToggleIndex(this.togglePlayerNums);
+        const playerNumAcquired = configTable[`playerNumAcquired`][playerNumIndex];
+
+        const cost = this.getCost(payType, playerNumAcquired, handNum);
+
+        this.newRoomView.updatePrice(cost);
+    }
+
+    public getRules(): string {
+        const configTable = this.getConfigTable();
+        const rules = this.rules;
+
+        const roundIndex = this.getToggleIndex(this.toggleRoundCounts);
+        rules[`handNum`] = configTable[`handNum`][roundIndex];
+
+        const payIndex = this.getToggleIndex(this.togglePays);
+        rules[`payType`] = configTable[`payType`][payIndex];
+
+        const playerNumIndex = this.getToggleIndex(this.togglePlayerNums);
+        rules[`playerNumAcquired`] = configTable[`playerNumAcquired`][playerNumIndex];
+
+        const difenIndex = this.getToggleIndex(this.toggleDifenTypes);
+        rules[`baseScoreType`] = configTable[`baseScoreType`][difenIndex];
+
+        const xuanMaIndex = this.getToggleIndex(this.toggleXuanMaTypes);
+        rules[`HorseNumberType`] = configTable[`HorseNumberType`][xuanMaIndex];
+
+        const fengdingIndex = this.getToggleIndex(this.toggleFengDingTypes);
+        rules[`trimType`] = configTable[`trimType`][fengdingIndex];
+
+        rules[`noWind`] = this.toggleQFP.selected;
+        rules[`afterKongChuckerPayForAll`] = this.toggleBSJ.selected;
+        rules[`afterKongX2`] = this.toggleG2B.selected;
+
+        rules[`finalDrawX2`] = this.toggleLY2B.selected;
+        rules[`sevenPairX2`] = this.toggleDZ2B.selected;
+        rules[`greatSevenPairX4`] = this.toggleDZ4B.selected;
+
+        rules[`allWindX2`] = this.toggleFZ2B.selected;
+        rules[`pureSameX2`] = this.toggleQYS2B.selected;
+        rules[`pongpongX2`] = this.togglePPH2B.selected;
+
+        rules[`heavenX5`] = this.toggleTH5B.selected;
+        rules[`thirteenOrphanX10`] = this.toggle13Y10B.selected;
+
+        return JSON.stringify(rules);
     }
 
     private initRount(): void {
@@ -239,9 +307,6 @@ export class ZJMJRuleView {
     }
 
     private initAllView(): void {
-        const consume = this.view.getChild("consumeCom").asCom;
-        this.consumeText = consume.getChild("consumeText");
-        this.consumeText.text = '0';
 
         this.initRount();
         this.initPay();
@@ -250,25 +315,6 @@ export class ZJMJRuleView {
         this.initXuanMa();
         this.initOtherRule();
         this.initFengding();
-
-        if (this.newRoomView.forReview) {
-            return;
-        }
-
-        if (DataStore.hasKey(this.recordKey)) {
-            const jsonStr = DataStore.getString(this.recordKey, "");
-            Logger.debug("jsnoStr:", jsonStr);
-            if (jsonStr !== "") {
-                try {
-                    const config = <{ [key: string]: boolean | number }>JSON.parse(jsonStr);
-                    this.initItems(config);
-                } catch (e) {
-                    Logger.error("parse config error:", e);
-                    // 如果解析不了，则清理数据
-                    DataStore.setItem(this.recordKey, "");
-                }
-            }
-        }
     }
 
     private setToggleIndex(toggles: fgui.GButton[], values: { [key: number]: number }, value: number): void {
@@ -369,45 +415,6 @@ export class ZJMJRuleView {
             }
         };
     }
-    private getRules(): string {
-        const configTable = this.getConfigTable();
-        const rules = this.rules;
-
-        const roundIndex = this.getToggleIndex(this.toggleRoundCounts);
-        rules[`handNum`] = configTable[`handNum`][roundIndex];
-
-        const payIndex = this.getToggleIndex(this.togglePays);
-        rules[`payType`] = configTable[`payType`][payIndex];
-
-        const playerNumIndex = this.getToggleIndex(this.togglePlayerNums);
-        rules[`playerNumAcquired`] = configTable[`playerNumAcquired`][playerNumIndex];
-
-        const difenIndex = this.getToggleIndex(this.toggleDifenTypes);
-        rules[`baseScoreType`] = configTable[`baseScoreType`][difenIndex];
-
-        const xuanMaIndex = this.getToggleIndex(this.toggleXuanMaTypes);
-        rules[`HorseNumberType`] = configTable[`HorseNumberType`][xuanMaIndex];
-
-        const fengdingIndex = this.getToggleIndex(this.toggleFengDingTypes);
-        rules[`trimType`] = configTable[`trimType`][fengdingIndex];
-
-        rules[`noWind`] = this.toggleQFP.selected;
-        rules[`afterKongChuckerPayForAll`] = this.toggleBSJ.selected;
-        rules[`afterKongX2`] = this.toggleG2B.selected;
-
-        rules[`finalDrawX2`] = this.toggleLY2B.selected;
-        rules[`sevenPairX2`] = this.toggleDZ2B.selected;
-        rules[`greatSevenPairX4`] = this.toggleDZ4B.selected;
-
-        rules[`allWindX2`] = this.toggleFZ2B.selected;
-        rules[`pureSameX2`] = this.toggleQYS2B.selected;
-        rules[`pongpongX2`] = this.togglePPH2B.selected;
-
-        rules[`heavenX5`] = this.toggleTH5B.selected;
-        rules[`thirteenOrphanX10`] = this.toggle13Y10B.selected;
-
-        return JSON.stringify(rules);
-    }
 
     private getCost(payType: number, playerNum: number, handNum: number): number {
         // Logger.debug("payType:"..payType..", playerNum:"..playerNum..", handNum"..handNum)
@@ -440,10 +447,6 @@ export class ZJMJRuleView {
         return 0;
     }
 
-    private onCreateRoomBtnClick(): void {
-        this.newRoomView.createRoom(this.getRules());
-    }
-
     private getToggleIndex(toggles: fgui.GButton[]): number {
         const len = toggles.length;
         for (let i = 0; i < len; i++) {
@@ -454,23 +457,6 @@ export class ZJMJRuleView {
         }
 
         return 0;
-    }
-
-    private updateComsumer(): void {
-        const configTable = this.getConfigTable();
-
-        const payIndex = this.getToggleIndex(this.togglePays);
-        const payType = configTable[`payType`][payIndex];
-
-        const roundIndex = this.getToggleIndex(this.toggleRoundCounts);
-        const handNum = configTable[`handNum`][roundIndex];
-
-        const playerNumIndex = this.getToggleIndex(this.togglePlayerNums);
-        const playerNumAcquired = configTable[`playerNumAcquired`][playerNumIndex];
-
-        const cost = this.getCost(payType, playerNumAcquired, handNum);
-        this.consumeText.text = `${cost}`;
-
     }
 
     private saveRule(): void {

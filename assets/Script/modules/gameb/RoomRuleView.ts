@@ -1,4 +1,4 @@
-import { ZJMJRuleView } from "../lobby/ruleviews/RuleViewsExports";
+import { DFRuleView, ZJMJRuleView } from "../lobby/ruleviews/RuleViewsExports";
 
 /**
  * 房间规则界面
@@ -14,10 +14,32 @@ export class RoomRuleView extends cc.Component {
     public updateView(roomConfigStr: string): void {
         //
         const roomConfigJSON = <{ [key: string]: boolean | number }>JSON.parse(roomConfigStr);
-        // Logger.debug("roomConfigJSON = ", roomConfigJSON);
+        //Logger.debug("roomConfigJSON = ", roomConfigJSON);
         this.itemsJSON = roomConfigJSON;
-        const ruleView = new ZJMJRuleView();
+
+        const roomType = <number>roomConfigJSON[`roomType`];
+
+        let ruleView;
+
+        switch (roomType) {
+            case 21:
+                ruleView = new ZJMJRuleView();
+                break;
+            case 1:
+                ruleView = new DFRuleView();
+                break;
+
+            default:
+
+        }
+
         ruleView.bindView(this);
+
+        // 加个控件，不能点击
+        const spaceView = fgui.UIPackage.createObject("dafeng", "spaceBtn").asCom;
+        const mountpoint = this.view.getChild("mount");
+        spaceView.setPosition(mountpoint.x, mountpoint.y);
+        this.view.addChild(spaceView);
 
         if (this.view !== null) {
             // this.room = room;
@@ -27,12 +49,12 @@ export class RoomRuleView extends cc.Component {
 
     }
 
-    public getView(): fgui.GComponent {
-        return this.view;
+    public updatePrice(price: number): void {
+        // don't need to update price
     }
 
-    public createRoom(): void {
-        //
+    public getView(): fgui.GComponent {
+        return this.view;
     }
 
     protected onLoad(): void {

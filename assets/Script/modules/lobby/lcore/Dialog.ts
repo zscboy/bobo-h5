@@ -7,12 +7,17 @@ import { Logger } from "./Logger";
 export class Dialog {
     public static inst: Dialog;
 
+    public static progressBar: fgui.GProgressBar;
+
     public loader: GResLoader;
 
     public dlgView: fgui.GComponent;
     public dlgWin: fgui.Window;
 
     public waitWin: fgui.Window;
+
+    public progressBarWin: fgui.Window;
+    public progressBarView: fgui.GComponent;
 
     public packageLoaded: boolean = false;
 
@@ -159,6 +164,37 @@ export class Dialog {
     public static hideWaiting(): void {
         if (Dialog.inst.waitWin !== undefined) {
             Dialog.inst.waitWin.hide();
+        }
+    }
+
+    public static showProgress(): void {
+        if (Dialog.inst.progressBarWin === undefined) {
+            Dialog.inst.loader.fguiAddPackage("lobby/fui_lobby_progress_bar/lobby_progress_bar");
+
+            const view = fgui.UIPackage.createObject("lobby_progress_bar", "progressBar").asCom;
+            const win = new fgui.Window();
+            win.modal = true;
+            win.contentPane = view;
+
+            win.setPosition(0, 0);
+            Dialog.inst.progressBarWin = win;
+            Dialog.inst.progressBarView = view;
+
+            this.progressBar = Dialog.inst.progressBarView.getChild("n0").asProgress;
+        }
+
+        Dialog.inst.progressBarWin.show();
+    }
+
+    public static updateProgress(progress: number): void {
+        if (Dialog.inst.progressBarWin !== undefined) {
+            this.progressBar.value = progress * 100;
+        }
+    }
+
+    public static hideProgress(): void {
+        if (Dialog.inst.progressBarWin !== undefined) {
+            Dialog.inst.progressBarWin.hide();
         }
     }
 }

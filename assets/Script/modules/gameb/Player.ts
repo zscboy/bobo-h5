@@ -413,7 +413,7 @@ export class Player {
         playerView.player = this;
         playerView.initCardLists();
 
-        playerView.showHeadImg();
+        playerView.showPlayerInfo(this.playerInfo);
         playerView.showOwner();
     }
 

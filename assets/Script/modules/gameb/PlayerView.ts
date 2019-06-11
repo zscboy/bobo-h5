@@ -2,7 +2,7 @@ import { Dialog, Logger } from "../lobby/lcore/LCoreExports";
 import { GameRules } from "./GameRules";
 import { ButtonDef, ClickCtrl, PlayerInterface } from "./PlayerInterface";
 import { proto } from "./proto/protoGame";
-import { RoomHost, RoomInterface, TingPai } from "./RoomInterface";
+import { PlayerInfo, RoomHost, RoomInterface, TingPai } from "./RoomInterface";
 import { TileImageMounter } from "./TileImageMounter";
 
 const mjproto = proto.mahjong;
@@ -24,6 +24,7 @@ class PosCtrl {
  */
 class Head {
     public headView: fgui.GComponent;
+    public headLoader: fgui.GLoader;
     public pos: fgui.GObject;
     public readyIndicator: fgui.GObject;
     public ting: fgui.GObject;
@@ -32,6 +33,7 @@ class Head {
     public continuousBankerFlag: fgui.GObject;
     public huaNode: fgui.GObject;
     public huaNodeText: fgui.GObject;
+    public nameText: fgui.GObject;
     public onUpdateBankerFlag: (isBanker: boolean, isContinue: boolean) => void;
     public hideAll: Function;
 }
@@ -622,9 +624,31 @@ export class PlayerView {
     }
 
     //显示玩家头像
-    public showHeadImg(): void {
+    public showPlayerInfo(playerInfo: PlayerInfo): void {
         this.head.headView.visible = true;
         this.head.headView.onClick(this.player.onPlayerInfoClick, this.player);
+
+        let nick = playerInfo.nick;
+        if (nick === undefined || nick === "") {
+            nick = playerInfo.userID;
+        }
+        //裁剪
+        if (nick.length > 8) {
+            nick = `${nick.substring(0, 8)}...`;
+        }
+        this.head.nameText.text = nick;
+        this.head.nameText.visible = true;
+        //头像
+        // Logger.debug("显示玩家 playerInfo : ", playerInfo);
+        let realUrl = playerInfo.headIconURI;
+        //"https://wx.qlogo.cn/mmopen/vi_32/DYAIOgq83er5prllVA37yiac4Vv8
+        //ZAXwbg0Zicibn6ZjsgJ4ha0hmFBY8MUTRMnRTmSlvzPd8XJZzd0icuyGoiakj4A/132";
+        if (realUrl !== undefined && realUrl !== "") {
+            if (realUrl.indexOf(".jpg") < 0 && realUrl.indexOf(".png") < 0) {
+                realUrl = `${realUrl}??aaa=aa.jpg`;
+            }
+            this.head.headLoader.url = realUrl;
+        }
     }
 
     //显示桌主
@@ -710,6 +734,7 @@ export class PlayerView {
         head.headView = this.myView.getChild("head").asCom;
         head.headView.visible = false;
         head.pos = head.headView.getChild("pos");
+        head.headLoader = head.headView.getChild("n1").asLoader;
         //ready状态指示
         head.readyIndicator = this.myView.getChild("ready");
         head.readyIndicator.visible = false;
@@ -730,6 +755,8 @@ export class PlayerView {
         head.huaNode.visible = false;
         head.huaNodeText = this.myView.getChild("huaText");
         head.huaNodeText.visible = false;
+        head.nameText = this.myView.getChild("nameText");
+        head.nameText.visible = false;
 
         //更新庄家UI
         const updateBanker = (isBanker: boolean, isContinue: boolean): void => {
@@ -757,6 +784,7 @@ export class PlayerView {
             head.continuousBankerFlag.visible = false;
             head.huaNode.visible = false;
             head.huaNodeText.visible = false;
+            head.nameText.visible = false;
         };
 
         this.head = head;

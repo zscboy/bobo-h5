@@ -5,8 +5,7 @@ import { Logger } from "../../lcore/LCoreExports";
  */
 export namespace WeiXinSDK {
 
-    // tslint:disable-next-line:no-any
-    const mDataMap: { [key: string]: any } = {};
+    const mDataMap: { [key: string]: string | object } = {};
 
     export const login = (cb: Function): void => {
         wx.login({
@@ -18,8 +17,7 @@ export namespace WeiXinSDK {
                     const xxCb: getUserInfoOpts = {
                         withCredentials: true,
 
-                        // tslint:disable-next-line:no-any
-                        success: (userRes: any) => {
+                        success: (userRes: getUserInfoRes) => {
                             const wxUserInfoStr: string = 'wxUserInfo';
                             mDataMap[wxUserInfoStr] = userRes;
                             cb(true);
@@ -43,8 +41,7 @@ export namespace WeiXinSDK {
         });
     };
 
-    // tslint:disable-next-line:no-any
-    export const getWxDataMap = (): { [key: string]: any } => {
+    export const getWxDataMap = (): { [key: string]: string | object } => {
         return mDataMap;
     };
 }

@@ -783,15 +783,15 @@ export class PlayerView {
             const image = tileObj.getChild("ts").asLoader;
             if (image != null) {
                 if (ischi) {
-                    image.url = "ui.//dafeng/ts_chi";
+                    image.url = "ui://dafeng/ts_chi";
                 } else {
                     const x = dir - viewChairID;
                     if (x === 1 || x === -3) {
-                        image.url = "ui.//dafeng/ts_xia";
+                        image.url = "ui://dafeng/ts_xia";
                     } else if (x === 2 || x === -2) {
-                        image.url = "ui.//dafeng/ts_dui";
+                        image.url = "ui://dafeng/ts_dui";
                     } else if (x === 3 || x === -1) {
-                        image.url = "ui.//dafeng/ts_shang";
+                        image.url = "ui://dafeng/ts_shang";
                     }
                 }
                 image.visible = true;

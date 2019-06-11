@@ -10,6 +10,8 @@ interface RuleView {
     updatePriceCfg: Function;
     show: Function;
     hide: Function;
+
+    getRules: Function;
 }
 
 /**
@@ -21,12 +23,6 @@ export class NewRoomView extends cc.Component {
     private win: fgui.Window;
 
     private eventTarget: cc.EventTarget;
-
-    // private runFastRuleView: RunFastRuleView;
-
-    // private dfRuleView: DFRuleView;
-
-    // private zjmjRuleVIew: ZJMJRuleView;
 
     private ruleViews: { [key: string]: RuleView } = {};
     private priceCfgs: { [key: string]: object };
@@ -87,6 +83,14 @@ export class NewRoomView extends cc.Component {
             body);
     }
 
+    public updatePrice(price: number): void {
+        //
+        Logger.debug("updatePrice = ", price);
+        const consumeText = this.view.getChild("consumeText");
+        consumeText.text = `${price}`;
+
+    }
+
     protected onLoad(): void {
         // 加载大厅界面
         this.eventTarget = new cc.EventTarget();
@@ -130,6 +134,11 @@ export class NewRoomView extends cc.Component {
         const list = this.view.getChild("gamelist").asList;
         list.on(fgui.Event.CLICK_ITEM, this.onListItemClicked, this);
 
+        const createRoomBtn = this.view.getChild("createRoomButton");
+        if (createRoomBtn !== null) {
+            createRoomBtn.onClick(this.onCreateRoomBtnClick, this);
+        }
+
         this.selectItem("btnZJMJ");
 
         this.loadRoomPrice();
@@ -138,6 +147,19 @@ export class NewRoomView extends cc.Component {
     private onListItemClicked(item: fgui.GObject, evt: fgui.Event): void {
         const name = item.packageItem.name;
         this.selectItem(name);
+    }
+
+    private onCreateRoomBtnClick(): void {
+        const list = this.view.getChild("gamelist").asList;
+        const index = list.selectedIndex;
+        const item = list.getChildAt(index);
+        const name = item.packageItem.name;
+        const ruleView = this.ruleViews[name];
+
+        if (ruleView !== undefined) {
+            const rules: string = <string>ruleView.getRules();
+            this.createRoom(rules);
+        }
     }
 
     private selectItem(name: string): void {

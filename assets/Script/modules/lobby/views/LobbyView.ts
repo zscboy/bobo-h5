@@ -97,6 +97,11 @@ export class LobbyView extends cc.Component {
         await this.msgCenter.start();
     }
     private onFriendClick(): void {
+        this.addComponent(ClubView);
+    }
+
+    private onCreateClick(): void {
+        // TODO:
         const myUser = { userID: "6" };
         const roomConfigObj = {
             roomType: 21
@@ -113,11 +118,6 @@ export class LobbyView extends cc.Component {
         };
 
         this.lm.switchToGame(params, "gameb");
-    }
-
-    private onCreateClick(): void {
-        // TODO:
-        this.addComponent(ClubView);
     }
 
     private onCoinClick(): void {

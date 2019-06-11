@@ -221,7 +221,7 @@ export class EmailView extends cc.Component {
         const selectedEmail = email;
         this.selectedEmail = selectedEmail;
 
-        if (selectedEmail !== null) {
+        if (selectedEmail !== null && selectedEmail.attachments !== null) {
             this.updateAttachmentsView();
         }
 

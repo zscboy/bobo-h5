@@ -1,9 +1,11 @@
+import { WeiXinSDK } from "../chanelSdk/wxSdk/WeiXinSDkExports";
 import {
     DataStore,
     Dialog, GameModuleLaunchArgs, LEnv, LobbyModuleInterface, Logger
 } from "../lcore/LCoreExports";
 import { LMsgCenter } from "../LMsgCenter";
 import { proto } from "../proto/protoLobby";
+import { Share } from "../shareUtil/ShareExports";
 import { ClubView } from "./club/ClubView";
 import { EmailView } from "./EmailView";
 import { GameRecordView } from "./GameRecordView";
@@ -25,6 +27,8 @@ export class LobbyView extends cc.Component {
 
     private onMessageFunc: Function;
 
+    private eventTarget: cc.EventTarget;
+
     public onMessage(data: ByteBuffer): void {
         Logger.debug("LobbyView.onMessage");
         const diamondBody = proto.lobby.MsgUpdateUserDiamond.decode(data);
@@ -34,6 +38,8 @@ export class LobbyView extends cc.Component {
 
     protected async onLoad(): Promise<void> {
         // 加载大厅界面
+        this.eventTarget = new cc.EventTarget();
+        WeiXinSDK.wxOnShow();
 
         const lm = <LobbyModuleInterface>this.getComponent("LobbyModule");
         this.lm = lm;
@@ -47,10 +53,10 @@ export class LobbyView extends cc.Component {
         this.initView();
 
         await this.startWebSocket();
-
     }
 
     protected onDestroy(): void {
+        this.eventTarget.emit("destroy");
         this.lm.eventTarget.off(`${proto.lobby.MessageCode.OPUpdateDiamond}`, this.onMessageFunc);
         this.msgCenter.destory();
     }
@@ -134,6 +140,9 @@ export class LobbyView extends cc.Component {
     private openRecordView(): void {
         // TODO:
         this.addComponent(GameRecordView);
+
+        //测试分享接口
+        Share.shareGame(this.eventTarget, Share.ShareSrcType.GameShare, Share.ShareMediaType.Image, Share.ShareDestType.Friend);
     }
 
     private openEmailView(): void {

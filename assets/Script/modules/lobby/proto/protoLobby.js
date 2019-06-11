@@ -1776,6 +1776,30 @@ exports.proto = require("protobuf").newBuilder({})['import']({
                             "id": 2
                         }
                     ]
+                },
+                {
+                    "name": "MsgShareInfo",
+                    "syntax": "proto2",
+                    "fields": [
+                        {
+                            "rule": "required",
+                            "type": "int32",
+                            "name": "result",
+                            "id": 1
+                        },
+                        {
+                            "rule": "optional",
+                            "type": "string",
+                            "name": "text",
+                            "id": 2
+                        },
+                        {
+                            "rule": "optional",
+                            "type": "string",
+                            "name": "multimedia",
+                            "id": 3
+                        }
+                    ]
                 }
             ],
             "enums": [

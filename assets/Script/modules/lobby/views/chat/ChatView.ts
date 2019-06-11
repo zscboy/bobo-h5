@@ -3,7 +3,7 @@ import { proto } from "../../proto/protoLobby";
 // tslint:disable-next-line:no-require-imports
 import bytebuffer = require("../../protobufjs/bytebuffer");
 
-const phraseMap: {[key: number]: string} = {
+const phraseMap: { [key: number]: string } = {
     [1]: "快点啊，都等到我花都谢了。。。",
     [2]: "真怕猪一样的队友。。。",
     [3]: "一走一停真有型，一秒一卡好潇洒。。。",
@@ -17,6 +17,27 @@ const phraseMap: {[key: number]: string} = {
     [11]: "屌爆了啊",
     [12]: "我就剩两张牌了。。。"
 };
+
+/**
+ * 聊天信息帮助类
+ */
+class ChatData {
+    public fromUserID: string;
+    public toUserID: string;
+    public scope: number;
+    public dataType: number;
+    public data: ByteBuffer;
+    public id: string;
+    public msg: string;
+    public constructor(chat: proto.lobby.MsgChat) {
+        this.fromUserID = chat.from;
+        this.toUserID = chat.to;
+        this.id = chat.id;
+        this.dataType = chat.dataType;
+        this.scope = chat.scope;
+        this.data = chat.data;
+    }
+}
 
 interface MsgContent {
     msg: string;
@@ -46,9 +67,11 @@ export class ChatView extends cc.Component {
 
     private userID: string;
 
-    private msgList: {[key: number]: proto.lobby.MsgChat};
+    private msgCallBack: Function;
+    private msgList: { [key: number]: ChatData };
 
-    public show(loader: GResLoader): void {
+    public show(loader: GResLoader, msgCallBack: Function): void {
+        this.msgCallBack = msgCallBack;
         if (this.view !== null) {
             fgui.GRoot.inst.showPopup(this.view);
             const size = cc.view.getVisibleSize();
@@ -72,9 +95,9 @@ export class ChatView extends cc.Component {
 
         this.userID = DataStore.getString("userID", "");
 
-        this.lobbyModule = <LobbyModuleInterface> this.node.getParent().getComponent("LobbyModule");
+        this.lobbyModule = <LobbyModuleInterface>this.node.getParent().getComponent("LobbyModule");
         if (this.lobbyModule !== null) {
-          this.onMessageFunc = this.lobbyModule.eventTarget.on(`${proto.lobby.MessageCode.OPChat}`, this.onMessage, this);
+            this.onMessageFunc = this.lobbyModule.eventTarget.on(`${proto.lobby.MessageCode.OPChat}`, this.onMessage, this);
         }
 
     }
@@ -164,13 +187,13 @@ export class ChatView extends cc.Component {
     }
 
     private getHistoryListItemResource(index: number): string {
-            const msgChat = this.msgList[index + 1];
-            Logger.debug("msgChat.from : ", msgChat.from);
-            if (msgChat.from === this.userID) {
-                return "ui://lobby_chat/chat_history_me_item";
-            } else {
-                return "ui://lobby_chat/chat_history_other_item";
-            }
+        const msgChat = this.msgList[index + 1];
+        Logger.debug("msgChat.from : ", msgChat.fromUserID);
+        if (msgChat.fromUserID === this.userID) {
+            return "ui://lobby_chat/chat_history_me_item";
+        } else {
+            return "ui://lobby_chat/chat_history_other_item";
+        }
     }
 
     private changeList(myType: number): void {
@@ -272,24 +295,34 @@ export class ChatView extends cc.Component {
         const msg = phraseMap[index + 1];
         const t = obj.getChild("n3");
         t.text = msg;
-}
+    }
 
-private renderHistoryListItem(index: number, item: fgui.GObject): void {
+    private renderHistoryListItem(index: number, item: fgui.GObject): void {
         const chatMsg = this.msgList[index + 1];
-        const contentString = chatMsg.data.toUTF8();
-        const msgContent = <MsgContent>JSON.parse(contentString);
+        // const contentString = chatMsg.data.toUTF8();
+        // const msgContent = <MsgContent>JSON.parse(contentString);
 
         const obj = item.asCom;
         const t = obj.getChild("text");
-        t.text = msgContent.msg;
-}
+        t.text = chatMsg.msg;
+    }
 
     private addMsg(msg: ByteBuffer): void {
         const chatMsg = proto.lobby.MsgChat.decode(msg);
+        const chatData = new ChatData(chatMsg);
 
-        const length = Object.keys(this.msgList).length  + 1;
-        this.msgList[length] = chatMsg;
+        const contentString = chatMsg.data.toUTF8();
+        const msgContent = <MsgContent>JSON.parse(contentString);
+        chatData.msg = msgContent.msg;
+
+        const length = Object.keys(this.msgList).length + 1;
+        this.msgList[length] = chatData;
         this.historyList.numItems = length;
         this.historyList.scrollPane.scrollBottom();
+
+        if (this.msgCallBack !== undefined && this.msgCallBack !== null) {
+            this.msgCallBack(chatData.fromUserID, chatData.msg);
+        }
+        // this.roomInterface.showMsg(chatMsg.from);
     }
 }

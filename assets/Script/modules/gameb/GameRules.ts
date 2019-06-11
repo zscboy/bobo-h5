@@ -231,4 +231,8 @@ export namespace GameRules {
     export const haveJiaJiaZhuang = (gameType: number): boolean => {
         return gameType === ROOM_TYPE.DaFeng;
     };
+    //是否有风圈
+    export const haveRoundMask = (gameType: number): boolean => {
+        return gameType === ROOM_TYPE.DaFeng;
+    };
 }

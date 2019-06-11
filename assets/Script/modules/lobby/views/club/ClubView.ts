@@ -5,8 +5,8 @@ import { ApplyRecordView } from "./ApplyRecordView";
 import { ClubRequestError } from "./ClubRequestError";
 import { CreateClubView } from "./CreateClubView";
 import { JoinClubView } from "./JoinClubView";
-import { MemberManagerView } from "./MemberManagerView";
-import { SettingPopupView } from "./SettingPopupView";
+import { MemberManagerView } from "./memberManager/MemberManagerView";
+import { SettingPopupView } from "./settingPopup/SettingPopupView";
 
 const { ccclass } = cc._decorator;
 
@@ -38,10 +38,10 @@ export class ClubView extends cc.Component {
     // 选择的茶馆
     private selectedClub: proto.club.IMsgClubInfo;
 
-    public deleteClub(): void {
+    public disbandClub(): void {
 
         const tk = DataStore.getString("token", "");
-        const loadEmailUrl = `${LEnv.rootURL}${LEnv.deleteClub}?&tk=${tk}&clubID=${this.selectedClub.baseInfo.clubID}`;
+        const url = `${LEnv.rootURL}${LEnv.deleteClub}?&tk=${tk}&clubID=${this.selectedClub.baseInfo.clubID}`;
 
         const cb = (xhr: XMLHttpRequest, err: string) => {
 
@@ -50,12 +50,30 @@ export class ClubView extends cc.Component {
 
         };
 
-        this.clubRequest(loadEmailUrl, cb);
+        this.clubRequest(url, cb);
 
     }
 
-    protected onDestroy(): void {
+    public modifyClubName(): void {
+        //
+    }
 
+    public quitClub(): void {
+        //
+        const tk = DataStore.getString("token", "");
+        const url = `${LEnv.rootURL}${LEnv.quitClub}?&tk=${tk}&clubID=${this.selectedClub.baseInfo.clubID}`;
+
+        const cb = (xhr: XMLHttpRequest, err: string) => {
+
+            const data = <Uint8Array>xhr.response;
+            this.reloadCLub(data);
+
+        };
+
+        this.clubRequest(url, cb);
+    }
+
+    protected onDestroy(): void {
         this.eventTarget.emit("destroy");
         this.win.hide();
         this.win.dispose();
@@ -275,7 +293,7 @@ export class ClubView extends cc.Component {
         }
 
         const spaceBtn = obj.asCom.getChild("spaceBtn");
-        //spaceBtn.offClick(undefined, undefined);
+        spaceBtn.offClick(undefined, undefined);
         spaceBtn.onClick(() => {
             if (buttonCtrl.selectedIndex === 0) {
                 this.setContent(clubInfo);

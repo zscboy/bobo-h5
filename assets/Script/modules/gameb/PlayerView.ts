@@ -81,6 +81,8 @@ export class PlayerView {
 
     private aniPos: fgui.GObject;
     private userInfoPos: fgui.GObject;
+    private qipao: fgui.GComponent;
+    private qipaoText: fgui.GObject;
     private alreadyShowNonDiscardAbleTips: boolean;
     private discardTipsTile: fgui.GComponent;
     private btnHanders: { [key: string]: Function };
@@ -89,6 +91,7 @@ export class PlayerView {
     private lastClickIndex: number;
 
     private dragHand: fgui.GComponent; //拖牌时 克隆的牌
+    private msgTimerCB: Function;
 
     public constructor(viewUnityNode: fgui.GComponent, viewChairID: number, room: RoomInterface) {
         this.room = room;
@@ -668,6 +671,23 @@ export class PlayerView {
         return this.userInfoPos;
     }
 
+    //显示聊天消息
+    public showChatMsg(str: string): void {
+        if (str !== undefined && str !== null) {
+            if (this.msgTimerCB === undefined) {
+                this.msgTimerCB = <Function>this.hideChatMsg.bind(this);
+            }
+            this.qipaoText.text = str;
+            this.qipao.visible = true;
+            //定时隐藏
+            this.roomHost.component.unschedule(this.msgTimerCB);
+            this.roomHost.component.scheduleOnce(this.msgTimerCB, 3);
+        }
+    }
+    private hideChatMsg(): void {
+        this.qipao.visible = false;
+    }
+
     private initOtherView(): void {
 
         // this.aniPos = view.getChild("aniPos")
@@ -676,6 +696,10 @@ export class PlayerView {
         //打出的牌放大显示
         this.discardTips = this.myView.getChild("discardTip").asCom;
         this.discardTipsTile = this.discardTips.getChild("card").asCom;
+
+        //聊天气泡
+        this.qipao = this.myView.getChild("qipao").asCom;
+        this.qipaoText = this.qipao.getChild("text");
     }
 
     //头像周边内容节点

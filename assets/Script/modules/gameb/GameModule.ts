@@ -1,4 +1,3 @@
-// tslint:disable-next-line:max-line-length
 import {
     AnimationMgr, DataStore, Dialog, GameModuleInterface,
     GameModuleLaunchArgs, GResLoader, LEnv,
@@ -34,7 +33,6 @@ export class GameModule extends cc.Component implements GameModuleInterface {
     private lm: LobbyModuleInterface;
     private mUser: UserInfo;
     private mAnimationMgr: AnimationMgr;
-
     public get room(): Room {
         return this.mRoom;
     }

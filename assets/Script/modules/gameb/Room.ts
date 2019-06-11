@@ -1,5 +1,6 @@
 
 import { Logger, RoomInfo, SoundMgr, UserInfo } from "../lobby/lcore/LCoreExports";
+import { ChatData } from "../lobby/views/chat/ChatExports";
 import { GameOverResultView } from "./GameOverResultView";
 import { HandlerActionResultNotify } from "./handlers/HandlerActionResultNotify";
 import { HandlerMsg2Lobby } from "./handlers/HandlerMsg2Lobby";
@@ -473,9 +474,8 @@ export class Room {
         //
         this.roomView.switchBg(index);
     }
-    public showMsg(userID: string, str: string): void {
-        const pv = this.players[userID].playerView;
-        pv.showChatMsg(str);
+    public showMsg(chatData: ChatData): void {
+        this.players[chatData.fromUserID].onChatMsg(chatData);
     }
     /**
      * 挂起若干秒

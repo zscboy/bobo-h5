@@ -1,5 +1,6 @@
 
 import { AnimationMgr, GResLoader, RoomInfo, UserInfo } from "../lobby/lcore/LCoreExports";
+import { ChatData } from "../lobby/views/chat/ChatExports";
 import { PlayerInterface } from "./PlayerInterface";
 import { proto } from "./proto/protoGame";
 
@@ -143,5 +144,5 @@ export interface RoomInterface {
 
     getMyPlayerInfo(): PlayerInfo;
     sendDonate(donateId: number, toChairID: number): void;
-    showMsg(userID: string, str: string): void;
+    showMsg(chatData: ChatData): void;
 }

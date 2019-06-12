@@ -1,4 +1,4 @@
-import { Dialog, Logger } from "../lobby/lcore/LCoreExports";
+import { CommonFunction, Dialog, Logger } from "../lobby/lcore/LCoreExports";
 import { GameRules } from "./GameRules";
 import { ButtonDef, ClickCtrl, PlayerInterface } from "./PlayerInterface";
 import { proto } from "./proto/protoGame";
@@ -639,16 +639,7 @@ export class PlayerView {
         this.head.nameText.text = nick;
         this.head.nameText.visible = true;
         //头像
-        // Logger.debug("显示玩家 playerInfo : ", playerInfo);
-        let realUrl = playerInfo.headIconURI;
-        //"https://wx.qlogo.cn/mmopen/vi_32/DYAIOgq83er5prllVA37yiac4Vv8
-        //ZAXwbg0Zicibn6ZjsgJ4ha0hmFBY8MUTRMnRTmSlvzPd8XJZzd0icuyGoiakj4A/132";
-        if (realUrl !== undefined && realUrl !== "") {
-            if (realUrl.indexOf(".jpg") < 0 && realUrl.indexOf(".png") < 0) {
-                realUrl = `${realUrl}??aaa=aa.jpg`;
-            }
-            this.head.headLoader.url = realUrl;
-        }
+        CommonFunction.setHead(this.head.headLoader, playerInfo.headIconURI, playerInfo.gender);
     }
 
     //显示桌主

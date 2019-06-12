@@ -152,8 +152,9 @@ export class RoomView {
     }
     public showRoomNumber(): void {
         const room = this.room;
-        const num = ""; // string.format(tostring(self.room.handStartted) or "0", "/", tostring((self.room.handNum)))
-        const str = `房号:${room.roomInfo.roomNumber} 局数:${num}`;
+        const num = `${this.room.handStartted}/${this.room.handNum}`;
+        const s = `     `;
+        const str = `${GameRules.gameName(this.room.roomType)}${s}房号:${room.roomInfo.roomNumber}${s}局数:${num}`;
         this.roomInfoText.text = str;
 
     }
@@ -339,11 +340,11 @@ export class RoomView {
         this.readyButton.onClick(this.room.onReadyButtonClick, this.room);
 
         // 调整微信版本的按钮位置
-        if (CC_WECHATGAME) {
-            Logger.debug("init wechat game button position");
-            settingBtn.setPosition(settingBtn.x, settingBtn.y + 60);
-            infoBtn.setPosition(infoBtn.x, infoBtn.y + 60);
-        }
+        // if (CC_WECHATGAME) {
+        //     Logger.debug("init wechat game button position");
+        //     settingBtn.setPosition(settingBtn.x, settingBtn.y + 60);
+        //     infoBtn.setPosition(infoBtn.x, infoBtn.y + 60);
+        // }
 
     }
 

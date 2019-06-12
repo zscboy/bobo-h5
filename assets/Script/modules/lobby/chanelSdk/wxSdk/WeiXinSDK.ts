@@ -41,6 +41,59 @@ export namespace WeiXinSDK {
         });
     };
 
+    /**
+     * 说明：由于微信分享api的调整，目前没法得到是否真正分享出去了
+     * 因此现在所谓的分享成功与否都是根据时间差来判断的
+     * 分享回来的时间差大于某个值（目前是2秒）则分享成功，小于某个值则分享失败
+     *
+     * 记录从微信分享界面回到游戏时间，判断分享是否成功
+     */
+    const gameReShowCallBack = (successCb: Function, failCb: Function, pullShareTime: number) => {
+        Logger.debug('come back from share');
+        if (pullShareTime !== 0) {
+            const timeDValue = (Date.now() - pullShareTime) / 1000;
+
+            if (timeDValue > 2) {
+                if (successCb !== null) {
+                    successCb();
+                }
+            } else {
+                if (failCb !== null) {
+                    failCb();
+                }
+            }
+        }
+    };
+
+    const wxOnShow = (successCb: Function, failCb: Function, pullShareTime: number = 0) => {
+        wx.onShow((res: showRes) => {
+            gameReShowCallBack(successCb, failCb, pullShareTime);
+        });
+    };
+
+    export const shareWeChat = (
+        successCb: Function = null,
+        failCb: Function = null,
+        shareTitle: string = null,
+        shareMedia: string = null): void => {
+
+        Logger.debug('shareInfo', shareTitle, shareMedia);
+
+        if (shareTitle === null || shareMedia == null) {
+            if (failCb !== null) {
+                failCb();
+            }
+
+            return;
+        }
+        wxOnShow(successCb, failCb, Date.now());
+
+        wx.shareAppMessage({
+            title: `${shareTitle}`,
+            imageUrl: `${shareMedia}`
+        });
+    };
+
     export const getWxDataMap = (): { [key: string]: string | object } => {
         return mDataMap;
     };

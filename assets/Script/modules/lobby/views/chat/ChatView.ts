@@ -4,24 +4,27 @@ import { proto } from "../../proto/protoLobby";
 import bytebuffer = require("../../protobufjs/bytebuffer");
 
 const phraseMap: { [key: number]: string } = {
-    [1]: "快点啊，都等到我花都谢了。。。",
-    [2]: "真怕猪一样的队友。。。",
-    [3]: "一走一停真有型，一秒一卡好潇洒。。。",
-    [4]: "我炸你个桃花朵朵开。。。",
-    [5]: "姑娘，你真是条汉子。。。",
-    [6]: "风吹鸡蛋壳，牌去人安乐。。。",
-    [7]: "搏一搏，单车变摩托。。。",
-    [8]: "我就剩一张牌了。。。",
-    [9]: "炸得好。。。",
-    [10]: "你这牌打得也太好了吧。。。",
-    [11]: "屌爆了啊",
-    [12]: "我就剩两张牌了。。。"
+    [1]: "不好意思 刚才有点小事情",
+    [2]: "冲过围墙就是银行",
+    [3]: "大姑爷爷 小姨奶奶 大家好啊",
+    [4]: "乖乖 这牌不丑呢",
+    [5]: "宽的很尼 过能松额把我吃两口啊",
+    [6]: "没得命了 打了错喽",
+    [7]: "朋友 你高手啊",
+    [8]: "朋友 你个能弄额扫点子啊",
+    [9]: "上碰下自摸 一点不瞎掐",
+    [10]: "头一坑 就往前冲",
+    [11]: "瞎打啊 你把我心都打凉啦",
+    [12]: "小时候胖不为胖 长大胖才叫胖呢",
+    [13]: "辛辛苦苦几十年 一把回到解放前啊",
+    [14]: "早打是个碰 安大是个冲",
+    [15]: "做大梦 打什么来什么"
 };
 
 /**
  * 聊天信息帮助类
  */
-class ChatData {
+export class ChatData {
     public fromUserID: string;
     public toUserID: string;
     public scope: number;
@@ -29,6 +32,7 @@ class ChatData {
     public data: ByteBuffer;
     public id: string;
     public msg: string;
+    public buildinId: string;
     public constructor(chat: proto.lobby.MsgChat) {
         this.fromUserID = chat.from;
         this.toUserID = chat.to;
@@ -120,8 +124,6 @@ export class ChatView extends cc.Component {
     }
 
     private initView(): void {
-        Logger.debug("initView");
-
         this.phraseBtn = this.view.getChild("phraseBtn").asButton;
         this.expressionBtn = this.view.getChild("expressionBtn").asButton;
         this.historyBtn = this.view.getChild("historyBtn").asButton;
@@ -172,7 +174,7 @@ export class ChatView extends cc.Component {
     }
 
     private onSendBtnClick(): void {
-        this.sendMsg(this.chatText.text);
+        this.sendMsg(this.chatText.text, proto.lobby.ChatDataType.Text);
         this.chatText.text = "";
     }
 
@@ -180,15 +182,14 @@ export class ChatView extends cc.Component {
         this.changeList(2);
         this.historyBtn.selected = true;
 
-        const obj = clickItem.asCom;
-        const msg = obj.getChild("n3").text;
-        this.sendMsg(msg);
+        // const obj = clickItem.asCom;
+        // const msg = obj.getChild("n3").text;
+        this.sendMsg(clickItem.name, proto.lobby.ChatDataType.Buildin);
 
     }
 
     private getHistoryListItemResource(index: number): string {
         const msgChat = this.msgList[index + 1];
-        Logger.debug("msgChat.from : ", msgChat.fromUserID);
         if (msgChat.fromUserID === this.userID) {
             return "ui://lobby_chat/chat_history_me_item";
         } else {
@@ -214,7 +215,7 @@ export class ChatView extends cc.Component {
         }
     }
 
-    private sendMsg(msg: string): void {
+    private sendMsg(msg: string, dataType: proto.lobby.ChatDataType): void {
         const tk = DataStore.getString("token", "");
         const nickName = DataStore.getString("nickName", "");
         const url = `${LEnv.rootURL}${LEnv.chat}?tk=${tk}`;
@@ -228,14 +229,13 @@ export class ChatView extends cc.Component {
 
         const jsonString = JSON.stringify(data);
 
-        Logger.debug("jsonString:", jsonString);
         // const enc = new TextEncoder();
         // const buf = enc.encode(jsonString);
 
         const chat = new proto.lobby.MsgChat();
         chat.from = this.userID;
         chat.scope = proto.lobby.ChatScopeType.InRoom;
-        chat.dataType = proto.lobby.ChatDataType.Text;
+        chat.dataType = dataType;
         chat.data = bytebuffer.fromUTF8(jsonString);
         // chat.data = <ByteBuffer>buf;
 
@@ -295,6 +295,7 @@ export class ChatView extends cc.Component {
         const msg = phraseMap[index + 1];
         const t = obj.getChild("n3");
         t.text = msg;
+        item.name = (index + 1).toString();
     }
 
     private renderHistoryListItem(index: number, item: fgui.GObject): void {
@@ -314,6 +315,10 @@ export class ChatView extends cc.Component {
         const contentString = chatMsg.data.toUTF8();
         const msgContent = <MsgContent>JSON.parse(contentString);
         chatData.msg = msgContent.msg;
+        if (chatMsg.dataType === proto.lobby.ChatDataType.Buildin) {
+            chatData.msg = phraseMap[+msgContent.msg];
+            chatData.buildinId = msgContent.msg;
+        }
 
         const length = Object.keys(this.msgList).length + 1;
         this.msgList[length] = chatData;
@@ -321,7 +326,7 @@ export class ChatView extends cc.Component {
         this.historyList.scrollPane.scrollBottom();
 
         if (this.msgCallBack !== undefined && this.msgCallBack !== null) {
-            this.msgCallBack(chatData.fromUserID, chatData.msg);
+            this.msgCallBack(chatData);
         }
         // this.roomInterface.showMsg(chatMsg.from);
     }

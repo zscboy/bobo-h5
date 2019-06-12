@@ -177,8 +177,10 @@ export class Dialog {
             win.setPosition(0, 0);
             Dialog.inst.progressBarWin = win;
             Dialog.inst.progressBarView = view;
-        }
 
+            const progressBar = Dialog.inst.progressBarView.getChild("n0").asProgress;
+            progressBar.value = 0;
+        }
         Dialog.inst.progressBarWin.show();
     }
 

@@ -34,7 +34,6 @@ export class LobbyView extends cc.Component {
 
     protected async onLoad(): Promise<void> {
         // 加载大厅界面
-
         const lm = <LobbyModuleInterface>this.getComponent("LobbyModule");
         this.lm = lm;
         const loader = lm.loader;
@@ -47,7 +46,6 @@ export class LobbyView extends cc.Component {
         this.initView();
 
         await this.startWebSocket();
-
     }
 
     protected onDestroy(): void {

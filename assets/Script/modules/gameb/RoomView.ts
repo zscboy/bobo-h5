@@ -340,11 +340,11 @@ export class RoomView {
         this.readyButton.onClick(this.room.onReadyButtonClick, this.room);
 
         // 调整微信版本的按钮位置
-        if (CC_WECHATGAME) {
-            Logger.debug("init wechat game button position");
-            settingBtn.setPosition(settingBtn.x, settingBtn.y + 60);
-            infoBtn.setPosition(infoBtn.x, infoBtn.y + 60);
-        }
+        // if (CC_WECHATGAME) {
+        //     Logger.debug("init wechat game button position");
+        //     settingBtn.setPosition(settingBtn.x, settingBtn.y + 60);
+        //     infoBtn.setPosition(infoBtn.x, infoBtn.y + 60);
+        // }
 
     }
 

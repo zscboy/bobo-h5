@@ -31,6 +31,9 @@ export namespace Share {
         Friend     // 好友
     }
 
+    // //测试分享接口
+    // Share.shareGame(this.eventTarget, Share.ShareSrcType.GameShare, Share.ShareMediaType.Image, Share.ShareDestType.Friend);
+
     export const shareGame = (
         target: cc.EventTarget,
         sence: ShareSrcType,

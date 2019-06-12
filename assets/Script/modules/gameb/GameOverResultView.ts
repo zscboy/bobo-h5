@@ -1,3 +1,4 @@
+import { Share } from "../lobby/shareUtil/ShareExports";
 import { Player } from "./Player";
 import { proto } from "./proto/protoGame";
 import { RoomInterface } from "./RoomInterface";
@@ -23,6 +24,7 @@ class ViewGroup {
  * 显示一手牌结束后的得分结果
  */
 export class GameOverResultView extends cc.Component {
+    private eventTarget: cc.EventTarget;
     private room: RoomInterface;
     private unityViewNode: fgui.GComponent = null;
     private win: fgui.Window;
@@ -36,6 +38,7 @@ export class GameOverResultView extends cc.Component {
     private aniPos: fgui.GObject;
 
     public showView(room: RoomInterface, msgGameOver: proto.mahjong.IMsgGameOver): void {
+        this.eventTarget = new cc.EventTarget();
         // -- 提高消息队列的优先级为1
         if (!room.isReplayMode()) {
             room.getRoomHost().blockNormal();
@@ -56,6 +59,8 @@ export class GameOverResultView extends cc.Component {
 
         const backHallBtn = this.unityViewNode.getChild("backHallBtn");
         backHallBtn.onClick(this.onCloseButtonClick, this);
+        const shanreBtn = this.unityViewNode.getChild("shanreBtn");
+        shanreBtn.onClick(this.onShareButtonClick, this);
 
         //更新数据
         this.updateAllData();
@@ -233,11 +238,16 @@ export class GameOverResultView extends cc.Component {
         if (!this.room.isReplayMode()) {
             this.room.getRoomHost().unblockNormal();
         }
+        this.eventTarget.emit("destroy");
         this.unityViewNode = null;
         this.destroy();
         this.win.hide();
         this.win.dispose();
 
         this.room.quit();
+    }
+
+    private onShareButtonClick(): void {
+        Share.shareGame(this.eventTarget, Share.ShareSrcType.GameShare, Share.ShareMediaType.Image, Share.ShareDestType.Friend);
     }
 }

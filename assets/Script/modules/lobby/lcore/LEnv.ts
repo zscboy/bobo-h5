@@ -37,6 +37,8 @@ export namespace LEnv {
 
     export const joinClub = "/lobby/uuid/joinClub";
 
+    export const quitClub = "/lobby/uuid/quitClub";
+
     export const loadClubMembers = "/lobby/uuid/loadClubMembers";
 
     export const joinApproval = "/lobby/uuid/joinApproval";

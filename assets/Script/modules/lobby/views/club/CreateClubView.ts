@@ -1,4 +1,4 @@
-import { DataStore, Dialog, HTTP, LEnv, LobbyModuleInterface, Logger } from "../../lcore/LCoreExports";
+import { DataStore, Dialog, HTTP, LEnv, Logger } from "../../lcore/LCoreExports";
 import { proto } from "../../proto/protoLobby";
 import { ClubRequestError } from "./ClubRequestError";
 
@@ -20,11 +20,6 @@ export class CreateClubView extends cc.Component {
     protected onLoad(): void {
         //
         this.eventTarget = new cc.EventTarget();
-
-        const lm = <LobbyModuleInterface>this.getComponent("LobbyModule");
-        const loader = lm.loader;
-        loader.fguiAddPackage("lobby/fui_club/lobby_club");
-
         const view = fgui.UIPackage.createObject("lobby_club", "createClubView").asCom;
         this.view = view;
 

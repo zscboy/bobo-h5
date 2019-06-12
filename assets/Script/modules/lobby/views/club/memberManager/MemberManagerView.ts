@@ -1,6 +1,7 @@
-import { DataStore, HTTP, LEnv, LobbyModuleInterface, Logger } from "../../lcore/LCoreExports";
-import { proto } from "../../proto/protoLobby";
-import { ClubRequestError } from "./ClubRequestError";
+import { DataStore, HTTP, LEnv, Logger } from "../../../lcore/LCoreExports";
+import { proto } from "../../../proto/protoLobby";
+import { ClubRequestError } from "../ClubRequestError";
+import { MemberOperationDialog } from "./MemberOperationDialog";
 const { ccclass } = cc._decorator;
 /**
  * 成员管理页面
@@ -41,10 +42,6 @@ export class MemberManagerView extends cc.Component {
     protected onLoad(): void {
         //
         this.eventTarget = new cc.EventTarget();
-
-        const lm = <LobbyModuleInterface>this.getComponent("LobbyModule");
-        const loader = lm.loader;
-        loader.fguiAddPackage("lobby/fui_club/lobby_club");
 
         const view = fgui.UIPackage.createObject("lobby_club", "memberManager").asCom;
         this.view = view;
@@ -131,8 +128,19 @@ export class MemberManagerView extends cc.Component {
             owner.visible = member.userID === this.clubInfo.creatorUserID;
         }
 
-    }
+        obj.offClick(undefined, undefined);
 
+        obj.onClick(() => {
+            this.showMemberOperationDialog(member);
+            // tslint:disable-next-line:align
+        }, this);
+
+    }
+    /**
+     * 渲染删除成员列表
+     * @param index 列表索引
+     * @param obj 列表item对象
+     */
     private renderDeleteMemberListItem(index: number, obj: fgui.GObject): void {
         //
 
@@ -160,8 +168,8 @@ export class MemberManagerView extends cc.Component {
     }
 
     /**
-     * 刷新成员列表
-     * @param index 第几个
+     * 刷新成员申请信息列表
+     * @param index 列表索引
      * @param obj 该UI对象
      */
     private renderApplyEventsListItem(index: number, obj: fgui.GObject): void {
@@ -210,6 +218,12 @@ export class MemberManagerView extends cc.Component {
             }, this);
         }
 
+    }
+
+    private showMemberOperationDialog(member: proto.club.IMsgClubMemberInfo): void {
+        //
+        const popupView = this.addComponent(MemberOperationDialog);
+        popupView.show(member);
     }
 
     private onMemberListBtnClick(): void {

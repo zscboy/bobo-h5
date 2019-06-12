@@ -24,7 +24,7 @@ export class GResLoaderImpl implements GResLoader {
             dir,
             (completedCount, totalCount, _) => {
                 Logger.debug(`GResLoader load progress:${completedCount}/${totalCount}`);
-                if (onProgress !== null && onProgress !== undefined) {
+                if (onProgress !== null && onProgress !== undefined && totalCount !== 0) {
                     onProgress(completedCount / totalCount);
                 }
             },

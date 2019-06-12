@@ -1,3 +1,4 @@
+import { WeiXinSDK } from "../chanelSdk/wxSdk/WeiXinSDkExports";
 import {
     DataStore,
     Dialog, GameModuleLaunchArgs, LEnv, LobbyModuleInterface, Logger
@@ -34,6 +35,7 @@ export class LobbyView extends cc.Component {
 
     protected async onLoad(): Promise<void> {
         // 加载大厅界面
+        WeiXinSDK.wxOnShow();
 
         const lm = <LobbyModuleInterface>this.getComponent("LobbyModule");
         this.lm = lm;
@@ -51,7 +53,6 @@ export class LobbyView extends cc.Component {
         this.initView();
 
         await this.startWebSocket();
-
     }
 
     protected onDestroy(): void {

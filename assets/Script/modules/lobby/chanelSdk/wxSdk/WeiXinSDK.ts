@@ -95,6 +95,9 @@ export namespace WeiXinSDK {
     };
 
     export const wxOnShow = () => {
+        if (cc.sys.platform !== cc.sys.WECHAT_GAME) {
+            return;
+        }
         wx.onShow((res: showRes) => {
             gameReShowCallBack();
         });

@@ -33,6 +33,10 @@ export class NewRoomView extends cc.Component {
         return this.view;
     }
 
+    public getEventTarget(): cc.EventTarget {
+        return this.eventTarget;
+    }
+
     public saveClubId(clubId: string): void {
         this.clubId = clubId;
     }
@@ -223,6 +227,9 @@ export class NewRoomView extends cc.Component {
         this.win.hide();
         // this.win.dispose();
         this.destroy();
+
+        // 发消息給俱乐部页面，让俱乐部界面隐藏
+        this.eventTarget.emit("enterGame");
 
         const myUserID = DataStore.getString("userID", "");
         const myUser = { userID: myUserID };

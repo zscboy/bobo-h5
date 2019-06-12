@@ -1,4 +1,4 @@
-import { DataStore, Dialog, HTTP, LEnv, LobbyModuleInterface, Logger } from "../../lcore/LCoreExports";
+import { DataStore, Dialog, GameModuleLaunchArgs, HTTP, LEnv, LobbyModuleInterface, Logger } from "../../lcore/LCoreExports";
 import { proto } from "../../proto/protoLobby";
 import { LobbyError } from "../LobbyError";
 import { NewRoomView } from "../NewRoomView";
@@ -44,6 +44,8 @@ export class ClubView extends cc.Component {
 
     private roomInfos: proto.lobby.IRoomInfo[] = [];
 
+    private lobbyModule: LobbyModuleInterface;
+
     public disbandClub(): void {
 
         const tk = DataStore.getString("token", "");
@@ -74,6 +76,11 @@ export class ClubView extends cc.Component {
     }
 
     protected onDestroy(): void {
+
+        if (this.lobbyModule !== null) {
+            this.lobbyModule.eventTarget.off("onClubViewShow", this.onClubViewShow);
+        }
+
         this.eventTarget.emit("destroy");
         this.win.hide();
         this.win.dispose();
@@ -124,8 +131,20 @@ export class ClubView extends cc.Component {
         };
         this.roomList.setVirtual();
 
+        this.lobbyModule = <LobbyModuleInterface>this.getComponent("LobbyModule");
+        if (this.lobbyModule !== null) {
+            this.lobbyModule.eventTarget.on(`onClubViewShow`, this.onClubViewShow, this);
+        }
+
         this.loadClub();
 
+    }
+
+    private onClubViewShow(): void {
+        if (this.win !== null) {
+            this.win.show();
+            this.loadClubRooms(this.selectedClub.baseInfo.clubID);
+        }
     }
 
     private initClickListener(): void {
@@ -259,6 +278,13 @@ export class ClubView extends cc.Component {
         //
         const view = this.addComponent(NewRoomView);
         view.saveClubId(this.selectedClub.baseInfo.clubID);
+
+        const eventTarget = view.getEventTarget();
+        eventTarget.on("enterGame", this.hide, this);
+    }
+
+    private hide(): void {
+        this.win.hide();
     }
 
     private onCopyWXBtnClick(): void {
@@ -281,6 +307,30 @@ export class ClubView extends cc.Component {
         view.setClubInfo(this.selectedClub);
     }
 
+    private onJoinRoomBtnClick(ev: fgui.Event): void {
+        const index = <number>ev.initiator.data;
+        const roomInfo = this.roomInfos[index];
+
+        this.win.hide();
+        const myUserID = DataStore.getString("userID", "");
+        const myUser = { userID: myUserID };
+        const myRoomInfo = { roomID: roomInfo.roomID, roomNumber: roomInfo.roomNumber, roomConfig: roomInfo.config };
+        const roomConfig = roomInfo.config;
+        const roomConfigJSON = <{ [key: string]: boolean | number | string }>JSON.parse(roomConfig);
+        const modName = <string>roomConfigJSON[`modName`];
+
+        const params: GameModuleLaunchArgs = {
+            jsonString: "",
+            userInfo: myUser,
+            roomInfo: myRoomInfo,
+            uuid: roomInfo.gameServerID,
+            record: null
+        };
+
+        const lobbyModuleInterface = <LobbyModuleInterface>this.getComponent("LobbyModule");
+        lobbyModuleInterface.switchToGame(params, modName);
+    }
+
     private renderClubRoomListItem(index: number, obj: fgui.GObject): void {
 
         let roomInfo: proto.lobby.IRoomInfo;
@@ -293,6 +343,12 @@ export class ClubView extends cc.Component {
         const stateText = obj.asCom.getChild("status").asTextField;
         const inviteBtn = obj.asCom.getChild("inviteBtn").asButton;
         const joinBtn = obj.asCom.getChild("JoinBtn").asButton;
+
+        //inviteBtn.onClick(this.onRefreshBtnClick, this);
+
+        joinBtn.offClick(undefined, undefined);
+        joinBtn.onClick(this.onJoinRoomBtnClick, this);
+        joinBtn.data = index;
 
         nameText.text = this.getGameName(roomInfo.config);
 
@@ -350,7 +406,6 @@ export class ClubView extends cc.Component {
 
             loader.url = `https://wx.qlogo.cn/mmopen/vi_32/DYAIOgq8
             3er5prllVA37yiac4Vv8ZAXwbg0Zicibn6ZjsgJ4ha0hmFBY8MUTRMnRTmSlvzPd8XJZzd0icuyGoiakj4A/132`;
-
         }
     }
 

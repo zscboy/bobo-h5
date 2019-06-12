@@ -1,4 +1,4 @@
-import { DataStore, LobbyModuleInterface, Logger } from "../lcore/LCoreExports";
+import { CommonFunction, DataStore, LobbyModuleInterface, Logger } from "../lcore/LCoreExports";
 
 const { ccclass } = cc._decorator;
 /**
@@ -73,6 +73,11 @@ export class UserInfoView extends cc.Component {
         const gender = DataStore.getString("sex");
         Logger.debug("gender ----------------- ", gender);
         genderCtrl.selectedIndex = +gender;
+
+        const iconLoader = this.view.getChild("loader").asLoader;
+
+        const headImgUrl = DataStore.getString("headImgUrl");
+        CommonFunction.setHead(iconLoader, headImgUrl, +gender);
 
     }
 

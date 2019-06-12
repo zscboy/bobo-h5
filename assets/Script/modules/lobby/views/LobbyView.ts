@@ -1,6 +1,6 @@
 import {
-    DataStore,
-    Dialog, GameModuleLaunchArgs, LEnv, LobbyModuleInterface, Logger
+    CommonFunction,
+    DataStore, Dialog, GameModuleLaunchArgs, LEnv, LobbyModuleInterface, Logger
 } from "../lcore/LCoreExports";
 import { LMsgCenter } from "../LMsgCenter";
 import { proto } from "../proto/protoLobby";
@@ -164,9 +164,16 @@ export class LobbyView extends cc.Component {
 
             if (name.length < 1) {
                 nameLab.text = "默认用户名字";
+            } else {
+                nameLab.text = DataStore.getString("userID");
             }
-            nameLab.text = name;
+
         }
+
+        const gender = +DataStore.getString("sex");
+        const iconLoader = userInfo.getChild("loader").asLoader;
+        const headImgUrl = DataStore.getString("headImgUrl");
+        CommonFunction.setHead(iconLoader, headImgUrl, +gender);
 
         idLab.text = `ID: ${DataStore.getString("userID")}`;
         const diamondNode = this.view.getChild("diamondNode").asCom;

@@ -34,18 +34,14 @@ export namespace LEnv {
     export const createClub = "/lobby/uuid/createClub";
     export const loadMyClubs = "/lobby/uuid/loadMyClubs";
     export const deleteClub = "/lobby/uuid/disbandClub";
-
     export const joinClub = "/lobby/uuid/joinClub";
-
     export const quitClub = "/lobby/uuid/quitClub";
-
     export const loadClubMembers = "/lobby/uuid/loadClubMembers";
-
     export const joinApproval = "/lobby/uuid/joinApproval";
-
     export const loadClubEvents = "/lobby/uuid/loadClubEvents";
-
     export const loadClubRooms = "/lobby/uuid/loadClubRooms";
+
+    export const createClubRoom = "/lobby/uuid/createClubRoom";
 
     export const cfmt = (str: string, ...args: any[]): string => { // tslint:disable-line:no-any
         return str.replace(/{(\d+)}/g, (match, n) => {

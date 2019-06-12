@@ -134,7 +134,7 @@ export class HandResultView extends cc.Component {
             return;
         }
 
-        let roomNumber = this.room.roomNumber;
+        let roomNumber = this.room.roomInfo.roomNumber;
         if (roomNumber == null) {
             roomNumber = "";
         }

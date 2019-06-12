@@ -60,8 +60,7 @@ export class Room {
     public scoreRecords: proto.mahjong.IMsgRoomHandScoreRecord[];
     public state: number;
     public ownerID: string;
-    public roomNumber: string;
-    public handStartted: number;
+    public handStartted: number = 0;
     public windFlowerID: number;
     public isDestroy: boolean = false;
     public bankerChairID: number = 0;
@@ -73,16 +72,18 @@ export class Room {
     public tilesInWall: number;
     public myPlayer: Player;
     public msgDisbandNotify: proto.mahjong.MsgDisbandNotify;
+    public handNum: number;
     public readonly roomType: number;
     public constructor(myUser: UserInfo, roomInfo: RoomInfo, host: RoomHost, rePlay?: Replay) {
         this.myUser = myUser;
-        this.roomInfo = roomInfo;
         this.host = host;
         this.replay = rePlay;
+        this.roomInfo = roomInfo;
 
         const roomConfigJSON = <{ [key: string]: boolean | number | string }>JSON.parse(roomInfo.roomConfig);
         // Logger.debug("roomConfigJSON ---------------------------------------------", roomConfigJSON);
         this.roomType = <number>roomConfigJSON[`roomType`];
+        this.handNum = <number>roomConfigJSON[`handNum`];
     }
 
     public getRoomHost(): RoomHost {

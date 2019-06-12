@@ -152,8 +152,9 @@ export class RoomView {
     }
     public showRoomNumber(): void {
         const room = this.room;
-        const num = ""; // string.format(tostring(self.room.handStartted) or "0", "/", tostring((self.room.handNum)))
-        const str = `房号:${room.roomInfo.roomNumber} 局数:${num}`;
+        const num = `${this.room.handStartted}/${this.room.handNum}`;
+        const s = `     `;
+        const str = `${GameRules.gameName(this.room.roomType)}${s}房号:${room.roomInfo.roomNumber}${s}局数:${num}`;
         this.roomInfoText.text = str;
 
     }

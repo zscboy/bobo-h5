@@ -78,7 +78,7 @@ export class GameOverResultView extends cc.Component {
         // const date = os.date("%Y-%m-%d %H:%M:%S")
         // this.textTime.text = date
         //房间信息
-        const roomNumber = this.room.roomNumber;
+        const roomNumber = this.room.roomInfo.roomNumber;
         this.textRoomNumber.text = `房号:${roomNumber}`;
     }
     //更新玩家基本信息

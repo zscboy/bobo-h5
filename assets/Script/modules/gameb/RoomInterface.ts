@@ -78,11 +78,10 @@ export interface RoomInterface {
     readonly roomType: number;
     readonly roomInfo: RoomInfo;
     readonly roomView: RoomViewInterface;
-
+    readonly handNum: number;
     scoreRecords: proto.mahjong.IMsgRoomHandScoreRecord[];
     state: number;
     ownerID: string;
-    roomNumber: string;
     handStartted: number;
     markup: number;
     bankerChairID: number;

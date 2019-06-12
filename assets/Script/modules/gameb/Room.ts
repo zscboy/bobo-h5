@@ -478,7 +478,10 @@ export class Room {
         //
         this.roomView.switchBg(index);
     }
-
+    public showMsg(userID: string, str: string): void {
+        const pv = this.players[userID].playerView;
+        pv.showChatMsg(str);
+    }
     /**
      * 挂起若干秒
      * @param seconds 秒数

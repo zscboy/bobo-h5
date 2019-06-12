@@ -145,4 +145,5 @@ export interface RoomInterface {
     sendDonate(donateId: number, toChairID: number): void;
 
     sendReturnLobby(): void;
+    showMsg(userID: string, str: string): void;
 }

@@ -220,7 +220,7 @@ export class RoomView {
 
     //设置当前房间所使用的风圈
     public setRoundMask(): void {
-        if (GameRules.haveFlower(this.room.roomType)) {
+        if (GameRules.haveRoundMask(this.room.roomType)) {
             this.wind.visible = true;
             this.windTile.visible = true;
             TileImageMounter.mountTileImage(this.windTile, this.room.windFlowerID);
@@ -310,9 +310,9 @@ export class RoomView {
             chatView = this.component.addComponent(ChatView);
         }
 
-        chatView.show(load);
+        const callBack: Function = <Function>this.room.showMsg.bind(this.room);
+        chatView.show(load, callBack);
     }
-
     /**
      * 初始化
      */

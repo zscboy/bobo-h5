@@ -49,7 +49,7 @@ export class LMsgCenter {
             } else {
                 Logger.trace(`Wait 3 seconds to retry, connectErrorCount:${this.connectErrorCount}`);
 
-                this.waitSecond();
+                await this.waitSecond(3);
             }
         }
     }
@@ -101,8 +101,14 @@ export class LMsgCenter {
         await this.pumpMsg();
     }
 
-    private waitSecond(): void {
-        Logger.debug("waitSecond");
+    private async waitSecond(seconds: number): Promise<void> {
+        return new Promise<void>((resovle) => {
+            this.component.scheduleOnce(
+                () => {
+                    resovle();
+                },
+                seconds);
+        });
     }
 
     private async waitConnect(): Promise<number> {

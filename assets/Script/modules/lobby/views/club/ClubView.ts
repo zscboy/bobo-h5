@@ -291,7 +291,7 @@ export class ClubView extends cc.Component {
         //
         const jsonStr = DataStore.getString("RoomInfoData");
         Logger.debug("jsonStr:", jsonStr);
-        if (jsonStr !== null) {
+        if (jsonStr !== "") {
             try {
                 const config = <{ [key: string]: string }>JSON.parse(jsonStr);
 

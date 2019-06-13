@@ -19,8 +19,6 @@ export class GameSubRecordView extends cc.Component {
 
     private recordList: fgui.GList;
 
-    private onGameRecordShowFunc: Function;
-
     public updateData(replayRoom: proto.lobby.MsgReplayRoom): void {
 
         this.replayRoom = replayRoom;
@@ -113,7 +111,7 @@ export class GameSubRecordView extends cc.Component {
     protected onDestroy(): void {
 
         if (this.lobbyModule !== null) {
-            this.lobbyModule.eventTarget.off("onGameRecordShow", this.onGameRecordShowFunc);
+            this.lobbyModule.eventTarget.off("onGameSubRecordShow", this.onGameSubRecordShow);
         }
 
         this.eventTarget.emit("destroy");
@@ -122,9 +120,8 @@ export class GameSubRecordView extends cc.Component {
     }
 
     private onCloseClick(): void {
-        const lobbyModule = <LobbyModuleInterface>this.getComponent("LobbyModule");
-        if (lobbyModule !== null) {
-            lobbyModule.eventTarget.emit(`onGameRecordShow`);
+        if (this.lobbyModule !== null) {
+            this.lobbyModule.eventTarget.emit(`onGameRecordShow`);
         }
 
         this.destroy();
@@ -145,12 +142,12 @@ export class GameSubRecordView extends cc.Component {
 
         this.lobbyModule = <LobbyModuleInterface>this.getComponent("LobbyModule");
         if (this.lobbyModule !== null) {
-            this.onGameRecordShowFunc = this.lobbyModule.eventTarget.on(`onGameRecordShow`, this.onGameRecordShow, this);
+            this.lobbyModule.eventTarget.on(`onGameSubRecordShow`, this.onGameSubRecordShow, this);
         }
 
     }
 
-    private onGameRecordShow(): void {
+    private onGameSubRecordShow(): void {
         if (this.win !== null) {
             this.win.show();
         }

@@ -239,7 +239,7 @@ export class LobbyView extends cc.Component {
     private checkRoomInfo(): void {
         //
         const jsonStr = DataStore.getString("RoomInfoData");
-        Logger.debug("jsonStr:", jsonStr);
+        Logger.debug("checkRoomInfo jsonStr:", jsonStr);
         if (jsonStr !== "") {
             this.view.getController("inRoom").selectedIndex = 1;
         } else {

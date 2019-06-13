@@ -503,14 +503,14 @@ export namespace proto {
 
 		interface IUserProfile {
 			userID: string;
-			userName?: string;
 			nickName?: string;
+			avatarURL?: string;
 		}
 
 		class UserProfile implements IUserProfile {
 			public userID: string;
-			public userName: string;
 			public nickName: string;
+			public avatarURL: string;
 			constructor(properties?: lobby.IUserProfile);
 			public static encode(message: UserProfile): ByteBuffer;
 			public static decode(reader: Uint8Array|ByteBuffer): UserProfile;
@@ -899,12 +899,14 @@ export namespace proto {
 			result: number;
 			token?: string;
 			userInfo?: lobby.IUserInfo;
+			lastRoomInfo?: lobby.IRoomInfo;
 		}
 
 		class MsgLoginReply implements IMsgLoginReply {
 			public result: number;
 			public token: string;
 			public userInfo: lobby.IUserInfo;
+			public lastRoomInfo: lobby.IRoomInfo;
 			constructor(properties?: lobby.IMsgLoginReply);
 			public static encode(message: MsgLoginReply): ByteBuffer;
 			public static decode(reader: Uint8Array|ByteBuffer): MsgLoginReply;
@@ -957,6 +959,7 @@ export namespace proto {
 			token?: string;
 			account?: string;
 			userInfo?: lobby.IUserInfo;
+			lastRoomInfo?: lobby.IRoomInfo;
 		}
 
 		class MsgQuicklyLoginReply implements IMsgQuicklyLoginReply {
@@ -964,6 +967,7 @@ export namespace proto {
 			public token: string;
 			public account: string;
 			public userInfo: lobby.IUserInfo;
+			public lastRoomInfo: lobby.IRoomInfo;
 			constructor(properties?: lobby.IMsgQuicklyLoginReply);
 			public static encode(message: MsgQuicklyLoginReply): ByteBuffer;
 			public static decode(reader: Uint8Array|ByteBuffer): MsgQuicklyLoginReply;

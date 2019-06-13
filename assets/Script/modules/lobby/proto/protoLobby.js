@@ -764,13 +764,13 @@ exports.proto = require("protobuf").newBuilder({})['import']({
                         {
                             "rule": "optional",
                             "type": "string",
-                            "name": "userName",
+                            "name": "nickName",
                             "id": 2
                         },
                         {
                             "rule": "optional",
                             "type": "string",
-                            "name": "nickName",
+                            "name": "avatarURL",
                             "id": 3
                         }
                     ]
@@ -1408,6 +1408,12 @@ exports.proto = require("protobuf").newBuilder({})['import']({
                             "type": "UserInfo",
                             "name": "userInfo",
                             "id": 3
+                        },
+                        {
+                            "rule": "optional",
+                            "type": "RoomInfo",
+                            "name": "lastRoomInfo",
+                            "id": 4
                         }
                     ]
                 },
@@ -1522,6 +1528,12 @@ exports.proto = require("protobuf").newBuilder({})['import']({
                             "type": "UserInfo",
                             "name": "userInfo",
                             "id": 4
+                        },
+                        {
+                            "rule": "optional",
+                            "type": "RoomInfo",
+                            "name": "lastRoomInfo",
+                            "id": 5
                         }
                     ]
                 },

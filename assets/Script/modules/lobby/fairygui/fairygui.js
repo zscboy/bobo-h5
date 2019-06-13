@@ -9026,10 +9026,11 @@ window.__extends = (this && this.__extends) || (function () {
             //取消掉原来的事件处理
         };
         MyEditBox.prototype.openKeyboard = function (touch) {
-            var impl = this["_impl"];
-            if (impl) {
-                impl._onTouchEnded(touch);
-            }
+            // var impl = this["_impl"];
+            // if (impl) {
+            //     impl._onTouchEnded(touch);
+            // }
+            this._onTouchEnded(touch);
         };
         return MyEditBox;
     }(cc.EditBox));

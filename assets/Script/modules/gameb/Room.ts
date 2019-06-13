@@ -170,6 +170,12 @@ export class Room {
         this.host.sendBinary(buf);
     }
 
+    public onReturnLobbyBtnClick(): void {
+
+        this.sendMsg(proto.mahjong.MessageCode.OP2Lobby);
+
+    }
+
     // 根据玩家的chairID获得相应的playerViewChairID    // 注意服务器的chairID是由0开始
     public getPlayerViewChairIDByChairID(chairID: number): number {
         const myChairId = this.myPlayer.chairID;
@@ -306,11 +312,6 @@ export class Room {
 
         const actionMsgBuf = proto.mahjong.MsgDonate.encode(msgDonate);
         this.sendMsg(proto.mahjong.MessageCode.OPDonate, actionMsgBuf);
-    }
-
-    public sendReturnLobby(): void {
-
-        this.sendMsg(proto.mahjong.MessageCode.OP2Lobby);
     }
 
     // 显示道具动画

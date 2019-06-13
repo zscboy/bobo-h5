@@ -24,6 +24,8 @@ export class RoomView {
     private room: RoomInterface;
     private unityViewNode: fgui.GComponent;
     private readyButton: fgui.GButton;
+
+    private returnLobbyBtn: fgui.GButton;
     private roomInfoText: fgui.GObject;
     private roundMarkView: fgui.GComponent;
     private roundMarks: fgui.GObject[];
@@ -69,6 +71,7 @@ export class RoomView {
      */
     public showOrHideReadyButton(isShow: boolean): void {
         this.readyButton.visible = isShow;
+        this.returnLobbyBtn.visible = isShow;
     }
 
     //响应玩家点击左上角的退出按钮以及后退事件
@@ -338,6 +341,10 @@ export class RoomView {
         this.readyButton = this.unityViewNode.getChild("ready").asButton;
         this.readyButton.visible = false;
         this.readyButton.onClick(this.room.onReadyButtonClick, this.room);
+
+        this.returnLobbyBtn = this.unityViewNode.getChild("return2LobbyBtn").asButton;
+        this.returnLobbyBtn.visible = false;
+        this.returnLobbyBtn.onClick(this.room.onReturnLobbyBtnClick, this.room);
 
         // 调整微信版本的按钮位置
         // if (CC_WECHATGAME) {

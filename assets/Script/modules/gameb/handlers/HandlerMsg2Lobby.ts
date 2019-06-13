@@ -6,5 +6,7 @@ import { RoomInterface } from "../RoomInterface";
 export namespace HandlerMsg2Lobby {
     export const onMsg = async (msgData: ByteBuffer, room: RoomInterface): Promise<void> => {
         // TODO:
+
+        room.quit();
     };
 }

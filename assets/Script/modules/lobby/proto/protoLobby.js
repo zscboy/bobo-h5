@@ -764,13 +764,13 @@ exports.proto = require("protobuf").newBuilder({})['import']({
                         {
                             "rule": "optional",
                             "type": "string",
-                            "name": "userName",
+                            "name": "nickName",
                             "id": 2
                         },
                         {
                             "rule": "optional",
                             "type": "string",
-                            "name": "nickName",
+                            "name": "avatarURL",
                             "id": 3
                         }
                     ]

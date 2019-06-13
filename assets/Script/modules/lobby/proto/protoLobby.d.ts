@@ -503,14 +503,14 @@ export namespace proto {
 
 		interface IUserProfile {
 			userID: string;
-			userName?: string;
 			nickName?: string;
+			avatarURL?: string;
 		}
 
 		class UserProfile implements IUserProfile {
 			public userID: string;
-			public userName: string;
 			public nickName: string;
+			public avatarURL: string;
 			constructor(properties?: lobby.IUserProfile);
 			public static encode(message: UserProfile): ByteBuffer;
 			public static decode(reader: Uint8Array|ByteBuffer): UserProfile;

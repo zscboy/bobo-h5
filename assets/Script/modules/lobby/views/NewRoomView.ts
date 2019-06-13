@@ -1,6 +1,6 @@
 import { DataStore, Dialog, HTTP, LEnv, LobbyModuleInterface, Logger } from "../lcore/LCoreExports";
 import { proto } from "../proto/protoLobby";
-import { DFRuleView, ZJMJRuleView } from "../ruleviews/RuleViewsExports";
+import { DFRuleView, RunFastRuleView, ZJMJRuleView } from "../ruleviews/RuleViewsExports";
 import { LobbyError } from "./LobbyError";
 
 const { ccclass } = cc._decorator;
@@ -194,6 +194,9 @@ export class NewRoomView extends cc.Component {
                     ruleView = rv2;
                     break;
                 case "btnGZ":
+                    const rv3 = new RunFastRuleView();
+                    rv3.bindView(this);
+                    ruleView = rv3;
                     break;
                 case "btnDDZ":
                     break;

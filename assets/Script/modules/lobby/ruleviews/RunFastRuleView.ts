@@ -5,7 +5,11 @@ import { DataStore, Logger } from "../lcore/LCoreExports";
 const { ccclass } = cc._decorator;
 
 interface NewRoomViewInterface {
-    createRoom: Function;
+
+    updatePrice: Function;
+    forReview?: boolean;
+    itemsJSON?: { [key: string]: boolean | number };
+
     getView(): fgui.GComponent;
 }
 
@@ -17,37 +21,123 @@ export class RunFastRuleView {
     private view: fgui.GComponent;
     private newRoomView: NewRoomViewInterface;
 
-    // private consumeText: fgui.GObject;
-
     private toggleRoundCounts: fgui.GButton[] = [];
 
     private togglePays: fgui.GButton[] = [];
 
     private recordKey: string = "GZRule";
 
-    private rules: string = `{"roomType":8, "playerNumAcquired":3, "payNum":4, "payType":0, "handNum":4, "modName":"game1"}`;
-    //     ["roomType"] : 8,
-    //     ["playerNumAcquired"] : 3,
-    //     ["payNum"] : 4,
-    //     ["payType"] : 0,
-    //     ["handNum"] : 4,
-    //     //游戏模块
-    //     ["modName"] : "game1"
-    // };
+    private priceCfg: object = null;
+
+    private readonly rules: { [key: string]: string | number | boolean } = {
+        ["roomType"]: 8,
+        ["playerNumAcquired"]: 3,
+        ["payNum"]: 4,
+        ["payType"]: 0,
+        ["handNum"]: 4,
+        ["modName"]: "gamea"
+    };
+
+    public show(): void {
+        this.view.visible = true;
+    }
+
+    public hide(): void {
+        this.view.visible = false;
+    }
 
     public destroy(): void {
-        this.saveRule();
+        if (!this.newRoomView.forReview) {
+            this.saveRule();
+        }
+    }
+
+    public updatePriceCfg(priceCfgs: { [key: string]: object }): void {
+        if (priceCfgs !== null) {
+            const roomType = this.rules[`roomType`];
+            this.priceCfg = priceCfgs[`${roomType}`];
+            Logger.debug(`dfmj RuleVIew.updateComsumer roomType:${roomType}, priceCfg:${JSON.stringify(this.priceCfg)}`);
+        }
+
+        this.updateComsumer();
+    }
+
+    public updateComsumer(): void {
+        const configTable = this.getConfigTable();
+
+        const payIndex = this.getToggleIndex(this.togglePays);
+        const payType = configTable[`payType`][payIndex];
+
+        const roundIndex = this.getToggleIndex(this.toggleRoundCounts);
+        const handNum = configTable[`handNum`][roundIndex];
+
+        const cost = this.getCost(payType, 3, handNum);
+
+        this.newRoomView.updatePrice(cost);
     }
     public bindView(newRoomView: NewRoomViewInterface): void {
-        const myNewRoomView = newRoomView.getView();
-
-        this.view = myNewRoomView.getChild("gzRule").asCom;
         this.newRoomView = newRoomView;
+
+        const view = fgui.UIPackage.createObject("lobby_create_room", "gzRoom").asCom;
+        this.view = view;
+        const roomview = newRoomView.getView();
+        const mountpoint = roomview.getChild("mount");
+        view.setPosition(mountpoint.x, mountpoint.y);
+        roomview.addChild(view);
 
         this.initAllView();
 
-        const createRoomBtn = this.view.getChild("createRoomButton");
-        createRoomBtn.onClick(this.onCreateRoomBtnClick, this);
+        if (this.newRoomView.forReview) {
+            this.initItems(this.newRoomView.itemsJSON);
+        } else {
+            if (DataStore.hasKey(this.recordKey)) {
+                const jsonStr = DataStore.getString(this.recordKey, "");
+                Logger.debug("jsnoStr:", jsonStr);
+                if (jsonStr !== "") {
+                    try {
+                        const config = <{ [key: string]: boolean | number }>JSON.parse(jsonStr);
+                        this.initItems(config);
+                    } catch (e) {
+                        Logger.error("parse config error:", e);
+                        // 如果解析不了，则清理数据
+                        DataStore.setItem(this.recordKey, "");
+                    }
+                }
+            }
+        }
+    }
+
+    public getRules(): string {
+        const configTable = this.getConfigTable();
+        const rules = this.rules;
+
+        const roundIndex = this.getToggleIndex(this.toggleRoundCounts);
+        rules[`handNum`] = configTable[`handNum`][roundIndex];
+
+        const payIndex = this.getToggleIndex(this.togglePays);
+        rules[`payType`] = configTable[`payType`][payIndex];
+
+        return JSON.stringify(rules);
+    }
+
+    private setToggleIndex(toggles: fgui.GButton[], values: { [key: number]: number }, value: number): void {
+        Object.keys(values).forEach((k) => {
+            const v = values[Number(k)];
+            if (v === value) {
+                toggles[Number(k)].selected = true;
+            }
+        });
+    }
+
+    private initItems(config: { [key: string]: boolean | number }): void {
+        try {
+            const configTable = this.getConfigTable();
+
+            this.setToggleIndex(this.toggleRoundCounts, configTable[`handNum`], <number>config[`handNum`]);
+            this.setToggleIndex(this.togglePays, configTable[`payType`], <number>config[`payType`]);
+        } catch (e) {
+            Logger.error(e);
+        }
     }
 
     private initAllView(): void {
@@ -85,36 +175,62 @@ export class RunFastRuleView {
             const jsonStr = DataStore.getString(this.recordKey);
             Logger.debug("jsnoStr:", jsonStr);
         }
-        // local pp = _ENV.CS.UnityEngine.PlayerPrefs
 
-        // if pp.HasKey(RecordKey) then
-        //     local jsonStr = pp.GetString(RecordKey)
-        //     if jsonStr and #jsonStr > 0 then
-        //         local key = rapidJson.decode(jsonStr)
-
-        //         self.toggleRoundCount[key[1]].selected = true
-        //         self.togglePay[key[2]].selected = true
-        //     end
-        // end
     }
 
-    private getRules(): string {
-        // const playCountIndex = this.getToggleIndex(this.toggleRoundCounts)
-        // rules["handNum"] = configTable["handNum"][playCountIndex]
-
-        // local payIndex = self:getToggleIndex(self.togglePay)
-        // rules["payType"] = configTable["payType"][payIndex]
-
-        //暂时不知道什么配置
-        //rules["doubleScoreWhenSelfDrawn"] = self.toggleKX[1].isOn
-
-        //rules["payNum"] = self:getCost(rules["payType"], rules["playerNumAcquired"], rules["handNum"])
-        //暂时不知道什么配置
-        return this.rules;
+    private getConfigTable(): { [key: string]: { [key: number]: number } } {
+        return {
+            ["playerNumAcquired"]: {
+                [0]: 2,
+                [1]: 3,
+                [2]: 4
+            },
+            ["payNum"]: {
+                [0]: 24,
+                [1]: 36,
+                [2]: 66
+            },
+            ["payType"]: {
+                [0]: 0,
+                [1]: 1
+            },
+            ["handNum"]: {
+                [0]: 4,
+                [1]: 8,
+                [2]: 16
+            }
+        };
     }
 
-    private onCreateRoomBtnClick(): void {
-        this.newRoomView.createRoom(this.getRules());
+    private getCost(payType: number, playerNum: number, handNum: number): number {
+        // Logger.debug("payType:"..payType..", playerNum:"..playerNum..", handNum"..handNum)
+        let key = `ownerPay:${playerNum}:${handNum}`;
+        if (payType === 1) {
+            key = `aaPay:${playerNum}:${handNum}`;
+        }
+
+        if (this.priceCfg === undefined) {
+            Logger.debug("this.priceCfg === undefine");
+
+            return 0;
+        }
+
+        Logger.debug(`key: ${key}`);
+
+        const priceCfg = <{ [key: string]: object }>this.priceCfg;
+        const activityPriceCfg = <{ [key: string]: object }>priceCfg.activityPriceCfg;
+        if (activityPriceCfg !== null) {
+            const discountCfg = <{ [key: string]: number }>activityPriceCfg.discountCfg;
+
+            return discountCfg[key];
+        }
+
+        const originalPriceCfg = <{ [key: string]: number }>priceCfg.originalPriceCfg;
+        if (originalPriceCfg !== null) {
+            return originalPriceCfg[key];
+        }
+
+        return 0;
     }
 
     private getToggleIndex(toggles: fgui.GButton[]): number {
@@ -129,45 +245,11 @@ export class RunFastRuleView {
         return 0;
     }
 
-    private updateComsumer(): void {
-        //     if priceCfgs ~= nil then
-        //     self.priceCfg = priceCfgs[tostring(rules.roomType)]
-        // end
-
-        // local payIndex = self:getToggleIndex(self.togglePay)
-        // local payType = configTable["payType"][payIndex]
-
-        // local playCountIndex = self:getToggleIndex(self.toggleRoundCount)
-        // local handNum = configTable["handNum"][playCountIndex]
-
-        // -- 0 是不配置或者无限用户个数
-        // local playerNumAcquired = 0
-
-        // local cost = self:getCost(payType, playerNumAcquired, handNum)
-
-        // if cost == nil then
-        //     logger.error(
-        //         "No price cfg found, payType:" .. payType .. ", playerNumAcquired:" .. playerNumAcquired .. ", handNum:"
-        //     )
-        // end
-
-        // logger.debug("cost:" .. cost)
-        // self.consumeText.text = cost
-    }
-
     private saveRule(): void {
-        const key: { [key: number]: boolean | number | string } = {};
-        // 局数
-        key[1] = this.getToggleIndex(this.toggleRoundCounts);
-        // 支付
-        key[2] = this.getToggleIndex(this.togglePays);
+        Logger.debug("guanzhang RuleVIew.saveRule()");
 
-        Logger.debug("RunFastRuleView:saveRule() ,key = ", key);
-        // local json = rapidJson.encode(key)
-        // local pp = CS.UnityEngine.PlayerPrefs
-        // pp.SetString(RecordKey, json)
-
-        DataStore.setItem(this.recordKey, key);
+        const jsonString = this.getRules();
+        DataStore.setItem(this.recordKey, jsonString);
     }
 
 }

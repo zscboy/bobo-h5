@@ -1,4 +1,4 @@
-import { GResLoader, LobbyModuleInterface, Logger } from "../../lcore/LCoreExports";
+import { CommonFunction, GResLoader, LobbyModuleInterface, Logger } from "../../lcore/LCoreExports";
 import { proto } from "../../proto/protoLobby";
 
 interface PropData {
@@ -44,6 +44,7 @@ export class PlayerInfoView extends cc.Component {
     private ipText: fgui.GTextField;
     private xinNumText: fgui.GTextField;
     private zuanNumText: fgui.GTextField;
+    private headLoader: fgui.GLoader;
     private sexImage: fgui.GLoader;
     private kickoutBtn: fgui.GButton;
     private propList: fgui.GList;
@@ -98,6 +99,8 @@ export class PlayerInfoView extends cc.Component {
         this.xinNumText = this.view.getChild("xinNum").asTextField;
         this.zuanNumText = this.view.getChild("zuanNum").asTextField;
         this.sexImage = this.view.getChild("sex").asLoader;
+        const head = this.view.getChild("head").asCom;
+        this.headLoader = head.getChild("n0").asLoader;
         //  button
         this.kickoutBtn = this.view.getChild("kickoutBtn").asButton;
         this.kickoutBtn.onClick(this.onKickoutBtnClick, this);
@@ -144,6 +147,8 @@ export class PlayerInfoView extends cc.Component {
         if (this.playerInfo.gender === 1) {
             sex = "y_nan";
         }
+        //头像
+        CommonFunction.setHead(this.headLoader, this.playerInfo.headIconURI, this.playerInfo.gender);
 
         this.sexImage.url = `ui://lobby_player_info/${sex}`;
         this.nameText.text = this.playerInfo.nick;

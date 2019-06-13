@@ -1,5 +1,6 @@
 
 import { AnimationMgr, GResLoader, RoomInfo, UserInfo } from "../lobby/lcore/LCoreExports";
+import { ChatData } from "../lobby/views/chat/ChatExports";
 import { PlayerInterface } from "./PlayerInterface";
 import { proto } from "./proto/protoGame";
 
@@ -77,11 +78,10 @@ export interface RoomInterface {
     readonly roomType: number;
     readonly roomInfo: RoomInfo;
     readonly roomView: RoomViewInterface;
-
+    readonly handNum: number;
     scoreRecords: proto.mahjong.IMsgRoomHandScoreRecord[];
     state: number;
     ownerID: string;
-    roomNumber: string;
     handStartted: number;
     markup: number;
     bankerChairID: number;
@@ -143,5 +143,5 @@ export interface RoomInterface {
 
     getMyPlayerInfo(): PlayerInfo;
     sendDonate(donateId: number, toChairID: number): void;
-    showMsg(userID: string, str: string): void;
+    showMsg(chatData: ChatData): void;
 }

@@ -14,3 +14,4 @@ export * from "./MsgQueue";
 export * from "./AnimationMgr";
 export * from "./Enum";
 export * from "./SoundMgr";
+export * from "./CommonFunction";

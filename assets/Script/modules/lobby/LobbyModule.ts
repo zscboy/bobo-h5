@@ -5,8 +5,10 @@ const { ccclass } = cc._decorator;
 import { GameModule } from "../gameb/GamebExports";
 import { GResLoaderImpl } from "./GResLoaderImpl";
 import { Dialog } from "./lcore/Dialog";
+import { DataStore } from "./lcore/LCoreExports";
 import { GameModuleInterface, GameModuleLaunchArgs, LobbyModuleInterface } from "./lcore/LDataType";
 import { Logger } from "./lcore/Logger";
+import { proto } from "./proto/protoLobby";
 import { LoginView } from "./views/LoginView";
 
 /**
@@ -53,8 +55,38 @@ export class LobbyModule extends cc.Component implements LobbyModuleInterface {
         }
         fgui.GRoot.inst.addChild(this.view);
 
+        this.eventTarget.emit(`checkRoomInfo`);
         this.eventTarget.emit(`onGameRecordShow`);
         this.eventTarget.emit(`onClubViewShow`);
+    }
+
+    public enterGame(roomInfo: proto.lobby.IRoomInfo): void {
+
+        // 发消息給俱乐部页面，让俱乐部界面隐藏
+        this.eventTarget.emit("enterGameEvent");
+
+        const myUserID = DataStore.getString("userID", "");
+        const myUser = { userID: myUserID };
+        const myRoomInfo = {
+            roomID: roomInfo.roomID,
+            roomNumber: roomInfo.roomNumber,
+            config: roomInfo.config,
+            gameServerID: roomInfo.gameServerID
+        };
+
+        const roomConfig = roomInfo.config;
+        const roomConfigJSON = <{ [key: string]: boolean | number | string }>JSON.parse(roomConfig);
+        const modName = <string>roomConfigJSON[`modName`];
+
+        const params: GameModuleLaunchArgs = {
+            jsonString: "",
+            userInfo: myUser,
+            roomInfo: myRoomInfo,
+            record: null
+        };
+
+        this.switchToGame(params, modName);
+
     }
 
     public switchToGame(params: GameModuleLaunchArgs, moduleName: string): void {

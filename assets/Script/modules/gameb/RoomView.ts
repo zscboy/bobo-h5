@@ -291,7 +291,7 @@ export class RoomView {
         if (roomRuleView === undefined || roomRuleView == null) {
             roomRuleView = this.component.addComponent(RoomRuleView);
         }
-        roomRuleView.updateView(this.room.roomInfo.roomConfig);
+        roomRuleView.updateView(this.room.roomInfo.config);
     }
 
     private onSettingBtnClick(): void {

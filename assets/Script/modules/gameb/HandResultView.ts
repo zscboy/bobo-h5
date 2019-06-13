@@ -388,7 +388,7 @@ export class HandResultView extends cc.Component {
         if (roomRuleView === undefined || roomRuleView == null) {
             roomRuleView = this.addComponent(RoomRuleView);
         }
-        roomRuleView.updateView(this.room.roomInfo.roomConfig);
+        roomRuleView.updateView(this.room.roomInfo.config);
     }
     // 玩家点击“继续”按钮，注意如果牌局结束，此按钮是“大结算”
     private onAgainButtonClick(): void {

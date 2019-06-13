@@ -1,5 +1,5 @@
 
-import { DataStore, Dialog, GameModuleLaunchArgs, HTTP, LEnv, LobbyModuleInterface, Logger } from "../lcore/LCoreExports";
+import { DataStore, Dialog, HTTP, LEnv, LobbyModuleInterface, Logger } from "../lcore/LCoreExports";
 import { proto } from "../proto/protoLobby";
 import { LobbyError } from "./LobbyError";
 const { ccclass } = cc._decorator;
@@ -161,23 +161,15 @@ export class JoinRoom extends cc.Component {
         this.win.dispose();
         this.destroy();
 
-        const myUserID = DataStore.getString("userID", "");
-        const myUser = { userID: myUserID };
-        const myRoomInfo = { roomID: roomInfo.roomID, roomNumber: roomInfo.roomNumber, roomConfig: roomInfo.config };
-        const roomConfig = roomInfo.config;
-        const roomConfigJSON = <{ [key: string]: boolean | number | string }>JSON.parse(roomConfig);
-        const modName = <string>roomConfigJSON[`modName`];
-
-        const params: GameModuleLaunchArgs = {
-            jsonString: "",
-            userInfo: myUser,
-            roomInfo: myRoomInfo,
-            uuid: roomInfo.gameServerID,
-            record: null
+        const myRoomInfo = {
+            roomID: roomInfo.roomID,
+            roomNumber: roomInfo.roomNumber,
+            config: roomInfo.config,
+            gameServerID: roomInfo.gameServerID
         };
+        const lm = <LobbyModuleInterface>this.getComponent("LobbyModule");
+        lm.enterGame(myRoomInfo);
 
-        const lobbyModuleInterface = <LobbyModuleInterface>this.getComponent("LobbyModule");
-        lobbyModuleInterface.switchToGame(params, modName);
     }
 
 }

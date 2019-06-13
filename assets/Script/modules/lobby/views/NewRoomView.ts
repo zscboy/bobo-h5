@@ -1,4 +1,4 @@
-import { DataStore, Dialog, GameModuleLaunchArgs, HTTP, LEnv, LobbyModuleInterface, Logger } from "../lcore/LCoreExports";
+import { DataStore, Dialog, HTTP, LEnv, LobbyModuleInterface, Logger } from "../lcore/LCoreExports";
 import { proto } from "../proto/protoLobby";
 import { DFRuleView, ZJMJRuleView } from "../ruleviews/RuleViewsExports";
 import { LobbyError } from "./LobbyError";
@@ -31,10 +31,6 @@ export class NewRoomView extends cc.Component {
 
     public getView(): fgui.GComponent {
         return this.view;
-    }
-
-    public getEventTarget(): cc.EventTarget {
-        return this.eventTarget;
     }
 
     public saveClubId(clubId: string): void {
@@ -222,32 +218,12 @@ export class NewRoomView extends cc.Component {
     }
 
     private enterGame(roomInfo: proto.lobby.IRoomInfo): void {
-        Logger.debug("enterGame");
 
         this.win.hide();
-        // this.win.dispose();
         this.destroy();
+        const lm = <LobbyModuleInterface>this.getComponent("LobbyModule");
+        lm.enterGame(roomInfo);
 
-        // 发消息給俱乐部页面，让俱乐部界面隐藏
-        this.eventTarget.emit("enterGame");
-
-        const myUserID = DataStore.getString("userID", "");
-        const myUser = { userID: myUserID };
-        const myRoomInfo = { roomID: roomInfo.roomID, roomNumber: roomInfo.roomNumber, roomConfig: roomInfo.config };
-        const roomConfig = roomInfo.config;
-        const roomConfigJSON = <{ [key: string]: boolean | number | string }>JSON.parse(roomConfig);
-        const modName = <string>roomConfigJSON[`modName`];
-
-        const params: GameModuleLaunchArgs = {
-            jsonString: "",
-            userInfo: myUser,
-            roomInfo: myRoomInfo,
-            uuid: roomInfo.gameServerID,
-            record: null
-        };
-
-        const lobbyModuleInterface = <LobbyModuleInterface>this.getComponent("LobbyModule");
-        lobbyModuleInterface.switchToGame(params, modName);
     }
 
     private reEnterGame(roomInfo: proto.lobby.IRoomInfo): void {

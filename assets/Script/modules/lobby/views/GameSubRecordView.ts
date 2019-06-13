@@ -222,7 +222,6 @@ export class GameSubRecordView extends cc.Component {
             jsonString: "replay",
             userInfo: myUser,
             roomInfo: null,
-            uuid: "",
             record: record
         };
 

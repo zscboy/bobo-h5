@@ -1,4 +1,4 @@
-import { DataStore, Dialog, GameModuleLaunchArgs, HTTP, LEnv, LobbyModuleInterface, Logger } from "../../lcore/LCoreExports";
+import { DataStore, Dialog, HTTP, LEnv, LobbyModuleInterface, Logger } from "../../lcore/LCoreExports";
 import { proto } from "../../proto/protoLobby";
 import { LobbyError } from "../LobbyError";
 import { NewRoomView } from "../NewRoomView";
@@ -79,6 +79,7 @@ export class ClubView extends cc.Component {
 
         if (this.lobbyModule !== null) {
             this.lobbyModule.eventTarget.off("onClubViewShow", this.onClubViewShow);
+            this.lobbyModule.eventTarget.off("enterGameEvent", this.hide);
         }
 
         this.eventTarget.emit("destroy");
@@ -134,6 +135,7 @@ export class ClubView extends cc.Component {
         this.lobbyModule = <LobbyModuleInterface>this.getComponent("LobbyModule");
         if (this.lobbyModule !== null) {
             this.lobbyModule.eventTarget.on(`onClubViewShow`, this.onClubViewShow, this);
+            this.lobbyModule.eventTarget.on(`enterGameEvent`, this.hide, this);
         }
 
         this.loadClub();
@@ -231,6 +233,10 @@ export class ClubView extends cc.Component {
         const createRoomBtn = this.clubPage.asCom.getChild("createRoomBtn");
         createRoomBtn.onClick(this.onCreateRoomBtnClick, this);
 
+        // 返回房间按钮
+        const return2GameBtn = this.clubPage.asCom.getChild("return2GameBtn");
+        return2GameBtn.onClick(this.onReturn2GameBtnClick, this);
+
     }
 
     private onCloseClick(): void {
@@ -279,8 +285,34 @@ export class ClubView extends cc.Component {
         const view = this.addComponent(NewRoomView);
         view.saveClubId(this.selectedClub.baseInfo.clubID);
 
-        const eventTarget = view.getEventTarget();
-        eventTarget.on("enterGame", this.hide, this);
+    }
+
+    private onReturn2GameBtnClick(): void {
+        //
+        const jsonStr = DataStore.getString("RoomInfoData");
+        Logger.debug("jsonStr:", jsonStr);
+        if (jsonStr !== null) {
+            try {
+                const config = <{ [key: string]: string }>JSON.parse(jsonStr);
+
+                this.win.hide();
+
+                const myRoomInfo = {
+                    roomID: config.roomID,
+                    roomNumber: config.roomNumber,
+                    config: config.config,
+                    gameServerID: config.gameServerID
+                };
+
+                const lm = <LobbyModuleInterface>this.getComponent("LobbyModule");
+                lm.enterGame(myRoomInfo);
+            } catch (e) {
+                Logger.error("parse config error:", e);
+                // 如果解析不了，则清理数据
+                DataStore.setItem("RoomInfoData", "");
+            }
+        }
+
     }
 
     private hide(): void {
@@ -312,23 +344,16 @@ export class ClubView extends cc.Component {
         const roomInfo = this.roomInfos[index];
 
         this.win.hide();
-        const myUserID = DataStore.getString("userID", "");
-        const myUser = { userID: myUserID };
-        const myRoomInfo = { roomID: roomInfo.roomID, roomNumber: roomInfo.roomNumber, roomConfig: roomInfo.config };
-        const roomConfig = roomInfo.config;
-        const roomConfigJSON = <{ [key: string]: boolean | number | string }>JSON.parse(roomConfig);
-        const modName = <string>roomConfigJSON[`modName`];
 
-        const params: GameModuleLaunchArgs = {
-            jsonString: "",
-            userInfo: myUser,
-            roomInfo: myRoomInfo,
-            uuid: roomInfo.gameServerID,
-            record: null
+        const myRoomInfo = {
+            roomID: roomInfo.roomID,
+            roomNumber: roomInfo.roomNumber,
+            config: roomInfo.config,
+            gameServerID: roomInfo.gameServerID
         };
 
-        const lobbyModuleInterface = <LobbyModuleInterface>this.getComponent("LobbyModule");
-        lobbyModuleInterface.switchToGame(params, modName);
+        const lm = <LobbyModuleInterface>this.getComponent("LobbyModule");
+        lm.enterGame(myRoomInfo);
     }
 
     private renderClubRoomListItem(index: number, obj: fgui.GObject): void {
@@ -353,11 +378,12 @@ export class ClubView extends cc.Component {
         nameText.text = this.getGameName(roomInfo.config);
 
         const state = roomInfo.state;
-        //  0表示等待，1表示游戏已经开始
-        if (state === 0) {
+
+        //  0表示房间空闲，1表示房间正在等待玩家进入,2 表示游戏正在进行中
+        if (state === 0 || state === 1) {
             stateText.text = "等待中...";
             stateText.color = new cc.Color().fromHEX("#4b8a0e");
-        } else {
+        } else if (state === 2) {
             stateText.text = "已开局";
             stateText.color = new cc.Color().fromHEX("#b3522e");
 
@@ -371,7 +397,7 @@ export class ClubView extends cc.Component {
 
         const playerNumAcquired = this.getPlayerNumAcquired(roomInfo.config);
 
-        if (playerNumAcquired === (roomInfo.users.length + 1)) {
+        if (playerNumAcquired === roomInfo.users.length) {
             inviteBtn._touchDisabled = true;
             inviteBtn.getController("gray").selectedIndex = 1;
 
@@ -404,8 +430,9 @@ export class ClubView extends cc.Component {
             loader = obj.asCom.getChild(`loader${i + 1}`).asLoader;
             loader.visible = true;
 
-            loader.url = `https://wx.qlogo.cn/mmopen/vi_32/DYAIOgq8
-            3er5prllVA37yiac4Vv8ZAXwbg0Zicibn6ZjsgJ4ha0hmFBY8MUTRMnRTmSlvzPd8XJZzd0icuyGoiakj4A/132`;
+            // test URL
+            // tslint:disable-next-line:max-line-length
+            loader.url = `https://wx.qlogo.cn/mmopen/vi_32/DYAIOgq83er5prllVA37yiac4Vv8ZAXwbg0Zicibn6ZjsgJ4ha0hmFBY8MUTRMnRTmSlvzPd8XJZzd0icuyGoiakj4A/132`;
         }
     }
 
@@ -562,6 +589,14 @@ export class ClubView extends cc.Component {
         Logger.debug("updateClubRooms roomInfos = ", roomInfos);
 
         this.roomInfos = [];
+
+        const roomInfoData = DataStore.getString("RoomInfoData");
+
+        if (roomInfoData !== undefined && roomInfoData !== null && roomInfoData !== "") {
+            this.clubPage.asCom.getController("isInRoom").selectedIndex = 1;
+        } else {
+            this.clubPage.asCom.getController("isInRoom").selectedIndex = 0;
+        }
 
         if (roomInfos.length === 0) {
             this.clubPage.asCom.getController("hasRoom").selectedIndex = 0;

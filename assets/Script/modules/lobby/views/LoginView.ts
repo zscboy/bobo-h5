@@ -144,7 +144,21 @@ export class LoginView extends cc.Component {
     }
 
     public saveWxLoginReply(wxLoginReply: proto.lobby.MsgLoginReply): void {
+
         DataStore.setItem("token", wxLoginReply.token);
+        const roomInfo = wxLoginReply.lastRoomInfo;
+        DataStore.setItem("RoomInfoData", "");
+        if (roomInfo !== undefined && roomInfo !== null) {
+            const roomInfoData = {
+                roomID: roomInfo.roomID,
+                roomNumber: roomInfo.roomNumber,
+                config: roomInfo.config,
+                gameServerID: roomInfo.gameServerID
+            };
+
+            const roomInfoDataStr = JSON.stringify(roomInfoData);
+            DataStore.setItem("RoomInfoData", roomInfoDataStr);
+        }
 
         const userInfo = wxLoginReply.userInfo;
         DataStore.setItem("userID", userInfo.userID);
@@ -161,6 +175,20 @@ export class LoginView extends cc.Component {
     public saveQuicklyLoginReply(quicklyLoginReply: proto.lobby.MsgQuicklyLoginReply): void {
         DataStore.setItem("account", quicklyLoginReply.account);
         DataStore.setItem("token", quicklyLoginReply.token);
+
+        const roomInfo = quicklyLoginReply.lastRoomInfo;
+        DataStore.setItem("RoomInfoData", "");
+        if (roomInfo !== undefined && roomInfo !== null) {
+            const roomInfoData = {
+                roomID: roomInfo.roomID,
+                roomNumber: roomInfo.roomNumber,
+                config: roomInfo.config,
+                gameServerID: roomInfo.gameServerID
+            };
+
+            const roomInfoDataStr = JSON.stringify(roomInfoData);
+            DataStore.setItem("RoomInfoData", roomInfoDataStr);
+        }
 
         const userInfo = quicklyLoginReply.userInfo;
         DataStore.setItem("userID", userInfo.userID);

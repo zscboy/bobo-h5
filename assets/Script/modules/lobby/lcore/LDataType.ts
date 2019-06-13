@@ -1,3 +1,5 @@
+import { proto } from "../proto/protoLobby";
+
 /**
  * 一些公用数据类型
  */
@@ -21,7 +23,15 @@ export class UserInfo {
 export class RoomInfo {
     public roomID: string;
     public roomNumber: string;
-    public roomConfig: string;
+
+    public gameServerID: string;
+    public state?: number;
+    public config?: string;
+    public timeStamp?: string;
+    public handStartted?: number;
+    public lastActiveTime?: number;
+    public propCfg?: string;
+    public moduleCfg?: string;
 }
 
 export interface GResLoader {
@@ -38,6 +48,7 @@ export interface LobbyModuleInterface {
     eventTarget: cc.EventTarget;
     returnFromGame(): void;
     switchToGame(args: GameModuleLaunchArgs, moduleName: string): void;
+    enterGame(roomInfo: proto.lobby.IRoomInfo): void;
 }
 
 /**
@@ -46,7 +57,6 @@ export interface LobbyModuleInterface {
 export interface GameModuleLaunchArgs {
     userInfo: UserInfo;
     roomInfo: RoomInfo;
-    uuid: string;
     jsonString: string;
     loader?: GResLoader;
     lm?: LobbyModuleInterface;

@@ -80,7 +80,7 @@ export class Room {
         this.replay = rePlay;
         this.roomInfo = roomInfo;
 
-        const roomConfigJSON = <{ [key: string]: boolean | number | string }>JSON.parse(roomInfo.roomConfig);
+        const roomConfigJSON = <{ [key: string]: boolean | number | string }>JSON.parse(roomInfo.config);
         // Logger.debug("roomConfigJSON ---------------------------------------------", roomConfigJSON);
         this.roomType = <number>roomConfigJSON[`roomType`];
         this.handNum = <number>roomConfigJSON[`handNum`];

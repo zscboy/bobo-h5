@@ -54,6 +54,9 @@ export class LobbyView extends cc.Component {
 
     protected onDestroy(): void {
         this.lm.eventTarget.off(`${proto.lobby.MessageCode.OPUpdateDiamond}`, this.onMessageFunc);
+
+        this.lm.eventTarget.off("checkRoomInfo", this.checkRoomInfo);
+
         this.msgCenter.destory();
     }
 
@@ -84,11 +87,19 @@ export class LobbyView extends cc.Component {
         const createRoom = this.view.getChild("createRoom");
         createRoom.onClick(this.onCreateRoom, this);
 
+        const returnGameBtn = this.view.getChild("returnGameBtn");
+        returnGameBtn.onClick(this.onReturnGameBtnClick, this);
+
         const userInfo = this.view.getChild("userInfo").asCom;
         this.initInfoView(userInfo);
         userInfo.onClick(this.openUserInfoView, this);
 
         this.onMessageFunc = this.lm.eventTarget.on(`${proto.lobby.MessageCode.OPUpdateDiamond}`, this.onMessage, this);
+
+        this.lm.eventTarget.on(`checkRoomInfo`, this.checkRoomInfo, this);
+
+        this.checkRoomInfo();
+
     }
 
     private async startWebSocket(): Promise<void> {
@@ -100,6 +111,7 @@ export class LobbyView extends cc.Component {
     }
     private onFriendClick(): void {
         this.addComponent(ClubView);
+
     }
 
     private onCreateClick(): void {
@@ -109,15 +121,21 @@ export class LobbyView extends cc.Component {
             roomType: 21
         };
 
-        const roomInfo = { roomID: "monkey-room", roomNumber: "monkey-room", roomConfig: JSON.stringify(roomConfigObj) };
+        const roomInfo = {
+            roomID: "monkey-room",
+            roomNumber: "monkey-room",
+            config: JSON.stringify(roomConfigObj),
+            gameServerID: "uuid"
+        };
 
         const params: GameModuleLaunchArgs = {
             jsonString: "",
             userInfo: myUser,
             roomInfo: roomInfo,
-            uuid: "uuid",
             record: null
         };
+
+        //this.enterGame(roomInfo);
 
         this.lm.switchToGame(params, "gameb");
     }
@@ -144,10 +162,33 @@ export class LobbyView extends cc.Component {
 
     private onJoinRoom(): void {
         this.addComponent(JoinRoom);
+
     }
 
     private onCreateRoom(): void {
         this.addComponent(NewRoomView);
+    }
+
+    private onReturnGameBtnClick(): void {
+        const jsonStr = DataStore.getString("RoomInfoData");
+        Logger.debug("jsonStr:", jsonStr);
+        if (jsonStr !== "") {
+            try {
+                const config = <{ [key: string]: string }>JSON.parse(jsonStr);
+                const myRoomInfo = {
+                    roomID: config.roomID,
+                    roomNumber: config.roomNumber,
+                    config: config.config,
+                    gameServerID: config.gameServerID
+                };
+
+                this.lm.enterGame(myRoomInfo);
+            } catch (e) {
+                Logger.error("parse config error:", e);
+                // 如果解析不了，则清理数据
+                DataStore.setItem("RoomInfoData", "");
+            }
+        }
     }
 
     private openUserInfoView(): void {
@@ -193,5 +234,16 @@ export class LobbyView extends cc.Component {
 
     private registerDiamondChange(): void {
         // TODO:
+    }
+
+    private checkRoomInfo(): void {
+        //
+        const jsonStr = DataStore.getString("RoomInfoData");
+        Logger.debug("jsonStr:", jsonStr);
+        if (jsonStr !== "") {
+            this.view.getController("inRoom").selectedIndex = 1;
+        } else {
+            this.view.getController("inRoom").selectedIndex = 0;
+        }
     }
 }

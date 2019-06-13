@@ -1,6 +1,7 @@
-import { DataStore, Dialog, HTTP, LEnv, LobbyModuleInterface, Logger } from "../../lcore/LCoreExports";
+import { DataStore, Dialog, GameModuleLaunchArgs, HTTP, LEnv, LobbyModuleInterface, Logger } from "../../lcore/LCoreExports";
 import { proto } from "../../proto/protoLobby";
 import { LobbyError } from "../LobbyError";
+import { NewRoomView } from "../NewRoomView";
 import { ApplyRecordView } from "./ApplyRecordView";
 import { ClubRequestError } from "./ClubRequestError";
 import { CreateClubView } from "./CreateClubView";
@@ -24,10 +25,10 @@ export class ClubView extends cc.Component {
     private createClubViewEventTarget: cc.EventTarget;
     private content: fgui.GComponent;
     // 茶馆页面
-    private clubPage: fgui.GObject;
+    private clubPage: fgui.GComponent;
 
     // 非茶馆页面
-    private noClubPage: fgui.GObject;
+    private noClubPage: fgui.GComponent;
 
     // 茶馆列表节点
     private clubList: fgui.GList;
@@ -38,20 +39,24 @@ export class ClubView extends cc.Component {
     // 选择的茶馆
     private selectedClub: proto.club.IMsgClubInfo;
 
+    // 茶馆房间列表
+    private roomList: fgui.GList;
+
+    private roomInfos: proto.lobby.IRoomInfo[] = [];
+
+    private lobbyModule: LobbyModuleInterface;
+
     public disbandClub(): void {
 
         const tk = DataStore.getString("token", "");
         const url = `${LEnv.rootURL}${LEnv.deleteClub}?&tk=${tk}&clubID=${this.selectedClub.baseInfo.clubID}`;
 
         const cb = (xhr: XMLHttpRequest, err: string) => {
-
             const data = <Uint8Array>xhr.response;
             this.reloadCLub(data);
-
         };
 
         this.clubRequest(url, cb);
-
     }
 
     public modifyClubName(): void {
@@ -59,21 +64,23 @@ export class ClubView extends cc.Component {
     }
 
     public quitClub(): void {
-        //
         const tk = DataStore.getString("token", "");
         const url = `${LEnv.rootURL}${LEnv.quitClub}?&tk=${tk}&clubID=${this.selectedClub.baseInfo.clubID}`;
 
         const cb = (xhr: XMLHttpRequest, err: string) => {
-
             const data = <Uint8Array>xhr.response;
             this.reloadCLub(data);
-
         };
 
         this.clubRequest(url, cb);
     }
 
     protected onDestroy(): void {
+
+        if (this.lobbyModule !== null) {
+            this.lobbyModule.eventTarget.off("onClubViewShow", this.onClubViewShow);
+        }
+
         this.eventTarget.emit("destroy");
         this.win.hide();
         this.win.dispose();
@@ -102,8 +109,8 @@ export class ClubView extends cc.Component {
     private initView(): void {
 
         this.content = this.view.getChild("content").asCom;
-        this.clubPage = this.content.getChild("clubPage");
-        this.noClubPage = this.content.getChild("noClubPage");
+        this.clubPage = this.content.getChild("clubPage").asCom;
+        this.noClubPage = this.content.getChild("noClubPage").asCom;
 
         const diamondText = this.view.getChild("diamondText");
         diamondText.text = DataStore.getString("diamond");
@@ -117,8 +124,27 @@ export class ClubView extends cc.Component {
         };
         this.clubList.setVirtual();
 
+        // 茶馆房间列表
+        this.roomList = this.clubPage.getChild("roomList").asList;
+        this.roomList.itemRenderer = (index: number, item: fgui.GObject) => {
+            this.renderClubRoomListItem(index, item);
+        };
+        this.roomList.setVirtual();
+
+        this.lobbyModule = <LobbyModuleInterface>this.getComponent("LobbyModule");
+        if (this.lobbyModule !== null) {
+            this.lobbyModule.eventTarget.on(`onClubViewShow`, this.onClubViewShow, this);
+        }
+
         this.loadClub();
 
+    }
+
+    private onClubViewShow(): void {
+        if (this.win !== null) {
+            this.win.show();
+            this.loadClubRooms(this.selectedClub.baseInfo.clubID);
+        }
     }
 
     private initClickListener(): void {
@@ -233,6 +259,7 @@ export class ClubView extends cc.Component {
 
     private onRefreshBtnClick(): void {
         //
+        this.loadClubRooms(this.selectedClub.baseInfo.clubID);
     }
 
     private onGameRecordBtnClick(): void {
@@ -249,6 +276,15 @@ export class ClubView extends cc.Component {
 
     private onCreateRoomBtnClick(): void {
         //
+        const view = this.addComponent(NewRoomView);
+        view.saveClubId(this.selectedClub.baseInfo.clubID);
+
+        const eventTarget = view.getEventTarget();
+        eventTarget.on("enterGame", this.hide, this);
+    }
+
+    private hide(): void {
+        this.win.hide();
     }
 
     private onCopyWXBtnClick(): void {
@@ -269,6 +305,134 @@ export class ClubView extends cc.Component {
 
         const view = this.addComponent(MemberManagerView);
         view.setClubInfo(this.selectedClub);
+    }
+
+    private onJoinRoomBtnClick(ev: fgui.Event): void {
+        const index = <number>ev.initiator.data;
+        const roomInfo = this.roomInfos[index];
+
+        this.win.hide();
+        const myUserID = DataStore.getString("userID", "");
+        const myUser = { userID: myUserID };
+        const myRoomInfo = { roomID: roomInfo.roomID, roomNumber: roomInfo.roomNumber, roomConfig: roomInfo.config };
+        const roomConfig = roomInfo.config;
+        const roomConfigJSON = <{ [key: string]: boolean | number | string }>JSON.parse(roomConfig);
+        const modName = <string>roomConfigJSON[`modName`];
+
+        const params: GameModuleLaunchArgs = {
+            jsonString: "",
+            userInfo: myUser,
+            roomInfo: myRoomInfo,
+            uuid: roomInfo.gameServerID,
+            record: null
+        };
+
+        const lobbyModuleInterface = <LobbyModuleInterface>this.getComponent("LobbyModule");
+        lobbyModuleInterface.switchToGame(params, modName);
+    }
+
+    private renderClubRoomListItem(index: number, obj: fgui.GObject): void {
+
+        let roomInfo: proto.lobby.IRoomInfo;
+
+        if (this.roomInfos !== undefined) {
+            roomInfo = this.roomInfos[index];
+        }
+
+        const nameText = obj.asCom.getChild("name");
+        const stateText = obj.asCom.getChild("status").asTextField;
+        const inviteBtn = obj.asCom.getChild("inviteBtn").asButton;
+        const joinBtn = obj.asCom.getChild("JoinBtn").asButton;
+
+        //inviteBtn.onClick(this.onRefreshBtnClick, this);
+
+        joinBtn.offClick(undefined, undefined);
+        joinBtn.onClick(this.onJoinRoomBtnClick, this);
+        joinBtn.data = index;
+
+        nameText.text = this.getGameName(roomInfo.config);
+
+        const state = roomInfo.state;
+        //  0表示等待，1表示游戏已经开始
+        if (state === 0) {
+            stateText.text = "等待中...";
+            stateText.color = new cc.Color().fromHEX("#4b8a0e");
+        } else {
+            stateText.text = "已开局";
+            stateText.color = new cc.Color().fromHEX("#b3522e");
+
+            inviteBtn._touchDisabled = true;
+            inviteBtn.getController("gray").selectedIndex = 1;
+
+            joinBtn._touchDisabled = true;
+            joinBtn.getController("gray").selectedIndex = 1;
+
+        }
+
+        const playerNumAcquired = this.getPlayerNumAcquired(roomInfo.config);
+
+        if (playerNumAcquired === (roomInfo.users.length + 1)) {
+            inviteBtn._touchDisabled = true;
+            inviteBtn.getController("gray").selectedIndex = 1;
+
+            joinBtn._touchDisabled = true;
+            joinBtn.getController("gray").selectedIndex = 1;
+        }
+
+        for (let i = 1; i < 7; i++) {
+            obj.asCom.getChild(`iconFrame${i}`).visible = false;
+            obj.asCom.getChild(`loader${i}`).visible = false;
+            obj.asCom.getChild(`notPlayer${i}`).visible = false;
+        }
+
+        for (let i = 1; i < playerNumAcquired + 1; i++) {
+            obj.asCom.getChild(`notPlayer${i}`).visible = true;
+        }
+
+        let iconFrame;
+        let loader;
+        let notPlayer;
+
+        for (let i = 0; i < roomInfo.users.length; i++) {
+            //const player = roomInfo.users[i];
+            iconFrame = obj.asCom.getChild(`iconFrame${i + 1}`);
+            iconFrame.visible = true;
+
+            notPlayer = obj.asCom.getChild(`notPlayer${i + 1}`);
+            notPlayer.visible = false;
+
+            loader = obj.asCom.getChild(`loader${i + 1}`).asLoader;
+            loader.visible = true;
+
+            loader.url = `https://wx.qlogo.cn/mmopen/vi_32/DYAIOgq8
+            3er5prllVA37yiac4Vv8ZAXwbg0Zicibn6ZjsgJ4ha0hmFBY8MUTRMnRTmSlvzPd8XJZzd0icuyGoiakj4A/132`;
+        }
+    }
+
+    private getPlayerNumAcquired(roomConfigStr: string): number {
+        const roomConfigJSON = <{ [key: string]: boolean | number }>JSON.parse(roomConfigStr);
+
+        return <number>roomConfigJSON[`playerNumAcquired`];
+
+    }
+
+    private getGameName(roomConfigStr: string): string {
+        const roomConfigJSON = <{ [key: string]: boolean | number }>JSON.parse(roomConfigStr);
+        const roomType = <number>roomConfigJSON[`roomType`];
+        let gameName = "";
+        switch (roomType) {
+            case 21:
+                gameName = "湛江麻将";
+                break;
+            case 1:
+                gameName = "大丰麻将";
+                break;
+
+            default:
+
+        }
+
+        return gameName;
     }
 
     private renderPhraseListItem(index: number, obj: fgui.GObject): void {
@@ -397,11 +561,21 @@ export class ClubView extends cc.Component {
 
         Logger.debug("updateClubRooms roomInfos = ", roomInfos);
 
+        this.roomInfos = [];
+
         if (roomInfos.length === 0) {
             this.clubPage.asCom.getController("hasRoom").selectedIndex = 0;
         } else {
+            this.clubPage.asCom.getController("hasRoom").selectedIndex = 1;
             //
+            this.roomInfos = roomInfos;
+            this.updateClubRoomsList();
         }
+
+    }
+
+    private updateClubRoomsList(): void {
+        this.roomList.numItems = this.roomInfos.length;
     }
 
     private reloadCLub(data: Uint8Array): void {

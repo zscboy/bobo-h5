@@ -27,60 +27,18 @@ export class NewRoomView extends cc.Component {
     private ruleViews: { [key: string]: RuleView } = {};
     private priceCfgs: { [key: string]: object };
 
+    private clubId: string = null;
+
     public getView(): fgui.GComponent {
         return this.view;
     }
 
-    public createRoom(ruleJson: string): void {
-        Logger.debug("NewRoomView.createRoom, ruleJson:", ruleJson);
-        const tk = DataStore.getString("token", "");
-        const createRoomURL = `${LEnv.rootURL}${LEnv.createRoom}?&tk=${tk}`;
+    public getEventTarget(): cc.EventTarget {
+        return this.eventTarget;
+    }
 
-        Logger.trace("createRoom, createRoomURL:", createRoomURL);
-        const createRoomReq = new proto.lobby.MsgCreateRoomReq();
-        createRoomReq.config = ruleJson;
-
-        const body = proto.lobby.MsgCreateRoomReq.encode(createRoomReq).toArrayBuffer();
-
-        HTTP.hPost(
-            this.eventTarget,
-            createRoomURL,
-            (xhr: XMLHttpRequest, err: string) => {
-                let errMsg = null;
-                if (err !== null) {
-                    errMsg = `创建房间错误，错误码:${err}`;
-                } else {
-                    errMsg = HTTP.hError(xhr);
-                    if (errMsg === null) {
-                        const data = <Uint8Array>xhr.response;
-                        // proto 解码登录结果
-                        const msgCreateRoomRsp = proto.lobby.MsgCreateRoomRsp.decode(data);
-
-                        Logger.debug("msgCreateRoomRsp:", msgCreateRoomRsp);
-                        if (msgCreateRoomRsp.result === proto.lobby.MsgError.ErrSuccess) {
-                            this.enterGame(msgCreateRoomRsp.roomInfo);
-                        } else if (msgCreateRoomRsp.result === proto.lobby.MsgError.ErrUserInOtherRoom) {
-                            this.reEnterGame(msgCreateRoomRsp.roomInfo);
-                        } else {
-                            Logger.error("Create room error:, code:", msgCreateRoomRsp.result);
-
-                            const errorString = LobbyError.getErrorString(msgCreateRoomRsp.result);
-                            Dialog.showDialog(errorString);
-
-                        }
-                    }
-                }
-
-                if (errMsg !== null) {
-                    Logger.debug("NewRoomView.createRoom failed:", errMsg);
-                    // 显示错误对话框
-                    Dialog.showDialog(errMsg, () => {
-                        //
-                    });
-                }
-            },
-            "arraybuffer",
-            body);
+    public saveClubId(clubId: string): void {
+        this.clubId = clubId;
     }
 
     public updatePrice(price: number): void {
@@ -162,6 +120,64 @@ export class NewRoomView extends cc.Component {
         }
     }
 
+    private createRoom(ruleJson: string): void {
+        Logger.debug("NewRoomView.createRoom, ruleJson:", ruleJson);
+        const tk = DataStore.getString("token", "");
+        let createRoomURL: string = "";
+
+        if (this.clubId !== null && this.clubId !== "") {
+            createRoomURL = `${LEnv.rootURL}${LEnv.createClubRoom}?&tk=${tk}&clubID=${this.clubId}`;
+        } else {
+            createRoomURL = `${LEnv.rootURL}${LEnv.createRoom}?&tk=${tk}`;
+        }
+
+        Logger.trace("createRoom, createRoomURL:", createRoomURL);
+        const createRoomReq = new proto.lobby.MsgCreateRoomReq();
+        createRoomReq.config = ruleJson;
+
+        const body = proto.lobby.MsgCreateRoomReq.encode(createRoomReq).toArrayBuffer();
+
+        HTTP.hPost(
+            this.eventTarget,
+            createRoomURL,
+            (xhr: XMLHttpRequest, err: string) => {
+                let errMsg = null;
+                if (err !== null) {
+                    errMsg = `创建房间错误，错误码:${err}`;
+                } else {
+                    errMsg = HTTP.hError(xhr);
+                    if (errMsg === null) {
+                        const data = <Uint8Array>xhr.response;
+                        // proto 解码登录结果
+                        const msgCreateRoomRsp = proto.lobby.MsgCreateRoomRsp.decode(data);
+
+                        Logger.debug("msgCreateRoomRsp:", msgCreateRoomRsp);
+                        if (msgCreateRoomRsp.result === proto.lobby.MsgError.ErrSuccess) {
+                            this.enterGame(msgCreateRoomRsp.roomInfo);
+                        } else if (msgCreateRoomRsp.result === proto.lobby.MsgError.ErrUserInOtherRoom) {
+                            this.reEnterGame(msgCreateRoomRsp.roomInfo);
+                        } else {
+                            Logger.error("Create room error:, code:", msgCreateRoomRsp.result);
+
+                            const errorString = LobbyError.getErrorString(msgCreateRoomRsp.result);
+                            Dialog.showDialog(errorString);
+
+                        }
+                    }
+                }
+
+                if (errMsg !== null) {
+                    Logger.debug("NewRoomView.createRoom failed:", errMsg);
+                    // 显示错误对话框
+                    Dialog.showDialog(errMsg, () => {
+                        //
+                    });
+                }
+            },
+            "arraybuffer",
+            body);
+    }
+
     private selectItem(name: string): void {
         let ruleView = this.ruleViews[name];
         Object.keys(this.ruleViews).forEach((k) => {
@@ -211,6 +227,9 @@ export class NewRoomView extends cc.Component {
         this.win.hide();
         // this.win.dispose();
         this.destroy();
+
+        // 发消息給俱乐部页面，让俱乐部界面隐藏
+        this.eventTarget.emit("enterGame");
 
         const myUserID = DataStore.getString("userID", "");
         const myUser = { userID: myUserID };

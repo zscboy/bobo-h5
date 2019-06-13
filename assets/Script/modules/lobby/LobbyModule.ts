@@ -54,6 +54,7 @@ export class LobbyModule extends cc.Component implements LobbyModuleInterface {
         fgui.GRoot.inst.addChild(this.view);
 
         this.eventTarget.emit(`onGameRecordShow`);
+        this.eventTarget.emit(`onClubViewShow`);
     }
 
     public switchToGame(params: GameModuleLaunchArgs, moduleName: string): void {

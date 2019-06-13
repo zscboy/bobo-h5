@@ -308,6 +308,11 @@ export class Room {
         this.sendMsg(proto.mahjong.MessageCode.OPDonate, actionMsgBuf);
     }
 
+    public sendReturnLobby(): void {
+
+        this.sendMsg(proto.mahjong.MessageCode.OP2Lobby);
+    }
+
     // 显示道具动画
     public showDonate(msgDonate: proto.mahjong.MsgDonate): void {
         // Logger.debug("显示道具动画 msgDonate : ", msgDonate);

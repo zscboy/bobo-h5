@@ -1408,6 +1408,12 @@ exports.proto = require("protobuf").newBuilder({})['import']({
                             "type": "UserInfo",
                             "name": "userInfo",
                             "id": 3
+                        },
+                        {
+                            "rule": "optional",
+                            "type": "RoomInfo",
+                            "name": "lastRoomInfo",
+                            "id": 4
                         }
                     ]
                 },
@@ -1522,6 +1528,12 @@ exports.proto = require("protobuf").newBuilder({})['import']({
                             "type": "UserInfo",
                             "name": "userInfo",
                             "id": 4
+                        },
+                        {
+                            "rule": "optional",
+                            "type": "RoomInfo",
+                            "name": "lastRoomInfo",
+                            "id": 5
                         }
                     ]
                 },

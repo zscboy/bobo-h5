@@ -145,7 +145,7 @@ export class MemberManagerView extends cc.Component {
         }
 
         const isManager = this.isManager();
-        const isMe = this.isMe();
+        const isMe = this.isMe(member.userID);
 
         if (isManager && isMe === false) {
             obj.offClick(undefined, undefined);
@@ -160,15 +160,27 @@ export class MemberManagerView extends cc.Component {
     private isManager(): boolean {
         const userId = DataStore.getString("userID", "");
         const clubOwnerId = this.clubInfo.creatorUserID;
+        const managers = this.clubInfo.managers;
+        let isManager = false;
+        managers.forEach(managerId => {
+            if (managerId === userId) {
+                isManager = true;
+            }
+        });
 
-        return userId === clubOwnerId ? true : false;
+        const isOwner = userId === clubOwnerId ? true : false;
+
+        if (isManager || isOwner) {
+            isManager = true;
+        }
+
+        return isManager;
     }
 
-    private isMe(): boolean {
+    private isMe(memberUserId: string): boolean {
         const userId = DataStore.getString("userID", "");
-        const clubOwnerId = this.clubInfo.creatorUserID;
 
-        return userId === clubOwnerId ? true : false;
+        return memberUserId === userId ? true : false;
     }
     /**
      * 渲染删除成员列表

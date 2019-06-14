@@ -63,18 +63,23 @@ export class SettingPopupView extends cc.Component {
         quickSettingItem.onClick(this.onQuickSettingClick, this);
         quitClub.onClick(this.onQuitClubClick, this);
 
-        const userId = DataStore.getString("userID", "");
-        const clubOwnerId = this.clubInfo.creatorUserID;
-        const isManager = userId === clubOwnerId ? true : false;
+        const isOwner = this.isOwner();
 
         const isManagerController = this.view.getController("isManager");
 
-        if (isManager === false) {
+        if (isOwner === false) {
             isManagerController.selectedIndex = 0;
             this.view.setSize(172, 94);
         } else {
             isManagerController.selectedIndex = 1;
         }
+    }
+
+    private isOwner(): boolean {
+        const userId = DataStore.getString("userID", "");
+        const clubOwnerId = this.clubInfo.creatorUserID;
+
+        return userId === clubOwnerId ? true : false;
     }
 
     private onModifyClubNameClick(): void {

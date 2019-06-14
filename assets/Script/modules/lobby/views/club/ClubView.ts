@@ -644,9 +644,20 @@ export class ClubView extends cc.Component {
 
         const userId = DataStore.getString("userID", "");
         const clubOwnerId = this.selectedClub.creatorUserID;
+        const managers = this.selectedClub.managers;
+        let isManager = false;
+        managers.forEach(managerId => {
+            if (managerId === userId) {
+                isManager = true;
+            }
+        });
 
-        //const manager =
-        const isManager = userId === clubOwnerId ? true : false;
+        const isOwner = userId === clubOwnerId ? true : false;
+
+        if (isManager || isOwner) {
+            isManager = true;
+        }
+
         this.setOperationBtnVisible(isManager);
     }
 

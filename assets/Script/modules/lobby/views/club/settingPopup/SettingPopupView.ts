@@ -30,8 +30,8 @@ export class SettingPopupView extends cc.Component {
         this.clubView.disbandClub();
     }
 
-    public modifyClubName(): void {
-        this.clubView.modifyClubName();
+    public modifyClubName(name: string): void {
+        this.clubView.modifyClubName(name);
     }
 
     public quitClub(): void {

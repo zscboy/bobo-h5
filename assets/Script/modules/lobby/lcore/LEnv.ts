@@ -43,6 +43,15 @@ export namespace LEnv {
     export const loadClubEvents = "/lobby/uuid/loadClubEvents";
     export const loadClubRooms = "/lobby/uuid/loadClubRooms";
 
+    export const loadMyApplyEvent = "/lobby/uuid/loadMyApplyEvent";
+    export const renameClub = "/lobby/uuid/renameClub";
+
+    export const kickOut = "/lobby/uuid/kickOut";
+
+    export const changeRole = "/lobby/uuid/changeRole";
+
+    export const loadClubMgrs = "/lobby/uuid/loadClubMgrs";
+
     export const createClubRoom = "/lobby/uuid/createClubRoom";
 
     export const cfmt = (str: string, ...args: any[]): string => { // tslint:disable-line:no-any

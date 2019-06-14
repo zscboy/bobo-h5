@@ -145,8 +145,9 @@ export class MemberManagerView extends cc.Component {
         }
 
         const isManager = this.isManager();
+        const isMe = this.isMe();
 
-        if (isManager) {
+        if (isManager && isMe === false) {
             obj.offClick(undefined, undefined);
 
             obj.onClick(() => {
@@ -157,6 +158,13 @@ export class MemberManagerView extends cc.Component {
 
     }
     private isManager(): boolean {
+        const userId = DataStore.getString("userID", "");
+        const clubOwnerId = this.clubInfo.creatorUserID;
+
+        return userId === clubOwnerId ? true : false;
+    }
+
+    private isMe(): boolean {
         const userId = DataStore.getString("userID", "");
         const clubOwnerId = this.clubInfo.creatorUserID;
 

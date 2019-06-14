@@ -101,7 +101,7 @@ export class CreateClubView extends cc.Component {
     private createClub(clubName: string): void {
         Logger.debug("createClub clubName = ", clubName);
         const tk = DataStore.getString("token", "");
-        const loadEmailUrl = `${LEnv.rootURL}${LEnv.createClub}?&tk=${tk}&&clname=${clubName}`;
+        const url = `${LEnv.rootURL}${LEnv.createClub}?&tk=${tk}&&clname=${clubName}`;
 
         const cb = (xhr: XMLHttpRequest, err: string) => {
             //
@@ -122,7 +122,7 @@ export class CreateClubView extends cc.Component {
 
         };
 
-        this.clubRequest(loadEmailUrl, cb);
+        this.clubRequest(url, cb);
 
     }
 

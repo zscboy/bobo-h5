@@ -79,8 +79,17 @@ export class ClubView extends cc.Component {
     /**
      * 修改茶馆名
      */
-    public modifyClubName(): void {
+    public modifyClubName(name: string): void {
         //
+        const tk = DataStore.getString("token", "");
+        const url = `${LEnv.rootURL}${LEnv.renameClub}?&tk=${tk}&clubID=${this.selectedClub.baseInfo.clubID}&clname=${name}`;
+
+        const cb = (xhr: XMLHttpRequest, err: string) => {
+            // const data = <Uint8Array>xhr.response;
+            this.loadClub();
+        };
+
+        this.clubRequest(url, cb);
     }
     /**
      * 退出茶馆
@@ -635,13 +644,15 @@ export class ClubView extends cc.Component {
 
         const userId = DataStore.getString("userID", "");
         const clubOwnerId = this.selectedClub.creatorUserID;
+
+        //const manager =
         const isManager = userId === clubOwnerId ? true : false;
         this.setOperationBtnVisible(isManager);
     }
 
     private loadClub(): void {
         const tk = DataStore.getString("token", "");
-        const loadEmailUrl = `${LEnv.rootURL}${LEnv.loadMyClubs}?&tk=${tk}`;
+        const url = `${LEnv.rootURL}${LEnv.loadMyClubs}?&tk=${tk}`;
 
         const cb = (xhr: XMLHttpRequest, err: string) => {
 
@@ -657,13 +668,13 @@ export class ClubView extends cc.Component {
 
         };
 
-        this.clubRequest(loadEmailUrl, cb);
+        this.clubRequest(url, cb);
 
     }
 
     private loadClubRooms(clubId: string): void {
         const tk = DataStore.getString("token", "");
-        const loadEmailUrl = `${LEnv.rootURL}${LEnv.loadClubRooms}?&tk=${tk}&clubID=${clubId}`;
+        const url = `${LEnv.rootURL}${LEnv.loadClubRooms}?&tk=${tk}&clubID=${clubId}`;
 
         const cb = (xhr: XMLHttpRequest, err: string) => {
             const data = <Uint8Array>xhr.response;
@@ -684,7 +695,7 @@ export class ClubView extends cc.Component {
             }
         };
 
-        this.clubRequest(loadEmailUrl, cb);
+        this.clubRequest(url, cb);
     }
 
     private updateClubRooms(roomInfos: proto.lobby.IRoomInfo[]): void {

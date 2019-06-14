@@ -166,7 +166,7 @@ export class JoinClubView extends cc.Component {
         //
 
         const tk = DataStore.getString("token", "");
-        const loadEmailUrl = `${LEnv.rootURL}${LEnv.joinClub}?&tk=${tk}&clubNumber=${clubNumber}`;
+        const url = `${LEnv.rootURL}${LEnv.joinClub}?&tk=${tk}&clubNumber=${clubNumber}`;
 
         const cb = (xhr: XMLHttpRequest, err: string) => {
             //
@@ -194,7 +194,7 @@ export class JoinClubView extends cc.Component {
             }
         };
 
-        this.clubRequest(loadEmailUrl, cb);
+        this.clubRequest(url, cb);
 
     }
     /**

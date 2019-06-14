@@ -5,6 +5,7 @@ import { NewRoomView } from "../NewRoomView";
 import { ApplyRecordView } from "./ApplyRecordView";
 import { ClubRequestError } from "./ClubRequestError";
 import { CreateClubView } from "./CreateClubView";
+import { FilterGameView } from "./FilterGameView";
 import { JoinClubView } from "./JoinClubView";
 import { MemberManagerView } from "./memberManager/MemberManagerView";
 import { SettingPopupView } from "./settingPopup/SettingPopupView";
@@ -21,8 +22,7 @@ export class ClubView extends cc.Component {
     private view: fgui.GComponent;
     private win: fgui.Window;
     private eventTarget: cc.EventTarget;
-
-    private createClubViewEventTarget: cc.EventTarget;
+    //内容节点，包括 茶馆页面 和 非茶馆页面
     private content: fgui.GComponent;
     // 茶馆页面
     private clubPage: fgui.GComponent;
@@ -42,10 +42,28 @@ export class ClubView extends cc.Component {
     // 茶馆房间列表
     private roomList: fgui.GList;
 
-    private roomInfos: proto.lobby.IRoomInfo[] = [];
-
+    // 一个茶馆所有的房间
+    private allRoomInfos: proto.lobby.IRoomInfo[] = [];
+    // 根据 room type 筛选出来的房间
+    private filterRoomInfos: proto.lobby.IRoomInfo[] = [];
+    // 筛选的 room type
+    private selectRoomType: number = 0;
+    // 大厅模块
     private lobbyModule: LobbyModuleInterface;
 
+    /**
+     * 选择筛选的房间类型
+     * @param selectRoomType RoomType
+     */
+    public selectGame(selectRoomType: number): void {
+
+        this.selectRoomType = selectRoomType;
+        this.setFilterBtnName();
+        this.updateClubRoomsList();
+    }
+    /**
+     * 解散茶馆
+     */
     public disbandClub(): void {
 
         const tk = DataStore.getString("token", "");
@@ -58,11 +76,15 @@ export class ClubView extends cc.Component {
 
         this.clubRequest(url, cb);
     }
-
+    /**
+     * 修改茶馆名
+     */
     public modifyClubName(): void {
         //
     }
-
+    /**
+     * 退出茶馆
+     */
     public quitClub(): void {
         const tk = DataStore.getString("token", "");
         const url = `${LEnv.rootURL}${LEnv.quitClub}?&tk=${tk}&clubID=${this.selectedClub.baseInfo.clubID}`;
@@ -73,6 +95,17 @@ export class ClubView extends cc.Component {
         };
 
         this.clubRequest(url, cb);
+    }
+
+    /**
+     * 新建茶馆
+     * @param clubInfo 新建的茶馆
+     */
+    public addClub(clubInfo: proto.club.IMsgClubInfo): void {
+        this.clubs.unshift(clubInfo);
+        this.clubList.numItems = this.clubs.length + 1;
+        this.clubList.selectedIndex = 0;
+        this.setContent(clubInfo);
     }
 
     protected onDestroy(): void {
@@ -141,7 +174,9 @@ export class ClubView extends cc.Component {
         this.loadClub();
 
     }
-
+    /**
+     * 从游戏内回来，显示茶馆页面
+     */
     private onClubViewShow(): void {
         if (this.win !== null) {
             this.win.show();
@@ -191,8 +226,7 @@ export class ClubView extends cc.Component {
         const createClubBtn = this.noClubPage.asCom.getChild("createClubBtn");
         createClubBtn.onClick(() => {
             const view = this.addComponent(CreateClubView);
-            this.createClubViewEventTarget = view.getEventTarget();
-            this.createClubViewEventTarget.on("addClub", this.addClub, this);
+            view.bind(this);
             // tslint:disable-next-line:align
         }, this);
 
@@ -261,6 +295,8 @@ export class ClubView extends cc.Component {
 
     private onAllBtnClick(): void {
         //
+        const filterGameView = this.addComponent(FilterGameView);
+        filterGameView.show(this, this.selectRoomType);
     }
 
     private onRefreshBtnClick(): void {
@@ -341,7 +377,7 @@ export class ClubView extends cc.Component {
 
     private onJoinRoomBtnClick(ev: fgui.Event): void {
         const index = <number>ev.initiator.data;
-        const roomInfo = this.roomInfos[index];
+        const roomInfo = this.filterRoomInfos[index];
 
         this.win.hide();
 
@@ -356,12 +392,17 @@ export class ClubView extends cc.Component {
         lm.enterGame(myRoomInfo);
     }
 
+    /**
+     *  刷新参观房间
+     * @param index 索引
+     * @param obj UI节点
+     */
     private renderClubRoomListItem(index: number, obj: fgui.GObject): void {
 
         let roomInfo: proto.lobby.IRoomInfo;
 
-        if (this.roomInfos !== undefined) {
-            roomInfo = this.roomInfos[index];
+        if (this.filterRoomInfos !== undefined) {
+            roomInfo = this.filterRoomInfos[index];
         }
 
         const nameText = obj.asCom.getChild("name");
@@ -405,6 +446,33 @@ export class ClubView extends cc.Component {
             joinBtn.getController("gray").selectedIndex = 1;
         }
 
+        const jsonStr = DataStore.getString("RoomInfoData");
+        if (jsonStr !== "") {
+            try {
+                const config = <{ [key: string]: string }>JSON.parse(jsonStr);
+
+                if (roomInfo.roomID === config.roomID) {
+                    // joinBtn._touchDisabled = true;
+                    // joinBtn.getController("gray").selectedIndex = 1;
+                } else {
+                    joinBtn._touchDisabled = true;
+                    joinBtn.getController("gray").selectedIndex = 1;
+                }
+
+            } catch (e) {
+                Logger.error("parse config error:", e);
+                // 如果解析不了，则清理数据
+                DataStore.setItem("RoomInfoData", "");
+            }
+        }
+
+        this.setIcon(roomInfo, obj);
+    }
+
+    private setIcon(roomInfo: proto.lobby.IRoomInfo, obj: fgui.GObject): void {
+
+        const playerNumAcquired = this.getPlayerNumAcquired(roomInfo.config);
+
         for (let i = 1; i < 7; i++) {
             obj.asCom.getChild(`iconFrame${i}`).visible = false;
             obj.asCom.getChild(`loader${i}`).visible = false;
@@ -443,6 +511,10 @@ export class ClubView extends cc.Component {
 
     }
 
+    /**
+     * 获取游戏名称
+     * @param roomConfigStr  配置字符串
+     */
     private getGameName(roomConfigStr: string): string {
         const roomConfigJSON = <{ [key: string]: boolean | number }>JSON.parse(roomConfigStr);
         const roomType = <number>roomConfigJSON[`roomType`];
@@ -462,6 +534,11 @@ export class ClubView extends cc.Component {
         return gameName;
     }
 
+    /**
+     * 刷新茶馆列表
+     * @param index 索引
+     * @param obj UI节点
+     */
     private renderPhraseListItem(index: number, obj: fgui.GObject): void {
         let clubInfo: proto.club.IMsgClubInfo;
 
@@ -494,6 +571,23 @@ export class ClubView extends cc.Component {
 
     }
 
+    /**
+     * 筛选
+     */
+    private filterGame(): void {
+        //
+        this.filterRoomInfos = [];
+        this.allRoomInfos.forEach(roomInfo => {
+            const config = <{ [key: string]: boolean | number }>JSON.parse(roomInfo.config);
+
+            const roomType = <number>config[`roomType`];
+
+            if (roomType === this.selectRoomType || this.selectRoomType === 0) {
+                this.filterRoomInfos.push(roomInfo);
+            }
+        });
+    }
+
     private updateClubList(clubRsp: proto.club.MsgClubLoadMyClubsReply): void {
         this.updateList(clubRsp);
 
@@ -521,13 +615,6 @@ export class ClubView extends cc.Component {
             this.updateSelectedClub(clubInfo);
         }
 
-    }
-
-    private addClub(clubInfo: proto.club.IMsgClubInfo): void {
-        this.clubs.unshift(clubInfo);
-        this.clubList.numItems = this.clubs.length + 1;
-        this.clubList.selectedIndex = 0;
-        this.setContent(clubInfo);
     }
 
     private loadClub(): void {
@@ -588,7 +675,7 @@ export class ClubView extends cc.Component {
 
         Logger.debug("updateClubRooms roomInfos = ", roomInfos);
 
-        this.roomInfos = [];
+        this.allRoomInfos = [];
 
         const roomInfoData = DataStore.getString("RoomInfoData");
 
@@ -603,14 +690,34 @@ export class ClubView extends cc.Component {
         } else {
             this.clubPage.asCom.getController("hasRoom").selectedIndex = 1;
             //
-            this.roomInfos = roomInfos;
+            this.allRoomInfos = roomInfos;
             this.updateClubRoomsList();
         }
 
     }
+    private setFilterBtnName(): void {
+        const btn = this.clubPage.asCom.getChild("allBtn").asButton;
+        const nameLab = btn.getChild("selectedGameName").asTextField;
+
+        switch (this.selectRoomType) {
+            case 0:
+                nameLab.text = "全部";
+                break;
+            case 1:
+                nameLab.text = "大丰麻将";
+                break;
+            case 21:
+                nameLab.text = "湛江麻将";
+                break;
+
+            default:
+                nameLab.text = "未知游戏";
+        }
+    }
 
     private updateClubRoomsList(): void {
-        this.roomList.numItems = this.roomInfos.length;
+        this.filterGame();
+        this.roomList.numItems = this.filterRoomInfos.length;
     }
 
     private reloadCLub(data: Uint8Array): void {

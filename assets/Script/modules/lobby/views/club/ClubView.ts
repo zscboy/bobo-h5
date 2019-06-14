@@ -51,9 +51,6 @@ export class ClubView extends cc.Component {
     // 大厅模块
     private lobbyModule: LobbyModuleInterface;
 
-    // 保存此按钮，便于移除与增加
-    private appointManagerBtn: fgui.GObject;
-
     /**
      * 选择筛选的房间类型
      * @param selectRoomType RoomType
@@ -203,27 +200,24 @@ export class ClubView extends cc.Component {
         const buyBtn = this.view.getChild("buyBtn");
         buyBtn.onClick(this.onBuyBtnClick, this);
 
-        const operationBtnList = this.view.getChild("operationBtn").asList;
-
         //复制ID按钮
-        const copyIdBtn = operationBtnList.getChildAt(0).asButton;
+        const copyIdBtn = this.view.getChild("copyIdBtn");
         copyIdBtn.onClick(this.onCopyIdBtnClick, this);
 
         //分享按钮
-        const shareBtn = operationBtnList.getChildAt(1).asButton;
+        const shareBtn = this.view.getChild("shareBtn");
         shareBtn.onClick(this.onShareBtnClick, this);
 
         // 任命管理按钮
-        const appointManagerBtn = operationBtnList.getChildAt(2).asButton;
-        this.appointManagerBtn = appointManagerBtn;
-        this.appointManagerBtn.onClick(this.onAppointManagerBtnClick, this);
+        const appointManagerBtn = this.view.getChild("appointManagerBtn");
+        appointManagerBtn.onClick(this.onAppointManagerBtnClick, this);
 
         // 成员管理
-        const memberSettingBtn = operationBtnList.getChildAt(3).asButton;
+        const memberSettingBtn = this.view.getChild("memberSettingBtn");
         memberSettingBtn.onClick(this.onMemberSettingBtnClick, this);
 
         // 管理
-        const managerBtn = operationBtnList.getChildAt(4).asButton;
+        const managerBtn = this.view.getChild("managerBtn");
         managerBtn.onClick(this.onManagerBtnClick, this);
 
         // 非茶馆页面点击事件
@@ -395,23 +389,15 @@ export class ClubView extends cc.Component {
     }
 
     private setOperationBtnVisible(isManager: boolean): void {
-
-        const operationBtnList = this.view.getChild("operationBtn").asList;
         // 任命管理按钮
-        const appointManagerBtn = this.appointManagerBtn;
+        const isManagerController = this.view.getController("isManager");
 
-        if (isManager) {
-            if (operationBtnList.numChildren === 4) {
-                operationBtnList.addChildAt(appointManagerBtn, 2);
-            }
+        if (isManager === false) {
+            isManagerController.selectedIndex = 0;
         } else {
-            if (operationBtnList.numChildren === 5) {
-                operationBtnList.removeChild(appointManagerBtn);
-            }
-
+            isManagerController.selectedIndex = 1;
         }
     }
-
     /**
      *  刷新参观房间
      * @param index 索引

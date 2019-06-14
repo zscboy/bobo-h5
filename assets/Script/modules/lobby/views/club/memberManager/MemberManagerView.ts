@@ -29,14 +29,14 @@ export class MemberManagerView extends cc.Component {
     private applyListBtn: fgui.GButton;
     private deleteMemberBtn: fgui.GButton;
 
-    public getEventTarget(): cc.EventTarget {
-        return this.eventTarget;
-    }
     public setClubInfo(clubInfo: proto.club.IMsgClubInfo): void {
         this.clubInfo = clubInfo;
 
+        this.updateUIByClubManager();
+
         //拉取成员
         this.loadMember();
+        this.win.show();
 
     }
     protected onLoad(): void {
@@ -51,7 +51,6 @@ export class MemberManagerView extends cc.Component {
         win.modal = true;
 
         this.win = win;
-        this.win.show();
 
         this.initView();
     }
@@ -61,6 +60,23 @@ export class MemberManagerView extends cc.Component {
         this.eventTarget.emit("destroy");
         this.win.hide();
         this.win.dispose();
+    }
+
+    private updateUIByClubManager(): void {
+
+        const isManager = this.isManager();
+        this.setOperationBtnVisible(isManager);
+    }
+
+    private setOperationBtnVisible(isManager: boolean): void {
+
+        const isManagerController = this.view.getController("isManager");
+
+        if (isManager === false) {
+            isManagerController.selectedIndex = 0;
+        } else {
+            isManagerController.selectedIndex = 1;
+        }
     }
 
     private onCloseClick(): void {
@@ -128,13 +144,23 @@ export class MemberManagerView extends cc.Component {
             owner.visible = member.userID === this.clubInfo.creatorUserID;
         }
 
-        obj.offClick(undefined, undefined);
+        const isManager = this.isManager();
 
-        obj.onClick(() => {
-            this.showMemberOperationDialog(member);
-            // tslint:disable-next-line:align
-        }, this);
+        if (isManager) {
+            obj.offClick(undefined, undefined);
 
+            obj.onClick(() => {
+                this.showMemberOperationDialog(member);
+                // tslint:disable-next-line:align
+            }, this);
+        }
+
+    }
+    private isManager(): boolean {
+        const userId = DataStore.getString("userID", "");
+        const clubOwnerId = this.clubInfo.creatorUserID;
+
+        return userId === clubOwnerId ? true : false;
     }
     /**
      * 渲染删除成员列表
@@ -181,7 +207,6 @@ export class MemberManagerView extends cc.Component {
             event = this.events[index];
         }
 
-        //const icon = obj.asCom.getChild("icon");
         const time = obj.asCom.getChild("time");
         const name = obj.asCom.getChild("name");
         const rejectBtn = obj.asCom.getChild("rejectBtn").asButton;

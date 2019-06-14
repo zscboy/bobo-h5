@@ -52,9 +52,6 @@ export class SettingPopupView extends cc.Component {
 
     private initView(): void {
         //
-
-        const bg = this.view.getChild("bg").asImage;
-
         const managerCom = this.view.getChild("managerCom").asCom;
         const modifyNameItem = managerCom.getChild("modify").asButton;
         const disbandItem = managerCom.getChild("disband").asButton;
@@ -70,14 +67,14 @@ export class SettingPopupView extends cc.Component {
         const clubOwnerId = this.clubInfo.creatorUserID;
         const isManager = userId === clubOwnerId ? true : false;
 
-        if (isManager === false) {
-            //
-            managerCom.visible = false;
-            bg.height = 91;
-            quitClub.setPosition(8, 19);
-            this.view.setSize(172, 94);
-        }
+        const isManagerController = this.view.getController("isManager");
 
+        if (isManager === false) {
+            isManagerController.selectedIndex = 0;
+            this.view.setSize(172, 94);
+        } else {
+            isManagerController.selectedIndex = 1;
+        }
     }
 
     private onModifyClubNameClick(): void {

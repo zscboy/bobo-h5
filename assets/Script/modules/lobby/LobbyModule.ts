@@ -2,6 +2,7 @@
  * lobby 模块入口
  */
 const { ccclass } = cc._decorator;
+import { GameModuleA } from "../gamea/GamebExportsA";
 import { GameModule } from "../gameb/GamebExports";
 import { GResLoaderImpl } from "./GResLoaderImpl";
 import { Dialog } from "./lcore/Dialog";
@@ -135,6 +136,16 @@ export class LobbyModule extends cc.Component implements LobbyModuleInterface {
 
                 if (error == null) {
                     switch (moduleName) {
+                        case "gamea":
+                            // 新建节点，然后挂载游戏组件
+                            const gameNodea = new cc.Node(moduleName);
+                            this.node.addChild(gameNodea);
+                            this.gameNode = gameNodea;
+                            const gmca = this.gameNode.addComponent(GameModuleA);
+                            const gma = <GameModuleInterface>gmca;
+                            // 启动游戏流程
+                            gma.launch(params);
+                            break;
                         case "gameb":
                             // 新建节点，然后挂载游戏组件
                             const gameNode = new cc.Node(moduleName);

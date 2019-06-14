@@ -20,7 +20,7 @@ export namespace proto {
 			CERR_Database_IO = 3,
 			CERR_Encode_Decode = 4,
 			CERR_Invalid_Input_Parameter = 5,
-			CERR_Only_Creator_Can_KickOut = 6,
+			CERR_Only_Creator_And_Mgr_Can_KickOut = 6,
 			CERR_You_Already_In_Club = 7,
 			CERR_You_Are_In_Club_Block_List = 8,
 			CERR_You_Already_Applicate = 9,
@@ -29,7 +29,7 @@ export namespace proto {
 			CERR_Invitee_Already_Applicate = 12,
 			CERR_Club_Not_Exist = 13,
 			CERR_Only_Creator_Can_Invite = 14,
-			CERR_Only_Creator_Can_Approve = 15,
+			CERR_Only_Creator_And_Mgr_Can_Approve = 15,
 			CERR_No_Applicant = 16,
 			CERR_Applicant_Already_In_Club = 17,
 			CERR_Applicant_In_Club_Block_List = 18,
@@ -39,10 +39,11 @@ export namespace proto {
 			CERR_Club_Only_Owner_Can_Disband = 22,
 			CERR_Owner_Can_not_quit = 23,
 			CERR_User_Not_In_Club = 24,
-			CERR_Club_Only_Owner_Can_Set = 25,
+			CERR_Club_Only_Owner_And_Mgr_Can_Set = 25,
 			CERR_Club_Forbit_Join = 26,
 			CERR_Input_Text_Too_Long = 27,
 			CERR_Club_Has_Room_In_PlayingState = 28,
+			CERR_Can_Not_Kick_Out_Creator_Or_Mgr = 29,
 		}
 
 		enum ClubEventType {
@@ -151,6 +152,8 @@ export namespace proto {
 			createRoomOption?: number;
 			payRoomOption?: number;
 			createTime?: number;
+			memberCount?: number;
+			managers?: string[];
 		}
 
 		class MsgClubInfo implements IMsgClubInfo {
@@ -166,6 +169,8 @@ export namespace proto {
 			public createRoomOption: number;
 			public payRoomOption: number;
 			public createTime: number;
+			public memberCount: number;
+			public managers: string[];
 			constructor(properties?: club.IMsgClubInfo);
 			public static encode(message: MsgClubInfo): ByteBuffer;
 			public static decode(reader: Uint8Array|ByteBuffer): MsgClubInfo;

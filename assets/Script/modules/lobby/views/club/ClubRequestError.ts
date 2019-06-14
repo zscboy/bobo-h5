@@ -17,7 +17,7 @@ export namespace ClubRequestError {
             [club.ClubOperError.CERR_Encode_Decode]: "无效输入参数",
             [club.ClubOperError.CERR_Invalid_Input_Parameter]: "无效输入参数",
 
-            [club.ClubOperError.CERR_Only_Creator_Can_KickOut]: "只有创建者才可以踢人",
+            [club.ClubOperError.CERR_Only_Creator_And_Mgr_Can_KickOut]: "只有创建者才可以踢人",
             [club.ClubOperError.CERR_You_Already_In_Club]: "你已经在此俱乐部",
             [club.ClubOperError.CERR_You_Are_In_Club_Block_List]: "你已经在此俱乐部黑名单，不能申请加入",
             [club.ClubOperError.CERR_You_Already_Applicate]: "你已经申请过，请耐心等候部长批准",
@@ -27,7 +27,7 @@ export namespace ClubRequestError {
             [club.ClubOperError.CERR_Invitee_Already_Applicate]: "你已经申请过，请耐心等候部长批准",
             [club.ClubOperError.CERR_Club_Not_Exist]: "俱乐部不存在",
             [club.ClubOperError.CERR_Only_Creator_Can_Invite]: "只有部长可以邀请别人",
-            [club.ClubOperError.CERR_Only_Creator_Can_Approve]: "只有部长可以批准",
+            [club.ClubOperError.CERR_Only_Creator_And_Mgr_Can_Approve]: "只有部长可以批准",
 
             [club.ClubOperError.CERR_No_Applicant]: "没有对应的申请者",
             [club.ClubOperError.CERR_Applicant_Already_In_Club]: "申请者已经是俱乐部成员",
@@ -39,7 +39,7 @@ export namespace ClubRequestError {
             [club.ClubOperError.CERR_Club_Only_Owner_Can_Disband]: "只有部长可以解散俱乐部",
             [club.ClubOperError.CERR_Owner_Can_not_quit]: "部长不能退出自己的俱乐部，只能解散",
             [club.ClubOperError.CERR_User_Not_In_Club]: "玩家不在俱乐部中",
-            [club.ClubOperError.CERR_Club_Only_Owner_Can_Set]: "只有部长可以设置俱乐部",
+            [club.ClubOperError.CERR_Club_Only_Owner_And_Mgr_Can_Set]: "只有部长可以设置俱乐部",
 
             [club.ClubOperError.CERR_Club_Forbit_Join]: "俱乐部禁止加入",
             [club.ClubOperError.CERR_Input_Text_Too_Long]: "输入文字过长",

@@ -196,6 +196,18 @@ exports.proto = require("protobuf").newBuilder({})['import']({
                             "type": "int32",
                             "name": "createTime",
                             "id": 12
+                        },
+                        {
+                            "rule": "optional",
+                            "type": "int32",
+                            "name": "memberCount",
+                            "id": 13
+                        },
+                        {
+                            "rule": "repeated",
+                            "type": "string",
+                            "name": "managers",
+                            "id": 14
                         }
                     ]
                 },
@@ -552,7 +564,7 @@ exports.proto = require("protobuf").newBuilder({})['import']({
                             "id": 5
                         },
                         {
-                            "name": "CERR_Only_Creator_Can_KickOut",
+                            "name": "CERR_Only_Creator_And_Mgr_Can_KickOut",
                             "id": 6
                         },
                         {
@@ -588,7 +600,7 @@ exports.proto = require("protobuf").newBuilder({})['import']({
                             "id": 14
                         },
                         {
-                            "name": "CERR_Only_Creator_Can_Approve",
+                            "name": "CERR_Only_Creator_And_Mgr_Can_Approve",
                             "id": 15
                         },
                         {
@@ -628,7 +640,7 @@ exports.proto = require("protobuf").newBuilder({})['import']({
                             "id": 24
                         },
                         {
-                            "name": "CERR_Club_Only_Owner_Can_Set",
+                            "name": "CERR_Club_Only_Owner_And_Mgr_Can_Set",
                             "id": 25
                         },
                         {
@@ -642,6 +654,10 @@ exports.proto = require("protobuf").newBuilder({})['import']({
                         {
                             "name": "CERR_Club_Has_Room_In_PlayingState",
                             "id": 28
+                        },
+                        {
+                            "name": "CERR_Can_Not_Kick_Out_Creator_Or_Mgr",
+                            "id": 29
                         }
                     ]
                 },

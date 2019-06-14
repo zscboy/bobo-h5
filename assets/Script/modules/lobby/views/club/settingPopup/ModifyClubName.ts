@@ -17,7 +17,10 @@ export class ModifyClubName extends cc.Component {
 
     private settingPopupView: SettingPopupInterface;
 
-    public bind(settingPopupView: SettingPopupInterface): void {
+    private clubName: string;
+
+    public bind(settingPopupView: SettingPopupInterface, clubName: string): void {
+        this.clubName = clubName;
         this.settingPopupView = settingPopupView;
     }
 
@@ -96,6 +99,8 @@ export class ModifyClubName extends cc.Component {
             msg = "输出名称为空";
         } else if (name.length < 3 || name.length > 7) {
             msg = `群名不合法，长于3个文字，并且小于七个文字,当前长度为${name.length}`;
+        } else if (name === this.clubName) {
+            msg = `新群名不得与旧群名相同`;
         }
 
         return msg;

@@ -3,6 +3,13 @@ import { proto } from "../../proto/protoLobby";
 import { ClubRequestError } from "./ClubRequestError";
 
 const { ccclass } = cc._decorator;
+
+interface CreateClubViewInterface {
+
+    addClub: Function;
+
+}
+
 /**
  * 创建茶馆页面
  */
@@ -13,8 +20,10 @@ export class CreateClubView extends cc.Component {
     private win: fgui.Window;
     private eventTarget: cc.EventTarget;
 
-    public getEventTarget(): cc.EventTarget {
-        return this.eventTarget;
+    private clubView: CreateClubViewInterface;
+
+    public bind(clubView: CreateClubViewInterface): void {
+        this.clubView = clubView;
     }
 
     protected onLoad(): void {
@@ -120,7 +129,7 @@ export class CreateClubView extends cc.Component {
     private updateViewClubList(clubInfo: proto.club.IMsgClubInfo): void {
         //
 
-        this.eventTarget.emit("addClub", clubInfo);
+        this.clubView.addClub(clubInfo);
         this.destroy();
     }
 

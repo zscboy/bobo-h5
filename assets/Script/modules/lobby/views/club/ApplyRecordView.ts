@@ -16,10 +16,6 @@ export class ApplyRecordView extends cc.Component {
 
     private records: proto.club.MsgClubLoadEventsReply[] = [];
 
-    public getEventTarget(): cc.EventTarget {
-        return this.eventTarget;
-    }
-
     protected onLoad(): void {
         //
         this.eventTarget = new cc.EventTarget();

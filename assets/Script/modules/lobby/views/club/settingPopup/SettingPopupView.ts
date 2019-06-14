@@ -1,4 +1,5 @@
-import { Logger } from "../../../lcore/LCoreExports";
+import { DataStore, Logger } from "../../../lcore/LCoreExports";
+import { proto } from "../../../proto/protoLobby";
 import { DisbandClubView } from "./DisbandClubView";
 import { ModifyClubName } from "./ModifyClubName";
 import { QuitClubView } from "./QuitClubView";
@@ -21,6 +22,8 @@ export class SettingPopupView extends cc.Component {
 
     private clubView: ClubViewInterface;
 
+    private clubInfo: proto.club.IMsgClubInfo;
+
     // 、private clubInfo: proto.club.IMsgClubInfo;
 
     public disbandClub(): void {
@@ -35,19 +38,19 @@ export class SettingPopupView extends cc.Component {
         this.clubView.quitClub();
     }
 
-    public show(isManager: boolean, clubView: ClubViewInterface): void {
+    public show(clubView: ClubViewInterface, clubInfo: proto.club.IMsgClubInfo): void {
         this.clubView = clubView;
-
+        this.clubInfo = clubInfo;
         const settingPopupView = fgui.UIPackage.createObject("lobby_club", "settingPopup").asCom;
         this.view = settingPopupView;
 
-        this.initView(isManager);
+        this.initView();
         fgui.GRoot.inst.showPopup(this.view);
         this.view.setPosition(949, 106);
 
     }
 
-    private initView(isManager: boolean): void {
+    private initView(): void {
         //
 
         const bg = this.view.getChild("bg").asImage;
@@ -63,6 +66,10 @@ export class SettingPopupView extends cc.Component {
         quickSettingItem.onClick(this.onQuickSettingClick, this);
         quitClub.onClick(this.onQuitClubClick, this);
 
+        const userId = DataStore.getString("userID", "");
+        const clubOwnerId = this.clubInfo.creatorUserID;
+        const isManager = userId === clubOwnerId ? true : false;
+
         if (isManager === false) {
             //
             managerCom.visible = false;
@@ -77,14 +84,14 @@ export class SettingPopupView extends cc.Component {
         //
         Logger.debug(`onModifyClubNameClick------------`);
         const view = this.addComponent(ModifyClubName);
-        view.bind(this);
+        view.bind(this, this.clubInfo.baseInfo.clubName);
     }
 
     private onDisbandClick(): void {
         //
         Logger.debug(`onDisbandClick------------`);
         const view = this.addComponent(DisbandClubView);
-        view.bind(this);
+        view.bind(this, this.clubInfo.baseInfo.clubName);
     }
 
     private onQuickSettingClick(): void {
@@ -96,7 +103,7 @@ export class SettingPopupView extends cc.Component {
         //
         Logger.debug(`onQuitClubClick------------`);
         const view = this.addComponent(QuitClubView);
-        view.bind(this);
+        view.bind(this, this.clubInfo.baseInfo.clubName);
     }
 
 }

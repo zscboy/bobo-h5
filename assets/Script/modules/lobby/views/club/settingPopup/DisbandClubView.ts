@@ -16,8 +16,10 @@ export class DisbandClubView extends cc.Component {
 
     private settingPopupView: SettingPopupInterface;
 
-    public bind(settingPopupView: SettingPopupInterface): void {
+    public bind(settingPopupView: SettingPopupInterface, clubName: string): void {
         this.settingPopupView = settingPopupView;
+        const confirmText = this.view.getChild("confirmText").asRichTextField;
+        confirmText.text = `确定要解散<font color="#96693a"> ${clubName} </font>吗?`;
     }
 
     protected onLoad(): void {
@@ -54,7 +56,6 @@ export class DisbandClubView extends cc.Component {
 
         const confirmBtn = this.view.getChild("confirmBtn").asButton;
         confirmBtn.onClick(this.onConfirmBtnClick, this);
-
     }
 
     private onConfirmBtnClick(): void {

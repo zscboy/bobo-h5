@@ -51,6 +51,9 @@ export class ClubView extends cc.Component {
     // 大厅模块
     private lobbyModule: LobbyModuleInterface;
 
+    // 保存此按钮，便于移除与增加
+    private appointManagerBtn: fgui.GObject;
+
     /**
      * 选择筛选的房间类型
      * @param selectRoomType RoomType
@@ -200,24 +203,27 @@ export class ClubView extends cc.Component {
         const buyBtn = this.view.getChild("buyBtn");
         buyBtn.onClick(this.onBuyBtnClick, this);
 
+        const operationBtnList = this.view.getChild("operationBtn").asList;
+
         //复制ID按钮
-        const copyIdBtn = this.view.getChild("copyIdBtn");
+        const copyIdBtn = operationBtnList.getChildAt(0).asButton;
         copyIdBtn.onClick(this.onCopyIdBtnClick, this);
 
         //分享按钮
-        const shareBtn = this.view.getChild("shareBtn");
+        const shareBtn = operationBtnList.getChildAt(1).asButton;
         shareBtn.onClick(this.onShareBtnClick, this);
 
         // 任命管理按钮
-        const appointManagerBtn = this.view.getChild("appointManagerBtn");
-        appointManagerBtn.onClick(this.onAppointManagerBtnClick, this);
+        const appointManagerBtn = operationBtnList.getChildAt(2).asButton;
+        this.appointManagerBtn = appointManagerBtn;
+        this.appointManagerBtn.onClick(this.onAppointManagerBtnClick, this);
 
         // 成员管理
-        const memberSettingBtn = this.view.getChild("memberSettingBtn");
+        const memberSettingBtn = operationBtnList.getChildAt(3).asButton;
         memberSettingBtn.onClick(this.onMemberSettingBtnClick, this);
 
         // 管理
-        const managerBtn = this.view.getChild("managerBtn");
+        const managerBtn = operationBtnList.getChildAt(4).asButton;
         managerBtn.onClick(this.onManagerBtnClick, this);
 
         // 非茶馆页面点击事件
@@ -361,12 +367,8 @@ export class ClubView extends cc.Component {
 
     private onManagerBtnClick(): void {
 
-        const userId = DataStore.getString("userID", "");
-        const clubOwnerId = this.selectedClub.creatorUserID;
-        const isManager = userId === clubOwnerId ? true : false;
-
         const popupView = this.addComponent(SettingPopupView);
-        popupView.show(isManager, this);
+        popupView.show(this, this.selectedClub);
     }
 
     private onMemberSettingBtnClick(): void {
@@ -390,6 +392,24 @@ export class ClubView extends cc.Component {
 
         const lm = <LobbyModuleInterface>this.getComponent("LobbyModule");
         lm.enterGame(myRoomInfo);
+    }
+
+    private setOperationBtnVisible(isManager: boolean): void {
+
+        const operationBtnList = this.view.getChild("operationBtn").asList;
+        // 任命管理按钮
+        const appointManagerBtn = this.appointManagerBtn;
+
+        if (isManager) {
+            if (operationBtnList.numChildren === 4) {
+                operationBtnList.addChildAt(appointManagerBtn, 2);
+            }
+        } else {
+            if (operationBtnList.numChildren === 5) {
+                operationBtnList.removeChild(appointManagerBtn);
+            }
+
+        }
     }
 
     /**
@@ -617,6 +637,22 @@ export class ClubView extends cc.Component {
 
     }
 
+    private updateSelectedClub(selectedClub: proto.club.IMsgClubInfo): void {
+        this.selectedClub = selectedClub;
+
+        this.updateUIByClubManager();
+
+        this.loadClubRooms(selectedClub.baseInfo.clubID);
+    }
+
+    private updateUIByClubManager(): void {
+
+        const userId = DataStore.getString("userID", "");
+        const clubOwnerId = this.selectedClub.creatorUserID;
+        const isManager = userId === clubOwnerId ? true : false;
+        this.setOperationBtnVisible(isManager);
+    }
+
     private loadClub(): void {
         const tk = DataStore.getString("token", "");
         const loadEmailUrl = `${LEnv.rootURL}${LEnv.loadMyClubs}?&tk=${tk}`;
@@ -637,12 +673,6 @@ export class ClubView extends cc.Component {
 
         this.clubRequest(loadEmailUrl, cb);
 
-    }
-
-    private updateSelectedClub(selectedClub: proto.club.IMsgClubInfo): void {
-        this.selectedClub = selectedClub;
-
-        this.loadClubRooms(selectedClub.baseInfo.clubID);
     }
 
     private loadClubRooms(clubId: string): void {

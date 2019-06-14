@@ -354,8 +354,8 @@ export class PlayerViewA {
             if (this.msgTimerCB === undefined) {
                 this.msgTimerCB = <Function>this.hideChatMsg.bind(this);
             }
-            this.qipao.visible = true;
             this.qipaoText.text = str;
+            this.qipao.visible = true;
             //定时隐藏
             this.roomHost.component.unschedule(this.msgTimerCB);
             this.roomHost.component.scheduleOnce(this.msgTimerCB, 3);

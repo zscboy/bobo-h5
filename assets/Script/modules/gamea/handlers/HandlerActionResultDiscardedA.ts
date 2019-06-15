@@ -23,9 +23,10 @@ export namespace HandlerActionResultDiscardedA {
         for (const discardTileId of discardTileIds) {
             //从手牌移除
             player.removeTileFromHand(discardTileId);
-            //加到打出牌列表
-            player.addDicardedTile(discardTileId);
         }
+        //加到打出牌列表
+        player.addDiscardedTiles(discardTileIds);
+
         player.sortHands();
 
         player.hand2UI(false);

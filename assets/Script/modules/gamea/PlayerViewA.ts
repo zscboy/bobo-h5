@@ -370,6 +370,14 @@ export class PlayerViewA {
             }
         }
     }
+
+    //把手牌往上移动30的单位距离
+    public moveHandUp(index: number): void {
+        const originPos = this.handsOriginPos[index];
+        const h = this.handsClickCtrls[index].h;
+        h.y = originPos.y - 30;
+        this.handsClickCtrls[index].clickCount = 1;
+    }
     private hideChatMsg(): void {
         this.qipao.visible = false;
     }
@@ -447,13 +455,6 @@ export class PlayerViewA {
         status[pokerface.PlayerState.PSOffline] = onLeave;
         status[pokerface.PlayerState.PSPlaying] = onPlaying;
         this.onUpdateStatus = status;
-    }
-    //把手牌往上移动30的单位距离
-    private moveHandUp(index: number): void {
-        const originPos = this.handsOriginPos[index];
-        const h = this.handsClickCtrls[index].h;
-        h.y = originPos.y - 30;
-        this.handsClickCtrls[index].clickCount = 1;
     }
 
     //把手牌还原位置

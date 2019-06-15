@@ -15,7 +15,7 @@ export namespace HandlerMsgActionAllowedA {
 
             p.playerView.skipBtn.visible = false;
             p.playerView.discardBtn.visible = false;
-            p.playerView.tipBtn.visible = false;
+            p.playerView.tipBtn.visible = true;
             const at = proto.prunfast.ActionType;
             if ((actions & at.enumActionType_SKIP) !== 0) {//如果可以过
                 Logger.debug("llwant, can skip");

@@ -65,7 +65,6 @@ export class ApplyRecordView extends cc.Component {
     private renderPhraseListItem(index: number, obj: fgui.GObject): void {
 
         const event = this.records[index];
-        Logger.debug(event);
 
         const time = obj.asCom.getChild("time");
         // const clubName = obj.asCom.getChild("clubName");

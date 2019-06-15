@@ -27,6 +27,9 @@ export class LoginView extends cc.Component {
         loader.fguiAddPackage("Lauch/fui_login/lobby_login");
         const view = fgui.UIPackage.createObject("lobby_login", "login").asCom;
 
+        const x = cc.winSize.width / 2 - (cc.winSize.height * 1136 / 640 / 2);
+        view.setPosition(x, view.y);
+
         const win = new fgui.Window();
         win.contentPane = view;
         win.modal = true;
@@ -81,6 +84,12 @@ export class LoginView extends cc.Component {
         this.loginBtn.onClick(this.onLoginClick, this);
 
         this.weixinButton.onClick(this.onWeixinBtnClick, this);
+
+        const bg = this.viewNode.getChild('n1');
+        bg.setSize(cc.winSize.width, cc.winSize.width * 640 / 1136);
+        const y = -(cc.winSize.width * 640 / 1136 - cc.winSize.height) / 2;
+        const x = (cc.winSize.height * 1136 / 640 / 2) - cc.winSize.width / 2;
+        bg.setPosition(x, y);
 
         // local progress = progressView.new(this)
         // progressView: updateView(this)

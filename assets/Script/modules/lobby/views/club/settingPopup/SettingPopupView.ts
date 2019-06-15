@@ -84,14 +84,12 @@ export class SettingPopupView extends cc.Component {
 
     private onModifyClubNameClick(): void {
         //
-        Logger.debug(`onModifyClubNameClick------------`);
         const view = this.addComponent(ModifyClubName);
         view.bind(this, this.clubInfo.baseInfo.clubName);
     }
 
     private onDisbandClick(): void {
         //
-        Logger.debug(`onDisbandClick------------`);
         const view = this.addComponent(DisbandClubView);
         view.bind(this, this.clubInfo.baseInfo.clubName);
     }
@@ -103,7 +101,6 @@ export class SettingPopupView extends cc.Component {
 
     private onQuitClubClick(): void {
         //
-        Logger.debug(`onQuitClubClick------------`);
         const view = this.addComponent(QuitClubView);
         view.bind(this, this.clubInfo.baseInfo.clubName);
     }

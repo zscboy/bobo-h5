@@ -206,7 +206,6 @@ export class PlayerA {
     }
 
     public showCardHandType(cardHandType: number, discardTileId: number): void {
-        Logger.debug("显示打出去的牌的类型。。。 : ", cardHandType);
         const e = EFFECTS[cardHandType];
         const s = SOUND[cardHandType];
         if (e !== "") {
@@ -281,7 +280,6 @@ export class PlayerA {
             }
             this.tipCards = tipCards;
         }
-        Logger.debug("tipCards ：", tipCards);
         if (tipCards.length === 0) {
             //如果提示没东西，则帮用户
             Dialog.prompt("如果提示没东西，则帮用户");

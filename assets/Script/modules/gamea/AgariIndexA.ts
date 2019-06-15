@@ -115,8 +115,10 @@ export namespace AgariIndexA {
             slots[i] = 0;
         }
         for (const v of hai) {
-            const idx = Math.floor(v / 4);
-            slots[idx]++;
+            if (v !== undefined && v !== null) {
+                const idx = Math.floor(v / 4);
+                slots[idx] = slots[idx] + 1;
+            }
         }
     };
 
@@ -223,11 +225,8 @@ export namespace AgariIndexA {
             return null;
         }
 
-        Logger.debug("key : ", key);
         const agari = agariTable[key];
         const ct = <proto.prunfast.CardHandType>(agari & 0xFF);
-        Logger.debug("hai : ", hai);
-        Logger.debug("ct : ", ct);
         const msgCardhand = new pokerface.MsgCardHand();
         msgCardhand.cardHandType = <number>ct;
 
@@ -293,8 +292,6 @@ export namespace AgariIndexA {
     //判断当前的手牌是否大于上一手牌
     export const agariGreatThan = (prevCardHand: proto.pokerface.IMsgCardHand, current: proto.pokerface.IMsgCardHand): boolean => {
         // 如果当前的是炸弹
-        Logger.debug("prevCardHand : ", prevCardHand);
-        Logger.debug("current : ", current);
         if (current.cardHandType === proto.prunfast.CardHandType.Bomb) {
             // 上一手不是炸弹
             if (prevCardHand.cardHandType !== proto.prunfast.CardHandType.Bomb) {
@@ -379,9 +376,7 @@ export namespace AgariIndexA {
         const right = Math.floor(pokerface.CardID.AH / 4);
         // 跳过2和3，因为四个3是非法牌型
         for (let newBombSuitID = 2; newBombSuitID < right; newBombSuitID++) {
-            Logger.debug("跳过2和3，因为四个3是非法牌型 : ");
             if (slots[newBombSuitID] > 3) {
-                Logger.debug("找到炸弹 : ", newBombSuitID);
                 const cardHand = new proto.pokerface.MsgCardHand();
                 cardHand.cardHandType = pokerfacerf.CardHandType.Bomb;
                 const xcards = extractCardsByRank(hands, newBombSuitID, 4);

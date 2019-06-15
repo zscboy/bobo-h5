@@ -1,8 +1,15 @@
-import { DataStore, HTTP, LEnv, Logger } from "../../../lcore/LCoreExports";
+import { DataStore, Dialog, HTTP, LEnv, Logger } from "../../../lcore/LCoreExports";
 import { proto } from "../../../proto/protoLobby";
 import { ClubRequestError } from "../ClubRequestError";
 import { MemberOperationDialog } from "./MemberOperationDialog";
 const { ccclass } = cc._decorator;
+
+interface ClubViewInterface {
+
+    saveClubInfo: Function;
+
+}
+
 /**
  * 成员管理页面
  */
@@ -13,11 +20,13 @@ export class MemberManagerView extends cc.Component {
     private win: fgui.Window;
     private eventTarget: cc.EventTarget;
 
+    private clubView: ClubViewInterface;
+
     private clubInfo: proto.club.IMsgClubInfo;
 
     private members: proto.club.IMsgClubMemberInfo[];
 
-    private membersWithoutOwner: proto.club.IMsgClubMemberInfo[];
+    private membersWithoutManager: proto.club.IMsgClubMemberInfo[];
 
     private events: proto.club.IMsgClubEvent[];
 
@@ -29,13 +38,25 @@ export class MemberManagerView extends cc.Component {
     private applyListBtn: fgui.GButton;
     private deleteMemberBtn: fgui.GButton;
 
-    public setClubInfo(clubInfo: proto.club.IMsgClubInfo): void {
+    public saveClubInfo(clubInfo: proto.club.IMsgClubInfo): void {
+
+        this.clubView.saveClubInfo(clubInfo);
+    }
+
+    public delMember(member: proto.club.IMsgClubMemberInfo): void {
+        //
+
+        this.deleteMember(member, 0);
+    }
+
+    public setClubInfo(clubView: ClubViewInterface, clubInfo: proto.club.IMsgClubInfo): void {
+        this.clubView = clubView;
         this.clubInfo = clubInfo;
 
         this.updateUIByClubManager();
 
         //拉取成员
-        this.loadMember();
+        this.loadMember(0);
         this.win.show();
 
     }
@@ -144,10 +165,13 @@ export class MemberManagerView extends cc.Component {
             owner.visible = member.userID === this.clubInfo.creatorUserID;
         }
 
-        const isManager = this.isManager();
         const isMe = this.isMe(member.userID);
+        const userId = DataStore.getString("userID", "");
+        const clubOwnerId = this.clubInfo.creatorUserID;
+        const isOwner = userId === clubOwnerId ? true : false;
 
-        if (isManager && isMe === false) {
+        // 只有茶馆群主才能进入
+        if (isOwner && isMe === false) {
             obj.offClick(undefined, undefined);
 
             obj.onClick(() => {
@@ -162,11 +186,11 @@ export class MemberManagerView extends cc.Component {
         const clubOwnerId = this.clubInfo.creatorUserID;
         const managers = this.clubInfo.managers;
         let isManager = false;
-        managers.forEach(managerId => {
+        for (const managerId of managers) {
             if (managerId === userId) {
                 isManager = true;
             }
-        });
+        }
 
         const isOwner = userId === clubOwnerId ? true : false;
 
@@ -192,8 +216,8 @@ export class MemberManagerView extends cc.Component {
 
         let member: proto.club.IMsgClubMemberInfo;
 
-        if (this.membersWithoutOwner !== undefined) {
-            member = this.membersWithoutOwner[index];
+        if (this.membersWithoutManager !== undefined) {
+            member = this.membersWithoutManager[index];
         }
 
         //const icon = obj.asCom.getChild("icon");
@@ -207,10 +231,22 @@ export class MemberManagerView extends cc.Component {
             name.text = `${nick}`;
 
             deleteBtn.onClick(() => {
-                this.deleteMember(member);
+                this.showDeleteMemberDialog(member);
                 // tslint:disable-next-line:align
             }, this);
         }
+    }
+
+    private showDeleteMemberDialog(member: proto.club.IMsgClubMemberInfo): void {
+
+        const nick = member.displayInfo.nick === "" ? member.userID : member.displayInfo.nick;
+        Dialog.showDialog(`是否删除 ${nick} ?`, () => {
+
+            this.deleteMember(member, 2);
+            // tslint:disable-next-line:align
+        }, () => {
+            //
+        });
     }
 
     /**
@@ -231,7 +267,6 @@ export class MemberManagerView extends cc.Component {
         const name = obj.asCom.getChild("name");
         const rejectBtn = obj.asCom.getChild("rejectBtn").asButton;
         const agreeBtn = obj.asCom.getChild("agreeBtn").asButton;
-        Logger.debug("event ---------------", event);
         if (event !== undefined) {
 
             const nick = event.displayInfo1.nick === "" ? event.userID1 : event.displayInfo1.nick;
@@ -268,56 +303,104 @@ export class MemberManagerView extends cc.Component {
     private showMemberOperationDialog(member: proto.club.IMsgClubMemberInfo): void {
         //
         const popupView = this.addComponent(MemberOperationDialog);
-        popupView.show(member);
+        popupView.bind(this, this.clubInfo, member);
     }
 
     private onMemberListBtnClick(): void {
-        //
-        //Logger.debug("selectedIndex = ", this.memberListBtn.getController("button").selectedIndex);
 
-        // if (this.memberListBtn.getController("button").selectedIndex === 1) {
-        //     return;
-        // }
-
-        this.loadMember();
+        this.loadMember(0);
     }
 
     private onApplyListBtnClick(): void {
-        //
-        // if (this.applyListBtn.getController("button").selectedIndex === 1) {
-        //     return;
-        // }
+
         this.loadRecord();
     }
 
     private onDeleteMemberBtnClick(): void {
-        //
-        // if (this.deleteMemberBtn.getController("button").selectedIndex === 1) {
-        //     return;
-        // }
-        this.updateDeleteMemberList();
+
+        this.loadMember(2);
     }
 
-    private updateDeleteMemberList(): void {
+    private updateDeleteMemberList(members: proto.club.IMsgClubMemberInfo[]): void {
         //
+        this.members = members;
+        this.membersWithoutManager = [];
 
-        this.membersWithoutOwner = [];
+        // 只有两人，暂时内部嵌套
+        const managers = this.clubInfo.managers;
+        for (const member of members) {
 
-        this.members.forEach(member => {
-            if (member.userID !== this.clubInfo.creatorUserID) {
-                this.membersWithoutOwner.push(member);
+            if (member.userID === this.clubInfo.creatorUserID) {
+                continue;
             }
-        });
 
-        Logger.debug("this.membersWithoutOwner.length = ", this.membersWithoutOwner.length);
+            let isManager = false;
+            for (const managerId of managers) {
+                if (member.userID === managerId) {
+                    isManager = true;
+                }
+            }
 
-        this.memberDeleteList.numItems = this.membersWithoutOwner.length;
+            if (isManager === false) {
+                this.membersWithoutManager.push(member);
+            }
+
+        }
+
+        this.memberDeleteList.numItems = this.membersWithoutManager.length;
+    }
+    private removeRecord(event: proto.club.IMsgClubEvent): void {
+        //
+        const index = this.events.indexOf(event);
+        this.events.splice(index, 1);
+        this.memberApplyList.numItems = this.events.length;
+
     }
 
-    private deleteMember(member: proto.club.IMsgClubMemberInfo): void {
+    private removeMember(member: proto.club.IMsgClubMemberInfo, listIndex: number): void {
+        //
+        let index;
+
+        if (listIndex === 0) {
+            index = this.members.indexOf(member);
+            this.members.splice(index, 1);
+            this.memberList.numItems = this.members.length;
+
+        } else if (listIndex === 2) {
+            index = this.membersWithoutManager.indexOf(member);
+            this.membersWithoutManager.splice(index, 1);
+            this.memberDeleteList.numItems = this.membersWithoutManager.length;
+        }
+
+    }
+
+    private deleteMember(member: proto.club.IMsgClubMemberInfo, listIndex: number): void {
         //
 
-        Logger.debug("deleteMember  member = ", member);
+        const tk = DataStore.getString("token", "");
+        const baseUrl = `${LEnv.rootURL}${LEnv.kickOut}?&`;
+        const params = `tk=${tk}&clubID=${this.clubInfo.baseInfo.clubID}&memberID=${member.userID}`;
+        const url = `${baseUrl}${params}`;
+
+        const cb = (xhr: XMLHttpRequest, err: string) => {
+            const data = <Uint8Array>xhr.response;
+            const msgClubReply = proto.club.MsgClubReply.decode(data);
+
+            if (msgClubReply.replyCode === proto.club.ClubReplyCode.RCError) {
+                const msgCubOperGenericReply = proto.club.MsgCubOperGenericReply.decode(msgClubReply.content);
+
+                if (msgCubOperGenericReply.errorCode === proto.club.ClubOperError.CERR_OK) {
+                    this.removeMember(member, listIndex);
+                } else {
+                    ClubRequestError.showErrMsg(msgCubOperGenericReply.errorCode);
+                }
+
+            }
+
+            //this.loadRecord();
+        };
+
+        this.clubRequest(url, cb);
     }
 
     private joinApproval(event: proto.club.IMsgClubEvent, agree: boolean): void {
@@ -329,28 +412,26 @@ export class MemberManagerView extends cc.Component {
         const params = `tk=${tk}&clubID=${this.clubInfo.baseInfo.clubID}&applicantID=${event.userID1}&agree=${result}&eID=${event.Id}`;
         const loadMemberUrl = `${baseUrl}${params}`;
 
-        Logger.debug(loadMemberUrl);
-
         const cb = (xhr: XMLHttpRequest, err: string) => {
-            //
-            // const data = <Uint8Array>xhr.response;
-
             const data = <Uint8Array>xhr.response;
             const msgClubReply = proto.club.MsgClubReply.decode(data);
-            Logger.debug("msgClubReply = ", msgClubReply);
 
             if (msgClubReply.replyCode === proto.club.ClubReplyCode.RCError) {
                 const msgCubOperGenericReply = proto.club.MsgCubOperGenericReply.decode(msgClubReply.content);
-                ClubRequestError.showErrMsg(msgCubOperGenericReply.errorCode);
+                if (msgCubOperGenericReply.errorCode === proto.club.ClubOperError.CERR_OK) {
+                    this.removeRecord(event);
+                } else {
+                    ClubRequestError.showErrMsg(msgCubOperGenericReply.errorCode);
+                }
             }
-            //this.loadRecord();
+
         };
 
         this.clubRequest(loadMemberUrl, cb);
 
     }
 
-    private loadMember(): void {
+    private loadMember(updateListIndex: number): void {
         //
 
         const tk = DataStore.getString("token", "");
@@ -363,8 +444,19 @@ export class MemberManagerView extends cc.Component {
             if (msgClubReply.replyCode === proto.club.ClubReplyCode.RCOperation) {
                 const reply = proto.club.MsgClubLoadMembersReply.decode(msgClubReply.content);
                 const members = reply.members;
-                this.updateMemberList(members);
 
+                switch (updateListIndex) {
+                    case 0:
+                        this.updateMemberList(members);
+                        break;
+
+                    case 2:
+                        this.updateDeleteMemberList(members);
+                        break;
+
+                    default:
+
+                }
             }
         };
 

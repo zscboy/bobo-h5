@@ -492,6 +492,66 @@ exports.proto = require("protobuf").newBuilder({})['import']({
                             "id": 2
                         }
                     ]
+                },
+                {
+                    "name": "MsgClubApplyRecord",
+                    "syntax": "proto2",
+                    "fields": [
+                        {
+                            "rule": "required",
+                            "type": "string",
+                            "name": "clubID",
+                            "id": 1
+                        },
+                        {
+                            "rule": "optional",
+                            "type": "string",
+                            "name": "clubNumber",
+                            "id": 2
+                        },
+                        {
+                            "rule": "optional",
+                            "type": "string",
+                            "name": "clubName",
+                            "id": 3
+                        },
+                        {
+                            "rule": "optional",
+                            "type": "int32",
+                            "name": "approvalResult",
+                            "id": 4
+                        },
+                        {
+                            "rule": "optional",
+                            "type": "int32",
+                            "name": "eventID",
+                            "id": 5
+                        },
+                        {
+                            "rule": "optional",
+                            "type": "int64",
+                            "name": "timeStamp",
+                            "id": 6
+                        }
+                    ]
+                },
+                {
+                    "name": "MsgClubLoadApplyRecordReply",
+                    "syntax": "proto2",
+                    "fields": [
+                        {
+                            "rule": "repeated",
+                            "type": "MsgClubApplyRecord",
+                            "name": "records",
+                            "id": 1
+                        },
+                        {
+                            "rule": "optional",
+                            "type": "int32",
+                            "name": "cursor",
+                            "id": 2
+                        }
+                    ]
                 }
             ],
             "enums": [

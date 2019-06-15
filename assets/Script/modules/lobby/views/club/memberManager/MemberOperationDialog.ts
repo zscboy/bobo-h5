@@ -38,12 +38,10 @@ export class MemberOperationDialog extends cc.Component {
 
     }
 
-    protected onload(): void {
-        this.eventTarget = new cc.EventTarget();
-    }
-
     private initView(member: proto.club.IMsgClubMemberInfo, clubInfo: proto.club.IMsgClubInfo): void {
         //
+
+        this.eventTarget = new cc.EventTarget();
         const revokeBtn = this.view.getChild("revokeBtn").asButton;
         revokeBtn.onClick(this.onRevokeBtnClick, this);
 
@@ -89,7 +87,7 @@ export class MemberOperationDialog extends cc.Component {
 
     private onRevokeBtnClick(): void {
         //
-        //this.revokeManager(this.member);
+        this.onUp2ManagerBtnBtnClick();
     }
 
     private onUp2ManagerBtnBtnClick(): void {
@@ -198,6 +196,7 @@ export class MemberOperationDialog extends cc.Component {
         }
 
         Logger.debug("clubRequest url = ", url);
+        Logger.debug("this.eventTarget = ", this.eventTarget);
 
         HTTP.hGet(this.eventTarget, url, (xhr: XMLHttpRequest, err: string) => {
 

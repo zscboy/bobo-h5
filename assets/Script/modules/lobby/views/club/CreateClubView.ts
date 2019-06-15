@@ -99,7 +99,6 @@ export class CreateClubView extends cc.Component {
     }
 
     private createClub(clubName: string): void {
-        Logger.debug("createClub clubName = ", clubName);
         const tk = DataStore.getString("token", "");
         const url = `${LEnv.rootURL}${LEnv.createClub}?&tk=${tk}&&clname=${clubName}`;
 

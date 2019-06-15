@@ -173,7 +173,6 @@ export class JoinClubView extends cc.Component {
             const data = <Uint8Array>xhr.response;
 
             const msgClubReply = proto.club.MsgClubReply.decode(data);
-            Logger.debug("msgClubReply = ", msgClubReply);
 
             if (msgClubReply.replyCode === proto.club.ClubReplyCode.RCOperation) {
                 //  这个接口不会返回 RCOperation

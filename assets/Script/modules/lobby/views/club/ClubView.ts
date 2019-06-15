@@ -51,6 +51,14 @@ export class ClubView extends cc.Component {
     // 大厅模块
     private lobbyModule: LobbyModuleInterface;
 
+    public saveClubInfo(clubInfo: proto.club.IMsgClubInfo): void {
+
+        const index = this.clubs.indexOf(this.selectedClub);
+
+        this.clubs[index] = clubInfo;
+        this.selectedClub = clubInfo;
+    }
+
     /**
      * 选择筛选的房间类型
      * @param selectRoomType RoomType
@@ -85,8 +93,18 @@ export class ClubView extends cc.Component {
         const url = `${LEnv.rootURL}${LEnv.renameClub}?&tk=${tk}&clubID=${this.selectedClub.baseInfo.clubID}&clname=${name}`;
 
         const cb = (xhr: XMLHttpRequest, err: string) => {
-            // const data = <Uint8Array>xhr.response;
-            this.loadClub();
+
+            const data = <Uint8Array>xhr.response;
+            const msgClubReply = proto.club.MsgClubReply.decode(data);
+
+            if (msgClubReply.replyCode === proto.club.ClubReplyCode.RCError) {
+                const msgCubOperGenericReply = proto.club.MsgCubOperGenericReply.decode(msgClubReply.content);
+                if (msgCubOperGenericReply.errorCode === proto.club.ClubOperError.CERR_OK) {
+                    this.loadClub();
+                } else {
+                    ClubRequestError.showErrMsg(msgCubOperGenericReply.errorCode);
+                }
+            }
         };
 
         this.clubRequest(url, cb);
@@ -335,7 +353,6 @@ export class ClubView extends cc.Component {
     private onReturn2GameBtnClick(): void {
         //
         const jsonStr = DataStore.getString("RoomInfoData");
-        Logger.debug("jsonStr:", jsonStr);
         if (jsonStr !== "") {
             try {
                 const config = <{ [key: string]: string }>JSON.parse(jsonStr);
@@ -377,7 +394,7 @@ export class ClubView extends cc.Component {
     private onMemberSettingBtnClick(): void {
 
         const view = this.addComponent(MemberManagerView);
-        view.setClubInfo(this.selectedClub);
+        view.setClubInfo(this, this.selectedClub);
     }
 
     private onJoinRoomBtnClick(ev: fgui.Event): void {
@@ -710,8 +727,6 @@ export class ClubView extends cc.Component {
     }
 
     private updateClubRooms(roomInfos: proto.lobby.IRoomInfo[]): void {
-
-        Logger.debug("updateClubRooms roomInfos = ", roomInfos);
 
         this.allRoomInfos = [];
 

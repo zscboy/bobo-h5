@@ -347,6 +347,40 @@ export namespace proto {
 			public static decode(reader: Uint8Array|ByteBuffer): MsgClubLoadReplayRoomsReply;
 		}
 
+		interface IMsgClubApplyRecord {
+			clubID: string;
+			clubNumber?: string;
+			clubName?: string;
+			approvalResult?: number;
+			eventID?: number;
+			timeStamp?: Long;
+		}
+
+		class MsgClubApplyRecord implements IMsgClubApplyRecord {
+			public clubID: string;
+			public clubNumber: string;
+			public clubName: string;
+			public approvalResult: number;
+			public eventID: number;
+			public timeStamp: Long;
+			constructor(properties?: club.IMsgClubApplyRecord);
+			public static encode(message: MsgClubApplyRecord): ByteBuffer;
+			public static decode(reader: Uint8Array|ByteBuffer): MsgClubApplyRecord;
+		}
+
+		interface IMsgClubLoadApplyRecordReply {
+			records?: club.IMsgClubApplyRecord[];
+			cursor?: number;
+		}
+
+		class MsgClubLoadApplyRecordReply implements IMsgClubLoadApplyRecordReply {
+			public records: club.IMsgClubApplyRecord[];
+			public cursor: number;
+			constructor(properties?: club.IMsgClubLoadApplyRecordReply);
+			public static encode(message: MsgClubLoadApplyRecordReply): ByteBuffer;
+			public static decode(reader: Uint8Array|ByteBuffer): MsgClubLoadApplyRecordReply;
+		}
+
 	}
 	export namespace lobby {
 		enum MsgError {

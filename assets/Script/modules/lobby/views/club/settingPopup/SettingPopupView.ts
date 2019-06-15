@@ -30,8 +30,8 @@ export class SettingPopupView extends cc.Component {
         this.clubView.disbandClub();
     }
 
-    public modifyClubName(): void {
-        this.clubView.modifyClubName();
+    public modifyClubName(name: string): void {
+        this.clubView.modifyClubName(name);
     }
 
     public quitClub(): void {
@@ -63,13 +63,11 @@ export class SettingPopupView extends cc.Component {
         quickSettingItem.onClick(this.onQuickSettingClick, this);
         quitClub.onClick(this.onQuitClubClick, this);
 
-        const userId = DataStore.getString("userID", "");
-        const clubOwnerId = this.clubInfo.creatorUserID;
-        const isManager = userId === clubOwnerId ? true : false;
+        const isOwner = this.isOwner();
 
         const isManagerController = this.view.getController("isManager");
 
-        if (isManager === false) {
+        if (isOwner === false) {
             isManagerController.selectedIndex = 0;
             this.view.setSize(172, 94);
         } else {
@@ -77,16 +75,21 @@ export class SettingPopupView extends cc.Component {
         }
     }
 
+    private isOwner(): boolean {
+        const userId = DataStore.getString("userID", "");
+        const clubOwnerId = this.clubInfo.creatorUserID;
+
+        return userId === clubOwnerId ? true : false;
+    }
+
     private onModifyClubNameClick(): void {
         //
-        Logger.debug(`onModifyClubNameClick------------`);
         const view = this.addComponent(ModifyClubName);
         view.bind(this, this.clubInfo.baseInfo.clubName);
     }
 
     private onDisbandClick(): void {
         //
-        Logger.debug(`onDisbandClick------------`);
         const view = this.addComponent(DisbandClubView);
         view.bind(this, this.clubInfo.baseInfo.clubName);
     }
@@ -98,7 +101,6 @@ export class SettingPopupView extends cc.Component {
 
     private onQuitClubClick(): void {
         //
-        Logger.debug(`onQuitClubClick------------`);
         const view = this.addComponent(QuitClubView);
         view.bind(this, this.clubInfo.baseInfo.clubName);
     }

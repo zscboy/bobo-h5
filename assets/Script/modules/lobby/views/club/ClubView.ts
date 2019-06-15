@@ -51,6 +51,14 @@ export class ClubView extends cc.Component {
     // 大厅模块
     private lobbyModule: LobbyModuleInterface;
 
+    public saveClubInfo(clubInfo: proto.club.IMsgClubInfo): void {
+
+        const index = this.clubs.indexOf(this.selectedClub);
+
+        this.clubs[index] = clubInfo;
+        this.selectedClub = clubInfo;
+    }
+
     /**
      * 选择筛选的房间类型
      * @param selectRoomType RoomType
@@ -79,8 +87,27 @@ export class ClubView extends cc.Component {
     /**
      * 修改茶馆名
      */
-    public modifyClubName(): void {
+    public modifyClubName(name: string): void {
         //
+        const tk = DataStore.getString("token", "");
+        const url = `${LEnv.rootURL}${LEnv.renameClub}?&tk=${tk}&clubID=${this.selectedClub.baseInfo.clubID}&clname=${name}`;
+
+        const cb = (xhr: XMLHttpRequest, err: string) => {
+
+            const data = <Uint8Array>xhr.response;
+            const msgClubReply = proto.club.MsgClubReply.decode(data);
+
+            if (msgClubReply.replyCode === proto.club.ClubReplyCode.RCError) {
+                const msgCubOperGenericReply = proto.club.MsgCubOperGenericReply.decode(msgClubReply.content);
+                if (msgCubOperGenericReply.errorCode === proto.club.ClubOperError.CERR_OK) {
+                    this.loadClub();
+                } else {
+                    ClubRequestError.showErrMsg(msgCubOperGenericReply.errorCode);
+                }
+            }
+        };
+
+        this.clubRequest(url, cb);
     }
     /**
      * 退出茶馆
@@ -326,7 +353,6 @@ export class ClubView extends cc.Component {
     private onReturn2GameBtnClick(): void {
         //
         const jsonStr = DataStore.getString("RoomInfoData");
-        Logger.debug("jsonStr:", jsonStr);
         if (jsonStr !== "") {
             try {
                 const config = <{ [key: string]: string }>JSON.parse(jsonStr);
@@ -368,7 +394,7 @@ export class ClubView extends cc.Component {
     private onMemberSettingBtnClick(): void {
 
         const view = this.addComponent(MemberManagerView);
-        view.setClubInfo(this.selectedClub);
+        view.setClubInfo(this, this.selectedClub);
     }
 
     private onJoinRoomBtnClick(ev: fgui.Event): void {
@@ -635,13 +661,26 @@ export class ClubView extends cc.Component {
 
         const userId = DataStore.getString("userID", "");
         const clubOwnerId = this.selectedClub.creatorUserID;
-        const isManager = userId === clubOwnerId ? true : false;
+        const managers = this.selectedClub.managers;
+        let isManager = false;
+        managers.forEach(managerId => {
+            if (managerId === userId) {
+                isManager = true;
+            }
+        });
+
+        const isOwner = userId === clubOwnerId ? true : false;
+
+        if (isManager || isOwner) {
+            isManager = true;
+        }
+
         this.setOperationBtnVisible(isManager);
     }
 
     private loadClub(): void {
         const tk = DataStore.getString("token", "");
-        const loadEmailUrl = `${LEnv.rootURL}${LEnv.loadMyClubs}?&tk=${tk}`;
+        const url = `${LEnv.rootURL}${LEnv.loadMyClubs}?&tk=${tk}`;
 
         const cb = (xhr: XMLHttpRequest, err: string) => {
 
@@ -657,13 +696,13 @@ export class ClubView extends cc.Component {
 
         };
 
-        this.clubRequest(loadEmailUrl, cb);
+        this.clubRequest(url, cb);
 
     }
 
     private loadClubRooms(clubId: string): void {
         const tk = DataStore.getString("token", "");
-        const loadEmailUrl = `${LEnv.rootURL}${LEnv.loadClubRooms}?&tk=${tk}&clubID=${clubId}`;
+        const url = `${LEnv.rootURL}${LEnv.loadClubRooms}?&tk=${tk}&clubID=${clubId}`;
 
         const cb = (xhr: XMLHttpRequest, err: string) => {
             const data = <Uint8Array>xhr.response;
@@ -684,12 +723,10 @@ export class ClubView extends cc.Component {
             }
         };
 
-        this.clubRequest(loadEmailUrl, cb);
+        this.clubRequest(url, cb);
     }
 
     private updateClubRooms(roomInfos: proto.lobby.IRoomInfo[]): void {
-
-        Logger.debug("updateClubRooms roomInfos = ", roomInfos);
 
         this.allRoomInfos = [];
 

@@ -166,14 +166,13 @@ export class JoinClubView extends cc.Component {
         //
 
         const tk = DataStore.getString("token", "");
-        const loadEmailUrl = `${LEnv.rootURL}${LEnv.joinClub}?&tk=${tk}&clubNumber=${clubNumber}`;
+        const url = `${LEnv.rootURL}${LEnv.joinClub}?&tk=${tk}&clubNumber=${clubNumber}`;
 
         const cb = (xhr: XMLHttpRequest, err: string) => {
             //
             const data = <Uint8Array>xhr.response;
 
             const msgClubReply = proto.club.MsgClubReply.decode(data);
-            Logger.debug("msgClubReply = ", msgClubReply);
 
             if (msgClubReply.replyCode === proto.club.ClubReplyCode.RCOperation) {
                 //  这个接口不会返回 RCOperation
@@ -194,7 +193,7 @@ export class JoinClubView extends cc.Component {
             }
         };
 
-        this.clubRequest(loadEmailUrl, cb);
+        this.clubRequest(url, cb);
 
     }
     /**

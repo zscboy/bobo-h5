@@ -183,7 +183,7 @@ export class EmailView extends cc.Component {
      */
     private loadEmail(): void {
         const tk = DataStore.getString("token", "");
-        const loadEmailUrl = `${LEnv.rootURL}${LEnv.loadMails}?&rt=1&tk=${tk}`;
+        const url = `${LEnv.rootURL}${LEnv.loadMails}?&rt=1&tk=${tk}`;
         const cb = (xhr: XMLHttpRequest, err: string) => {
 
             let errMsg;
@@ -204,7 +204,7 @@ export class EmailView extends cc.Component {
 
         };
 
-        this.emailRequest(loadEmailUrl, cb);
+        this.emailRequest(url, cb);
 
     }
 

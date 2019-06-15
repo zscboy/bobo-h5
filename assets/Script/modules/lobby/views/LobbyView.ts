@@ -40,7 +40,11 @@ export class LobbyView extends cc.Component {
 
         loader.fguiAddPackage("lobby/fui/lobby_main");
         const view = fgui.UIPackage.createObject("lobby_main", "Main").asCom;
+
         fgui.GRoot.inst.addChild(view);
+        const x = cc.winSize.width / 2 - (cc.winSize.height * 1136 / 640 / 2);
+        view.setPosition(x, view.y);
+
         this.view = view;
 
         this.initView();
@@ -83,6 +87,12 @@ export class LobbyView extends cc.Component {
         const userInfo = this.view.getChild("userInfo").asCom;
         this.initInfoView(userInfo);
         userInfo.onClick(this.openUserInfoView, this);
+
+        const bg = this.view.getChild('n21');
+        bg.setSize(cc.winSize.width, cc.winSize.width * 640 / 1136);
+        const y = -(cc.winSize.width * 640 / 1136 - cc.winSize.height) / 2;
+        const x = (cc.winSize.height * 1136 / 640 / 2) - cc.winSize.width / 2;
+        bg.setPosition(x, y);
 
         this.onMessageFunc = this.lm.eventTarget.on(`${proto.lobby.MessageCode.OPUpdateDiamond}`, this.onMessage, this);
     }

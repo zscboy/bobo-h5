@@ -1,4 +1,5 @@
 import { Logger, SoundMgr } from "../lobby/lcore/LCoreExports";
+import { ChatData } from "../lobby/views/chat/ChatExports";
 import { PlayerInfoView } from "../lobby/views/playerInfo/PlayerInfoExports";
 import { AgariIndex } from "./AgariIndex";
 import { PlayerView } from "./PlayerView";
@@ -413,7 +414,7 @@ export class Player {
         playerView.player = this;
         playerView.initCardLists();
 
-        playerView.showHeadImg();
+        playerView.showPlayerInfo(this.playerInfo);
         playerView.showOwner();
     }
 
@@ -800,7 +801,13 @@ export class Player {
             this.playerView.checkReadyHandBtn.visible = false;
         }
     }
-
+    public onChatMsg(chatData: ChatData): void {
+        if (chatData.buildinId !== undefined && chatData.buildinId !== "") {
+            //播放快捷语音效
+            this.playSound("commonLanguage", `speak${chatData.buildinId}`);
+        }
+        this.playerView.showChatMsg(chatData.msg);
+    }
     public onPlayerInfoClick(): void {
         // const pos = { x = this.playerView.userInfoPos.x, y = this.playerView.userInfoPos.y }
         // playerInfoView.showUserInfoView(this.playerInfo, pos, this.isMe() == false, this.host)

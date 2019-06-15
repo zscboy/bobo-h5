@@ -1,3 +1,4 @@
+import { Share } from "../lobby/shareUtil/ShareExports";
 import { GameRules } from "./GameRules";
 import { Player } from "./Player";
 import { proto } from "./proto/protoGame";
@@ -39,6 +40,7 @@ class ViewGroup {
  * 显示一手牌结束后的得分结果
  */
 export class HandResultView extends cc.Component {
+    private eventTarget: cc.EventTarget;
     private room: RoomInterface;
     private unityViewNode: fgui.GComponent = null;
     private win: fgui.Window;
@@ -51,6 +53,7 @@ export class HandResultView extends cc.Component {
     private contentGroup: ViewGroup[];
 
     public showView(room: RoomInterface, msgHandOver: proto.mahjong.IMsgHandOver): void {
+        this.eventTarget = new cc.EventTarget();
         this.room = room;
         // 提高消息队列的优先级为1
         if (!room.isReplayMode()) {
@@ -86,10 +89,10 @@ export class HandResultView extends cc.Component {
 
         const againBtn = this.unityViewNode.getChild("againBtn");
         againBtn.onClick(this.onAgainButtonClick, this);
-        const shanreBtn = this.unityViewNode.getChild("shanreBtn");
         const infoBtn = this.unityViewNode.getChild("guizeBtn");
         infoBtn.onClick(this.onRoomRuleBtnClick, this);
-        // shanreBtn.onClick(this.onShareButtonClick, this);
+        const shanreBtn = this.unityViewNode.getChild("shanreBtn");
+        shanreBtn.onClick(this.onShareButtonClick, this);
 
         if (room.isReplayMode()) {
             againBtn.visible = false;
@@ -131,7 +134,7 @@ export class HandResultView extends cc.Component {
             return;
         }
 
-        let roomNumber = this.room.roomNumber;
+        let roomNumber = this.room.roomInfo.roomNumber;
         if (roomNumber == null) {
             roomNumber = "";
         }
@@ -376,13 +379,16 @@ export class HandResultView extends cc.Component {
         this.contentGroup = contentGroup;
     }
 
+    private onShareButtonClick(): void {
+        Share.shareGame(this.eventTarget, Share.ShareSrcType.GameShare, Share.ShareMediaType.Image, Share.ShareDestType.Friend);
+    }
     private onRoomRuleBtnClick(): void {
         let roomRuleView = this.getComponent(RoomRuleView);
 
         if (roomRuleView === undefined || roomRuleView == null) {
             roomRuleView = this.addComponent(RoomRuleView);
         }
-        roomRuleView.updateView(this.room.roomInfo.roomConfig);
+        roomRuleView.updateView(this.room.roomInfo.config);
     }
     // 玩家点击“继续”按钮，注意如果牌局结束，此按钮是“大结算”
     private onAgainButtonClick(): void {
@@ -394,6 +400,7 @@ export class HandResultView extends cc.Component {
         // if (this.ani) {
         //     this.ani.setVisible(false);
         // }
+        this.eventTarget.emit("destroy");
         this.destroy();
         this.win.hide();
         this.win.dispose();

@@ -24,6 +24,8 @@ export class RoomView {
     private room: RoomInterface;
     private unityViewNode: fgui.GComponent;
     private readyButton: fgui.GButton;
+
+    private returnLobbyBtn: fgui.GButton;
     private roomInfoText: fgui.GObject;
     private roundMarkView: fgui.GComponent;
     private roundMarks: fgui.GObject[];
@@ -69,6 +71,7 @@ export class RoomView {
      */
     public showOrHideReadyButton(isShow: boolean): void {
         this.readyButton.visible = isShow;
+        this.returnLobbyBtn.visible = isShow;
     }
 
     //响应玩家点击左上角的退出按钮以及后退事件
@@ -152,8 +155,9 @@ export class RoomView {
     }
     public showRoomNumber(): void {
         const room = this.room;
-        const num = ""; // string.format(tostring(self.room.handStartted) or "0", "/", tostring((self.room.handNum)))
-        const str = `房号:${room.roomInfo.roomNumber} 局数:${num}`;
+        const num = `${this.room.handStartted}/${this.room.handNum}`;
+        const s = `     `;
+        const str = `${GameRules.gameName(this.room.roomType)}${s}房号:${room.roomInfo.roomNumber}${s}局数:${num}`;
         this.roomInfoText.text = str;
 
     }
@@ -220,7 +224,7 @@ export class RoomView {
 
     //设置当前房间所使用的风圈
     public setRoundMask(): void {
-        if (GameRules.haveFlower(this.room.roomType)) {
+        if (GameRules.haveRoundMask(this.room.roomType)) {
             this.wind.visible = true;
             this.windTile.visible = true;
             TileImageMounter.mountTileImage(this.windTile, this.room.windFlowerID);
@@ -287,7 +291,7 @@ export class RoomView {
         if (roomRuleView === undefined || roomRuleView == null) {
             roomRuleView = this.component.addComponent(RoomRuleView);
         }
-        roomRuleView.updateView(this.room.roomInfo.roomConfig);
+        roomRuleView.updateView(this.room.roomInfo.config);
     }
 
     private onSettingBtnClick(): void {
@@ -310,9 +314,9 @@ export class RoomView {
             chatView = this.component.addComponent(ChatView);
         }
 
-        chatView.show(load);
+        const callBack: Function = <Function>this.room.showMsg.bind(this.room);
+        chatView.show(load, callBack);
     }
-
     /**
      * 初始化
      */
@@ -338,12 +342,16 @@ export class RoomView {
         this.readyButton.visible = false;
         this.readyButton.onClick(this.room.onReadyButtonClick, this.room);
 
+        this.returnLobbyBtn = this.unityViewNode.getChild("return2LobbyBtn").asButton;
+        this.returnLobbyBtn.visible = false;
+        this.returnLobbyBtn.onClick(this.room.onReturnLobbyBtnClick, this.room);
+
         // 调整微信版本的按钮位置
-        if (CC_WECHATGAME) {
-            Logger.debug("init wechat game button position");
-            settingBtn.setPosition(settingBtn.x, settingBtn.y + 60);
-            infoBtn.setPosition(infoBtn.x, infoBtn.y + 60);
-        }
+        // if (CC_WECHATGAME) {
+        //     Logger.debug("init wechat game button position");
+        //     settingBtn.setPosition(settingBtn.x, settingBtn.y + 60);
+        //     infoBtn.setPosition(infoBtn.x, infoBtn.y + 60);
+        // }
 
     }
 

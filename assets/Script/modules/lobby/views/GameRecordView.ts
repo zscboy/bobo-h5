@@ -16,8 +16,6 @@ export class GameRecordView extends cc.Component {
 
     private lobbyModule: LobbyModuleInterface;
 
-    private onGameRecordShowFunc: Function;
-
     protected onLoad(): void {
 
         this.eventTarget = new cc.EventTarget();
@@ -41,7 +39,7 @@ export class GameRecordView extends cc.Component {
 
     protected onDestroy(): void {
         if (this.lobbyModule !== null) {
-            this.lobbyModule.eventTarget.off("onGameRecordShow", this.onGameRecordShowFunc);
+            this.lobbyModule.eventTarget.off("onGameRecordShow", this.onGameRecordShow);
         }
 
         this.eventTarget.emit("destroy");
@@ -68,7 +66,7 @@ export class GameRecordView extends cc.Component {
 
         this.lobbyModule = <LobbyModuleInterface>this.getComponent("LobbyModule");
         if (this.lobbyModule !== null) {
-            this.onGameRecordShowFunc = this.lobbyModule.eventTarget.on(`onGameRecordShow`, this.onGameRecordShow, this);
+            this.lobbyModule.eventTarget.on(`onGameRecordShow`, this.onGameRecordShow, this);
         }
         //this.recordList.numItems = 1;
     }

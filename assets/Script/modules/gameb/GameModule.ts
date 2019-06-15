@@ -1,4 +1,3 @@
-// tslint:disable-next-line:max-line-length
 import {
     AnimationMgr, DataStore, Dialog, GameModuleInterface,
     GameModuleLaunchArgs, GResLoader, LEnv,
@@ -34,7 +33,6 @@ export class GameModule extends cc.Component implements GameModuleInterface {
     private lm: LobbyModuleInterface;
     private mUser: UserInfo;
     private mAnimationMgr: AnimationMgr;
-
     public get room(): Room {
         return this.mRoom;
     }
@@ -75,7 +73,7 @@ export class GameModule extends cc.Component implements GameModuleInterface {
             const chairID = 0;
             await this.tryEnterReplayRoom(args.userInfo.userID, args.record, chairID);
         } else {
-            await this.tryEnterRoom(args.uuid, args.userInfo, args.roomInfo);
+            await this.tryEnterRoom(args.userInfo, args.roomInfo);
         }
     }
 
@@ -121,7 +119,6 @@ export class GameModule extends cc.Component implements GameModuleInterface {
     }
 
     private async tryEnterRoom(
-        serverUUID: string,
         myUser: UserInfo,
         roomInfo: RoomInfo): Promise<void> {
 
@@ -134,9 +131,9 @@ export class GameModule extends cc.Component implements GameModuleInterface {
 
         let path;
         if (roomInfo.roomID === "monkey-room") {
-            path = LEnv.cfmt(LEnv.gameWebsocketMonkey, serverUUID);
+            path = LEnv.cfmt(LEnv.gameWebsocketMonkey, roomInfo.gameServerID);
         } else {
-            path = LEnv.cfmt(LEnv.gameWebsocketPlay, serverUUID);
+            path = LEnv.cfmt(LEnv.gameWebsocketPlay, roomInfo.gameServerID);
         }
 
         url = `${host}${path}?userID=${uID}&roomID=${rID}&tk=${tk}&web=1`;
@@ -258,11 +255,15 @@ export class GameModule extends cc.Component implements GameModuleInterface {
         if (enterRoomResult.status !== 0) {
             // 进入房间错误提示
             Logger.debug(" server return enter mRoom ~= 0");
+            //  进入房间错误清除保留的房间信息
+            DataStore.setItem("RoomInfoData", "");
             await this.showEnterRoomError(enterRoomResult.status);
 
             return;
         }
 
+        //  进入房间错误清除保留的房间信息
+        DataStore.setItem("RoomInfoData", "");
         await this.pumpMsg();
         Logger.debug("doEnterRoom leave---");
     }
@@ -395,10 +396,10 @@ export class GameModule extends cc.Component implements GameModuleInterface {
         const roomInfo = {
             roomID: "",
             roomNumber: msgHandRecord.roomNumber,
-            roomConfig: msgAccLoadReplayRecord.roomJSONConfig,
-            gameServerURL: "",
+            config: msgAccLoadReplayRecord.roomJSONConfig,
+            gameServerID: "",
             state: 1,
-            config: msgHandRecord.roomConfigID,
+            roomConfigID: msgHandRecord.roomConfigID,
             timeStamp: "",
             handStartted: msgHandRecord.handNum,
             lastActiveTime: 0

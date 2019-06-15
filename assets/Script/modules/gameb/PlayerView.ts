@@ -1,8 +1,8 @@
-import { Dialog, Logger } from "../lobby/lcore/LCoreExports";
+import { CommonFunction, Dialog, Logger } from "../lobby/lcore/LCoreExports";
 import { GameRules } from "./GameRules";
 import { ButtonDef, ClickCtrl, PlayerInterface } from "./PlayerInterface";
 import { proto } from "./proto/protoGame";
-import { RoomHost, RoomInterface, TingPai } from "./RoomInterface";
+import { PlayerInfo, RoomHost, RoomInterface, TingPai } from "./RoomInterface";
 import { TileImageMounter } from "./TileImageMounter";
 
 const mjproto = proto.mahjong;
@@ -24,6 +24,7 @@ class PosCtrl {
  */
 class Head {
     public headView: fgui.GComponent;
+    public headLoader: fgui.GLoader;
     public pos: fgui.GObject;
     public readyIndicator: fgui.GObject;
     public ting: fgui.GObject;
@@ -32,6 +33,7 @@ class Head {
     public continuousBankerFlag: fgui.GObject;
     public huaNode: fgui.GObject;
     public huaNodeText: fgui.GObject;
+    public nameText: fgui.GObject;
     public onUpdateBankerFlag: (isBanker: boolean, isContinue: boolean) => void;
     public hideAll: Function;
 }
@@ -81,6 +83,8 @@ export class PlayerView {
 
     private aniPos: fgui.GObject;
     private userInfoPos: fgui.GObject;
+    private qipao: fgui.GComponent;
+    private qipaoText: fgui.GObject;
     private alreadyShowNonDiscardAbleTips: boolean;
     private discardTipsTile: fgui.GComponent;
     private btnHanders: { [key: string]: Function };
@@ -89,6 +93,7 @@ export class PlayerView {
     private lastClickIndex: number;
 
     private dragHand: fgui.GComponent; //拖牌时 克隆的牌
+    private msgTimerCB: Function;
 
     public constructor(viewUnityNode: fgui.GComponent, viewChairID: number, room: RoomInterface) {
         this.room = room;
@@ -619,9 +624,22 @@ export class PlayerView {
     }
 
     //显示玩家头像
-    public showHeadImg(): void {
+    public showPlayerInfo(playerInfo: PlayerInfo): void {
         this.head.headView.visible = true;
         this.head.headView.onClick(this.player.onPlayerInfoClick, this.player);
+
+        let nick = playerInfo.nick;
+        if (nick === undefined || nick === "") {
+            nick = playerInfo.userID;
+        }
+        //裁剪
+        if (nick.length > 8) {
+            nick = `${nick.substring(0, 8)}...`;
+        }
+        this.head.nameText.text = nick;
+        this.head.nameText.visible = true;
+        //头像
+        CommonFunction.setHead(this.head.headLoader, playerInfo.headIconURI, playerInfo.gender);
     }
 
     //显示桌主
@@ -668,6 +686,23 @@ export class PlayerView {
         return this.userInfoPos;
     }
 
+    //显示聊天消息
+    public showChatMsg(str: string): void {
+        if (str !== undefined && str !== null) {
+            if (this.msgTimerCB === undefined) {
+                this.msgTimerCB = <Function>this.hideChatMsg.bind(this);
+            }
+            this.qipaoText.text = str;
+            this.qipao.visible = true;
+            //定时隐藏
+            this.roomHost.component.unschedule(this.msgTimerCB);
+            this.roomHost.component.scheduleOnce(this.msgTimerCB, 3);
+        }
+    }
+    private hideChatMsg(): void {
+        this.qipao.visible = false;
+    }
+
     private initOtherView(): void {
 
         // this.aniPos = view.getChild("aniPos")
@@ -676,6 +711,10 @@ export class PlayerView {
         //打出的牌放大显示
         this.discardTips = this.myView.getChild("discardTip").asCom;
         this.discardTipsTile = this.discardTips.getChild("card").asCom;
+
+        //聊天气泡
+        this.qipao = this.myView.getChild("qipao").asCom;
+        this.qipaoText = this.qipao.getChild("text");
     }
 
     //头像周边内容节点
@@ -686,6 +725,7 @@ export class PlayerView {
         head.headView = this.myView.getChild("head").asCom;
         head.headView.visible = false;
         head.pos = head.headView.getChild("pos");
+        head.headLoader = head.headView.getChild("n1").asLoader;
         //ready状态指示
         head.readyIndicator = this.myView.getChild("ready");
         head.readyIndicator.visible = false;
@@ -706,6 +746,8 @@ export class PlayerView {
         head.huaNode.visible = false;
         head.huaNodeText = this.myView.getChild("huaText");
         head.huaNodeText.visible = false;
+        head.nameText = this.myView.getChild("nameText");
+        head.nameText.visible = false;
 
         //更新庄家UI
         const updateBanker = (isBanker: boolean, isContinue: boolean): void => {
@@ -733,6 +775,7 @@ export class PlayerView {
             head.continuousBankerFlag.visible = false;
             head.huaNode.visible = false;
             head.huaNodeText.visible = false;
+            head.nameText.visible = false;
         };
 
         this.head = head;

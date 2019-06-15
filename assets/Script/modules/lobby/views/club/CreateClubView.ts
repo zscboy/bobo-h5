@@ -1,8 +1,15 @@
-import { DataStore, Dialog, HTTP, LEnv, LobbyModuleInterface, Logger } from "../../lcore/LCoreExports";
+import { DataStore, Dialog, HTTP, LEnv, Logger } from "../../lcore/LCoreExports";
 import { proto } from "../../proto/protoLobby";
 import { ClubRequestError } from "./ClubRequestError";
 
 const { ccclass } = cc._decorator;
+
+interface CreateClubViewInterface {
+
+    addClub: Function;
+
+}
+
 /**
  * 创建茶馆页面
  */
@@ -13,18 +20,15 @@ export class CreateClubView extends cc.Component {
     private win: fgui.Window;
     private eventTarget: cc.EventTarget;
 
-    public getEventTarget(): cc.EventTarget {
-        return this.eventTarget;
+    private clubView: CreateClubViewInterface;
+
+    public bind(clubView: CreateClubViewInterface): void {
+        this.clubView = clubView;
     }
 
     protected onLoad(): void {
         //
         this.eventTarget = new cc.EventTarget();
-
-        const lm = <LobbyModuleInterface>this.getComponent("LobbyModule");
-        const loader = lm.loader;
-        loader.fguiAddPackage("lobby/fui_club/lobby_club");
-
         const view = fgui.UIPackage.createObject("lobby_club", "createClubView").asCom;
         this.view = view;
 
@@ -95,9 +99,8 @@ export class CreateClubView extends cc.Component {
     }
 
     private createClub(clubName: string): void {
-        Logger.debug("createClub clubName = ", clubName);
         const tk = DataStore.getString("token", "");
-        const loadEmailUrl = `${LEnv.rootURL}${LEnv.createClub}?&tk=${tk}&&clname=${clubName}`;
+        const url = `${LEnv.rootURL}${LEnv.createClub}?&tk=${tk}&&clname=${clubName}`;
 
         const cb = (xhr: XMLHttpRequest, err: string) => {
             //
@@ -118,14 +121,14 @@ export class CreateClubView extends cc.Component {
 
         };
 
-        this.clubRequest(loadEmailUrl, cb);
+        this.clubRequest(url, cb);
 
     }
 
     private updateViewClubList(clubInfo: proto.club.IMsgClubInfo): void {
         //
 
-        this.eventTarget.emit("addClub", clubInfo);
+        this.clubView.addClub(clubInfo);
         this.destroy();
     }
 

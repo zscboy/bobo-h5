@@ -1,4 +1,4 @@
-import { DataStore, Dialog, HTTP, LEnv, LobbyModuleInterface, Logger } from "../../lcore/LCoreExports";
+import { DataStore, Dialog, HTTP, LEnv, Logger } from "../../lcore/LCoreExports";
 import { proto } from "../../proto/protoLobby";
 import { ClubRequestError } from "./ClubRequestError";
 
@@ -26,10 +26,6 @@ export class JoinClubView extends cc.Component {
     protected onLoad(): void {
         //
         this.eventTarget = new cc.EventTarget();
-
-        const lm = <LobbyModuleInterface>this.getComponent("LobbyModule");
-        const loader = lm.loader;
-        loader.fguiAddPackage("lobby/fui_club/lobby_club");
 
         const view = fgui.UIPackage.createObject("lobby_club", "joinClub").asCom;
         this.view = view;
@@ -170,14 +166,13 @@ export class JoinClubView extends cc.Component {
         //
 
         const tk = DataStore.getString("token", "");
-        const loadEmailUrl = `${LEnv.rootURL}${LEnv.joinClub}?&tk=${tk}&clubNumber=${clubNumber}`;
+        const url = `${LEnv.rootURL}${LEnv.joinClub}?&tk=${tk}&clubNumber=${clubNumber}`;
 
         const cb = (xhr: XMLHttpRequest, err: string) => {
             //
             const data = <Uint8Array>xhr.response;
 
             const msgClubReply = proto.club.MsgClubReply.decode(data);
-            Logger.debug("msgClubReply = ", msgClubReply);
 
             if (msgClubReply.replyCode === proto.club.ClubReplyCode.RCOperation) {
                 //  这个接口不会返回 RCOperation
@@ -198,7 +193,7 @@ export class JoinClubView extends cc.Component {
             }
         };
 
-        this.clubRequest(loadEmailUrl, cb);
+        this.clubRequest(url, cb);
 
     }
     /**

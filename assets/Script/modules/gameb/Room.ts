@@ -1,5 +1,6 @@
 
 import { Logger, RoomInfo, SoundMgr, UserInfo } from "../lobby/lcore/LCoreExports";
+import { ChatData } from "../lobby/views/chat/ChatExports";
 import { GameOverResultView } from "./GameOverResultView";
 import { HandlerActionResultNotify } from "./handlers/HandlerActionResultNotify";
 import { HandlerMsg2Lobby } from "./handlers/HandlerMsg2Lobby";
@@ -59,8 +60,7 @@ export class Room {
     public scoreRecords: proto.mahjong.IMsgRoomHandScoreRecord[];
     public state: number;
     public ownerID: string;
-    public roomNumber: string;
-    public handStartted: number;
+    public handStartted: number = 0;
     public windFlowerID: number;
     public isDestroy: boolean = false;
     public bankerChairID: number = 0;
@@ -72,16 +72,18 @@ export class Room {
     public tilesInWall: number;
     public myPlayer: Player;
     public msgDisbandNotify: proto.mahjong.MsgDisbandNotify;
+    public handNum: number;
     public readonly roomType: number;
     public constructor(myUser: UserInfo, roomInfo: RoomInfo, host: RoomHost, rePlay?: Replay) {
         this.myUser = myUser;
-        this.roomInfo = roomInfo;
         this.host = host;
         this.replay = rePlay;
+        this.roomInfo = roomInfo;
 
-        const roomConfigJSON = <{ [key: string]: boolean | number | string }>JSON.parse(roomInfo.roomConfig);
+        const roomConfigJSON = <{ [key: string]: boolean | number | string }>JSON.parse(roomInfo.config);
         // Logger.debug("roomConfigJSON ---------------------------------------------", roomConfigJSON);
         this.roomType = <number>roomConfigJSON[`roomType`];
+        this.handNum = <number>roomConfigJSON[`handNum`];
     }
 
     public getRoomHost(): RoomHost {
@@ -166,6 +168,12 @@ export class Room {
         gm.Ops = proto.mahjong.MessageCode.OPPlayerReady;
         const buf = proto.mahjong.GameMessage.encode(gm);
         this.host.sendBinary(buf);
+    }
+
+    public onReturnLobbyBtnClick(): void {
+
+        this.sendMsg(proto.mahjong.MessageCode.OP2Lobby);
+
     }
 
     // 根据玩家的chairID获得相应的playerViewChairID    // 注意服务器的chairID是由0开始
@@ -473,7 +481,9 @@ export class Room {
         //
         this.roomView.switchBg(index);
     }
-
+    public showMsg(chatData: ChatData): void {
+        this.players[chatData.fromUserID].onChatMsg(chatData);
+    }
     /**
      * 挂起若干秒
      * @param seconds 秒数

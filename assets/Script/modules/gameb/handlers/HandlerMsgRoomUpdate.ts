@@ -34,8 +34,10 @@ export namespace HandlerMsgRoomUpdate {
         room.state = msgRoomUpdate.state;
 
         room.ownerID = msgRoomUpdate.ownerID;
-        room.roomNumber = msgRoomUpdate.roomNumber;
-        room.handStartted = msgRoomUpdate.handStartted;
+        // room.roomNumber = msgRoomUpdate.roomNumber;
+        if (msgRoomUpdate.handStartted !== undefined && msgRoomUpdate.handStartted >= 0) {
+            room.handStartted = msgRoomUpdate.handStartted;
+        }
         //有人退出为 -1 有人进来为 1 没有变动为 0
         let updatePlayer = 0;
         //显示房间号

@@ -102,6 +102,11 @@ const BASE_WIN_SCORE: { [key: number]: string } = {
     [ROOM_TYPE.DaFeng]: "基本分"
 };
 
+//游戏名字
+const GAME_NAME: { [key: number]: string } = {
+    [ROOM_TYPE.DaFeng]: "大丰麻将",
+    [ROOM_TYPE.ZhanJiang]: "湛江麻将"
+};
 /**
  *  游戏差异类
  */
@@ -230,5 +235,14 @@ export namespace GameRules {
     //是否有家家庄
     export const haveJiaJiaZhuang = (gameType: number): boolean => {
         return gameType === ROOM_TYPE.DaFeng;
+    };
+    //是否有风圈
+    export const haveRoundMask = (gameType: number): boolean => {
+        return gameType === ROOM_TYPE.DaFeng;
+    };
+
+    //获取游戏名字
+    export const gameName = (gameType: number): string => {
+        return GAME_NAME[gameType];
     };
 }

@@ -552,6 +552,24 @@ exports.proto = require("protobuf").newBuilder({})['import']({
                             "id": 2
                         }
                     ]
+                },
+                {
+                    "name": "MsgClubNotify",
+                    "syntax": "proto2",
+                    "fields": [
+                        {
+                            "rule": "required",
+                            "type": "int32",
+                            "name": "notifyType",
+                            "id": 1
+                        },
+                        {
+                            "rule": "optional",
+                            "type": "bytes",
+                            "name": "content",
+                            "id": 2
+                        }
+                    ]
                 }
             ],
             "enums": [
@@ -786,6 +804,20 @@ exports.proto = require("protobuf").newBuilder({})['import']({
                         {
                             "name": "CFET_Add_By_Room",
                             "id": 6
+                        }
+                    ]
+                },
+                {
+                    "name": "ClubNotifyType",
+                    "syntax": "proto2",
+                    "values": [
+                        {
+                            "name": "CNotify_None",
+                            "id": 0
+                        },
+                        {
+                            "name": "CNotify_Change_Member_Role",
+                            "id": 1
                         }
                     ]
                 }
@@ -2080,6 +2112,10 @@ exports.proto = require("protobuf").newBuilder({})['import']({
                         {
                             "name": "OPMail",
                             "id": 4
+                        },
+                        {
+                            "name": "OPClubNotify",
+                            "id": 5
                         },
                         {
                             "name": "OPPing",

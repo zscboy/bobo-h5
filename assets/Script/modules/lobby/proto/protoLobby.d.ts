@@ -66,6 +66,11 @@ export namespace proto {
 			CFET_Add_By_Room = 6,
 		}
 
+		enum ClubNotifyType {
+			CNotify_None = 0,
+			CNotify_Change_Member_Role = 1,
+		}
+
 		interface IMsgClubReply {
 			replyCode: number;
 			content?: ByteBuffer;
@@ -381,6 +386,19 @@ export namespace proto {
 			public static decode(reader: Uint8Array|ByteBuffer): MsgClubLoadApplyRecordReply;
 		}
 
+		interface IMsgClubNotify {
+			notifyType: number;
+			content?: ByteBuffer;
+		}
+
+		class MsgClubNotify implements IMsgClubNotify {
+			public notifyType: number;
+			public content: ByteBuffer;
+			constructor(properties?: club.IMsgClubNotify);
+			public static encode(message: MsgClubNotify): ByteBuffer;
+			public static decode(reader: Uint8Array|ByteBuffer): MsgClubNotify;
+		}
+
 	}
 	export namespace lobby {
 		enum MsgError {
@@ -432,6 +450,7 @@ export namespace proto {
 			OPChat = 2,
 			OPUpdateDiamond = 3,
 			OPMail = 4,
+			OPClubNotify = 5,
 			OPPing = 100,
 			OPPong = 101,
 		}

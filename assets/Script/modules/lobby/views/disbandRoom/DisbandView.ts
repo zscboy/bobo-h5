@@ -1,16 +1,39 @@
+import { proto } from "../../../gameb/proto/protoGame";
+import { Dialog, GResLoader, Logger } from "../../lcore/LCoreExports";
 
-import { Dialog, Logger } from "../lobby/lcore/LCoreExports";
-import { proto } from "./proto/protoGame";
-import { RoomInterface } from "./RoomInterface";
+export interface RoomInterface {
+    sendDisbandAgree(agree: boolean): void;
+
+}
+/**
+ * 包装精简的用户信息，
+ */
+export class DisBandPlayerInfo {
+    public readonly userID: string;
+    public readonly chairID: number;
+
+    public readonly nick: string;
+
+    constructor(userID: string, chairID: number, nick: string) {
+        this.userID = userID;
+        this.chairID = chairID;
+        this.nick = nick;
+    }
+
+}
 
 /**
- * 设置界面
+ * 解散页面
  */
 export class DisbandView extends cc.Component {
 
     private view: fgui.GComponent;
 
-    private eventTarget: cc.EventTarget;
+    private win: fgui.Window;
+
+    private playersInfo: DisBandPlayerInfo[];
+
+    private myInfo: DisBandPlayerInfo;
 
     private room: RoomInterface;
 
@@ -28,24 +51,36 @@ export class DisbandView extends cc.Component {
 
     private msgDisbandNotify: proto.mahjong.MsgDisbandNotify;
 
-    public saveRoomView(room: RoomInterface, msgDisbandNotify: proto.mahjong.MsgDisbandNotify): void {
+    public saveRoomView(room: RoomInterface, msgDisbandNotify: proto.mahjong.MsgDisbandNotify, loader: GResLoader
+        // tslint:disable-next-line:align
+        , myInfo: DisBandPlayerInfo, playersInfo: DisBandPlayerInfo[]): void {
+        this.myInfo = myInfo;
         this.room = room;
+        this.playersInfo = playersInfo;
         this.msgDisbandNotify = msgDisbandNotify;
+
+        if (this.view === null || this.view === undefined) {
+            loader.fguiAddPackage("lobby/fui_disband_room/lobby_disband_room");
+            const view = fgui.UIPackage.createObject("lobby_disband_room", "disband_room").asCom;
+            this.view = view;
+            const win = new fgui.Window();
+            win.contentPane = view;
+            win.modal = true;
+
+            this.win = win;
+            this.win.show();
+
+            this.initView();
+        }
+
+        this.updateView();
+
     }
 
     public updateView(): void {
         const msgDisbandNotify = this.msgDisbandNotify;
         //
         Logger.debug("msgDisbandNotify = ", msgDisbandNotify);
-
-        if (this.view !== null) {
-            // this.room = room;
-            if (this.view.visible === false) {
-                this.view.visible = true;
-                fgui.GRoot.inst.showPopup(this.view);
-                this.view.setPosition(0, 0);
-            }
-        }
 
         //先更新所有文字信息，例如谁同意，谁拒绝之类
         this.updateTexts(msgDisbandNotify);
@@ -78,7 +113,7 @@ export class DisbandView extends cc.Component {
                 this.unschedule(this.disbandCountDown);
                 this.leftTime = msgDisbandNotify.countdown; //倒计时时间，秒为单位
                 let found = false;
-                const me = this.room.getMyPlayerInfo();
+                const me = this.myInfo;
 
                 msgDisbandNotify.waits.forEach(chairID => {
                     if (chairID === me.chairID) {
@@ -117,24 +152,10 @@ export class DisbandView extends cc.Component {
 
     }
 
-    protected onLoad(): void {
-
-        this.eventTarget = new cc.EventTarget();
-
-        const view = fgui.UIPackage.createObject("dafeng", "disband_room").asCom;
-        this.view = view;
-        this.view.visible = false;
-
-        this.initView();
-    }
-
-    protected start(): void {
-        this.updateView();
-    }
-
     protected onDestroy(): void {
-        this.eventTarget.emit("destroy");
         this.view.dispose();
+        this.win.hide();
+        this.win.dispose();
     }
 
     private disbandCountDown(): void {
@@ -206,8 +227,8 @@ export class DisbandView extends cc.Component {
         }
 
         // 显示谁解散房间
-        if (this.room.getPlayerByChairID(msgDisbandNotify.applicant) !== undefined
-            && this.room.getPlayerByChairID(msgDisbandNotify.applicant) !== null) {
+        if (this.getPlayerByChairID(msgDisbandNotify.applicant) !== undefined
+            && this.getPlayerByChairID(msgDisbandNotify.applicant) !== null) {
 
             const view = playerList[msgDisbandNotify.applicant];
             nick = this.getPlayerNick(msgDisbandNotify.applicant);
@@ -222,7 +243,7 @@ export class DisbandView extends cc.Component {
             Logger.debug("llwant, msgDisbandNotify.waits length:", msgDisbandNotify.waits.length);
 
             msgDisbandNotify.waits.forEach(chairID => {
-                if (this.room.getPlayerByChairID(chairID) !== undefined) {
+                if (this.getPlayerByChairID(chairID) !== undefined) {
                     Logger.debug("llwant, msgDisbandNotify.waits chairID:", chairID);
                     const view = playerList[chairID];
                     nick = this.getPlayerNick(chairID);
@@ -240,7 +261,7 @@ export class DisbandView extends cc.Component {
             Logger.debug("llwant, msgDisbandNotify.agrees length:", msgDisbandNotify.agrees.length);
 
             msgDisbandNotify.agrees.forEach(chairID => {
-                if (this.room.getPlayerByChairID(chairID) !== undefined) {
+                if (this.getPlayerByChairID(chairID) !== undefined) {
                     Logger.debug("llwant, msgDisbandNotify.agrees chairID:", chairID);
                     const view = playerList[chairID];
                     nick = this.getPlayerNick(chairID);
@@ -260,7 +281,7 @@ export class DisbandView extends cc.Component {
             Logger.debug("llwant, msgDisbandNotify.rejects length:", msgDisbandNotify.rejects.length);
 
             msgDisbandNotify.rejects.forEach(chairID => {
-                if (this.room.getPlayerByChairID(chairID) !== undefined) {
+                if (this.getPlayerByChairID(chairID) !== undefined) {
                     Logger.debug("llwant, msgDisbandNotify.rejects chairID:", chairID);
                     const view = playerList[chairID];
                     nick = this.getPlayerNick(chairID);
@@ -292,7 +313,7 @@ export class DisbandView extends cc.Component {
     }
 
     private getPlayerNick(chairID: number): string {
-        const playerInfo = this.room.getPlayerInfoByChairID(chairID);
+        const playerInfo = this.getPlayerByChairID(chairID);
         let nick = playerInfo.nick;
 
         if (nick === undefined || nick === undefined || nick === "") {
@@ -300,6 +321,21 @@ export class DisbandView extends cc.Component {
         }
 
         return nick;
+    }
+
+    private getPlayerByChairID(chairID: number): DisBandPlayerInfo {
+        //
+
+        let playerInfo = null;
+
+        for (const p of this.playersInfo) {
+            if (p.chairID === chairID) {
+                playerInfo = p;
+            }
+        }
+
+        return playerInfo;
+
     }
 
 }

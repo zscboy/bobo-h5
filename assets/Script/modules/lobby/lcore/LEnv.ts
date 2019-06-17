@@ -44,6 +44,7 @@ export namespace LEnv {
     export const loadClubRooms = "/lobby/uuid/loadClubRooms";
 
     export const loadMyApplyEvent = "/lobby/uuid/loadMyApplyEvent";
+
     export const renameClub = "/lobby/uuid/renameClub";
 
     export const kickOut = "/lobby/uuid/kickOut";

@@ -14,7 +14,7 @@ export namespace HandlerActionResultDraw {
         const drawTile = actionResultMsg.actionTile;
         //本次抽牌如果有抽到花牌，则把花牌保存到player的花牌列表
         //并显示出来
-        if (tilesFlower !== null && tilesFlower.length > 0) {
+        if (tilesFlower !== undefined && tilesFlower.length > 0) {
             for (const flower of tilesFlower) {
                 const xf = [];
                 player.playerView.showFlowerOnHandTail(flower);

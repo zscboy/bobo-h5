@@ -401,11 +401,11 @@ export class GameModuleA extends cc.Component implements GameModuleInterface {
             lastActiveTime: 0
         };
 
-        const replay = new ReplayA(this, msgHandRecord);
+        const replay = new ReplayA(msgHandRecord);
         // 新建room和绑定roomView
         this.createRoom(this.user, roomInfo, replay);
 
-        await replay.gogogo();
+        await replay.gogogo(this.room);
 
         this.backToLobby();
     }

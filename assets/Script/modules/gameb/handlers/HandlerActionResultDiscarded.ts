@@ -13,10 +13,11 @@ export namespace HandlerActionResultDiscarded {
 
         const me = room.getMyPlayer();
         const isMe = player.isMe();
-        if (!isMe || room.isReplayMode()) {
+        const isReplayMode = room.isReplayMode();
+        if (!isMe || isReplayMode) {
             player.discardOutTileID(discardTileId);
         }
-        if (isMe) {
+        if (isMe && !isReplayMode) {
 
             return;
         }

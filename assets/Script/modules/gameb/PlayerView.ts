@@ -1,8 +1,8 @@
-import { CommonFunction, Dialog, Logger } from "../lobby/lcore/LCoreExports";
+import { CommonFunction, Dialog, Logger, RoomHost } from "../lobby/lcore/LCoreExports";
 import { GameRules } from "./GameRules";
 import { ButtonDef, ClickCtrl, PlayerInterface } from "./PlayerInterface";
 import { proto } from "./proto/protoGame";
-import { PlayerInfo, RoomHost, RoomInterface, TingPai } from "./RoomInterface";
+import { PlayerInfo, RoomInterface, TingPai } from "./RoomInterface";
 import { TileImageMounter } from "./TileImageMounter";
 
 const mjproto = proto.mahjong;

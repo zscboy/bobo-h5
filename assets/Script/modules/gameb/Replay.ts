@@ -11,7 +11,7 @@ import { HandlerMsgHandOver } from "./handlers/HandlerMsgHandOver";
 import { Player } from "./Player";
 // import { HandlerMsgHandOver } from "./handlers/HandlerMsgHandOver";
 import { proto } from "./proto/protoGame";
-import { RoomHost } from "./RoomInterface";
+import { RoomInterface } from "./RoomInterface";
 
 type ActionHandler = (srAction: proto.mahjong.ISRAction, x?: any) => Promise<void>; // tslint:disable-line:no-any
 
@@ -19,8 +19,8 @@ type ActionHandler = (srAction: proto.mahjong.ISRAction, x?: any) => Promise<voi
  * 回播
  */
 export class Replay {
-    public readonly host: RoomHost;
     public readonly msgHandRecord: proto.mahjong.SRMsgHandRecorder;
+    private room: RoomInterface;
 
     private speed: number;
     private actionStep: number;
@@ -37,19 +37,18 @@ export class Replay {
     // private latestDiscardedTile: number;
     private latestDiscardedPlayer: Player;
 
-    public constructor(host: RoomHost, msgHandRecord: proto.mahjong.SRMsgHandRecorder) {
-        this.host = host;
+    public constructor(msgHandRecord: proto.mahjong.SRMsgHandRecorder) {
+
         this.msgHandRecord = msgHandRecord;
     }
 
-    public async gogogo(): Promise<void> {
+    public async gogogo(room: RoomInterface): Promise<void> {
         Logger.debug("gogogogo");
-
-        const room = this.host.room;
+        this.room = room;
         const players = this.msgHandRecord.players;
         players.forEach((p) => {
             Logger.debug("p.userID:", p.userID);
-            if (p.userID === this.host.user.userID) {
+            if (p.userID === this.room.getRoomHost().user.userID) {
                 room.createMyPlayer(this.clonePlayer(p));
             } else {
                 room.createPlayerByInfo(this.clonePlayer(p));
@@ -73,7 +72,7 @@ export class Replay {
         const color = new cc.Color(0, 0, 0, 0);
         fgui.GRoot.inst.modalLayer.color = color;
 
-        this.host.loader.fguiAddPackage("lobby/fui_replay/lobby_replay");
+        this.room.getRoomHost().loader.fguiAddPackage("lobby/fui_replay/lobby_replay");
         const view = fgui.UIPackage.createObject("lobby_replay", "operations").asCom;
         const win = new fgui.Window();
         win.contentPane = view;
@@ -119,7 +118,7 @@ export class Replay {
             this.mq.pushMessage(mt);
         };
 
-        this.host.component.schedule(
+        this.room.getRoomHost().component.schedule(
             cb,
             this.speed,
             cc.macro.REPEAT_FOREVER);
@@ -168,7 +167,7 @@ export class Replay {
     public onPauseClick(): void {
         this.btnPause.visible = false;
         this.btnResume.visible = true;
-        this.host.component.unschedule(this.timerCb);
+        this.room.getRoomHost().component.unschedule(this.timerCb);
     }
 
     public onResumeClick(): void {
@@ -188,7 +187,7 @@ export class Replay {
             return;
         }
 
-        this.host.component.unschedule(this.timerCb);
+        this.room.getRoomHost().component.unschedule(this.timerCb);
         this.speed = this.speed / 2;
         this.startStepTimer();
     }
@@ -201,7 +200,7 @@ export class Replay {
             return;
         }
 
-        this.host.component.unschedule(this.timerCb);
+        this.room.getRoomHost().component.unschedule(this.timerCb);
         this.speed = this.speed * 2;
         this.startStepTimer();
     }
@@ -224,7 +223,7 @@ export class Replay {
     }
 
     public async doReplayStep(): Promise<void> {
-        const room = this.host.room;
+        const room = this.room;
         if (this.actionStep === -1) {
             Logger.debug("Replay:doReplayStep, deal");
             // 重置房间
@@ -235,7 +234,7 @@ export class Replay {
             const actionlist = this.msgHandRecord.actions;
             if (this.actionStep >= actionlist.length) {
                 // 已经播放完成了
-                this.host.component.unschedule(this.timerCb);
+                this.room.getRoomHost().component.unschedule(this.timerCb);
 
                 // 结算页面
                 await this.handOver();
@@ -252,7 +251,7 @@ export class Replay {
     }
 
     public async doAction(srAction: proto.mahjong.ISRAction, actionlist: proto.mahjong.ISRAction[]): Promise<void> {
-        const room = this.host.room;
+        const room = this.room;
         const i = this.actionStep;
         const player = <Player>room.getPlayerByChairID(srAction.chairID);
         room.setWaitingPlayer(player.chairID);
@@ -273,7 +272,7 @@ export class Replay {
     }
 
     public deal(): void {
-        const room = this.host.room;
+        const room = this.room;
         // 房间状态改为playing
         room.state = proto.mahjong.RoomState.SRoomPlaying;
         room.onUpdateStatus(room.state);
@@ -342,6 +341,7 @@ export class Replay {
             const handScore = proto.mahjong.MsgHandScore.decode(handScoreBytes);
             let endType;
             handScore.playerScores.forEach((s) => {
+                Logger.debug("s ----------------: ", s);
                 endType = s.winType;
             });
 
@@ -349,21 +349,22 @@ export class Replay {
             msgHandOver.scores = handScore;
         }
 
-        // room.msgHandOver = msgHandOver;
-        // const players = room.players;
-        // // players.forEach((p) => {
-        // //     const len = p.tilesHand.length;
-        // //     p.lastTile = p.tilesHand[len - 1]; // 保存最后一张牌，可能是胡牌。。。用于最后结算显示
-        // // });
+        // const players = this.room.getPlayers();
+        // Object.keys(players).forEach((key: string) => {
+        //     const p = <Player>players[key];
+        //     const len = p.tilesHand.length;
+        //     p.lastTile = p.tilesHand[len - 1]; // 保存最后一张牌，可能是胡牌。。。用于最后结算显示
 
-        await HandlerMsgHandOver.onHandOver(<proto.mahjong.IMsgHandOver>msgHandOver, this.host.room);
+        // });
+
+        await HandlerMsgHandOver.onHandOver(<proto.mahjong.IMsgHandOver>msgHandOver, this.room);
     }
 
     public async firstReadyHandActionHandler(srAction: proto.mahjong.ISRAction): Promise<void> {
         Logger.debug("llwant, dfreplay, firstReadyHand");
 
         const actionResultMsg = { targetChairID: srAction.chairID };
-        await HandlerActionResultReadyHand.onMsg(<proto.mahjong.MsgActionResultNotify>actionResultMsg, this.host.room);
+        await HandlerActionResultReadyHand.onMsg(<proto.mahjong.MsgActionResultNotify>actionResultMsg, this.room);
     }
 
     public async discardedActionHandler(srAction: proto.mahjong.ISRAction, waitDiscardReAction: boolean): Promise<void> {
@@ -376,9 +377,9 @@ export class Replay {
             waitDiscardReAction: waitDiscardReAction
         };
 
-        await HandlerActionResultDiscarded.onMsg(<proto.mahjong.MsgActionResultNotify>actionResultMsg, this.host.room);
+        await HandlerActionResultDiscarded.onMsg(<proto.mahjong.MsgActionResultNotify>actionResultMsg, this.room);
 
-        const room = this.host.room;
+        const room = this.room;
         this.latestDiscardedPlayer = <Player>room.getPlayerByChairID(srAction.chairID);
         // this.latestDiscardedTile = discardTileId;
 
@@ -404,7 +405,7 @@ export class Replay {
             drawCnt = drawCnt - 1;
         }
 
-        const room = this.host.room;
+        const room = this.room;
         const tilesInWall = room.tilesInWall - drawCnt;
 
         const actionResultMsg = {
@@ -438,7 +439,7 @@ export class Replay {
             actionTile: chowTileId
         };
 
-        await HandlerActionResultChow.onMsg(<proto.mahjong.MsgActionResultNotify>actionResultMsg, this.host.room);
+        await HandlerActionResultChow.onMsg(<proto.mahjong.MsgActionResultNotify>actionResultMsg, this.room);
     }
 
     public async pongActionHandler(srAction: proto.mahjong.ISRAction): Promise<void> {
@@ -456,7 +457,7 @@ export class Replay {
             actionMeld: actionMeld
         };
 
-        await HandlerActionResultPong.onMsg(<proto.mahjong.MsgActionResultNotify>actionResultMsg, this.host.room);
+        await HandlerActionResultPong.onMsg(<proto.mahjong.MsgActionResultNotify>actionResultMsg, this.room);
     }
 
     public async kongExposedActionHandler(srAction: proto.mahjong.ISRAction): Promise<void> {
@@ -473,7 +474,7 @@ export class Replay {
             actionMeld: actionMeld
         };
 
-        await HandlerActionResultKongExposed.onMsg(<proto.mahjong.MsgActionResultNotify>actionResultMsg, this.host.room);
+        await HandlerActionResultKongExposed.onMsg(<proto.mahjong.MsgActionResultNotify>actionResultMsg, this.room);
     }
 
     public async kongConcealedActionHandler(srAction: proto.mahjong.ISRAction): Promise<void> {
@@ -486,7 +487,7 @@ export class Replay {
             actionTile: kongTileId
         };
 
-        await HandlerActionResultKongConcealed.onMsg(<proto.mahjong.MsgActionResultNotify>actionResultMsg, this.host.room);
+        await HandlerActionResultKongConcealed.onMsg(<proto.mahjong.MsgActionResultNotify>actionResultMsg, this.room);
     }
 
     public async triplet2KongActionHandler(srAction: proto.mahjong.ISRAction): Promise<void> {
@@ -499,12 +500,12 @@ export class Replay {
             actionTile: kongTileId
         };
 
-        await HandlerActionResultTriplet2Kong.onMsg(<proto.mahjong.MsgActionResultNotify>actionResultMsg, this.host.room);
+        await HandlerActionResultTriplet2Kong.onMsg(<proto.mahjong.MsgActionResultNotify>actionResultMsg, this.room);
     }
 
     public async winChuckActionHandler(srAction: proto.mahjong.ISRAction): Promise<void> {
         Logger.debug("llwant, dfreplay, win chuck ");
-        const room = this.host.room;
+        const room = this.room;
         const player = <Player>room.getPlayerByChairID(srAction.chairID);
         player.addHandTile(srAction.tiles[0]);
     }

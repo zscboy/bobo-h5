@@ -1,5 +1,5 @@
 
-import { Logger, RoomInfo, SoundMgr, UserInfo } from "../lobby/lcore/LCoreExports";
+import { Logger, RoomHost, RoomInfo, SoundMgr, UserInfo } from "../lobby/lcore/LCoreExports";
 import { ChatData } from "../lobby/views/chat/ChatExports";
 import { GameOverResultViewA } from "./GameOverResultViewA";
 import { HandlerActionResultNotifyA } from "./handlers/HandlerActionResultNotifyA";
@@ -23,7 +23,7 @@ import { PlayerA } from "./PlayerA";
 import { PlayerInterfaceA } from "./PlayerInterfaceA";
 import { proto } from "./proto/protoGameA";
 import { ReplayA } from "./ReplayA";
-import { PlayerInfo, RoomHost, RoomInterfaceA } from "./RoomInterfaceA";
+import { PlayerInfo, RoomInterfaceA } from "./RoomInterfaceA";
 import { RoomViewA } from "./RoomViewA";
 
 type msgHandler = (msgData: ByteBuffer, room: RoomInterfaceA) => Promise<void>;

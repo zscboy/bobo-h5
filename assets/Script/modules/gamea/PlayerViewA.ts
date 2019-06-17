@@ -1,7 +1,7 @@
-import { CommonFunction, Logger } from "../lobby/lcore/LCoreExports";
+import { CommonFunction, Logger, RoomHost } from "../lobby/lcore/LCoreExports";
 import { ClickCtrl, PlayerInterfaceA } from "./PlayerInterfaceA";
 import { proto } from "./proto/protoGameA";
-import { PlayerInfo, RoomHost, RoomInterfaceA } from "./RoomInterfaceA";
+import { PlayerInfo, RoomInterfaceA } from "./RoomInterfaceA";
 import { TileImageMounterA } from "./TileImageMounterA";
 
 const pokerface = proto.pokerface;

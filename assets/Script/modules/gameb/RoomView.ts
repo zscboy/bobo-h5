@@ -1,13 +1,13 @@
 import { Logger } from "../lobby/lcore/LCoreExports";
 import { ChatView } from "../lobby/views/chat/ChatExports";
 import { DisBandPlayerInfo, DisbandView } from "../lobby/views/disbandRoom/DisbandViewExports";
+import { RoomSettingView } from "../lobby/views/roomSetting/RoomSettingViewExports";
 import { GameRules } from "./GameRules";
 import { Player } from "./Player";
 import { PlayerView } from "./PlayerView";
 import { proto } from "./proto/protoGame";
 import { RoomInterface, TingPai } from "./RoomInterface";
 import { RoomRuleView } from "./RoomRuleView";
-import { SettingView } from "./SettingView";
 import { TileImageMounter } from "./TileImageMounter";
 const mjproto = proto.mahjong;
 
@@ -309,8 +309,8 @@ export class RoomView {
 
     private onSettingBtnClick(): void {
         // Logger.debug("onSettingBtnClick---------------");
-        const settingView = this.component.addComponent(SettingView);
-        settingView.showView(this.room);
+        const settingView = this.component.addComponent(RoomSettingView);
+        settingView.showView(this.room, this.room.getRoomHost().loader);
     }
 
     /**

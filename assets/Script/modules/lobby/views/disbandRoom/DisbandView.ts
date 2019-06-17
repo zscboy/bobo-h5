@@ -60,8 +60,8 @@ export class DisbandView extends cc.Component {
         this.msgDisbandNotify = msgDisbandNotify;
 
         if (this.view === null || this.view === undefined) {
-            loader.fguiAddPackage("lobby/fui_disband_room/lobby_disband_room");
-            const view = fgui.UIPackage.createObject("lobby_disband_room", "disband_room").asCom;
+            loader.fguiAddPackage("lobby/fui_room_other_view/room_other_view");
+            const view = fgui.UIPackage.createObject("room_other_view", "disband_room").asCom;
             this.view = view;
             const win = new fgui.Window();
             win.contentPane = view;

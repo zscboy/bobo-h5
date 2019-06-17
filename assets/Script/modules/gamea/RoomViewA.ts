@@ -1,12 +1,13 @@
 import { Logger } from "../lobby/lcore/LCoreExports";
 import { ChatView } from "../lobby/views/chat/ChatExports";
-import { DisbandViewA } from "./DisbandViewA";
+import { DisBandPlayerInfo, DisbandView } from "../lobby/views/disbandRoom/DisbandViewExports";
+import { RoomSettingView } from "../lobby/views/roomSetting/RoomSettingViewExports";
 import { GameRulesA } from "./GameRulesA";
+import { PlayerA } from "./PlayerA";
 import { PlayerViewA } from "./PlayerViewA";
 import { proto } from "./proto/protoGameA";
 import { RoomInterfaceA } from "./RoomInterfaceA";
 import { RoomRuleViewA } from "./RoomRuleViewA";
-import { SettingViewA } from "./SettingViewA";
 
 /**
  * 房间
@@ -160,17 +161,27 @@ export class RoomViewA {
     }
 
     public updateDisbandVoteView(msgDisbandNotify: proto.pokerface.MsgDisbandNotify): void {
-        //
+        let disbandView = this.component.getComponent(DisbandView);
 
-        let disbandView = this.component.getComponent(DisbandViewA);
+        const myPlayerInfo = this.room.getMyPlayerInfo();
+        const myInfo = new DisBandPlayerInfo(myPlayerInfo.userID, myPlayerInfo.chairID, myPlayerInfo.nick);
+        const players = this.room.getPlayers();
+
+        const playersInfo: DisBandPlayerInfo[] = [];
+        Object.keys(players).forEach((key: string) => {
+            const p = <PlayerA>players[key];
+            const playInfo = new DisBandPlayerInfo(p.userID, p.chairID, p.playerInfo.nick);
+            playersInfo.push(playInfo);
+
+        });
+
+        const load = this.room.getRoomHost().loader;
 
         if (disbandView === undefined || disbandView == null) {
-            disbandView = this.component.addComponent(DisbandViewA);
-            disbandView.saveRoomView(this.room, msgDisbandNotify);
-        } else {
-            disbandView.saveRoomView(this.room, msgDisbandNotify);
-            disbandView.updateView();
+            disbandView = this.component.addComponent(DisbandView);
         }
+
+        disbandView.saveRoomView(this.room, msgDisbandNotify, load, myInfo, playersInfo);
     }
 
     private onRoomRuleBtnClick(): void {
@@ -184,8 +195,8 @@ export class RoomViewA {
 
     private onSettingBtnClick(): void {
         // Logger.debug("onSettingBtnClick---------------");
-        const settingView = this.component.addComponent(SettingViewA);
-        settingView.showView(this.room);
+        const settingView = this.component.addComponent(RoomSettingView);
+        settingView.showView(this.room, this.room.getRoomHost().loader);
     }
 
     /**

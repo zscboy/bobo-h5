@@ -354,7 +354,7 @@ export namespace AgariIndexA {
 
     const extractCardsByRanks = (hands: number[], rankStart: number, rankStop: number, count: number): number[] => {
         const extract = [];
-        for (let rank = rankStart; rank < rankStop; rank++) {
+        for (let rank = rankStart; rank <= rankStop; rank++) {
             let ecount = 0;
             for (const h of hands) {
                 if (Math.floor(h / 4) === rank) {
@@ -682,15 +682,14 @@ export namespace AgariIndexA {
         resetSlots(hands);
         const flushLen = prev.cards.length;
         const bombCardRankID = Math.floor(prev.cards[0] / 4); // 最大的顺子牌rank
-        const seqLength = flushLen;
         let newBombSuitID = bombCardRankID + 1;
         const rightMost = Math.floor(pokerface.CardID.AH / 4); // AH 改为 R3H  20180201 mufan
-        while (newBombSuitID <= rightMost) {
-            const testBombRankID = newBombSuitID;
+        while (newBombSuitID < rightMost) {
+            // const testBombRankID = newBombSuitID;
             let found = true;
-            for (let i = 0; i < seqLength; i++) {
-                if (slots[testBombRankID - i + 2] < 1) {
-                    newBombSuitID = newBombSuitID + 1;
+            for (let i = 0; i < flushLen; i++) {
+                if (slots[newBombSuitID - i] < 1) {
+                    // newBombSuitID = newBombSuitID + 1;
                     found = false;
 
                     break;
@@ -700,12 +699,12 @@ export namespace AgariIndexA {
             if (found) {
                 const cardHand = new proto.pokerface.MsgCardHand();
                 cardHand.cardHandType = pokerfacerf.CardHandType.Flush;
-                const xcards = extractCardsByRanks(hands, testBombRankID - seqLength + 1, testBombRankID, 1);
+                const xcards = extractCardsByRanks(hands, newBombSuitID - flushLen + 1, newBombSuitID, 1);
                 cardHand.cards = xcards;
                 cardHands.push(cardHand);
 
-                newBombSuitID = newBombSuitID + 1;
             }
+            newBombSuitID++;
 
         }
 

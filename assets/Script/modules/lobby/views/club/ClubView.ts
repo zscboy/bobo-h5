@@ -3,6 +3,7 @@ import { proto } from "../../proto/protoLobby";
 import { LobbyError } from "../LobbyError";
 import { NewRoomView } from "../NewRoomView";
 import { ApplyRecordView } from "./ApplyRecordView";
+import { AppointManagerView } from "./AppointManager/AppointManagerView";
 import { ClubRequestError } from "./ClubRequestError";
 import { CreateClubView } from "./CreateClubView";
 import { FilterGameView } from "./FilterGameView";
@@ -314,6 +315,10 @@ export class ClubView extends cc.Component {
 
     private onAppointManagerBtnClick(): void {
         //
+
+        const appointManagerView = this.addComponent(AppointManagerView);
+        appointManagerView.show(this.selectedClub);
+
     }
 
     private onBuyBtnClick(): void {

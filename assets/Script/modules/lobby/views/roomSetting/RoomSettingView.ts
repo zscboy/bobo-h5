@@ -1,34 +1,34 @@
-import { Dialog } from "../lobby/lcore/LCoreExports";
-import { RoomInterfaceA } from "./RoomInterfaceA";
 
+import { Dialog, GResLoader } from "../../lcore/LCoreExports";
+
+export interface RoomInterface {
+    switchBg(agree: number): void;
+    onDissolveClicked(): void;
+}
 /**
  * 设置界面
  */
-export class SettingViewA extends cc.Component {
+export class RoomSettingView extends cc.Component {
 
     private view: fgui.GComponent;
     private eventTarget: cc.EventTarget;
 
-    private room: RoomInterfaceA;
+    private room: RoomInterface;
 
-    public showView(room: RoomInterfaceA): void {
+    public showView(room: RoomInterface, loader: GResLoader): void {
         this.room = room;
-        if (this.view !== null) {
+        if (this.view === null || this.view === undefined) {
             // this.room = room;
-            fgui.GRoot.inst.showPopup(this.view);
-            this.view.setPosition(0, 0);
-
+            loader.fguiAddPackage("lobby/fui_room_other_view/room_other_view");
+            this.view = fgui.UIPackage.createObject("room_other_view", "setting").asCom;
+            this.initView();
         }
+        fgui.GRoot.inst.showPopup(this.view);
+        this.view.setPosition(0, 0);
     }
 
     protected onLoad(): void {
-
         this.eventTarget = new cc.EventTarget();
-
-        const view = fgui.UIPackage.createObject("runfast", "setting").asCom;
-        this.view = view;
-
-        this.initView();
     }
 
     protected onDestroy(): void {

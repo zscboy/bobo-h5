@@ -196,7 +196,6 @@ export class MemberOperationDialog extends cc.Component {
         }
 
         Logger.debug("clubRequest url = ", url);
-        Logger.debug("this.eventTarget = ", this.eventTarget);
 
         HTTP.hGet(this.eventTarget, url, (xhr: XMLHttpRequest, err: string) => {
 

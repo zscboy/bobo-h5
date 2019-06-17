@@ -1,12 +1,13 @@
 import { Logger } from "../lobby/lcore/LCoreExports";
 import { ChatView } from "../lobby/views/chat/ChatExports";
-import { DisbandView } from "./DisbandView";
+import { DisBandPlayerInfo, DisbandView } from "../lobby/views/disbandRoom/DisbandViewExports";
+import { RoomSettingView } from "../lobby/views/roomSetting/RoomSettingViewExports";
 import { GameRules } from "./GameRules";
+import { Player } from "./Player";
 import { PlayerView } from "./PlayerView";
 import { proto } from "./proto/protoGame";
 import { RoomInterface, TingPai } from "./RoomInterface";
 import { RoomRuleView } from "./RoomRuleView";
-import { SettingView } from "./SettingView";
 import { TileImageMounter } from "./TileImageMounter";
 const mjproto = proto.mahjong;
 
@@ -262,13 +263,25 @@ export class RoomView {
 
         let disbandView = this.component.getComponent(DisbandView);
 
+        const myPlayerInfo = this.room.getMyPlayerInfo();
+        const myInfo = new DisBandPlayerInfo(myPlayerInfo.userID, myPlayerInfo.chairID, myPlayerInfo.nick);
+        const players = this.room.getPlayers();
+
+        const playersInfo: DisBandPlayerInfo[] = [];
+        Object.keys(players).forEach((key: string) => {
+            const p = <Player>players[key];
+            const playInfo = new DisBandPlayerInfo(p.userID, p.chairID, p.playerInfo.nick);
+            playersInfo.push(playInfo);
+
+        });
+
+        const load = this.room.getRoomHost().loader;
+
         if (disbandView === undefined || disbandView == null) {
             disbandView = this.component.addComponent(DisbandView);
-            disbandView.saveRoomView(this.room, msgDisbandNotify);
-        } else {
-            disbandView.saveRoomView(this.room, msgDisbandNotify);
-            disbandView.updateView();
         }
+
+        disbandView.saveRoomView(this.room, msgDisbandNotify, load, myInfo, playersInfo);
     }
 
     //解散房间按钮点击事件
@@ -296,8 +309,8 @@ export class RoomView {
 
     private onSettingBtnClick(): void {
         // Logger.debug("onSettingBtnClick---------------");
-        const settingView = this.component.addComponent(SettingView);
-        settingView.showView(this.room);
+        const settingView = this.component.addComponent(RoomSettingView);
+        settingView.showView(this.room, this.room.getRoomHost().loader);
     }
 
     /**

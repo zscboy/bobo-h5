@@ -45,5 +45,4 @@ export interface PlayerInterface {
     isMe(): boolean;
     onPlayerDiscardTile(tileID: number): void;
 
-    // getPlayInfo(): PlayerInfo;
 }

@@ -667,8 +667,14 @@ export class ClubView extends cc.Component {
 
     }
 
+    private updateClubBaseInfo(): void {
+        this.view.getChild("memberCountText").asTextField.text = `${this.selectedClub.memberCount} 人`;
+    }
+
     private updateSelectedClub(selectedClub: proto.club.IMsgClubInfo): void {
         this.selectedClub = selectedClub;
+
+        this.updateClubBaseInfo();
 
         this.updateUIByClubManager();
         // 拉取房间信息

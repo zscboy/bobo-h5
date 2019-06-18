@@ -311,6 +311,15 @@ export class ClubView extends cc.Component {
 
     private onCopyIdBtnClick(): void {
         //
+        if (cc.sys.platform === cc.sys.WECHAT_GAME) {
+
+            const cb = (res: string) => {
+                //
+                Logger.debug("res", res);
+            };
+            const data = { data: `${this.selectedClub.baseInfo.clubNumber}`, success: cb };
+            wx.setClipboardData(data);
+        }
     }
 
     private onShareBtnClick(): void {

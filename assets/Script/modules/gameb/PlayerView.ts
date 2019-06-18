@@ -1,4 +1,5 @@
-import { CommonFunction, Dialog, Logger, RoomHost } from "../lobby/lcore/LCoreExports";
+import { RoomHost } from "../lobby/interface/LInterfaceExports";
+import { CommonFunction, Dialog, Logger } from "../lobby/lcore/LCoreExports";
 import { GameRules } from "./GameRules";
 import { ButtonDef, ClickCtrl, PlayerInterface } from "./PlayerInterface";
 import { proto } from "./proto/protoGame";

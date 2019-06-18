@@ -1,5 +1,4 @@
-import { AnimationMgr } from "./AnimationMgr";
-import { GResLoader, UserInfo } from "./LDataType";
+import { AnimationMgr, GResLoader, UserInfo } from "../lcore/LCoreExports";
 
 /**
  * room对外接口

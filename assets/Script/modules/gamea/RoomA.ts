@@ -1,5 +1,6 @@
 
-import { Logger, RoomHost, RoomInfo, SoundMgr, UserInfo } from "../lobby/lcore/LCoreExports";
+import { RoomHost } from "../lobby/interface/LInterfaceExports";
+import { Logger, RoomInfo, SoundMgr, UserInfo } from "../lobby/lcore/LCoreExports";
 import { ChatData } from "../lobby/views/chat/ChatExports";
 import { GameOverResultViewA } from "./GameOverResultViewA";
 import { HandlerActionResultNotifyA } from "./handlers/HandlerActionResultNotifyA";

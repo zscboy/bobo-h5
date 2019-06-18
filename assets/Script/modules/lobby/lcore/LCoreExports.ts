@@ -15,4 +15,3 @@ export * from "./AnimationMgr";
 export * from "./Enum";
 export * from "./SoundMgr";
 export * from "./CommonFunction";
-export * from "./RoomHost";

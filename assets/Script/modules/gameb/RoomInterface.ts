@@ -1,5 +1,6 @@
 
-import { RoomHost, RoomInfo } from "../lobby/lcore/LCoreExports";
+import { RoomHost } from "../lobby/interface/LInterfaceExports";
+import { RoomInfo } from "../lobby/lcore/LCoreExports";
 import { ChatData } from "../lobby/views/chat/ChatExports";
 import { PlayerInterface } from "./PlayerInterface";
 import { proto } from "./proto/protoGame";

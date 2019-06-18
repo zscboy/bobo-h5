@@ -33,6 +33,10 @@ export class GameModule extends cc.Component implements GameModuleInterface {
     private lm: LobbyModuleInterface;
     private mUser: UserInfo;
     private mAnimationMgr: AnimationMgr;
+
+    public getLobbyModuleLoader(): GResLoader {
+        return this.lm.loader;
+    }
     public get room(): Room {
         return this.mRoom;
     }

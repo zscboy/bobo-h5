@@ -441,7 +441,7 @@ export class PlayerA {
             playerInfoView = roomHost.component.addComponent(PlayerInfoView);
         }
 
-        playerInfoView.showUserInfoView(roomHost.loader, this.host, this.playerInfo, pos, this.isMe() === false);
+        playerInfoView.showUserInfoView(roomHost.getLobbyModuleLoader(), this.host, this.playerInfo, pos, this.isMe() === false);
     }
     private playSound(directory: string, effectName: string): void {
         let soundName = "";

@@ -5,7 +5,7 @@ import { HandlerMsgHandOverA } from "./handlers/HandlerMsgHandOverA";
 import { PlayerA } from "./PlayerA";
 // import { HandlerMsgHandOver } from "./handlers/HandlerMsgHandOver";
 import { proto } from "./proto/protoGameA";
-import { RoomHost } from "./RoomInterfaceA";
+import { RoomInterfaceA } from "./RoomInterfaceA";
 
 type ActionHandler = (srAction: proto.pokerface.ISRAction, x?: any) => Promise<void>; // tslint:disable-line:no-any
 
@@ -13,9 +13,8 @@ type ActionHandler = (srAction: proto.pokerface.ISRAction, x?: any) => Promise<v
  * 回播
  */
 export class ReplayA {
-    public readonly host: RoomHost;
     public readonly msgHandRecord: proto.pokerface.SRMsgHandRecorder;
-
+    private room: RoomInterfaceA;
     private speed: number;
     private actionStep: number;
     private modalLayerColor: cc.Color;
@@ -30,19 +29,18 @@ export class ReplayA {
     private actionHandlers: { [key: number]: ActionHandler } = {};
     // private latestDiscardedTile: number;
 
-    public constructor(host: RoomHost, msgHandRecord: proto.pokerface.SRMsgHandRecorder) {
-        this.host = host;
+    public constructor(msgHandRecord: proto.pokerface.SRMsgHandRecorder) {
         this.msgHandRecord = msgHandRecord;
     }
 
-    public async gogogo(): Promise<void> {
+    public async gogogo(room: RoomInterfaceA): Promise<void> {
         Logger.debug("gogogogo");
 
-        const room = this.host.room;
+        this.room = room;
         const players = this.msgHandRecord.players;
         players.forEach((p) => {
             Logger.debug("p.userID:", p.userID);
-            if (p.userID === this.host.user.userID) {
+            if (p.userID === this.room.getRoomHost().user.userID) {
                 room.createMyPlayer(this.clonePlayer(p));
             } else {
                 room.createPlayerByInfo(this.clonePlayer(p));
@@ -66,7 +64,7 @@ export class ReplayA {
         const color = new cc.Color(0, 0, 0, 0);
         fgui.GRoot.inst.modalLayer.color = color;
 
-        this.host.loader.fguiAddPackage("lobby/fui_replay/lobby_replay");
+        this.room.getRoomHost().loader.fguiAddPackage("lobby/fui_replay/lobby_replay");
         const view = fgui.UIPackage.createObject("lobby_replay", "operations").asCom;
         const win = new fgui.Window();
         win.contentPane = view;
@@ -112,7 +110,7 @@ export class ReplayA {
             this.mq.pushMessage(mt);
         };
 
-        this.host.component.schedule(
+        this.room.getRoomHost().component.schedule(
             cb,
             this.speed,
             cc.macro.REPEAT_FOREVER);
@@ -161,7 +159,7 @@ export class ReplayA {
     public onPauseClick(): void {
         this.btnPause.visible = false;
         this.btnResume.visible = true;
-        this.host.component.unschedule(this.timerCb);
+        this.room.getRoomHost().component.unschedule(this.timerCb);
     }
 
     public onResumeClick(): void {
@@ -181,7 +179,7 @@ export class ReplayA {
             return;
         }
 
-        this.host.component.unschedule(this.timerCb);
+        this.room.getRoomHost().component.unschedule(this.timerCb);
         this.speed = this.speed / 2;
         this.startStepTimer();
     }
@@ -194,7 +192,7 @@ export class ReplayA {
             return;
         }
 
-        this.host.component.unschedule(this.timerCb);
+        this.room.getRoomHost().component.unschedule(this.timerCb);
         this.speed = this.speed * 2;
         this.startStepTimer();
     }
@@ -210,7 +208,7 @@ export class ReplayA {
     }
 
     public async doReplayStep(): Promise<void> {
-        const room = this.host.room;
+        const room = this.room;
         if (this.actionStep === -1) {
             Logger.debug("Replay:doReplayStep, deal");
             // 重置房间
@@ -221,7 +219,7 @@ export class ReplayA {
             const actionlist = this.msgHandRecord.actions;
             if (this.actionStep >= actionlist.length) {
                 // 已经播放完成了
-                this.host.component.unschedule(this.timerCb);
+                this.room.getRoomHost().component.unschedule(this.timerCb);
 
                 // 结算页面
                 await this.handOver();
@@ -238,7 +236,7 @@ export class ReplayA {
     }
 
     public async doAction(srAction: proto.pokerface.ISRAction, actionlist: proto.pokerface.ISRAction[]): Promise<void> {
-        const room = this.host.room;
+        const room = this.room;
         const i = this.actionStep;
         const player = <PlayerA>room.getPlayerByChairID(srAction.chairID);
         room.setWaitingPlayer(player.chairID);
@@ -259,7 +257,7 @@ export class ReplayA {
     }
 
     public deal(): void {
-        const room = this.host.room;
+        const room = this.room;
         // 房间状态改为playing
         room.state = proto.pokerface.RoomState.SRoomPlaying;
         room.onUpdateStatus(room.state);
@@ -332,14 +330,14 @@ export class ReplayA {
         // //     p.lastTile = p.tilesHand[len - 1]; // 保存最后一张牌，可能是胡牌。。。用于最后结算显示
         // // });
 
-        await HandlerMsgHandOverA.onHandOver(<proto.pokerface.IMsgHandOver>msgHandOver, this.host.room);
+        await HandlerMsgHandOverA.onHandOver(<proto.pokerface.IMsgHandOver>msgHandOver, this.room);
     }
 
     public async skipActionHandler(srAction: proto.pokerface.ISRAction): Promise<void> {
         const actionResultMsg = {
             targetChairID: srAction.chairID
         };
-        await HandlerActionResultSkipA.onMsg(<proto.pokerface.MsgActionResultNotify>actionResultMsg, this.host.room);
+        await HandlerActionResultSkipA.onMsg(<proto.pokerface.MsgActionResultNotify>actionResultMsg, this.room);
     }
     public async discardedActionHandler(srAction: proto.pokerface.ISRAction, waitDiscardReAction: boolean): Promise<void> {
         Logger.debug("llwant, dfreplay, discarded");
@@ -353,12 +351,12 @@ export class ReplayA {
         actionResultMsg.targetChairID = srAction.chairID;
         actionResultMsg.actionHand = ah;
 
-        await HandlerActionResultDiscardedA.onMsg(actionResultMsg, this.host.room);
+        await HandlerActionResultDiscardedA.onMsg(actionResultMsg, this.room);
     }
 
     public async winChuckActionHandler(srAction: proto.pokerface.ISRAction): Promise<void> {
         Logger.debug("llwant, dfreplay, win chuck ");
-        const room = this.host.room;
+        const room = this.room;
         const player = <PlayerA>room.getPlayerByChairID(srAction.chairID);
         player.addHandTile(srAction.cards[0]);
     }

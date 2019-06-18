@@ -9,7 +9,7 @@ export namespace HandlerMsgRoomUpdate {
     const saveScore = (room: RoomInterface, msgRoomUpdate: proto.mahjong.MsgRoomInfo): void => {
         const scoreRecords = msgRoomUpdate.scoreRecords;
         room.scoreRecords = scoreRecords;
-        if (scoreRecords !== null && scoreRecords.length > 0) {
+        if (scoreRecords !== undefined && scoreRecords.length > 0) {
             const totalScores: number[] = [0, 0, 0, 0];
             for (const scoreRecord of scoreRecords) {
                 const playerRecords = scoreRecord.playerRecords;

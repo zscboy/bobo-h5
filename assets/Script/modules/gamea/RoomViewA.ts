@@ -175,7 +175,7 @@ export class RoomViewA {
 
         });
 
-        const load = this.room.getRoomHost().loader;
+        const load = this.room.getRoomHost().getLobbyModuleLoader();
 
         if (disbandView === undefined || disbandView == null) {
             disbandView = this.component.addComponent(DisbandView);
@@ -196,14 +196,14 @@ export class RoomViewA {
     private onSettingBtnClick(): void {
         // Logger.debug("onSettingBtnClick---------------");
         const settingView = this.component.addComponent(RoomSettingView);
-        settingView.showView(this.room, this.room.getRoomHost().loader);
+        settingView.showView(this.room, this.room.getRoomHost().getLobbyModuleLoader());
     }
 
     /**
      * 聊天按钮点击事件
      */
     private onChatBtnClick(): void {
-        const load = this.room.getRoomHost().loader;
+        const load = this.room.getRoomHost().getLobbyModuleLoader();
         if (load === null) {
             Logger.debug("load === null");
         }

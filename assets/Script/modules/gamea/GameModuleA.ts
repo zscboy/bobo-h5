@@ -33,6 +33,10 @@ export class GameModuleA extends cc.Component implements GameModuleInterface {
     private lm: LobbyModuleInterface;
     private mUser: UserInfo;
     private mAnimationMgr: AnimationMgr;
+
+    public getLobbyModuleLoader(): GResLoader {
+        return this.lm.loader;
+    }
     public get room(): RoomA {
         return this.mRoom;
     }
@@ -401,11 +405,11 @@ export class GameModuleA extends cc.Component implements GameModuleInterface {
             lastActiveTime: 0
         };
 
-        const replay = new ReplayA(this, msgHandRecord);
+        const replay = new ReplayA(msgHandRecord);
         // 新建room和绑定roomView
         this.createRoom(this.user, roomInfo, replay);
 
-        await replay.gogogo();
+        await replay.gogogo(this.room);
 
         this.backToLobby();
     }

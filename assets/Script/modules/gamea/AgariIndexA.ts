@@ -222,6 +222,8 @@ export namespace AgariIndexA {
     export const agariConvertMsgCardHand = (hai: number[]): proto.pokerface.MsgCardHand => {
         const key = calcKey(hai);
         if (agariTable[key] === undefined) {
+            Logger.debug("agariConvertMsgCardHand undefined...");
+
             return null;
         }
 
@@ -237,6 +239,8 @@ export namespace AgariIndexA {
         const flushLength = ((agari >> 16) & 0xFF);
         if (flushLength > 0) {
             if (!agariFlushVerify(ct, flushLength)) {
+                Logger.debug("agariConvertMsgCardHand 顺子类型...");
+
                 return null;
             }
         }
@@ -488,7 +492,7 @@ export namespace AgariIndexA {
             const testBombRankID = newBombSuitID;
             let found = true;
             for (let i = 0; i < seqLength; i++) {
-                if (slots[testBombRankID - i + 2] < 3) {
+                if (slots[testBombRankID - i] < 3) {
                     newBombSuitID = newBombSuitID + 1;
 
                     found = false;
@@ -504,13 +508,13 @@ export namespace AgariIndexA {
                 const pairAble = [];
 
                 for (let testPair = 0; testPair < left; testPair++) {
-                    if (slots[testPair + 1] > 1) {
+                    if (slots[testPair] > 1) {
                         pairCount = pairCount + 1;
                         pairAble.push(testPair);
                     }
                 }
                 const uppon = Math.floor(pokerface.CardID.AH / 4);
-                for (let testPair = right + 1; testPair < uppon; testPair++) {
+                for (let testPair = right; testPair < uppon; testPair++) {
                     if (slots[testPair] > 1) {
                         pairCount = pairCount + 1;
                         pairAble.push(testPair);
@@ -566,7 +570,7 @@ export namespace AgariIndexA {
             const testBombRankID = newBombSuitID;
             let found = true;
             for (let i = 0; i < seqLength; i++) {
-                if (slots[testBombRankID - i + 2] < 3) {
+                if (slots[testBombRankID - i] < 3) {
                     newBombSuitID = newBombSuitID + 1;
 
                     found = false;
@@ -601,7 +605,7 @@ export namespace AgariIndexA {
             const testBombRankID = newBombSuitID;
             let found = true;
             for (let i = 0; i < seqLength; i++) {
-                if (slots[testBombRankID - i + 2] < 2) {
+                if (slots[testBombRankID - i] < 2) {
                     newBombSuitID = newBombSuitID + 1;
 
                     found = false;

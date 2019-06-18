@@ -282,8 +282,8 @@ export class PlayerA {
         }
         if (tipCards.length === 0) {
             //如果提示没东西，则帮用户
-            Dialog.prompt("如果提示没东西，则帮用户");
-            // this.onSkipBtnClick();
+            // Dialog.prompt("如果提示没东西，则帮用户");
+            this.onSkipBtnClick();
 
             return;
         }
@@ -316,7 +316,7 @@ export class PlayerA {
         const handsClickCtrls = this.playerView.handsClickCtrls;
         const discardCards = [];
         for (const handsClickCtrl of handsClickCtrls) {
-            if (handsClickCtrl.tileID !== undefined) {
+            if (handsClickCtrl.tileID !== undefined && handsClickCtrl.tileID !== null) {
                 if (handsClickCtrl.clickCount === 1) {
                     discardCards.push(handsClickCtrl.tileID);
                 }
@@ -358,6 +358,7 @@ export class PlayerA {
         }
         const actionMsg = new proto.pokerface.MsgPlayerAction();
         let r3h = false;
+        Logger.debug("tileIDs === :", tileIDs);
         const current = AgariIndexA.agariConvertMsgCardHand(tileIDs);
         if (current === null) {
             Logger.debug("current === :", current);

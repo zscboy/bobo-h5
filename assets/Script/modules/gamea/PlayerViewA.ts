@@ -293,6 +293,7 @@ export class PlayerViewA {
                 const originPos = this.handsOriginPos[i];
                 const h = clickCtrl.h;
                 h.y = originPos.y;
+                clickCtrl.clickCount = 0;
             }
         }
     }

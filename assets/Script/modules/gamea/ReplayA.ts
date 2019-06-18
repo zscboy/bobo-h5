@@ -92,7 +92,16 @@ export class ReplayA {
         fgui.GRoot.inst.modalLayer.color = this.modalLayerColor;
     }
 
-    public clonePlayer(p: proto.pokerface.ISRMsgPlayerInfo): proto.pokerface.IMsgPlayerInfo {
+    //克隆牌组
+    private cloneCards(cards: number[]): number[] {
+        const cs: number[] = [];
+        for (const c of cards) {
+            cs.push(c);
+        }
+
+        return cs;
+    }
+    private clonePlayer(p: proto.pokerface.ISRMsgPlayerInfo): proto.pokerface.IMsgPlayerInfo {
         return {
             state: 0,
             userID: p.userID,
@@ -104,7 +113,7 @@ export class ReplayA {
         };
     }
 
-    public startStepTimer(): void {
+    private startStepTimer(): void {
         const cb = () => {
             const mt = new Message(MsgType.replay);
             this.mq.pushMessage(mt);
@@ -118,7 +127,7 @@ export class ReplayA {
         this.timerCb = cb;
     }
 
-    public initControlView(view: fgui.GComponent): void {
+    private initControlView(view: fgui.GComponent): void {
         this.btnResume = view.getChild("resume");
         this.btnPause = view.getChild("pause");
         this.btnFast = view.getChild("fast");
@@ -151,18 +160,18 @@ export class ReplayA {
         );
     }
 
-    public onBackClick(): void {
+    private onBackClick(): void {
         const msg = new Message(MsgType.quit);
         this.mq.pushMessage(msg);
     }
 
-    public onPauseClick(): void {
+    private onPauseClick(): void {
         this.btnPause.visible = false;
         this.btnResume.visible = true;
         this.room.getRoomHost().component.unschedule(this.timerCb);
     }
 
-    public onResumeClick(): void {
+    private onResumeClick(): void {
         this.btnPause.visible = true;
         this.btnResume.visible = false;
         this.startStepTimer();
@@ -171,7 +180,7 @@ export class ReplayA {
         this.mq.pushMessage(msg);
     }
 
-    public onFastClick(): void {
+    private onFastClick(): void {
         if (this.speed < 0.2) {
             Logger.debug("fastest speed already");
             Dialog.prompt("已经是最快速度");
@@ -184,7 +193,7 @@ export class ReplayA {
         this.startStepTimer();
     }
 
-    public onSlowClick(): void {
+    private onSlowClick(): void {
         if (this.speed > 3) {
             Logger.debug("slowest speed already");
             Dialog.prompt("已经是最慢速度");
@@ -197,7 +206,7 @@ export class ReplayA {
         this.startStepTimer();
     }
 
-    public armActionHandler(): void {
+    private armActionHandler(): void {
         const handers: { [key: number]: ActionHandler } = {};
         const actionType = proto.prunfast.ActionType;
 
@@ -207,7 +216,7 @@ export class ReplayA {
         this.actionHandlers = handers;
     }
 
-    public async doReplayStep(): Promise<void> {
+    private async doReplayStep(): Promise<void> {
         const room = this.room;
         if (this.actionStep === -1) {
             Logger.debug("Replay:doReplayStep, deal");
@@ -235,7 +244,7 @@ export class ReplayA {
         this.actionStep = this.actionStep + 1;
     }
 
-    public async doAction(srAction: proto.pokerface.ISRAction, actionlist: proto.pokerface.ISRAction[]): Promise<void> {
+    private async doAction(srAction: proto.pokerface.ISRAction, actionlist: proto.pokerface.ISRAction[]): Promise<void> {
         const room = this.room;
         const i = this.actionStep;
         const player = <PlayerA>room.getPlayerByChairID(srAction.chairID);
@@ -256,7 +265,7 @@ export class ReplayA {
         }
     }
 
-    public deal(): void {
+    private deal(): void {
         const room = this.room;
         // 房间状态改为playing
         room.state = proto.pokerface.RoomState.SRoomPlaying;
@@ -304,7 +313,7 @@ export class ReplayA {
         room.setWaitingPlayer(bankerPlayer.chairID);
     }
 
-    public async handOver(): Promise<void> {
+    private async handOver(): Promise<void> {
         // const room = <Room>this.host.room;
         const handScoreBytes = this.msgHandRecord.handScore;
         const msgHandOver: { continueAble?: boolean; endType?: number; scores?: proto.pokerface.MsgHandScore } = {};
@@ -333,16 +342,16 @@ export class ReplayA {
         await HandlerMsgHandOverA.onHandOver(<proto.pokerface.IMsgHandOver>msgHandOver, this.room);
     }
 
-    public async skipActionHandler(srAction: proto.pokerface.ISRAction): Promise<void> {
+    private async skipActionHandler(srAction: proto.pokerface.ISRAction): Promise<void> {
         const actionResultMsg = {
             targetChairID: srAction.chairID
         };
         await HandlerActionResultSkipA.onMsg(<proto.pokerface.MsgActionResultNotify>actionResultMsg, this.room);
     }
-    public async discardedActionHandler(srAction: proto.pokerface.ISRAction, waitDiscardReAction: boolean): Promise<void> {
+    private async discardedActionHandler(srAction: proto.pokerface.ISRAction, waitDiscardReAction: boolean): Promise<void> {
         Logger.debug("llwant, dfreplay, discarded");
-        const tiles = srAction.cards;
-        const cardHandType = tiles[0];
+        const tiles = this.cloneCards(srAction.cards);
+        const cardHandType = tiles.shift(); //tiles[0];  删除并返回第一个元素
         const ah = new proto.pokerface.MsgCardHand();
         ah.cards = tiles;
         ah.cardHandType = cardHandType;
@@ -354,14 +363,14 @@ export class ReplayA {
         await HandlerActionResultDiscardedA.onMsg(actionResultMsg, this.room);
     }
 
-    public async winChuckActionHandler(srAction: proto.pokerface.ISRAction): Promise<void> {
-        Logger.debug("llwant, dfreplay, win chuck ");
-        const room = this.room;
-        const player = <PlayerA>room.getPlayerByChairID(srAction.chairID);
-        player.addHandTile(srAction.cards[0]);
-    }
+    // private async winChuckActionHandler(srAction: proto.pokerface.ISRAction): Promise<void> {
+    //     Logger.debug("llwant, dfreplay, win chuck ");
+    //     const room = this.room;
+    //     const player = <PlayerA>room.getPlayerByChairID(srAction.chairID);
+    //     player.addHandTile(srAction.cards[0]);
+    // }
 
-    public async winSelfDrawActionHandler(srAction?: proto.pokerface.ISRAction): Promise<void> {
-        Logger.debug("llwant, dfreplay, win self draw ");
-    }
+    // private async winSelfDrawActionHandler(srAction?: proto.pokerface.ISRAction): Promise<void> {
+    //     Logger.debug("llwant, dfreplay, win self draw ");
+    // }
 }

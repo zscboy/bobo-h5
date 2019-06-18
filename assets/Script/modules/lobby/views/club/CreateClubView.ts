@@ -27,7 +27,7 @@ export class CreateClubView extends cc.Component {
     }
 
     protected onLoad(): void {
-        //
+
         this.eventTarget = new cc.EventTarget();
         const view = fgui.UIPackage.createObject("lobby_club", "createClubView").asCom;
         this.view = view;
@@ -103,7 +103,6 @@ export class CreateClubView extends cc.Component {
         const url = `${LEnv.rootURL}${LEnv.createClub}?&tk=${tk}&&clname=${clubName}`;
 
         const cb = (xhr: XMLHttpRequest, err: string) => {
-            //
 
             const data = <Uint8Array>xhr.response;
 
@@ -126,7 +125,6 @@ export class CreateClubView extends cc.Component {
     }
 
     private updateViewClubList(clubInfo: proto.club.IMsgClubInfo): void {
-        //
 
         this.clubView.addClub(clubInfo);
         this.destroy();

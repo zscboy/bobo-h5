@@ -44,7 +44,6 @@ export class MemberManagerView extends cc.Component {
     }
 
     public delMember(member: proto.club.IMsgClubMemberInfo): void {
-        //
 
         this.deleteMember(member, 0);
     }
@@ -61,7 +60,7 @@ export class MemberManagerView extends cc.Component {
 
     }
     protected onLoad(): void {
-        //
+
         this.eventTarget = new cc.EventTarget();
 
         const view = fgui.UIPackage.createObject("lobby_club", "memberManager").asCom;
@@ -105,7 +104,6 @@ export class MemberManagerView extends cc.Component {
     }
 
     private initView(): void {
-        //
 
         const closeBtn = this.view.getChild("closeBtn");
         closeBtn.onClick(this.onCloseClick, this);
@@ -145,7 +143,6 @@ export class MemberManagerView extends cc.Component {
      * @param obj 该UI对象
      */
     private renderMemberListItem(index: number, obj: fgui.GObject): void {
-        //
 
         let member: proto.club.IMsgClubMemberInfo;
 
@@ -212,7 +209,6 @@ export class MemberManagerView extends cc.Component {
      * @param obj 列表item对象
      */
     private renderDeleteMemberListItem(index: number, obj: fgui.GObject): void {
-        //
 
         let member: proto.club.IMsgClubMemberInfo;
 
@@ -255,7 +251,6 @@ export class MemberManagerView extends cc.Component {
      * @param obj 该UI对象
      */
     private renderApplyEventsListItem(index: number, obj: fgui.GObject): void {
-        //
 
         let event: proto.club.IMsgClubEvent;
 
@@ -301,7 +296,7 @@ export class MemberManagerView extends cc.Component {
     }
 
     private showMemberOperationDialog(member: proto.club.IMsgClubMemberInfo): void {
-        //
+
         const popupView = this.addComponent(MemberOperationDialog);
         popupView.bind(this, this.clubInfo, member);
     }
@@ -322,7 +317,6 @@ export class MemberManagerView extends cc.Component {
     }
 
     private updateDeleteMemberList(members: proto.club.IMsgClubMemberInfo[]): void {
-        //
         this.members = members;
         this.membersWithoutManager = [];
 
@@ -350,7 +344,7 @@ export class MemberManagerView extends cc.Component {
         this.memberDeleteList.numItems = this.membersWithoutManager.length;
     }
     private removeRecord(event: proto.club.IMsgClubEvent): void {
-        //
+
         const index = this.events.indexOf(event);
         this.events.splice(index, 1);
         this.memberApplyList.numItems = this.events.length;
@@ -358,7 +352,7 @@ export class MemberManagerView extends cc.Component {
     }
 
     private removeMember(member: proto.club.IMsgClubMemberInfo, listIndex: number): void {
-        //
+
         let index;
 
         if (listIndex === 0) {
@@ -375,7 +369,6 @@ export class MemberManagerView extends cc.Component {
     }
 
     private deleteMember(member: proto.club.IMsgClubMemberInfo, listIndex: number): void {
-        //
 
         const tk = DataStore.getString("token", "");
         const baseUrl = `${LEnv.rootURL}${LEnv.kickOut}?&`;
@@ -404,7 +397,7 @@ export class MemberManagerView extends cc.Component {
     }
 
     private joinApproval(event: proto.club.IMsgClubEvent, agree: boolean): void {
-        //
+
         const result = agree === true ? "yes" : "no";
         const tk = DataStore.getString("token", "");
 
@@ -432,13 +425,12 @@ export class MemberManagerView extends cc.Component {
     }
 
     private loadMember(updateListIndex: number): void {
-        //
 
         const tk = DataStore.getString("token", "");
         const loadMemberUrl = `${LEnv.rootURL}${LEnv.loadClubMembers}?&tk=${tk}&clubID=${this.clubInfo.baseInfo.clubID} `;
 
         const cb = (xhr: XMLHttpRequest, err: string) => {
-            //
+
             const data = <Uint8Array>xhr.response;
             const msgClubReply = proto.club.MsgClubReply.decode(data);
             if (msgClubReply.replyCode === proto.club.ClubReplyCode.RCOperation) {
@@ -465,13 +457,12 @@ export class MemberManagerView extends cc.Component {
     }
 
     private loadRecord(): void {
-        //
 
         const tk = DataStore.getString("token", "");
         const loadRecordUrl = `${LEnv.rootURL}${LEnv.loadClubEvents}?&tk=${tk}&clubID=${this.clubInfo.baseInfo.clubID}&cursor=${0} `;
 
         const cb = (xhr: XMLHttpRequest, err: string) => {
-            //
+
             const data = <Uint8Array>xhr.response;
             const msgClubReply = proto.club.MsgClubReply.decode(data);
             if (msgClubReply.replyCode === proto.club.ClubReplyCode.RCOperation) {
@@ -488,7 +479,6 @@ export class MemberManagerView extends cc.Component {
     }
 
     private updateMemberList(members: proto.club.IMsgClubMemberInfo[]): void {
-        //
         this.members = members;
         this.memberList.numItems = this.members.length;
     }

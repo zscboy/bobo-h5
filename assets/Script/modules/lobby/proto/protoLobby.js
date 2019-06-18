@@ -565,9 +565,15 @@ exports.proto = require("protobuf").newBuilder({})['import']({
                         },
                         {
                             "rule": "optional",
+                            "type": "string",
+                            "name": "clubID",
+                            "id": 2
+                        },
+                        {
+                            "rule": "optional",
                             "type": "bytes",
                             "name": "content",
-                            "id": 2
+                            "id": 3
                         }
                     ]
                 }

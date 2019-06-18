@@ -388,11 +388,13 @@ export namespace proto {
 
 		interface IMsgClubNotify {
 			notifyType: number;
+			clubID?: string;
 			content?: ByteBuffer;
 		}
 
 		class MsgClubNotify implements IMsgClubNotify {
 			public notifyType: number;
+			public clubID: string;
 			public content: ByteBuffer;
 			constructor(properties?: club.IMsgClubNotify);
 			public static encode(message: MsgClubNotify): ByteBuffer;

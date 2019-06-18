@@ -341,8 +341,10 @@ export class Replay {
             const handScore = proto.mahjong.MsgHandScore.decode(handScoreBytes);
             let endType;
             handScore.playerScores.forEach((s) => {
-                Logger.debug("s ----------------: ", s);
-                endType = s.winType;
+                if (s.winType !== proto.mahjong.HandOverType.enumHandOverType_None
+                    && s.winType !== proto.mahjong.HandOverType.enumHandOverType_Chucker) {
+                    endType = s.winType;
+                }
             });
 
             msgHandOver.endType = endType;

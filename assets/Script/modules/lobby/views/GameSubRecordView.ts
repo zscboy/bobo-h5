@@ -207,6 +207,8 @@ export class GameSubRecordView extends cc.Component {
         } else if (recordCfg.recordRoomType === 21) {
             //湛江
             modName = "gameb";
+        } else if (recordCfg.recordRoomType === 8) {
+            modName = "gamea";
         }
 
         this.win.hide();

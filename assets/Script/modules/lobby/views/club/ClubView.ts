@@ -89,7 +89,7 @@ export class ClubView extends cc.Component {
      * 修改茶馆名
      */
     public modifyClubName(name: string): void {
-        //
+
         const tk = DataStore.getString("token", "");
         const url = `${LEnv.rootURL}${LEnv.renameClub}?&tk=${tk}&clubID=${this.selectedClub.baseInfo.clubID}&clname=${name}`;
 
@@ -101,7 +101,7 @@ export class ClubView extends cc.Component {
             if (msgClubReply.replyCode === proto.club.ClubReplyCode.RCError) {
                 const msgCubOperGenericReply = proto.club.MsgCubOperGenericReply.decode(msgClubReply.content);
                 if (msgCubOperGenericReply.errorCode === proto.club.ClubOperError.CERR_OK) {
-                    this.loadClub();
+                    this.loadAllClub();
                 } else {
                     ClubRequestError.showErrMsg(msgCubOperGenericReply.errorCode);
                 }
@@ -199,7 +199,7 @@ export class ClubView extends cc.Component {
             this.lobbyModule.eventTarget.on(`enterGameEvent`, this.hide, this);
         }
 
-        this.loadClub();
+        this.loadAllClub();
 
     }
     /**
@@ -314,10 +314,9 @@ export class ClubView extends cc.Component {
     }
 
     private onAppointManagerBtnClick(): void {
-        //
 
         const appointManagerView = this.addComponent(AppointManagerView);
-        appointManagerView.show(this.selectedClub);
+        appointManagerView.show(this, this.selectedClub);
 
     }
 
@@ -349,7 +348,7 @@ export class ClubView extends cc.Component {
     }
 
     private onCreateRoomBtnClick(): void {
-        //
+
         const view = this.addComponent(NewRoomView);
         view.saveClubId(this.selectedClub.baseInfo.clubID);
 
@@ -612,7 +611,7 @@ export class ClubView extends cc.Component {
      * 筛选
      */
     private filterGame(): void {
-        //
+
         this.filterRoomInfos = [];
         this.allRoomInfos.forEach(roomInfo => {
             const config = <{ [key: string]: boolean | number }>JSON.parse(roomInfo.config);
@@ -643,6 +642,8 @@ export class ClubView extends cc.Component {
 
     private setContent(clubInfo: proto.club.IMsgClubInfo): void {
 
+        this.selectedClub = null;
+
         if (clubInfo === undefined || clubInfo === null) {
             this.content.getController("isClub").selectedIndex = 0;
             this.view.getController("isClub").selectedIndex = 0;
@@ -658,7 +659,7 @@ export class ClubView extends cc.Component {
         this.selectedClub = selectedClub;
 
         this.updateUIByClubManager();
-
+        // 拉取房间信息
         this.loadClubRooms(selectedClub.baseInfo.clubID);
     }
 
@@ -683,7 +684,7 @@ export class ClubView extends cc.Component {
         this.setOperationBtnVisible(isManager);
     }
 
-    private loadClub(): void {
+    private loadAllClub(): void {
         const tk = DataStore.getString("token", "");
         const url = `${LEnv.rootURL}${LEnv.loadMyClubs}?&tk=${tk}`;
 
@@ -704,6 +705,28 @@ export class ClubView extends cc.Component {
         this.clubRequest(url, cb);
 
     }
+
+    // private loadClub(): void {
+    //     const tk = DataStore.getString("token", "");
+    //     const url = `${LEnv.rootURL}${LEnv.loadClub}?&tk=${tk}&clubID=${this.selectedClub.baseInfo.clubID}`;
+
+    //     const cb = (xhr: XMLHttpRequest, err: string) => {
+
+    //         const data = <Uint8Array>xhr.response;
+    //         let clubRsp: proto.club.MsgClubInfo = null;
+    //         if (data !== null) {
+    //             const msgClubReply = proto.club.MsgClubReply.decode(data);
+    //             if (msgClubReply.replyCode === proto.club.ClubReplyCode.RCOperation) {
+    //                 clubRsp = proto.club.MsgClubInfo.decode(msgClubReply.content);
+    //             }
+    //         }
+    //         //this.updateClubList(clubRsp);
+
+    //     };
+
+    //     this.clubRequest(url, cb);
+
+    // }
 
     private loadClubRooms(clubId: string): void {
         const tk = DataStore.getString("token", "");

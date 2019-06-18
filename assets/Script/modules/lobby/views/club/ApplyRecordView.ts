@@ -18,7 +18,6 @@ export class ApplyRecordView extends cc.Component {
     private records: proto.club.IMsgClubEvent[] = [];
 
     protected onLoad(): void {
-        //
         this.eventTarget = new cc.EventTarget();
 
         const view = fgui.UIPackage.createObject("lobby_club", "applyRecord").asCom;
@@ -46,8 +45,6 @@ export class ApplyRecordView extends cc.Component {
     }
 
     private initView(): void {
-        //
-
         const closeBtn = this.view.getChild("closeBtn");
         closeBtn.onClick(this.onCloseClick, this);
 
@@ -115,13 +112,12 @@ export class ApplyRecordView extends cc.Component {
     }
 
     private loadMyRecord(): void {
-        //
 
         const tk = DataStore.getString("token", "");
         const url = `${LEnv.rootURL}${LEnv.loadMyApplyEvent}?&tk=${tk}`;
 
         const cb = (xhr: XMLHttpRequest, err: string) => {
-            //
+
             const data = <Uint8Array>xhr.response;
 
             if (data !== null) {

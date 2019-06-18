@@ -24,7 +24,7 @@ export class JoinClubView extends cc.Component {
     }
 
     protected onLoad(): void {
-        //
+
         this.eventTarget = new cc.EventTarget();
 
         const view = fgui.UIPackage.createObject("lobby_club", "joinClub").asCom;
@@ -52,7 +52,7 @@ export class JoinClubView extends cc.Component {
     }
 
     private initView(): void {
-        //
+
         const closeBtn = this.view.getChild("closeBtn");
         closeBtn.onClick(this.onCloseClick, this);
 
@@ -82,8 +82,6 @@ export class JoinClubView extends cc.Component {
     }
 
     private onResetBtnClick(): void {
-        //
-
         this.numbers.forEach(element => {
             element.text = "";
         });
@@ -93,7 +91,6 @@ export class JoinClubView extends cc.Component {
     }
 
     private onBackBtnClick(): void {
-        //
 
         if (this.clubNumber === undefined) {
             return;
@@ -118,7 +115,6 @@ export class JoinClubView extends cc.Component {
     }
 
     private onInputButton(inputNumber: number): void {
-        //
 
         let numberLength = 0;
 
@@ -155,7 +151,7 @@ export class JoinClubView extends cc.Component {
     }
 
     private joinRoomCheck(clubNumber: string): void {
-        //
+
         if (clubNumber.length === 5) {
             this.requestJoinClub(clubNumber);
         }
@@ -163,13 +159,12 @@ export class JoinClubView extends cc.Component {
     }
 
     private requestJoinClub(clubNumber: string): void {
-        //
 
         const tk = DataStore.getString("token", "");
         const url = `${LEnv.rootURL}${LEnv.joinClub}?&tk=${tk}&clubNumber=${clubNumber}`;
 
         const cb = (xhr: XMLHttpRequest, err: string) => {
-            //
+
             const data = <Uint8Array>xhr.response;
 
             const msgClubReply = proto.club.MsgClubReply.decode(data);

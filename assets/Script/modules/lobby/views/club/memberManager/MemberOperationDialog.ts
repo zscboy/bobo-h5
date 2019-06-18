@@ -39,7 +39,6 @@ export class MemberOperationDialog extends cc.Component {
     }
 
     private initView(member: proto.club.IMsgClubMemberInfo, clubInfo: proto.club.IMsgClubInfo): void {
-        //
 
         this.eventTarget = new cc.EventTarget();
         const revokeBtn = this.view.getChild("revokeBtn").asButton;
@@ -86,12 +85,12 @@ export class MemberOperationDialog extends cc.Component {
     }
 
     private onRevokeBtnClick(): void {
-        //
+
         this.onUp2ManagerBtnBtnClick();
     }
 
     private onUp2ManagerBtnBtnClick(): void {
-        //
+
         const managers = this.clubInfo.managers;
         let isManager = false;
         for (const managerId of managers) {
@@ -101,29 +100,21 @@ export class MemberOperationDialog extends cc.Component {
         }
 
         const role = isManager ? proto.club.ClubRoleType.CRoleTypeMember : proto.club.ClubRoleType.CRoleTypeMgr;
-        // // 俱乐部角色定义
-        // enum ClubRoleType
-        // {
-        //     CRoleTypeNone = 0; // 无效角色
-        //     CRoleTypeMember = 1; // 成员
-        //     CRoleTypeCreator = 2; // 创建者
-        //     CRoleTypeMgr = 3; // 管理者
-        // }
         this.changeManagerRequest(this.member, role);
     }
 
     private onAuthorize2CreateRoomBtnClick(): void {
-        //
+
         //this.memberView.authCreateRoom(this.member);
     }
 
     private onDelMemberBtnClick(): void {
-        //
+
         this.memberView.delMember(this.member);
     }
 
     private onCancelAuthBtnClick(): void {
-        //
+
         //this.memberView.cancelAuth(this.member);
     }
 
@@ -163,7 +154,6 @@ export class MemberOperationDialog extends cc.Component {
     }
 
     private changeManager(member: proto.club.IMsgClubMemberInfo, role: proto.club.ClubRoleType): void {
-        //
 
         const memberLevelCtrl = this.view.getController("memberLevel");
 
@@ -180,7 +170,7 @@ export class MemberOperationDialog extends cc.Component {
     }
 
     private saveClubInfo(): void {
-        //
+
         this.memberView.saveClubInfo(this.clubInfo);
     }
 

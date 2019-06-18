@@ -23,7 +23,7 @@ export class DisbandClubView extends cc.Component {
     }
 
     protected onLoad(): void {
-        //
+
         this.eventTarget = new cc.EventTarget();
         const view = fgui.UIPackage.createObject("lobby_club", "disbandClubCom").asCom;
         this.view = view;
@@ -59,7 +59,7 @@ export class DisbandClubView extends cc.Component {
     }
 
     private onConfirmBtnClick(): void {
-        //
+
         this.settingPopupView.disbandClub();
         this.destroy();
     }

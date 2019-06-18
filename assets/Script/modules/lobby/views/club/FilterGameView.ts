@@ -29,7 +29,6 @@ export class FilterGameView extends cc.Component {
     }
 
     private initView(selectRoomType: number): void {
-        //
         const allBtn = this.view.getChild("allBtn").asButton;
         const dfmjBtn = this.view.getChild("dfmj").asButton;
         const zjmjBtn = this.view.getChild("zjmj").asButton;
@@ -59,17 +58,17 @@ export class FilterGameView extends cc.Component {
     }
 
     private onAllGameBtnClick(): void {
-        //
+
         this.clubView.selectGame(0);
     }
 
     private onDFMJBtmClick(): void {
-        //
+
         this.clubView.selectGame(1);
     }
 
     private onZJMJBtnClick(): void {
-        //
+
         this.clubView.selectGame(21);
 
     }

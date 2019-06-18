@@ -7,7 +7,7 @@ import { proto } from "../../proto/protoLobby";
 
 export namespace ClubRequestError {
     export const showErrMsg = (errCode: number): void => {
-        //
+
         const club = proto.club;
         const errMsgMap: { [key: string]: string } = {
             [club.ClubOperError.CERR_OK]: "没有错误",

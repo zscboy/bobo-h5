@@ -4,7 +4,7 @@ import { ClubRequestError } from "./ClubRequestError";
 
 const { ccclass } = cc._decorator;
 /**
- * 创建茶馆页面
+ * 加入茶馆页面
  */
 @ccclass
 export class JoinClubView extends cc.Component {
@@ -12,16 +12,9 @@ export class JoinClubView extends cc.Component {
     private view: fgui.GComponent;
     private win: fgui.Window;
     private eventTarget: cc.EventTarget;
-
     private clubNumber: string;
-
     private numbers: fgui.GObject[] = [];
-
     private hintText: fgui.GObject;
-
-    public getEventTarget(): cc.EventTarget {
-        return this.eventTarget;
-    }
 
     protected onLoad(): void {
 
@@ -147,7 +140,6 @@ export class JoinClubView extends cc.Component {
         }
 
         this.joinRoomCheck(this.clubNumber);
-
     }
 
     private joinRoomCheck(clubNumber: string): void {
@@ -155,7 +147,6 @@ export class JoinClubView extends cc.Component {
         if (clubNumber.length === 5) {
             this.requestJoinClub(clubNumber);
         }
-
     }
 
     private requestJoinClub(clubNumber: string): void {
@@ -194,7 +185,6 @@ export class JoinClubView extends cc.Component {
     /**
      * 网络请求
      * @param url 链接
-     * @param msg 滚动圈弹的信息
      * @param cb 回调
      */
     private clubRequest(url: string, cb: Function): void {

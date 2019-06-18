@@ -1,13 +1,7 @@
 import { CommonFunction, DataStore, HTTP, LEnv, Logger } from "../../../lcore/LCoreExports";
 import { proto } from "../../../proto/protoLobby";
+import { ClubViewInterface } from "../ClubModuleInterface";
 import { ClubRequestError } from "../ClubRequestError";
-
-interface MemberManagerInterface {
-
-    delMember: Function;
-    saveClubInfo: Function;
-
-}
 
 /**
  * 成员管理，对成员进行操作
@@ -18,13 +12,13 @@ export class MemberOperationDialog extends cc.Component {
 
     private member: proto.club.IMsgClubMemberInfo;
 
-    private memberView: MemberManagerInterface;
+    private memberView: ClubViewInterface;
 
     private clubInfo: proto.club.IMsgClubInfo;
 
     private eventTarget: cc.EventTarget;
 
-    public bind(memberView: MemberManagerInterface, clubInfo: proto.club.IMsgClubInfo, member: proto.club.IMsgClubMemberInfo): void {
+    public bind(memberView: ClubViewInterface, clubInfo: proto.club.IMsgClubInfo, member: proto.club.IMsgClubMemberInfo): void {
         this.memberView = memberView;
         this.member = member;
         this.clubInfo = clubInfo;
@@ -177,7 +171,6 @@ export class MemberOperationDialog extends cc.Component {
     /**
      * 网络请求
      * @param url 链接
-     * @param msg 滚动圈弹的信息
      * @param cb 回调
      */
     private clubRequest(url: string, cb: Function): void {

@@ -1,17 +1,9 @@
 import { DataStore, Logger } from "../../../lcore/LCoreExports";
 import { proto } from "../../../proto/protoLobby";
+import { ClubViewInterface } from "../ClubModuleInterface";
 import { DisbandClubView } from "./DisbandClubView";
 import { ModifyClubName } from "./ModifyClubName";
 import { QuitClubView } from "./QuitClubView";
-
-interface ClubViewInterface {
-
-    disbandClub: Function;
-
-    modifyClubName: Function;
-
-    quitClub: Function;
-}
 
 /**
  * 管理界面

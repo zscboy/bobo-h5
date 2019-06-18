@@ -4,6 +4,7 @@ import { LobbyError } from "../LobbyError";
 import { NewRoomView } from "../NewRoomView";
 import { ApplyRecordView } from "./ApplyRecordView";
 import { AppointManagerView } from "./AppointManager/AppointManagerView";
+import { RoomType } from "./ClubModuleInterface";
 import { ClubRequestError } from "./ClubRequestError";
 import { CreateClubView } from "./CreateClubView";
 import { FilterGameView } from "./FilterGameView";
@@ -48,7 +49,7 @@ export class ClubView extends cc.Component {
     // 根据 room type 筛选出来的房间
     private filterRoomInfos: proto.lobby.IRoomInfo[] = [];
     // 筛选的 room type
-    private selectRoomType: number = 0;
+    private selectRoomType: RoomType = RoomType.ALL;
     // 大厅模块
     private lobbyModule: LobbyModuleInterface;
 
@@ -64,7 +65,7 @@ export class ClubView extends cc.Component {
      * 选择筛选的房间类型
      * @param selectRoomType RoomType
      */
-    public selectGame(selectRoomType: number): void {
+    public selectGame(selectRoomType: RoomType): void {
 
         this.selectRoomType = selectRoomType;
         this.setFilterBtnName();
@@ -499,10 +500,7 @@ export class ClubView extends cc.Component {
             try {
                 const config = <{ [key: string]: string }>JSON.parse(jsonStr);
 
-                if (roomInfo.roomID === config.roomID) {
-                    // joinBtn._touchDisabled = true;
-                    // joinBtn.getController("gray").selectedIndex = 1;
-                } else {
+                if (roomInfo.roomID !== config.roomID) {
                     joinBtn._touchDisabled = true;
                     joinBtn.getController("gray").selectedIndex = 1;
                 }
@@ -568,10 +566,10 @@ export class ClubView extends cc.Component {
         const roomType = <number>roomConfigJSON[`roomType`];
         let gameName = "";
         switch (roomType) {
-            case 21:
+            case RoomType.ZJMJ:
                 gameName = "湛江麻将";
                 break;
-            case 1:
+            case RoomType.DFMJ:
                 gameName = "大丰麻将";
                 break;
 
@@ -630,18 +628,13 @@ export class ClubView extends cc.Component {
 
             const roomType = <number>config[`roomType`];
 
-            if (roomType === this.selectRoomType || this.selectRoomType === 0) {
+            if (roomType === this.selectRoomType || this.selectRoomType === RoomType.ALL) {
                 this.filterRoomInfos.push(roomInfo);
             }
         });
     }
 
     private updateClubList(clubRsp: proto.club.MsgClubLoadMyClubsReply): void {
-        this.updateList(clubRsp);
-
-    }
-
-    private updateList(clubRsp: proto.club.MsgClubLoadMyClubsReply): void {
         if (clubRsp !== null) {
             this.clubs = clubRsp.clubs;
         }
@@ -650,6 +643,7 @@ export class ClubView extends cc.Component {
 
         const clubInfo = this.clubs[0];
         this.setContent(clubInfo);
+
     }
 
     private setContent(clubInfo: proto.club.IMsgClubInfo): void {
@@ -667,8 +661,14 @@ export class ClubView extends cc.Component {
 
     }
 
+    private updateClubBaseInfo(): void {
+        this.view.getChild("memberCountText").asTextField.text = `${this.selectedClub.memberCount} 人`;
+    }
+
     private updateSelectedClub(selectedClub: proto.club.IMsgClubInfo): void {
         this.selectedClub = selectedClub;
+
+        this.updateClubBaseInfo();
 
         this.updateUIByClubManager();
         // 拉取房间信息
@@ -810,13 +810,13 @@ export class ClubView extends cc.Component {
         const nameLab = btn.getChild("selectedGameName").asTextField;
 
         switch (this.selectRoomType) {
-            case 0:
+            case RoomType.ALL:
                 nameLab.text = "全部";
                 break;
-            case 1:
+            case RoomType.DFMJ:
                 nameLab.text = "大丰麻将";
                 break;
-            case 21:
+            case RoomType.ZJMJ:
                 nameLab.text = "湛江麻将";
                 break;
 
@@ -848,7 +848,6 @@ export class ClubView extends cc.Component {
     /**
      * 网络请求
      * @param url 链接
-     * @param msg 滚动圈弹的信息
      * @param cb 回调
      */
     private clubRequest(url: string, cb: Function): void {

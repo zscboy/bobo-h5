@@ -1,8 +1,4 @@
-interface SettingPopupInterface {
-
-    disbandClub: Function;
-
-}
+import { ClubViewInterface } from "../ClubModuleInterface";
 
 /**
  * 解散该群
@@ -14,9 +10,9 @@ export class DisbandClubView extends cc.Component {
     private win: fgui.Window;
     private eventTarget: cc.EventTarget;
 
-    private settingPopupView: SettingPopupInterface;
+    private settingPopupView: ClubViewInterface;
 
-    public bind(settingPopupView: SettingPopupInterface, clubName: string): void {
+    public bind(settingPopupView: ClubViewInterface, clubName: string): void {
         this.settingPopupView = settingPopupView;
         const confirmText = this.view.getChild("confirmText").asRichTextField;
         confirmText.text = `确定要解散<font color="#96693a"> ${clubName} </font>吗?`;

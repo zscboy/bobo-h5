@@ -1,14 +1,9 @@
 import { DataStore, Dialog, HTTP, LEnv, Logger } from "../../../lcore/LCoreExports";
 import { proto } from "../../../proto/protoLobby";
+import { ClubViewInterface } from "../ClubModuleInterface";
 import { ClubRequestError } from "../ClubRequestError";
 import { MemberOperationDialog } from "./MemberOperationDialog";
 const { ccclass } = cc._decorator;
-
-interface ClubViewInterface {
-
-    saveClubInfo: Function;
-
-}
 
 /**
  * 成员管理页面
@@ -497,7 +492,6 @@ export class MemberManagerView extends cc.Component {
     /**
      * 网络请求
      * @param url 链接
-     * @param msg 滚动圈弹的信息
      * @param cb 回调
      */
     private clubRequest(url: string, cb: Function): void {

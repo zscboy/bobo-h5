@@ -150,7 +150,6 @@ export class ApplyRecordView extends cc.Component {
     /**
      * 网络请求
      * @param url 链接
-     * @param msg 滚动圈弹的信息
      * @param cb 回调
      */
     private clubRequest(url: string, cb: Function): void {

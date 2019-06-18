@@ -39,10 +39,14 @@ export class ReplayA {
         this.room = room;
         const players = this.msgHandRecord.players;
         players.forEach((p) => {
-            Logger.debug("p.userID:", p.userID);
+            //先创建自己
             if (p.userID === this.room.getRoomHost().user.userID) {
                 room.createMyPlayer(this.clonePlayer(p));
-            } else {
+            }
+        });
+        players.forEach((p) => {
+            //再创建其他人
+            if (p.userID !== this.room.getRoomHost().user.userID) {
                 room.createPlayerByInfo(this.clonePlayer(p));
             }
         });

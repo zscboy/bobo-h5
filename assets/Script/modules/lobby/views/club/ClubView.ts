@@ -141,6 +141,7 @@ export class ClubView extends cc.Component {
         if (this.lobbyModule !== null) {
             this.lobbyModule.eventTarget.off("onClubViewShow", this.onClubViewShow);
             this.lobbyModule.eventTarget.off("enterGameEvent", this.hide);
+            this.lobbyModule.eventTarget.off(`${proto.lobby.MessageCode.OPClubNotify}`, this.refreshClubInfo, this);
         }
 
         this.eventTarget.emit("destroy");
@@ -166,6 +167,7 @@ export class ClubView extends cc.Component {
         this.win.show();
 
         this.initView();
+
     }
 
     private initView(): void {
@@ -197,6 +199,7 @@ export class ClubView extends cc.Component {
         if (this.lobbyModule !== null) {
             this.lobbyModule.eventTarget.on(`onClubViewShow`, this.onClubViewShow, this);
             this.lobbyModule.eventTarget.on(`enterGameEvent`, this.hide, this);
+            this.lobbyModule.eventTarget.on(`${proto.lobby.MessageCode.OPClubNotify}`, this.refreshClubInfo, this);
         }
 
         this.loadAllClub();
@@ -379,6 +382,15 @@ export class ClubView extends cc.Component {
             }
         }
 
+    }
+
+    private refreshClubInfo(data: ByteBuffer): void {
+        if (data !== null) {
+            const msgClubNotify = proto.club.MsgClubNotify.decode(data);
+            if (msgClubNotify.notifyType === proto.club.ClubNotifyType.CNotify_Change_Member_Role) {
+                this.loadClub(msgClubNotify.clubID);
+            }
+        }
     }
 
     private hide(): void {
@@ -684,6 +696,22 @@ export class ClubView extends cc.Component {
         this.setOperationBtnVisible(isManager);
     }
 
+    private updateClubInfo(clubRsp: proto.club.MsgClubInfo): void {
+
+        for (let i = 0; i < this.clubs.length; i++) {
+            const club = this.clubs[i];
+            if (club.baseInfo.clubID === clubRsp.baseInfo.clubID) {
+                this.clubs[i] = clubRsp;
+                break;
+            }
+        }
+
+        if (this.selectedClub.baseInfo.clubID === clubRsp.baseInfo.clubID) {
+            this.setContent(clubRsp);
+        }
+
+    }
+
     private loadAllClub(): void {
         const tk = DataStore.getString("token", "");
         const url = `${LEnv.rootURL}${LEnv.loadMyClubs}?&tk=${tk}`;
@@ -706,27 +734,28 @@ export class ClubView extends cc.Component {
 
     }
 
-    // private loadClub(): void {
-    //     const tk = DataStore.getString("token", "");
-    //     const url = `${LEnv.rootURL}${LEnv.loadClub}?&tk=${tk}&clubID=${this.selectedClub.baseInfo.clubID}`;
+    private loadClub(clubID: string): void {
+        const tk = DataStore.getString("token", "");
+        const url = `${LEnv.rootURL}${LEnv.loadClub}?&tk=${tk}&clubID=${clubID}`;
 
-    //     const cb = (xhr: XMLHttpRequest, err: string) => {
+        const cb = (xhr: XMLHttpRequest, err: string) => {
 
-    //         const data = <Uint8Array>xhr.response;
-    //         let clubRsp: proto.club.MsgClubInfo = null;
-    //         if (data !== null) {
-    //             const msgClubReply = proto.club.MsgClubReply.decode(data);
-    //             if (msgClubReply.replyCode === proto.club.ClubReplyCode.RCOperation) {
-    //                 clubRsp = proto.club.MsgClubInfo.decode(msgClubReply.content);
-    //             }
-    //         }
-    //         //this.updateClubList(clubRsp);
+            const data = <Uint8Array>xhr.response;
+            let clubRsp: proto.club.MsgClubInfo = null;
+            if (data !== null) {
+                const msgClubReply = proto.club.MsgClubReply.decode(data);
+                if (msgClubReply.replyCode === proto.club.ClubReplyCode.RCOperation) {
+                    clubRsp = proto.club.MsgClubInfo.decode(msgClubReply.content);
+                    this.updateClubInfo(clubRsp);
+                }
+            }
+            //this.updateClubList(clubRsp);
 
-    //     };
+        };
 
-    //     this.clubRequest(url, cb);
+        this.clubRequest(url, cb);
 
-    // }
+    }
 
     private loadClubRooms(clubId: string): void {
         const tk = DataStore.getString("token", "");

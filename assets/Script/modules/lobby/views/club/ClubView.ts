@@ -185,7 +185,7 @@ export class ClubView extends cc.Component {
         //茶馆列表
         this.clubList = this.view.getChild("clubList").asList;
         this.clubList.itemRenderer = (index: number, item: fgui.GObject) => {
-            this.renderPhraseListItem(index, item);
+            this.renderClubListItem(index, item);
         };
         this.clubList.setVirtual();
 
@@ -574,7 +574,6 @@ export class ClubView extends cc.Component {
                 break;
 
             default:
-
         }
 
         return gameName;
@@ -585,7 +584,7 @@ export class ClubView extends cc.Component {
      * @param index 索引
      * @param obj UI节点
      */
-    private renderPhraseListItem(index: number, obj: fgui.GObject): void {
+    private renderClubListItem(index: number, obj: fgui.GObject): void {
         let clubInfo: proto.club.IMsgClubInfo;
 
         if (this.clubs !== undefined) {

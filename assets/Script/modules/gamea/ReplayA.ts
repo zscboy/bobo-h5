@@ -319,13 +319,15 @@ export class ReplayA {
         const msgHandOver: { continueAble?: boolean; endType?: number; scores?: proto.pokerface.MsgHandScore } = {};
         msgHandOver.continueAble = false;
 
-        if (handScoreBytes === null || handScoreBytes === undefined) {
+        if (handScoreBytes === undefined || handScoreBytes === null) {
             msgHandOver.endType = proto.prunfast.HandOverType.enumHandOverType_None;
         } else {
             const handScore = proto.pokerface.MsgHandScore.decode(handScoreBytes);
             let endType;
             handScore.playerScores.forEach((s) => {
-                endType = s.winType;
+                if (s.winType !== proto.prunfast.HandOverType.enumHandOverType_None) {
+                    endType = s.winType;
+                }
             });
 
             msgHandOver.endType = endType;

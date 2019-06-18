@@ -1,10 +1,6 @@
 import { Dialog } from "../../../lcore/LCoreExports";
+import { ClubViewInterface } from "../ClubModuleInterface";
 
-interface SettingPopupInterface {
-
-    modifyClubName: Function;
-
-}
 /**
  * 修改群名
  */
@@ -15,11 +11,11 @@ export class ModifyClubName extends cc.Component {
     private win: fgui.Window;
     private eventTarget: cc.EventTarget;
 
-    private settingPopupView: SettingPopupInterface;
+    private settingPopupView: ClubViewInterface;
 
     private clubName: string;
 
-    public bind(settingPopupView: SettingPopupInterface, clubName: string): void {
+    public bind(settingPopupView: ClubViewInterface, clubName: string): void {
         this.clubName = clubName;
         this.settingPopupView = settingPopupView;
     }

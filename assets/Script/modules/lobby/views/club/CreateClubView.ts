@@ -1,14 +1,9 @@
 import { DataStore, Dialog, HTTP, LEnv, Logger } from "../../lcore/LCoreExports";
 import { proto } from "../../proto/protoLobby";
+import { ClubViewInterface } from "./ClubModuleInterface";
 import { ClubRequestError } from "./ClubRequestError";
 
 const { ccclass } = cc._decorator;
-
-interface CreateClubViewInterface {
-
-    addClub: Function;
-
-}
 
 /**
  * 创建茶馆页面
@@ -20,9 +15,9 @@ export class CreateClubView extends cc.Component {
     private win: fgui.Window;
     private eventTarget: cc.EventTarget;
 
-    private clubView: CreateClubViewInterface;
+    private clubView: ClubViewInterface;
 
-    public bind(clubView: CreateClubViewInterface): void {
+    public bind(clubView: ClubViewInterface): void {
         this.clubView = clubView;
     }
 
@@ -133,7 +128,6 @@ export class CreateClubView extends cc.Component {
     /**
      * 网络请求
      * @param url 链接
-     * @param msg 滚动圈弹的信息
      * @param cb 回调
      */
     private clubRequest(url: string, cb: Function): void {

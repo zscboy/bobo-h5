@@ -1,9 +1,4 @@
-
-interface ClubViewInterface {
-
-    selectGame: Function;
-
-}
+import { ClubViewInterface, RoomType } from "./ClubModuleInterface";
 
 /**
  * 管理界面
@@ -14,9 +9,7 @@ export class FilterGameView extends cc.Component {
 
     private clubView: ClubViewInterface;
 
-    // 、private clubInfo: proto.club.IMsgClubInfo;
-
-    public show(clubView: ClubViewInterface, selectRoomType: number): void {
+    public show(clubView: ClubViewInterface, selectRoomType: RoomType): void {
         this.clubView = clubView;
 
         const settingPopupView = fgui.UIPackage.createObject("lobby_club", "filterPopup").asCom;
@@ -28,29 +21,25 @@ export class FilterGameView extends cc.Component {
 
     }
 
-    private initView(selectRoomType: number): void {
+    private initView(selectRoomType: RoomType): void {
         const allBtn = this.view.getChild("allBtn").asButton;
         const dfmjBtn = this.view.getChild("dfmj").asButton;
         const zjmjBtn = this.view.getChild("zjmj").asButton;
 
         switch (selectRoomType) {
-            case 0:
+            case RoomType.ALL:
                 allBtn.selected = true;
                 break;
-            case 1:
+            case RoomType.DFMJ:
                 dfmjBtn.selected = true;
                 break;
-            case 21:
+            case RoomType.ZJMJ:
                 zjmjBtn.selected = true;
                 break;
 
             default:
 
         }
-
-        // allBtn.onClick(this.onAllGameBtnClick, this);
-        // dfmjBtn.onClick(this.onDFMJBtmClick, this);
-        // zjmjBtn.onClick(this.onZJMJBtnClick, this);
 
         allBtn.on(fgui.Event.TOUCH_END, this.onAllGameBtnClick, this);
         dfmjBtn.on(fgui.Event.TOUCH_END, this.onDFMJBtmClick, this);
@@ -59,17 +48,17 @@ export class FilterGameView extends cc.Component {
 
     private onAllGameBtnClick(): void {
 
-        this.clubView.selectGame(0);
+        this.clubView.selectGame(RoomType.ALL);
     }
 
     private onDFMJBtmClick(): void {
 
-        this.clubView.selectGame(1);
+        this.clubView.selectGame(RoomType.DFMJ);
     }
 
     private onZJMJBtnClick(): void {
 
-        this.clubView.selectGame(21);
+        this.clubView.selectGame(RoomType.ZJMJ);
 
     }
 

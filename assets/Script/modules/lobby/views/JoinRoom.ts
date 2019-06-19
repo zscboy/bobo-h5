@@ -1,7 +1,5 @@
 
-import { DataStore, Dialog, HTTP, LEnv, LobbyModuleInterface, Logger } from "../lcore/LCoreExports";
-import { proto } from "../proto/protoLobby";
-import { LobbyError } from "./LobbyError";
+import { LobbyModuleInterface, Logger } from "../lcore/LCoreExports";
 const { ccclass } = cc._decorator;
 
 /**
@@ -11,7 +9,7 @@ const { ccclass } = cc._decorator;
 export class JoinRoom extends cc.Component {
     private view: fgui.GComponent;
     private win: fgui.Window;
-    private eventTarget: cc.EventTarget;
+    // private eventTarget: cc.EventTarget;
 
     private numbers: fgui.GObject[];
 
@@ -21,7 +19,7 @@ export class JoinRoom extends cc.Component {
     private lm: LobbyModuleInterface;
 
     protected onLoad(): void {
-        this.eventTarget = new cc.EventTarget();
+        // this.eventTarget = new cc.EventTarget();
         this.lm = <LobbyModuleInterface>this.getComponent("LobbyModule");
         const loader = this.lm.loader;
         loader.fguiAddPackage("lobby/fui_join_room/lobby_join_room");
@@ -118,59 +116,62 @@ export class JoinRoom extends cc.Component {
 
     private joinRoomCheck(roomNumber: string): void {
         if (roomNumber.length === 6) {
-            this.requetJoinRoom(roomNumber);
+            this.lm.requetJoinRoom(roomNumber);
+            this.win.hide();
+            this.win.dispose();
+            this.destroy();
         }
     }
 
-    private requetJoinRoom(roomNumber: string): void {
-        const tk = DataStore.getString("token", "");
-        const joinRoomURL = `${LEnv.rootURL}${LEnv.requestRoomInfo}?&tk=${tk}&roomNumber=${roomNumber}`;
+    // private requetJoinRoom(roomNumber: string): void {
+    //     const tk = DataStore.getString("token", "");
+    //     const joinRoomURL = `${LEnv.rootURL}${LEnv.requestRoomInfo}?&tk=${tk}&roomNumber=${roomNumber}`;
 
-        Logger.trace("joinRoomURL, joinRoomURL:", joinRoomURL);
+    //     Logger.trace("joinRoomURL, joinRoomURL:", joinRoomURL);
 
-        HTTP.hGet(this.eventTarget, joinRoomURL, (xhr: XMLHttpRequest, err: string) => {
-            let errMsg = null;
-            if (err !== null) {
-                errMsg = `加入房间错误，错误码:${err}`;
-            } else {
-                errMsg = HTTP.hError(xhr);
-                if (errMsg === null) {
-                    const data = <Uint8Array>xhr.response;
-                    // proto 解码登录结果
-                    const requestRoomInfoRsp = proto.lobby.MsgRequestRoomInfoRsp.decode(data);
-                    if (requestRoomInfoRsp.result === proto.lobby.MsgError.ErrSuccess) {
-                        this.enterGame(requestRoomInfoRsp.roomInfo);
-                    } else {
-                        const errorString = LobbyError.getErrorString(requestRoomInfoRsp.result);
-                        Dialog.showDialog(errorString);
-                    }
-                }
-            }
+    //     HTTP.hGet(this.eventTarget, joinRoomURL, (xhr: XMLHttpRequest, err: string) => {
+    //         let errMsg = null;
+    //         if (err !== null) {
+    //             errMsg = `加入房间错误，错误码:${err}`;
+    //         } else {
+    //             errMsg = HTTP.hError(xhr);
+    //             if (errMsg === null) {
+    //                 const data = <Uint8Array>xhr.response;
+    //                 // proto 解码登录结果
+    //                 const requestRoomInfoRsp = proto.lobby.MsgRequestRoomInfoRsp.decode(data);
+    //                 if (requestRoomInfoRsp.result === proto.lobby.MsgError.ErrSuccess) {
+    //                     this.enterGame(requestRoomInfoRsp.roomInfo);
+    //                 } else {
+    //                     const errorString = LobbyError.getErrorString(requestRoomInfoRsp.result);
+    //                     Dialog.showDialog(errorString);
+    //                 }
+    //             }
+    //         }
 
-            if (errMsg !== null) {
-                Logger.debug("quickly login failed:", errMsg);
-                // 显示错误对话框
-                Dialog.showDialog(errMsg, () => {
-                    //
-                });
-            }
-        });
-    }
+    //         if (errMsg !== null) {
+    //             Logger.debug("quickly login failed:", errMsg);
+    //             // 显示错误对话框
+    //             Dialog.showDialog(errMsg, () => {
+    //                 //
+    //             });
+    //         }
+    //     });
+    // }
 
-    private enterGame(roomInfo: proto.lobby.IRoomInfo): void {
-        this.win.hide();
-        this.win.dispose();
-        this.destroy();
+    // private enterGame(roomInfo: proto.lobby.IRoomInfo): void {
+    //     this.win.hide();
+    //     this.win.dispose();
+    //     this.destroy();
 
-        const myRoomInfo = {
-            roomID: roomInfo.roomID,
-            roomNumber: roomInfo.roomNumber,
-            config: roomInfo.config,
-            gameServerID: roomInfo.gameServerID
-        };
-        const lm = <LobbyModuleInterface>this.getComponent("LobbyModule");
-        lm.enterGame(myRoomInfo);
+    //     const myRoomInfo = {
+    //         roomID: roomInfo.roomID,
+    //         roomNumber: roomInfo.roomNumber,
+    //         config: roomInfo.config,
+    //         gameServerID: roomInfo.gameServerID
+    //     };
+    //     const lm = <LobbyModuleInterface>this.getComponent("LobbyModule");
+    //     lm.enterGame(myRoomInfo);
 
-    }
+    // }
 
 }

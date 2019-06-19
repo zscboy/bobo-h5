@@ -49,6 +49,7 @@ export interface LobbyModuleInterface {
     returnFromGame(): void;
     switchToGame(args: GameModuleLaunchArgs, moduleName: string): void;
     enterGame(roomInfo: proto.lobby.IRoomInfo): void;
+    requetJoinRoom(roomNumber: string): void;
 }
 
 /**

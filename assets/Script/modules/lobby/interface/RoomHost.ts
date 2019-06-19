@@ -4,6 +4,7 @@ import { AnimationMgr, GResLoader, UserInfo } from "../lcore/LCoreExports";
  * room对外接口
  */
 export interface RoomHost {
+    eventTarget: cc.EventTarget;
     timeElapsed: number;
     animationMgr: AnimationMgr;
     quit: Function;

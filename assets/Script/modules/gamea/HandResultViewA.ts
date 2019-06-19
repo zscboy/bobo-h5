@@ -75,6 +75,7 @@ export class HandResultViewA extends cc.Component {
         // const infoBtn = this.unityViewNode.getChild("guizeBtn");
         // infoBtn.onClick(this.onRoomRuleBtnClick, this);
         const shanreBtn = this.unityViewNode.getChild("shanreBtn");
+        shanreBtn.visible = cc.sys.platform === cc.sys.WECHAT_GAME;
         shanreBtn.onClick(this.onShareButtonClick, this);
 
         if (room.isReplayMode()) {

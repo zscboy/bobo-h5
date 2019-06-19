@@ -100,5 +100,6 @@ export interface RoomInterfaceA {
     sendDonate(donateId: number, toChairID: number): void;
     showMsg(chatData: ChatData): void;
     onReadyButtonClick(): void;
+    onInviteButtonClick(): void;
     showOrHideReadyButton(isShow: boolean): void;
 }

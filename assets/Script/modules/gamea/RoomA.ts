@@ -1,6 +1,7 @@
 
 import { RoomHost } from "../lobby/interface/LInterfaceExports";
 import { Logger, RoomInfo, SoundMgr, UserInfo } from "../lobby/lcore/LCoreExports";
+import { Share } from "../lobby/shareUtil/ShareExports";
 import { ChatData } from "../lobby/views/chat/ChatExports";
 import { GameOverResultViewA } from "./GameOverResultViewA";
 import { HandlerActionResultNotifyA } from "./handlers/HandlerActionResultNotifyA";
@@ -424,6 +425,15 @@ export class RoomA {
     }
     public showOrHideReadyButton(isShow: boolean): void {
         this.roomView.showOrHideReadyButton(isShow);
+    }
+
+    public onInviteButtonClick(): void {
+        Share.shareGame(
+            this.host.eventTarget,
+            Share.ShareSrcType.GameShare,
+            Share.ShareMediaType.Image,
+            Share.ShareDestType.Friend,
+            `roomNumber=${this.roomInfo.roomNumber}`);
     }
     /**
      * 挂起若干秒

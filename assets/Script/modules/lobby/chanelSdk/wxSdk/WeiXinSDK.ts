@@ -65,6 +65,15 @@ export namespace WeiXinSDK {
         }
     };
 
+    export const getLaunchOption = (): string2stringMap => {
+        const launchOption = wx.getLaunchOptionsSync();
+        Object.keys(launchOption.query).forEach((value: string) => {
+            Logger.debug("launchOption.query", value, launchOption.query[value]);
+        });
+
+        return launchOption.query;
+    };
+
     const wxOnShow = (successCb: Function, failCb: Function, pullShareTime: number = 0) => {
         wx.onShow((res: showRes) => {
             gameReShowCallBack(successCb, failCb, pullShareTime);
@@ -75,7 +84,8 @@ export namespace WeiXinSDK {
         successCb: Function = null,
         failCb: Function = null,
         shareTitle: string = null,
-        shareMedia: string = null): void => {
+        shareMedia: string = null,
+        customParam: string): void => {
 
         Logger.debug('shareInfo', shareTitle, shareMedia);
 
@@ -90,11 +100,13 @@ export namespace WeiXinSDK {
 
         wx.shareAppMessage({
             title: `${shareTitle}`,
-            imageUrl: `${shareMedia}`
+            imageUrl: `${shareMedia}`,
+            query: customParam
         });
     };
 
     export const getWxDataMap = (): { [key: string]: string | object } => {
         return mDataMap;
     };
+
 }

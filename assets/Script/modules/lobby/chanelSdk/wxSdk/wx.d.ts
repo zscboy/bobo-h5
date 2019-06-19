@@ -2223,6 +2223,7 @@ interface OpenInterfaceAPIs {
   chooseAddress: (options: chooseAddressOpts) => void;
   onShareAppMessage: (func: (res: any) => {}) => void;
   onShow: (func: (res: showRes) => void) => void;
+  offShow: (func: (res: showRes) => void) => void;
 
   onError: (func: (res: errorInfo) => void) => void;
 

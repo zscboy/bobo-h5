@@ -104,6 +104,9 @@ export class LoginView extends cc.Component {
 
     public onLoginClick(): void {
         Logger.debug("onQuicklyBtnClick");
+        if (this.button !== null) {
+            this.button.hide();
+        }
         this.quicklyLogin();
     }
 

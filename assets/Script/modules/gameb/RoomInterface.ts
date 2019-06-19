@@ -89,6 +89,7 @@ export interface RoomInterface {
     showTingDataView(tingP: TingPai[]): void;
     hideTingDataView(): void;
     onReadyButtonClick(): void;
+    onInviteButtonClick(): void;
     resetForNewHand(): void;
     isListensObjVisible(): boolean;
 

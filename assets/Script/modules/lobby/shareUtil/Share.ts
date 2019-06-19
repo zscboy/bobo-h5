@@ -32,13 +32,19 @@ export namespace Share {
     }
 
     // //测试分享接口
-    // Share.shareGame(this.eventTarget, Share.ShareSrcType.GameShare, Share.ShareMediaType.Image, Share.ShareDestType.Friend);
+    // Share.shareGame(
+    //     this.eventTarget,
+    //     Share.ShareSrcType.GameShare,
+    //     Share.ShareMediaType.Image,
+    //     Share.ShareDestType.Friend,
+    //     'roomName=dali&roomId=123');
 
     export const shareGame = (
         target: cc.EventTarget,
         sence: ShareSrcType,
         media: ShareMediaType,
-        shareType: ShareDestType) => {
+        shareType: ShareDestType,
+        customParam?: string) => {
 
         const token = DataStore.getString("token", '');
         const wxShareInfoURL = `${LEnv.rootURL}${LEnv.wxShareInfo}?tk=${token}&sence=${sence}&mediaType=${media}&shareType=${shareType}`;
@@ -65,7 +71,7 @@ export namespace Share {
                         const cb2 = () => {
                             Logger.debug('share fail');
                         };
-                        WeiXinSDK.shareWeChat(cb1, cb2, wxShareInfoReply.text, wxShareInfoReply.multimedia);
+                        WeiXinSDK.shareWeChat(cb1, cb2, wxShareInfoReply.text, wxShareInfoReply.multimedia, customParam);
                     } else {
                         // TODO: show error msg
                         Logger.debug("get wxShareInfo error, errCode:", wxShareInfoReply.result);

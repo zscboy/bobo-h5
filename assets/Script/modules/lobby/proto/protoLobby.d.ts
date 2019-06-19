@@ -105,12 +105,16 @@ export namespace proto {
 			userID: string;
 			displayInfo?: club.IMsgClubDisplayInfo;
 			online?: boolean;
+			role?: number;
+			allowCreateRoom?: boolean;
 		}
 
 		class MsgClubMemberInfo implements IMsgClubMemberInfo {
 			public userID: string;
 			public displayInfo: club.IMsgClubDisplayInfo;
 			public online: boolean;
+			public role: number;
+			public allowCreateRoom: boolean;
 			constructor(properties?: club.IMsgClubMemberInfo);
 			public static encode(message: MsgClubMemberInfo): ByteBuffer;
 			public static decode(reader: Uint8Array|ByteBuffer): MsgClubMemberInfo;

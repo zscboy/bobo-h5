@@ -1,4 +1,4 @@
-import { DataStore, Dialog, HTTP, LEnv, LobbyModuleInterface, Logger } from "../../lcore/LCoreExports";
+import { CommonFunction, DataStore, Dialog, HTTP, LEnv, LobbyModuleInterface, Logger } from "../../lcore/LCoreExports";
 import { proto } from "../../proto/protoLobby";
 import { LobbyError } from "../LobbyError";
 import { NewRoomView } from "../NewRoomView";
@@ -53,14 +53,6 @@ export class ClubView extends cc.Component {
     private selectRoomType: RoomType = RoomType.ALL;
     // 大厅模块
     private lobbyModule: LobbyModuleInterface;
-
-    public saveClubInfo(clubInfo: proto.club.IMsgClubInfo): void {
-
-        const index = this.clubs.indexOf(this.selectedClub);
-
-        this.clubs[index] = clubInfo;
-        this.selectedClub = clubInfo;
-    }
 
     /**
      * 选择筛选的房间类型
@@ -364,7 +356,7 @@ export class ClubView extends cc.Component {
     private onAppointManagerBtnClick(): void {
 
         const appointManagerView = this.addComponent(AppointManagerView);
-        appointManagerView.show(this, this.selectedClub);
+        appointManagerView.show(this.selectedClub);
 
     }
 
@@ -466,7 +458,7 @@ export class ClubView extends cc.Component {
     private onMemberSettingBtnClick(): void {
 
         const view = this.addComponent(MemberManagerView);
-        view.setClubInfo(this, this.selectedClub);
+        view.setClubInfo(this.selectedClub);
     }
 
     private onJoinRoomBtnClick(ev: fgui.Event): void {
@@ -580,7 +572,7 @@ export class ClubView extends cc.Component {
         let notPlayer;
 
         for (let i = 0; i < roomInfo.users.length; i++) {
-            //const player = roomInfo.users[i];
+            const player = roomInfo.users[i];
             iconFrame = obj.asCom.getChild(`iconFrame${i + 1}`);
             iconFrame.visible = true;
 
@@ -590,9 +582,7 @@ export class ClubView extends cc.Component {
             loader = obj.asCom.getChild(`loader${i + 1}`).asLoader;
             loader.visible = true;
 
-            // test URL
-            // tslint:disable-next-line:max-line-length
-            loader.url = `https://wx.qlogo.cn/mmopen/vi_32/DYAIOgq83er5prllVA37yiac4Vv8ZAXwbg0Zicibn6ZjsgJ4ha0hmFBY8MUTRMnRTmSlvzPd8XJZzd0icuyGoiakj4A/132`;
+            CommonFunction.setHead(loader, player.avatarURL);
         }
     }
 
@@ -732,11 +722,12 @@ export class ClubView extends cc.Component {
         const clubOwnerId = this.selectedClub.creatorUserID;
         const managers = this.selectedClub.managers;
         let isManager = false;
-        managers.forEach(managerId => {
+
+        for (const managerId of managers) {
             if (managerId === userId) {
                 isManager = true;
             }
-        });
+        }
 
         const isOwner = userId === clubOwnerId ? true : false;
 

@@ -76,6 +76,7 @@ export class RoomA {
     public msgDisbandNotify: proto.pokerface.MsgDisbandNotify;
     public handNum: number;
     public readonly roomType: number;
+    private soundNum: number;
     public constructor(myUser: UserInfo, roomInfo: RoomInfo, host: RoomHost, rePlay?: ReplayA) {
         this.myUser = myUser;
         this.host = host;
@@ -138,6 +139,8 @@ export class RoomA {
     public loadRoomView(view: fgui.GComponent): void {
         const roomView = new RoomViewA(this, view);
         this.roomView = roomView;
+
+        this.playBgSound();
     }
 
     // 创建玩家对象    // 并绑定playerView
@@ -383,6 +386,7 @@ export class RoomA {
         this.sendMsg(proto.pokerface.MessageCode.OPAction, msgAction);
     }
     public quit(): void {
+        this.stopBgSound();
         this.host.quit();
     }
     public getPlayerByUserID(userID: string): PlayerInterfaceA {
@@ -414,6 +418,9 @@ export class RoomA {
         this.roomView.showRoomNumber();
     }
     public onUpdateStatus(state: number): void {
+        if (state === proto.pokerface.RoomState.SRoomPlaying) {
+            this.stopBgSound();
+        }
         this.roomView.onUpdateStatus(state);
     }
     public switchBg(index: number): void {
@@ -447,5 +454,16 @@ export class RoomA {
                 },
                 seconds);
         });
+    }
+
+    //播放背景音乐
+    private playBgSound(): void {
+        SoundMgr.playEffectAudio("gamea/game_matchBg", true, <(num: number) => void>this.bgSound.bind(this));
+    }
+    private bgSound(num: number): void {
+        this.soundNum = num;
+    }
+    private stopBgSound(): void {
+        SoundMgr.stopEffect(this.soundNum);
     }
 }

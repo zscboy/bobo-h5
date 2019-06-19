@@ -76,6 +76,7 @@ export class Room {
     public msgDisbandNotify: proto.mahjong.MsgDisbandNotify;
     public handNum: number;
     public readonly roomType: number;
+    private soundNum: number;
     public constructor(myUser: UserInfo, roomInfo: RoomInfo, host: RoomHost, rePlay?: Replay) {
         this.myUser = myUser;
         this.host = host;
@@ -138,6 +139,8 @@ export class Room {
     public loadRoomView(view: fgui.GComponent): void {
         const roomView = new RoomView(this, view);
         this.roomView = roomView;
+
+        this.playBgSound();
     }
 
     // 创建玩家对象    // 并绑定playerView
@@ -434,6 +437,7 @@ export class Room {
         this.sendMsg(proto.mahjong.MessageCode.OPAction, msgAction);
     }
     public quit(): void {
+        this.stopBgSound();
         this.host.quit();
     }
     public hideTingDataView(): void {
@@ -485,6 +489,9 @@ export class Room {
         this.roomView.showOrHideReadyButton(isShow);
     }
     public onUpdateStatus(state: number): void {
+        if (state === proto.mahjong.RoomState.SRoomPlaying) {
+            this.stopBgSound();
+        }
         this.roomView.onUpdateStatus(state);
     }
     public switchBg(index: number): void {
@@ -506,5 +513,16 @@ export class Room {
                 },
                 seconds);
         });
+    }
+
+    //播放背景音乐
+    private playBgSound(): void {
+        SoundMgr.playEffectAudio("gameb/game_matchBg", true, <(num: number) => void>this.bgSound.bind(this));
+    }
+    private bgSound(num: number): void {
+        this.soundNum = num;
+    }
+    private stopBgSound(): void {
+        SoundMgr.stopEffect(this.soundNum);
     }
 }

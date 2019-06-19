@@ -202,7 +202,6 @@ export class LobbyModule extends cc.Component implements LobbyModuleInterface {
     }
 
     protected start(): void {
-        Logger.error("lobby module-------start--------------- ");
         this.loader = new GResLoaderImpl("lobby");
         this.eventTarget = new cc.EventTarget();
 

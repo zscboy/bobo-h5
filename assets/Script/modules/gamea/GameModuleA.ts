@@ -68,6 +68,8 @@ export class GameModuleA extends cc.Component implements GameModuleInterface {
 
         const view = fgui.UIPackage.createObject("runfast", "desk").asCom;
         fgui.GRoot.inst.addChild(view);
+        const x = cc.winSize.width / 2 - (cc.winSize.height * 1136 / 640 / 2);
+        view.setPosition(x, view.y);
         this.view = view;
 
         this.mAnimationMgr = new AnimationMgr(this.lm.loader);

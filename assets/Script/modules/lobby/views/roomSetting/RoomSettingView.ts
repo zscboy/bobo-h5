@@ -4,6 +4,8 @@ import { Dialog, GResLoader } from "../../lcore/LCoreExports";
 export interface RoomInterface {
     switchBg(agree: number): void;
     onDissolveClicked(): void;
+
+    onExitButtonClicked(): void;
 }
 /**
  * 设置界面
@@ -15,13 +17,13 @@ export class RoomSettingView extends cc.Component {
 
     private room: RoomInterface;
 
-    public showView(room: RoomInterface, loader: GResLoader): void {
+    public showView(room: RoomInterface, loader: GResLoader, isOwner: boolean): void {
         this.room = room;
         if (this.view === null || this.view === undefined) {
             // this.room = room;
             loader.fguiAddPackage("lobby/fui_room_other_view/room_other_view");
             this.view = fgui.UIPackage.createObject("room_other_view", "setting").asCom;
-            this.initView();
+            this.initView(isOwner);
         }
         fgui.GRoot.inst.showPopup(this.view);
         this.view.setPosition(0, 0);
@@ -41,7 +43,7 @@ export class RoomSettingView extends cc.Component {
         this.destroy();
     }
 
-    private initView(): void {
+    private initView(isOwner: boolean): void {
 
         const bg = this.view.getChild("bg");
         bg.onClick(this.onCloseClick, this);
@@ -51,6 +53,11 @@ export class RoomSettingView extends cc.Component {
 
         const shutdownBtn = this.view.getChild("shutdownBtn");
         shutdownBtn.onClick(this.onCloseClick, this);
+
+        const exitBtn = this.view.getChild("exitBtn");
+        exitBtn.onClick(this.onExitBtnClick, this);
+
+        this.view.getController("isOwner").selectedIndex = isOwner ? 0 : 1;
 
         const disbandBtn = this.view.getChild("disbandBtn");
         disbandBtn.onClick(this.onDisbandBtnClick, this);
@@ -63,6 +70,11 @@ export class RoomSettingView extends cc.Component {
 
         const arrowBtn = this.view.getChild("arrowBtn");
         arrowBtn.onClick(this.onArrowBtnClick, this);
+    }
+
+    private onExitBtnClick(): void {
+        //
+        this.room.onExitButtonClicked();
     }
 
     private onClassColorBtnClick(): void {

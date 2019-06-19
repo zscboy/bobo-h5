@@ -349,6 +349,23 @@ export class GameModule extends cc.Component implements GameModuleInterface {
             }
 
             if (msg.mt === MsgType.wsData) {
+
+                const data = <proto.mahjong.GameMessage>msg.data;
+                if (data.Ops === proto.mahjong.MessageCode.OPPlayerLeaveRoom) {
+
+                    if (data.Data !== undefined && data.Data !== null) {
+                        const leaveReplyMsg = proto.mahjong.MsgEnterRoomResult.decode(data.Data);
+                        Logger.debug("用户主动离开房间--------------- leaveReplyMsg = ", leaveReplyMsg);
+                        if (leaveReplyMsg.status !== undefined && leaveReplyMsg.status !== null
+                            && leaveReplyMsg.status !== 0) {
+                            Logger.debug("游戏已经开始或者房间正在申请解散，不能退出");
+                        }
+                    } else {
+                        loop = false;
+                        break;
+                    }
+                }
+
                 await this.mRoom.dispatchWebsocketMsg(<proto.mahjong.GameMessage>msg.data);
             } else if (msg.mt === MsgType.wsClosed || msg.mt === MsgType.wsError) {
                 Logger.debug(" websocket connection has broken");

@@ -90,6 +90,8 @@ export interface RoomInterfaceA {
 
     onDissolveClicked(): void;
 
+    onExitButtonClicked(): void;
+
     coWaitSeconds(seconds: number): Promise<void>;
 
     sendDisbandAgree(agree: boolean): void;

@@ -222,6 +222,10 @@ export class RoomA {
         //}
     }
 
+    public onExitButtonClicked(): void {
+        //this.sendMsg(proto.mahjong.MessageCode.OPDisbandRequest);
+    }
+
     //处理玩家申请解散请求
     public onDissolveClicked(): void {
         this.sendMsg(proto.pokerface.MessageCode.OPDisbandRequest);

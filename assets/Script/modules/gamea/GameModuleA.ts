@@ -345,6 +345,23 @@ export class GameModuleA extends cc.Component implements GameModuleInterface {
             }
 
             if (msg.mt === MsgType.wsData) {
+
+                const data = <proto.pokerface.GameMessage>msg.data;
+                if (data.Ops === proto.pokerface.MessageCode.OPPlayerLeaveRoom) {
+
+                    if (data.Data !== undefined && data.Data !== null) {
+                        const leaveReplyMsg = proto.pokerface.MsgEnterRoomResult.decode(data.Data);
+                        Logger.debug("用户主动离开房间--------------- leaveReplyMsg = ", leaveReplyMsg);
+                        if (leaveReplyMsg.status !== undefined && leaveReplyMsg.status !== null
+                            && leaveReplyMsg.status !== 0) {
+                            Logger.debug("游戏已经开始或者房间正在申请解散，不能退出");
+                        }
+                    } else {
+                        loop = false;
+                        break;
+                    }
+                }
+
                 await this.mRoom.dispatchWebsocketMsg(<proto.pokerface.GameMessage>msg.data);
             } else if (msg.mt === MsgType.wsClosed || msg.mt === MsgType.wsError) {
                 Logger.debug(" websocket connection has broken");

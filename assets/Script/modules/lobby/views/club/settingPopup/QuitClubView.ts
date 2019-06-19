@@ -1,8 +1,5 @@
-interface SettingPopupInterface {
+import { ClubViewInterface } from "../ClubModuleInterface";
 
-    quitClub: Function;
-
-}
 /**
  * 退出该群
  */
@@ -13,9 +10,9 @@ export class QuitClubView extends cc.Component {
     private win: fgui.Window;
     private eventTarget: cc.EventTarget;
 
-    private settingPopupView: SettingPopupInterface;
+    private settingPopupView: ClubViewInterface;
 
-    public bind(settingPopupView: SettingPopupInterface, clubName: string): void {
+    public bind(settingPopupView: ClubViewInterface, clubName: string): void {
         this.settingPopupView = settingPopupView;
 
         const confirmText = this.view.getChild("confirmText").asRichTextField;
@@ -23,7 +20,7 @@ export class QuitClubView extends cc.Component {
     }
 
     protected onLoad(): void {
-        //
+
         this.eventTarget = new cc.EventTarget();
         const view = fgui.UIPackage.createObject("lobby_club", "quitClubCom").asCom;
         this.view = view;
@@ -60,7 +57,7 @@ export class QuitClubView extends cc.Component {
     }
 
     private onConfirmBtnClick(): void {
-        //
+
         this.settingPopupView.quitClub();
         this.destroy();
     }

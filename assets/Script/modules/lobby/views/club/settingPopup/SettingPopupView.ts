@@ -1,17 +1,9 @@
 import { DataStore, Logger } from "../../../lcore/LCoreExports";
 import { proto } from "../../../proto/protoLobby";
+import { ClubViewInterface } from "../ClubModuleInterface";
 import { DisbandClubView } from "./DisbandClubView";
 import { ModifyClubName } from "./ModifyClubName";
 import { QuitClubView } from "./QuitClubView";
-
-interface ClubViewInterface {
-
-    disbandClub: Function;
-
-    modifyClubName: Function;
-
-    quitClub: Function;
-}
 
 /**
  * 管理界面
@@ -51,7 +43,7 @@ export class SettingPopupView extends cc.Component {
     }
 
     private initView(): void {
-        //
+
         const managerCom = this.view.getChild("managerCom").asCom;
         const modifyNameItem = managerCom.getChild("modify").asButton;
         const disbandItem = managerCom.getChild("disband").asButton;
@@ -83,24 +75,24 @@ export class SettingPopupView extends cc.Component {
     }
 
     private onModifyClubNameClick(): void {
-        //
+
         const view = this.addComponent(ModifyClubName);
         view.bind(this, this.clubInfo.baseInfo.clubName);
     }
 
     private onDisbandClick(): void {
-        //
+
         const view = this.addComponent(DisbandClubView);
         view.bind(this, this.clubInfo.baseInfo.clubName);
     }
 
     private onQuickSettingClick(): void {
-        //
+
         Logger.debug(`onQuickSettingClick------------`);
     }
 
     private onQuitClubClick(): void {
-        //
+
         const view = this.addComponent(QuitClubView);
         view.bind(this, this.clubInfo.baseInfo.clubName);
     }

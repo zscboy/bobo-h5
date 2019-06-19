@@ -1,13 +1,7 @@
 import { CommonFunction, DataStore, HTTP, LEnv, Logger } from "../../../lcore/LCoreExports";
 import { proto } from "../../../proto/protoLobby";
+import { ClubViewInterface } from "../ClubModuleInterface";
 import { ClubRequestError } from "../ClubRequestError";
-
-interface MemberManagerInterface {
-
-    delMember: Function;
-    saveClubInfo: Function;
-
-}
 
 /**
  * 成员管理，对成员进行操作
@@ -18,13 +12,13 @@ export class MemberOperationDialog extends cc.Component {
 
     private member: proto.club.IMsgClubMemberInfo;
 
-    private memberView: MemberManagerInterface;
+    private memberView: ClubViewInterface;
 
     private clubInfo: proto.club.IMsgClubInfo;
 
     private eventTarget: cc.EventTarget;
 
-    public bind(memberView: MemberManagerInterface, clubInfo: proto.club.IMsgClubInfo, member: proto.club.IMsgClubMemberInfo): void {
+    public bind(memberView: ClubViewInterface, clubInfo: proto.club.IMsgClubInfo, member: proto.club.IMsgClubMemberInfo): void {
         this.memberView = memberView;
         this.member = member;
         this.clubInfo = clubInfo;
@@ -39,7 +33,6 @@ export class MemberOperationDialog extends cc.Component {
     }
 
     private initView(member: proto.club.IMsgClubMemberInfo, clubInfo: proto.club.IMsgClubInfo): void {
-        //
 
         this.eventTarget = new cc.EventTarget();
         const revokeBtn = this.view.getChild("revokeBtn").asButton;
@@ -86,12 +79,12 @@ export class MemberOperationDialog extends cc.Component {
     }
 
     private onRevokeBtnClick(): void {
-        //
+
         this.onUp2ManagerBtnBtnClick();
     }
 
     private onUp2ManagerBtnBtnClick(): void {
-        //
+
         const managers = this.clubInfo.managers;
         let isManager = false;
         for (const managerId of managers) {
@@ -101,29 +94,21 @@ export class MemberOperationDialog extends cc.Component {
         }
 
         const role = isManager ? proto.club.ClubRoleType.CRoleTypeMember : proto.club.ClubRoleType.CRoleTypeMgr;
-        // // 俱乐部角色定义
-        // enum ClubRoleType
-        // {
-        //     CRoleTypeNone = 0; // 无效角色
-        //     CRoleTypeMember = 1; // 成员
-        //     CRoleTypeCreator = 2; // 创建者
-        //     CRoleTypeMgr = 3; // 管理者
-        // }
         this.changeManagerRequest(this.member, role);
     }
 
     private onAuthorize2CreateRoomBtnClick(): void {
-        //
+
         //this.memberView.authCreateRoom(this.member);
     }
 
     private onDelMemberBtnClick(): void {
-        //
+
         this.memberView.delMember(this.member);
     }
 
     private onCancelAuthBtnClick(): void {
-        //
+
         //this.memberView.cancelAuth(this.member);
     }
 
@@ -163,7 +148,6 @@ export class MemberOperationDialog extends cc.Component {
     }
 
     private changeManager(member: proto.club.IMsgClubMemberInfo, role: proto.club.ClubRoleType): void {
-        //
 
         const memberLevelCtrl = this.view.getController("memberLevel");
 
@@ -180,14 +164,13 @@ export class MemberOperationDialog extends cc.Component {
     }
 
     private saveClubInfo(): void {
-        //
+
         this.memberView.saveClubInfo(this.clubInfo);
     }
 
     /**
      * 网络请求
      * @param url 链接
-     * @param msg 滚动圈弹的信息
      * @param cb 回调
      */
     private clubRequest(url: string, cb: Function): void {
@@ -196,7 +179,6 @@ export class MemberOperationDialog extends cc.Component {
         }
 
         Logger.debug("clubRequest url = ", url);
-        Logger.debug("this.eventTarget = ", this.eventTarget);
 
         HTTP.hGet(this.eventTarget, url, (xhr: XMLHttpRequest, err: string) => {
 

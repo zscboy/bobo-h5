@@ -1,7 +1,8 @@
+import { RoomHost } from "../lobby/interface/LInterfaceExports";
 import { CommonFunction, Logger } from "../lobby/lcore/LCoreExports";
 import { ClickCtrl, PlayerInterfaceA } from "./PlayerInterfaceA";
 import { proto } from "./proto/protoGameA";
-import { PlayerInfo, RoomHost, RoomInterfaceA } from "./RoomInterfaceA";
+import { PlayerInfo, RoomInterfaceA } from "./RoomInterfaceA";
 import { TileImageMounterA } from "./TileImageMounterA";
 
 const pokerface = proto.pokerface;
@@ -292,6 +293,7 @@ export class PlayerViewA {
                 const originPos = this.handsOriginPos[i];
                 const h = clickCtrl.h;
                 h.y = originPos.y;
+                clickCtrl.clickCount = 0;
             }
         }
     }
@@ -370,6 +372,14 @@ export class PlayerViewA {
             }
         }
     }
+
+    //把手牌往上移动30的单位距离
+    public moveHandUp(index: number): void {
+        const originPos = this.handsOriginPos[index];
+        const h = this.handsClickCtrls[index].h;
+        h.y = originPos.y - 30;
+        this.handsClickCtrls[index].clickCount = 1;
+    }
     private hideChatMsg(): void {
         this.qipao.visible = false;
     }
@@ -447,13 +457,6 @@ export class PlayerViewA {
         status[pokerface.PlayerState.PSOffline] = onLeave;
         status[pokerface.PlayerState.PSPlaying] = onPlaying;
         this.onUpdateStatus = status;
-    }
-    //把手牌往上移动30的单位距离
-    private moveHandUp(index: number): void {
-        const originPos = this.handsOriginPos[index];
-        const h = this.handsClickCtrls[index].h;
-        h.y = originPos.y - 30;
-        this.handsClickCtrls[index].clickCount = 1;
     }
 
     //把手牌还原位置

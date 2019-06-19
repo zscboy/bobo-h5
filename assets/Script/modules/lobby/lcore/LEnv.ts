@@ -44,6 +44,7 @@ export namespace LEnv {
     export const loadClubRooms = "/lobby/uuid/loadClubRooms";
 
     export const loadMyApplyEvent = "/lobby/uuid/loadMyApplyEvent";
+
     export const renameClub = "/lobby/uuid/renameClub";
 
     export const kickOut = "/lobby/uuid/kickOut";
@@ -51,6 +52,8 @@ export namespace LEnv {
     export const changeRole = "/lobby/uuid/changeRole";
 
     export const loadClubMgrs = "/lobby/uuid/loadClubMgrs";
+
+    export const loadClub = "/lobby/uuid/loadClub";
 
     export const createClubRoom = "/lobby/uuid/createClubRoom";
 

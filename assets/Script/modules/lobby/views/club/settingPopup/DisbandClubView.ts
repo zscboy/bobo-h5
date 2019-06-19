@@ -1,8 +1,4 @@
-interface SettingPopupInterface {
-
-    disbandClub: Function;
-
-}
+import { ClubViewInterface } from "../ClubModuleInterface";
 
 /**
  * 解散该群
@@ -14,16 +10,16 @@ export class DisbandClubView extends cc.Component {
     private win: fgui.Window;
     private eventTarget: cc.EventTarget;
 
-    private settingPopupView: SettingPopupInterface;
+    private settingPopupView: ClubViewInterface;
 
-    public bind(settingPopupView: SettingPopupInterface, clubName: string): void {
+    public bind(settingPopupView: ClubViewInterface, clubName: string): void {
         this.settingPopupView = settingPopupView;
         const confirmText = this.view.getChild("confirmText").asRichTextField;
         confirmText.text = `确定要解散<font color="#96693a"> ${clubName} </font>吗?`;
     }
 
     protected onLoad(): void {
-        //
+
         this.eventTarget = new cc.EventTarget();
         const view = fgui.UIPackage.createObject("lobby_club", "disbandClubCom").asCom;
         this.view = view;
@@ -59,7 +55,7 @@ export class DisbandClubView extends cc.Component {
     }
 
     private onConfirmBtnClick(): void {
-        //
+
         this.settingPopupView.disbandClub();
         this.destroy();
     }

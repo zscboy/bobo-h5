@@ -4,7 +4,7 @@ import { ClubRequestError } from "./ClubRequestError";
 
 const { ccclass } = cc._decorator;
 /**
- * 创建茶馆页面
+ * 加入茶馆页面
  */
 @ccclass
 export class JoinClubView extends cc.Component {
@@ -12,19 +12,12 @@ export class JoinClubView extends cc.Component {
     private view: fgui.GComponent;
     private win: fgui.Window;
     private eventTarget: cc.EventTarget;
-
     private clubNumber: string;
-
     private numbers: fgui.GObject[] = [];
-
     private hintText: fgui.GObject;
 
-    public getEventTarget(): cc.EventTarget {
-        return this.eventTarget;
-    }
-
     protected onLoad(): void {
-        //
+
         this.eventTarget = new cc.EventTarget();
 
         const view = fgui.UIPackage.createObject("lobby_club", "joinClub").asCom;
@@ -52,7 +45,7 @@ export class JoinClubView extends cc.Component {
     }
 
     private initView(): void {
-        //
+
         const closeBtn = this.view.getChild("closeBtn");
         closeBtn.onClick(this.onCloseClick, this);
 
@@ -82,8 +75,6 @@ export class JoinClubView extends cc.Component {
     }
 
     private onResetBtnClick(): void {
-        //
-
         this.numbers.forEach(element => {
             element.text = "";
         });
@@ -93,7 +84,6 @@ export class JoinClubView extends cc.Component {
     }
 
     private onBackBtnClick(): void {
-        //
 
         if (this.clubNumber === undefined) {
             return;
@@ -118,7 +108,6 @@ export class JoinClubView extends cc.Component {
     }
 
     private onInputButton(inputNumber: number): void {
-        //
 
         let numberLength = 0;
 
@@ -151,25 +140,22 @@ export class JoinClubView extends cc.Component {
         }
 
         this.joinRoomCheck(this.clubNumber);
-
     }
 
     private joinRoomCheck(clubNumber: string): void {
-        //
+
         if (clubNumber.length === 5) {
             this.requestJoinClub(clubNumber);
         }
-
     }
 
     private requestJoinClub(clubNumber: string): void {
-        //
 
         const tk = DataStore.getString("token", "");
         const url = `${LEnv.rootURL}${LEnv.joinClub}?&tk=${tk}&clubNumber=${clubNumber}`;
 
         const cb = (xhr: XMLHttpRequest, err: string) => {
-            //
+
             const data = <Uint8Array>xhr.response;
 
             const msgClubReply = proto.club.MsgClubReply.decode(data);
@@ -199,7 +185,6 @@ export class JoinClubView extends cc.Component {
     /**
      * 网络请求
      * @param url 链接
-     * @param msg 滚动圈弹的信息
      * @param cb 回调
      */
     private clubRequest(url: string, cb: Function): void {

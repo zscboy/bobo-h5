@@ -58,7 +58,7 @@ export class PlayerA {
     public allowedReActionMsg: proto.pokerface.MsgAllowPlayerReAction;
     public allowedActionMsg: proto.pokerface.MsgAllowPlayerAction;
     public isGuoHuTips: boolean;
-    public tipCards: number[];
+    public tipCards: proto.pokerface.MsgCardHand[];
     public discardR2H: boolean;
     public tipCardsIndex: number;
 
@@ -206,7 +206,6 @@ export class PlayerA {
     }
 
     public showCardHandType(cardHandType: number, discardTileId: number): void {
-        Logger.debug("显示打出去的牌的类型。。。 : ", cardHandType);
         const e = EFFECTS[cardHandType];
         const s = SOUND[cardHandType];
         if (e !== "") {
@@ -260,32 +259,55 @@ export class PlayerA {
     public onTipBtnClick(): void {
         this.playerView.restoreHandPositionAndClickCount(-1);
         const handsClickCtrls = this.playerView.handsClickCtrls;
-        if (this.tipCards === null) {
+        let tipCards = this.tipCards;
+        if (tipCards === undefined || tipCards === null) {
             const cards = [];
             for (const handsClickCtrl of handsClickCtrls) {
                 if (handsClickCtrl.tileID !== undefined) {
                     cards.push(handsClickCtrl.tileID);
                 }
             }
-            // let specialCardID = -1;
+            let specialCardID = -1;
             if (this.discardR2H) {
-                // specialCardID = 1;
+                specialCardID = 1;
             }
             if (this.allowedReActionMsg === null) {
                 //提示  自己的出牌提示
-                // this.tipCards = AgariIndexA.searchLongestDiscardCardHand(cards, specialCardID);
+                tipCards = AgariIndexA.searchLongestDiscardCardHand(cards, specialCardID);
             } else {
-                // const prevActionHand = this.allowedReActionMsg.prevActionHand;
-                // this.tipCards = AgariIndexA.findAllGreatThanCardHands(prevActionHand, cards, specialCardID);
+                const prevActionHand = this.allowedReActionMsg.prevActionHand;
+                tipCards = AgariIndexA.findAllGreatThanCardHands(prevActionHand, cards, specialCardID);
             }
+            this.tipCards = tipCards;
         }
-        if (this.tipCards.length === 0) {
+        if (tipCards.length === 0) {
             //如果提示没东西，则帮用户
+            // Dialog.prompt("如果提示没东西，则帮用户");
             this.onSkipBtnClick();
 
             return;
         }
-        //TODO :  提示出牌 待完善
+        if (this.tipCardsIndex >= tipCards.length) {
+            this.tipCardsIndex = 0;
+        }
+        const tipCard = tipCards[this.tipCardsIndex];
+        this.tipCardsIndex = this.tipCardsIndex + 1;
+        if (tipCard !== undefined && tipCard !== null) {
+            const cs = tipCard.cards;
+            if (cs !== undefined && cs.length > 0) {
+                for (let i = 0; i < handsClickCtrls.length; i++) {
+                    const handsClickCtrl = handsClickCtrls[i];
+                    const tileID = handsClickCtrl.tileID;
+                    if (tileID !== undefined) {
+                        for (const c of cs) {
+                            if (c === tileID) {
+                                this.playerView.moveHandUp(i);
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
     //玩家选择出牌
@@ -294,7 +316,7 @@ export class PlayerA {
         const handsClickCtrls = this.playerView.handsClickCtrls;
         const discardCards = [];
         for (const handsClickCtrl of handsClickCtrls) {
-            if (handsClickCtrl.tileID !== undefined) {
+            if (handsClickCtrl.tileID !== undefined && handsClickCtrl.tileID !== null) {
                 if (handsClickCtrl.clickCount === 1) {
                     discardCards.push(handsClickCtrl.tileID);
                 }
@@ -336,10 +358,13 @@ export class PlayerA {
         }
         const actionMsg = new proto.pokerface.MsgPlayerAction();
         let r3h = false;
-        // const current = AgariIndexA.agariConvertMsgCardHand(tileIDs);
-        // if (current === null) {
-        //     return;
-        // }
+        Logger.debug("tileIDs === :", tileIDs);
+        const current = AgariIndexA.agariConvertMsgCardHand(tileIDs);
+        if (current === null) {
+            Logger.debug("current === :", current);
+
+            return;
+        }
         actionMsg.cards = [];
         for (const card of tileIDs) {
             if (card === pokerface.CardID.R3H) {
@@ -363,7 +388,7 @@ export class PlayerA {
         }
         if (this.allowedReActionMsg !== null) {
             actionMsg.qaIndex = this.allowedReActionMsg.qaIndex;
-            // const prevActionHand = this.allowedReActionMsg.prevActionHand;
+            const prevActionHand = this.allowedReActionMsg.prevActionHand;
             if (this.discardR2H) {
                 //此时必须出2
                 if (tileIDs.length !== 1 || tileIDs[0] !== pokerface.CardID.R2H) {
@@ -374,10 +399,11 @@ export class PlayerA {
                 }
                 this.discardR2H = false;
             }
-            // if (!AgariIndexA.agariGreatThan(prevActionHand, current)) {
-            //     // prompt.showPrompt(dfConfig.ErrorInRoom.ERR_ROOM_DISCARDISSMALL)
-            //     return;
-            // }
+            if (!AgariIndexA.agariGreatThan(prevActionHand, current)) {
+                Dialog.prompt("您的牌不够大");
+
+                return;
+            }
         }
         this.sendActionMsg(actionMsg);
         this.playerView.clearAllowedActionsView();
@@ -416,7 +442,7 @@ export class PlayerA {
             playerInfoView = roomHost.component.addComponent(PlayerInfoView);
         }
 
-        playerInfoView.showUserInfoView(roomHost.loader, this.host, this.playerInfo, pos, this.isMe() === false);
+        playerInfoView.showUserInfoView(roomHost.getLobbyModuleLoader(), this.host, this.playerInfo, pos, this.isMe() === false);
     }
     private playSound(directory: string, effectName: string): void {
         let soundName = "";

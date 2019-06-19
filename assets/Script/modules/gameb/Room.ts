@@ -1,4 +1,5 @@
 
+import { RoomHost } from "../lobby/interface/LInterfaceExports";
 import { Logger, RoomInfo, SoundMgr, UserInfo } from "../lobby/lcore/LCoreExports";
 import { ChatData } from "../lobby/views/chat/ChatExports";
 import { GameOverResultView } from "./GameOverResultView";
@@ -23,7 +24,7 @@ import { Player } from "./Player";
 import { PlayerInterface } from "./PlayerInterface";
 import { proto } from "./proto/protoGame";
 import { Replay } from "./Replay";
-import { PlayerInfo, RoomHost, RoomInterface, TingPai } from "./RoomInterface";
+import { PlayerInfo, RoomInterface, TingPai } from "./RoomInterface";
 import { RoomView } from "./RoomView";
 
 type msgHandler = (msgData: ByteBuffer, room: RoomInterface) => Promise<void>;

@@ -83,10 +83,9 @@ export class ChatView extends cc.Component {
 
             return;
         }
-
         loader.fguiAddPackage("lobby/fui_chat/lobby_chat");
-
         const view = fgui.UIPackage.createObject("lobby_chat", "chat").asCom;
+
         this.view = view;
 
         this.initView();

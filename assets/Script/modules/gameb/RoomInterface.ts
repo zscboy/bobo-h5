@@ -1,24 +1,9 @@
 
-import { AnimationMgr, GResLoader, RoomInfo, UserInfo } from "../lobby/lcore/LCoreExports";
+import { RoomHost } from "../lobby/interface/LInterfaceExports";
+import { RoomInfo } from "../lobby/lcore/LCoreExports";
 import { ChatData } from "../lobby/views/chat/ChatExports";
 import { PlayerInterface } from "./PlayerInterface";
 import { proto } from "./proto/protoGame";
-
-/**
- * Room host
- */
-export interface RoomHost {
-    timeElapsed: number;
-    animationMgr: AnimationMgr;
-    room: RoomInterface;
-    quit: Function;
-    unblockNormal: Function;
-    blockNormal: Function;
-    user: UserInfo;
-    component: cc.Component;
-    loader: GResLoader;
-    sendBinary(buf: ByteBuffer): void;
-}
 
 /**
  * 听牌详情类

@@ -1,10 +1,6 @@
 import { Dialog } from "../../../lcore/LCoreExports";
+import { ClubViewInterface } from "../ClubModuleInterface";
 
-interface SettingPopupInterface {
-
-    modifyClubName: Function;
-
-}
 /**
  * 修改群名
  */
@@ -15,11 +11,11 @@ export class ModifyClubName extends cc.Component {
     private win: fgui.Window;
     private eventTarget: cc.EventTarget;
 
-    private settingPopupView: SettingPopupInterface;
+    private settingPopupView: ClubViewInterface;
 
     private clubName: string;
 
-    public bind(settingPopupView: SettingPopupInterface, clubName: string): void {
+    public bind(settingPopupView: ClubViewInterface, clubName: string): void {
         this.clubName = clubName;
         this.settingPopupView = settingPopupView;
     }
@@ -35,7 +31,6 @@ export class ModifyClubName extends cc.Component {
 
     }
     protected onLoad(): void {
-        //
         this.eventTarget = new cc.EventTarget();
         const view = fgui.UIPackage.createObject("lobby_club", "modifyClubNameCom").asCom;
         this.view = view;
@@ -74,7 +69,7 @@ export class ModifyClubName extends cc.Component {
     }
 
     private onConfirmBtnClick(): void {
-        //
+
         const inputField = this.view.getChild("inputField");
         const clubName = inputField.text;
 

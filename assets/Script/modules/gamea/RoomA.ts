@@ -186,8 +186,8 @@ export class RoomA {
     }
     //从房间的玩家列表中删除一个玩家
     //注意玩家视图的解除绑定需要外部处理
-    public removePlayer(chairID: number): void {
-        this.players[chairID] = null;
+    public removePlayer(userID: string): void {
+        delete this.players[userID];
     }
 
     //往服务器发送消息
@@ -224,6 +224,10 @@ export class RoomA {
         //     soundMgr:SetBackMusicVolume(soundModule.backMusicVolume)
         // }
         //}
+    }
+
+    public onExitButtonClicked(): void {
+        //this.sendMsg(proto.mahjong.MessageCode.OPDisbandRequest);
     }
 
     //处理玩家申请解散请求
@@ -393,7 +397,7 @@ export class RoomA {
 
         return this.players[userID];
     }
-    public getPlayerByCharID(charID: number): PlayerA {
+    public getPlayerByCharID(charID: string): PlayerA {
 
         return this.players[charID];
     }

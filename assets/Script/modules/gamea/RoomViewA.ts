@@ -1,4 +1,4 @@
-import { Logger } from "../lobby/lcore/LCoreExports";
+import { Dialog, Logger } from "../lobby/lcore/LCoreExports";
 import { ChatView } from "../lobby/views/chat/ChatExports";
 import { DisBandPlayerInfo, DisbandView } from "../lobby/views/disbandRoom/DisbandViewExports";
 import { RoomSettingView } from "../lobby/views/roomSetting/RoomSettingViewExports";
@@ -57,6 +57,21 @@ export class RoomViewA {
 
     //响应玩家点击左上角的退出按钮以及后退事件
     public onExitButtonClicked(): void {
+
+        if (this.room !== null && this.room.handStartted > 0) {
+
+            Dialog.prompt("牌局已经开始，请申请解散房间");
+
+            return;
+        }
+
+        Dialog.showDialog(`确实要退出房间吗？`, () => {
+
+            this.room.onExitButtonClicked();
+            // tslint:disable-next-line:align
+        }, () => {
+            //
+        });
         // if (roomView.room != null && roomView.room.handStartted > 0) {
         //      prompt.showPrompt("牌局已经开始，请申请解散房间");
 
@@ -200,7 +215,9 @@ export class RoomViewA {
     private onSettingBtnClick(): void {
         // Logger.debug("onSettingBtnClick---------------");
         const settingView = this.component.addComponent(RoomSettingView);
-        settingView.showView(this.room, this.room.getRoomHost().getLobbyModuleLoader());
+
+        const isOwner = this.room.ownerID === this.room.getMyPlayerInfo().userID;
+        settingView.showView(this.room, this.room.getRoomHost().getLobbyModuleLoader(), isOwner);
     }
 
     /**

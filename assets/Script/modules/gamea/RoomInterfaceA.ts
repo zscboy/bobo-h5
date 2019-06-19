@@ -78,7 +78,7 @@ export interface RoomInterfaceA {
     updateDisbandVoteView(msgDisbandNotify: proto.pokerface.MsgDisbandNotify): void;
     showDonate(msgDonate: proto.pokerface.MsgDonate): void;
     showRoomNumber(): void;
-    removePlayer(chairID: number): void;
+    removePlayer(userID: string): void;
     createMyPlayer(playerInfo: proto.pokerface.IMsgPlayerInfo): void;
     createPlayerByInfo(playerInfo: proto.pokerface.IMsgPlayerInfo): void;
     onUpdateStatus(state: number): void;
@@ -89,6 +89,8 @@ export interface RoomInterfaceA {
     switchBg(index: number): void;
 
     onDissolveClicked(): void;
+
+    onExitButtonClicked(): void;
 
     coWaitSeconds(seconds: number): Promise<void>;
 

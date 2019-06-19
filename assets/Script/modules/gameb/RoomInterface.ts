@@ -108,7 +108,7 @@ export interface RoomInterface {
     updateDisbandVoteView(msgDisbandNotify: proto.mahjong.MsgDisbandNotify): void;
     showDonate(msgDonate: proto.mahjong.MsgDonate): void;
     showRoomNumber(): void;
-    removePlayer(chairID: number): void;
+    removePlayer(chairID: string): void;
     createMyPlayer(playerInfo: proto.mahjong.IMsgPlayerInfo): void;
     createPlayerByInfo(playerInfo: proto.mahjong.IMsgPlayerInfo): void;
     showOrHideReadyButton(isShow: boolean): void;
@@ -120,6 +120,8 @@ export interface RoomInterface {
     switchBg(index: number): void;
 
     onDissolveClicked(): void;
+
+    onExitButtonClicked(): void;
 
     coWaitSeconds(seconds: number): Promise<void>;
 

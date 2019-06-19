@@ -70,7 +70,7 @@ export class MemberManagerView extends cc.Component {
 
     private updateUIByClubManager(): void {
 
-        const isManager = this.isManager();
+        const isManager = this.isManagerIncludeOwner();
         this.setOperationBtnVisible(isManager);
     }
 
@@ -167,7 +167,7 @@ export class MemberManagerView extends cc.Component {
         }
 
     }
-    private isManager(): boolean {
+    private isManagerIncludeOwner(): boolean {
         const userId = DataStore.getString("userID", "");
         const clubOwnerId = this.clubInfo.creatorUserID;
         const managers = this.clubInfo.managers;
@@ -385,7 +385,6 @@ export class MemberManagerView extends cc.Component {
 
             }
 
-            //this.loadRecord();
         };
 
         this.clubRequest(url, cb);

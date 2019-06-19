@@ -52,13 +52,13 @@ export namespace HandlerMsgRoomUpdate {
         const players = room.getPlayers();
         Object.keys(players).forEach((key: string) => {
             const player = <Player>players[key];
-            if (userID2Player[player.userID] === null || userID2Player[player.userID].chairID !== player.chairID) {
+            if (userID2Player[player.userID] === undefined || userID2Player[player.userID].chairID !== player.chairID) {
                 player2Remove.push(player);
             }
         });
         //删除已经离开的玩家，并隐藏其视图
         for (const player of player2Remove) {
-            room.removePlayer(player.chairID);
+            room.removePlayer(player.userID);
             player.unbindView();
             //有人出去
             updatePlayer = -1;
@@ -70,7 +70,7 @@ export namespace HandlerMsgRoomUpdate {
                 if (player === null) {
                     room.createMyPlayer(msgPlayer);
                 } else if (player.chairID !== msgPlayer.chairID) {
-                    room.removePlayer(player.chairID);
+                    room.removePlayer(player.userID);
                     player.unbindView();
                     room.createMyPlayer(msgPlayer);
                 }

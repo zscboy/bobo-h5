@@ -3,13 +3,14 @@ import { proto } from "../../proto/protoLobby";
 import { LobbyError } from "../LobbyError";
 import { NewRoomView } from "../NewRoomView";
 import { ApplyRecordView } from "./ApplyRecordView";
-import { AppointManagerView } from "./AppointManager/AppointManagerView";
+import { AppointManagerView } from "./appointManager/AppointManagerView";
 import { RoomType } from "./ClubModuleInterface";
 import { ClubRequestError } from "./ClubRequestError";
 import { CreateClubView } from "./CreateClubView";
 import { FilterGameView } from "./FilterGameView";
 import { JoinClubView } from "./JoinClubView";
 import { MemberManagerView } from "./memberManager/MemberManagerView";
+import { RoomManageView } from "./roomManage/RoomManageView";
 import { SettingPopupView } from "./settingPopup/SettingPopupView";
 
 const { ccclass } = cc._decorator;
@@ -137,6 +138,32 @@ export class ClubView extends cc.Component {
         this.setContent(clubInfo);
     }
 
+    public loadClubRooms(): void {
+        const tk = DataStore.getString("token", "");
+        const url = `${LEnv.rootURL}${LEnv.loadClubRooms}?&tk=${tk}&clubID=${this.selectedClub.baseInfo.clubID}`;
+
+        const cb = (xhr: XMLHttpRequest, err: string) => {
+            const data = <Uint8Array>xhr.response;
+
+            if (data !== null) {
+                const msgLoadRoomListRsp = proto.lobby.MsgLoadRoomListRsp.decode(data);
+                if (msgLoadRoomListRsp.result === proto.lobby.MsgError.ErrSuccess) {
+
+                    this.updateClubRooms(msgLoadRoomListRsp.roomInfos);
+                } else {
+                    const error = LobbyError.getErrorString(msgLoadRoomListRsp.result);
+                    Dialog.showDialog(error, () => {
+                        // tslint:disable-next-line:align
+                    }, () => {
+                        //
+                    });
+                }
+            }
+        };
+
+        this.clubRequest(url, cb);
+    }
+
     protected onDestroy(): void {
 
         if (this.lobbyModule !== null) {
@@ -212,7 +239,7 @@ export class ClubView extends cc.Component {
     private onClubViewShow(): void {
         if (this.win !== null) {
             this.win.show();
-            this.loadClubRooms(this.selectedClub.baseInfo.clubID);
+            this.loadClubRooms();
         }
     }
 
@@ -324,6 +351,14 @@ export class ClubView extends cc.Component {
 
     private onShareBtnClick(): void {
         //
+
+        if (cc.sys.platform === cc.sys.WECHAT_GAME) {
+            wx.shareAppMessage({
+                title: `茶馆 ${this.selectedClub.baseInfo.clubNumber} 邀请您来打牌.`,
+                imageUrl: ``,
+                query: ``
+            });
+        }
     }
 
     private onAppointManagerBtnClick(): void {
@@ -345,7 +380,7 @@ export class ClubView extends cc.Component {
 
     private onRefreshBtnClick(): void {
         //
-        this.loadClubRooms(this.selectedClub.baseInfo.clubID);
+        this.loadClubRooms();
     }
 
     private onGameRecordBtnClick(): void {
@@ -364,6 +399,17 @@ export class ClubView extends cc.Component {
 
         const view = this.addComponent(NewRoomView);
         view.saveClubId(this.selectedClub.baseInfo.clubID);
+
+    }
+
+    private onRoomItemClick(ev: fgui.Event): void {
+        //
+        const roomInfo = <proto.lobby.IRoomInfo>ev.initiator.data;
+
+        if (roomInfo !== undefined || roomInfo !== null) {
+            const roomManageView = this.addComponent(RoomManageView);
+            roomManageView.show(this, roomInfo, this.selectedClub.baseInfo.clubID);
+        }
 
     }
 
@@ -504,21 +550,12 @@ export class ClubView extends cc.Component {
             joinBtn.getController("gray").selectedIndex = 1;
         }
 
-        const jsonStr = DataStore.getString("RoomInfoData");
-        if (jsonStr !== "") {
-            try {
-                const config = <{ [key: string]: string }>JSON.parse(jsonStr);
+        const isManager = this.isManager();
+        obj.offClick(undefined, undefined);
 
-                if (roomInfo.roomID !== config.roomID) {
-                    joinBtn._touchDisabled = true;
-                    joinBtn.getController("gray").selectedIndex = 1;
-                }
-
-            } catch (e) {
-                Logger.error("parse config error:", e);
-                // 如果解析不了，则清理数据
-                DataStore.setItem("RoomInfoData", "");
-            }
+        if (isManager) {
+            obj.onClick(this.onRoomItemClick, this);
+            obj.data = roomInfo;
         }
 
         this.setIcon(roomInfo, obj);
@@ -680,11 +717,17 @@ export class ClubView extends cc.Component {
 
         this.updateUIByClubManager();
         // 拉取房间信息
-        this.loadClubRooms(selectedClub.baseInfo.clubID);
+        this.loadClubRooms();
     }
 
     private updateUIByClubManager(): void {
 
+        const isManager = this.isManager();
+
+        this.setOperationBtnVisible(isManager);
+    }
+
+    private isManager(): boolean {
         const userId = DataStore.getString("userID", "");
         const clubOwnerId = this.selectedClub.creatorUserID;
         const managers = this.selectedClub.managers;
@@ -701,7 +744,8 @@ export class ClubView extends cc.Component {
             isManager = true;
         }
 
-        this.setOperationBtnVisible(isManager);
+        return isManager;
+
     }
 
     private updateClubInfo(clubRsp: proto.club.MsgClubInfo): void {
@@ -763,32 +807,6 @@ export class ClubView extends cc.Component {
 
         this.clubRequest(url, cb);
 
-    }
-
-    private loadClubRooms(clubId: string): void {
-        const tk = DataStore.getString("token", "");
-        const url = `${LEnv.rootURL}${LEnv.loadClubRooms}?&tk=${tk}&clubID=${clubId}`;
-
-        const cb = (xhr: XMLHttpRequest, err: string) => {
-            const data = <Uint8Array>xhr.response;
-
-            if (data !== null) {
-                const msgLoadRoomListRsp = proto.lobby.MsgLoadRoomListRsp.decode(data);
-                if (msgLoadRoomListRsp.result === proto.lobby.MsgError.ErrSuccess) {
-
-                    this.updateClubRooms(msgLoadRoomListRsp.roomInfos);
-                } else {
-                    const error = LobbyError.getErrorString(msgLoadRoomListRsp.result);
-                    Dialog.showDialog(error, () => {
-                        // tslint:disable-next-line:align
-                    }, () => {
-                        //
-                    });
-                }
-            }
-        };
-
-        this.clubRequest(url, cb);
     }
 
     private updateClubRooms(roomInfos: proto.lobby.IRoomInfo[]): void {

@@ -11,6 +11,9 @@ export interface ClubViewInterface {
     addClub?: Function;
 
     delMember?: Function;
+
+    loadClubRooms?: Function;
+
 }
 
 export enum RoomType {

@@ -1,4 +1,4 @@
-import { Dialog, Logger } from "../lobby/lcore/LCoreExports";
+import { Dialog, Logger, SoundMgr } from "../lobby/lcore/LCoreExports";
 import { ChatData } from "../lobby/views/chat/ChatExports";
 import { PlayerInfoView } from "../lobby/views/playerInfo/PlayerInfoExports";
 import { AgariIndexA } from "./AgariIndexA";
@@ -209,9 +209,10 @@ export class PlayerA {
         const e = EFFECTS[cardHandType];
         const s = SOUND[cardHandType];
         if (e !== "") {
-            this.playerView.playerOperationEffect(e, s);
+            this.playerView.playerOperationEffect(e);
+            this.playSound("gamea", s);
         } else {
-            this.playReadTileSound(discardTileId, true);
+            this.playReadTileSound(discardTileId, cardHandType === pokerfaceRf.CardHandType.Pair);
         }
     }
 
@@ -226,7 +227,7 @@ export class PlayerA {
         if (isDuiZi) {
             effectName = `dui${effectName}`;
         }
-        this.playSound("tile", effectName);
+        this.playSound("gamea", effectName);
     }
 
     //绑定playerView
@@ -444,15 +445,18 @@ export class PlayerA {
 
         playerInfoView.showUserInfoView(roomHost.getLobbyModuleLoader(), this.host, this.playerInfo, pos, this.isMe() === false);
     }
+    public playSkipAnimation(): void {
+        this.playSound("gamea", "buyao");
+    }
+
     private playSound(directory: string, effectName: string): void {
         let soundName = "";
         if (this.playerInfo.gender === 1) {
-            soundName = `${directory}/boy/${effectName}`;
+            soundName = `${directory}/boy/boy_${effectName}`;
         } else {
-            soundName = `${directory}/girl/${effectName}`;
+            soundName = `${directory}/girl/girl_${effectName}`;
         }
-        Logger.debug("声音 ------------- : ", soundName);
-        // SoundMgr.playEffectAudio(soundName);
+        SoundMgr.playEffectAudio(soundName);
     }
 
     private sendActionMsg(actionMsg: proto.pokerface.MsgPlayerAction): void {

@@ -323,7 +323,7 @@ export class PlayerViewA {
         this.head.roomOwnerFlag.visible = player.isMe();
     }
 
-    public playerOperationEffect(effectName: string, sound?: string): void {
+    public playerOperationEffect(effectName: string): void {
         // if (isWait) {
         //     await this.roomHost.animationMgr.coPlay(`lobby/prefabs/mahjong/${effectName}`, this.aniPos.node);
         // } else {

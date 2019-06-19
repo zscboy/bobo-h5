@@ -12,7 +12,6 @@ export namespace HandlerActionResultSkipA {
 
         //隐藏打出的牌 TODO
         player.hideDiscarded();
-        // player.playSkipAnimation();
-
+        player.playSkipAnimation();
     };
 }

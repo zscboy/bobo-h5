@@ -324,6 +324,14 @@ export class ClubView extends cc.Component {
 
     private onShareBtnClick(): void {
         //
+
+        if (cc.sys.platform === cc.sys.WECHAT_GAME) {
+            wx.shareAppMessage({
+                title: `茶馆 ${this.selectedClub.baseInfo.clubNumber} 邀请您来打牌.`,
+                imageUrl: ``,
+                query: ``
+            });
+        }
     }
 
     private onAppointManagerBtnClick(): void {

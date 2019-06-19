@@ -139,7 +139,7 @@ export class JoinRoom extends cc.Component {
                     // proto 解码登录结果
                     const requestRoomInfoRsp = proto.lobby.MsgRequestRoomInfoRsp.decode(data);
                     if (requestRoomInfoRsp.result === proto.lobby.MsgError.ErrSuccess) {
-                        this.lm.enterGame(requestRoomInfoRsp.roomInfo);
+                        this.enterGame(requestRoomInfoRsp.roomInfo);
                     } else {
                         const errorString = LobbyError.getErrorString(requestRoomInfoRsp.result);
                         Dialog.showDialog(errorString);
@@ -157,20 +157,20 @@ export class JoinRoom extends cc.Component {
         });
     }
 
-    // private enterGame(roomInfo: proto.lobby.IRoomInfo): void {
-    //     this.win.hide();
-    //     this.win.dispose();
-    //     this.destroy();
+    private enterGame(roomInfo: proto.lobby.IRoomInfo): void {
+        this.win.hide();
+        this.win.dispose();
+        this.destroy();
 
-    //     const myRoomInfo = {
-    //         roomID: roomInfo.roomID,
-    //         roomNumber: roomInfo.roomNumber,
-    //         config: roomInfo.config,
-    //         gameServerID: roomInfo.gameServerID
-    //     };
-    //     const lm = <LobbyModuleInterface>this.getComponent("LobbyModule");
-    //     lm.enterGame(myRoomInfo);
+        const myRoomInfo = {
+            roomID: roomInfo.roomID,
+            roomNumber: roomInfo.roomNumber,
+            config: roomInfo.config,
+            gameServerID: roomInfo.gameServerID
+        };
+        const lm = <LobbyModuleInterface>this.getComponent("LobbyModule");
+        lm.enterGame(myRoomInfo);
 
-    // }
+    }
 
 }

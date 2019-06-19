@@ -25,7 +25,7 @@ export class RoomView {
     private room: RoomInterface;
     private unityViewNode: fgui.GComponent;
     private readyButton: fgui.GButton;
-
+    private inviteButton: fgui.GButton;
     private returnLobbyBtn: fgui.GButton;
     private roomInfoText: fgui.GObject;
     private roundMarkView: fgui.GComponent;
@@ -73,6 +73,9 @@ export class RoomView {
     public showOrHideReadyButton(isShow: boolean): void {
         this.readyButton.visible = isShow;
         this.returnLobbyBtn.visible = isShow;
+        if (cc.sys.platform === cc.sys.WECHAT_GAME) {
+            this.inviteButton.visible = isShow;
+        }
     }
 
     //响应玩家点击左上角的退出按钮以及后退事件
@@ -354,6 +357,10 @@ export class RoomView {
         this.readyButton = this.unityViewNode.getChild("ready").asButton;
         this.readyButton.visible = false;
         this.readyButton.onClick(this.room.onReadyButtonClick, this.room);
+
+        this.inviteButton = this.unityViewNode.getChild("invite").asButton;
+        this.inviteButton.visible = false;
+        this.inviteButton.onClick(this.room.onInviteButtonClick, this.room);
 
         this.returnLobbyBtn = this.unityViewNode.getChild("return2LobbyBtn").asButton;
         this.returnLobbyBtn.visible = false;

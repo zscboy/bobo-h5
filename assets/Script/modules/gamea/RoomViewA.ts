@@ -21,6 +21,7 @@ export class RoomViewA {
     private room: RoomInterfaceA;
     private unityViewNode: fgui.GComponent;
     private readyButton: fgui.GButton;
+    private inviteButton: fgui.GButton;
     private roomInfoText: fgui.GObject;
     private component: cc.Component;
 
@@ -49,6 +50,9 @@ export class RoomViewA {
      */
     public showOrHideReadyButton(isShow: boolean): void {
         this.readyButton.visible = isShow;
+        if (cc.sys.platform === cc.sys.WECHAT_GAME) {
+            this.inviteButton.visible = isShow;
+        }
     }
 
     //响应玩家点击左上角的退出按钮以及后退事件
@@ -241,6 +245,9 @@ export class RoomViewA {
         this.readyButton.visible = false;
         this.readyButton.onClick(this.room.onReadyButtonClick, this.room);
 
+        this.inviteButton = this.unityViewNode.getChild("invite").asButton;
+        this.inviteButton.visible = false;
+        this.inviteButton.onClick(this.room.onInviteButtonClick, this.room);
         // 调整微信版本的按钮位置
         // if (CC_WECHATGAME) {
         //     Logger.debug("init wechat game button position");

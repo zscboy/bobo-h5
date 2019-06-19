@@ -286,7 +286,7 @@ export class Player {
         }
 
         //播放对应音效
-        this.playSound("operate", SoundDef.Chow);
+        this.playSound("gameb/operate", SoundDef.Chow);
         await this.playerView.playerOperationEffect(EffectsDef.Chow);
     }
 
@@ -299,7 +299,7 @@ export class Player {
         }
 
         //播放对应音效
-        this.playSound("operate", SoundDef.Pong);
+        this.playSound("gameb/operate", SoundDef.Pong);
         await this.playerView.playerOperationEffect(EffectsDef.Pong);
     }
 
@@ -312,7 +312,7 @@ export class Player {
         }
 
         //播放对应音效
-        this.playSound("operate", SoundDef.Kong);
+        this.playSound("gameb/operate", SoundDef.Kong);
         await this.playerView.playerOperationEffect(EffectsDef.Kong);
     }
 
@@ -325,7 +325,7 @@ export class Player {
         }
 
         //播放对应音效
-        this.playSound("operate", SoundDef.Kong);
+        this.playSound("gameb/operate", SoundDef.Kong);
         await this.playerView.playerOperationEffect(EffectsDef.Kong);
     }
 
@@ -338,7 +338,7 @@ export class Player {
         }
 
         //播放对应音效
-        this.playSound("operate", SoundDef.Kong);
+        this.playSound("gameb/operate", SoundDef.Kong);
         await this.playerView.playerOperationEffect(EffectsDef.Kong);
     }
 
@@ -350,14 +350,14 @@ export class Player {
             this.playerView.showHandsForMe(true);
         }
         //播放对应音效
-        // this.playSound("operate",SoundDef.DrawCard)
+        // this.playSound("gameb/operate",SoundDef.DrawCard)
         await this.playerView.playerOperationEffect(EffectsDef.DrawCard);
     }
 
     //播放自摸
     public async playZiMoAnimation(): Promise<void> {
         //播放对应音效
-        this.playSound("operate", SoundDef.WinDraw);
+        this.playSound("gameb/operate", SoundDef.WinDraw);
         //自摸, 1, 3 位置的玩家播放zimo1, 2, 4位置的玩家播放zimo2
         //const effect = dfConfig.EFF_DEFINE.SUB_ZI_ZIMO.. "1"
         // if this.playerView.viewChairID == 2 or this.playerView.viewChairID == 4 {
@@ -369,14 +369,14 @@ export class Player {
     //播放点炮
     public async playDianPaoAnimation(): Promise<void> {
         //播放对应音效
-        this.playSound("operate", SoundDef.WinChuck);
+        this.playSound("gameb/operate", SoundDef.WinChuck);
         await this.playerView.playerOperationEffect(EffectsDef.WinChuck);
     }
 
     //播放吃铳
     public async playChiChongAnimation(): Promise<void> {
         //播放对应音效
-        this.playSound("operate", SoundDef.WinChuck);
+        this.playSound("gameb/operate", SoundDef.WinChuck);
         await this.playerView.playerOperationEffect(EffectsDef.WinChuck);
     }
 
@@ -384,7 +384,7 @@ export class Player {
     public readyHandEffect(): void {
         //播放对应音效
         //TODO. 没有这个音效，暂时注销 by陈日光
-        this.playSound("operate", SoundDef.Ting);
+        this.playSound("gameb/operate", SoundDef.Ting);
         this.playerView.playReadyHandEffect();
     }
 
@@ -393,7 +393,7 @@ export class Player {
         const index = AgariIndex.tileId2ArtId(tileID);
         const id = +index;
         if (id >= 51 && id <= 58) {
-            // this.playSound("operate", "hua")
+            // this.playSound("gameb/operate", "hua")
         } else {
             let effectName = `tile${id}`;
             if (id === 11) {
@@ -403,7 +403,7 @@ export class Player {
                 // math.newrandomseed()
                 effectName = `tile${id}_${1}`; // id, math.random(1, 2));
             }
-            this.playSound("tile", effectName);
+            this.playSound("gameb/tile", effectName);
         }
     }
 

@@ -3,10 +3,12 @@ import { proto } from "../proto/protoGameA";
 import { RoomInterfaceA } from "../RoomInterfaceA";
 import { HandlerActionResultDiscardedA } from "./HandlerActionResultDiscardedA";
 import { HandlerActionResultDrawA } from "./HandlerActionResultDrawA";
+import { HandlerActionResultSkipA } from "./HandlerActionResultSkipA";
 
 type ActionHandler = (actionResultMsg: proto.pokerface.MsgActionResultNotify, room: RoomInterfaceA) => Promise<void>;
 const actionType = proto.prunfast.ActionType;
 const actionHandlers: { [key: number]: ActionHandler } = {
+    [actionType.enumActionType_SKIP]: HandlerActionResultSkipA.onMsg,
     [actionType.enumActionType_DRAW]: HandlerActionResultDrawA.onMsg,
     [actionType.enumActionType_DISCARD]: HandlerActionResultDiscardedA.onMsg
 };

@@ -6,10 +6,11 @@ import { GameModuleA } from "../gamea/GamebExportsA";
 import { GameModule } from "../gameb/GamebExports";
 import { GResLoaderImpl } from "./GResLoaderImpl";
 import { Dialog } from "./lcore/Dialog";
-import { DataStore } from "./lcore/LCoreExports";
+import { DataStore, HTTP, LEnv } from "./lcore/LCoreExports";
 import { GameModuleInterface, GameModuleLaunchArgs, LobbyModuleInterface } from "./lcore/LDataType";
 import { Logger } from "./lcore/Logger";
 import { proto } from "./proto/protoLobby";
+import { LobbyError } from "./views/LobbyError";
 import { LoginView } from "./views/LoginView";
 
 /**
@@ -61,6 +62,40 @@ export class LobbyModule extends cc.Component implements LobbyModuleInterface {
         this.eventTarget.emit(`onClubViewShow`);
     }
 
+    public requetJoinRoom(roomNumber: string): void {
+        const tk = DataStore.getString("token", "");
+        const joinRoomURL = `${LEnv.rootURL}${LEnv.requestRoomInfo}?&tk=${tk}&roomNumber=${roomNumber}`;
+
+        Logger.trace("joinRoomURL, joinRoomURL:", joinRoomURL);
+
+        HTTP.hGet(this.eventTarget, joinRoomURL, (xhr: XMLHttpRequest, err: string) => {
+            let errMsg = null;
+            if (err !== null) {
+                errMsg = `加入房间错误，错误码:${err}`;
+            } else {
+                errMsg = HTTP.hError(xhr);
+                if (errMsg === null) {
+                    const data = <Uint8Array>xhr.response;
+                    // proto 解码登录结果
+                    const requestRoomInfoRsp = proto.lobby.MsgRequestRoomInfoRsp.decode(data);
+                    if (requestRoomInfoRsp.result === proto.lobby.MsgError.ErrSuccess) {
+                        this.enterGame(requestRoomInfoRsp.roomInfo);
+                    } else {
+                        const errorString = LobbyError.getErrorString(requestRoomInfoRsp.result);
+                        Dialog.showDialog(errorString);
+                    }
+                }
+            }
+
+            if (errMsg !== null) {
+                Logger.debug("quickly login failed:", errMsg);
+                // 显示错误对话框
+                Dialog.showDialog(errMsg, () => {
+                    //
+                });
+            }
+        });
+    }
     public enterGame(roomInfo: proto.lobby.IRoomInfo): void {
 
         // 发消息給俱乐部页面，让俱乐部界面隐藏
@@ -167,6 +202,7 @@ export class LobbyModule extends cc.Component implements LobbyModuleInterface {
     }
 
     protected start(): void {
+        Logger.error("lobby module-------start--------------- ");
         this.loader = new GResLoaderImpl("lobby");
         this.eventTarget = new cc.EventTarget();
 
@@ -180,6 +216,7 @@ export class LobbyModule extends cc.Component implements LobbyModuleInterface {
                 this.loadLobbyRes();
             }
         });
+
     }
 
     // 加载大厅的所有资源，显示加载进度
@@ -203,4 +240,5 @@ export class LobbyModule extends cc.Component implements LobbyModuleInterface {
 
         this.loginView.updateCompleted();
     }
+
 }

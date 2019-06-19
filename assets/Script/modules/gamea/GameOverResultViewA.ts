@@ -55,6 +55,7 @@ export class GameOverResultViewA extends cc.Component {
         const backHallBtn = this.unityViewNode.getChild("backHallBtn");
         backHallBtn.onClick(this.onCloseButtonClick, this);
         const shanreBtn = this.unityViewNode.getChild("shanreBtn");
+        shanreBtn.visible = cc.sys.platform === cc.sys.WECHAT_GAME;
         shanreBtn.onClick(this.onShareButtonClick, this);
 
         //更新数据

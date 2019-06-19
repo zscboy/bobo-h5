@@ -65,6 +65,15 @@ export namespace WeiXinSDK {
         }
     };
 
+    export const getLaunchOption = (): string2stringMap => {
+        const launchOption = wx.getLaunchOptionsSync();
+        Object.keys(launchOption.query).forEach((value: string) => {
+            Logger.debug("launchOption.query", value, launchOption.query[value]);
+        });
+
+        return launchOption.query;
+    };
+
     const wxOnShow = (successCb: Function, failCb: Function, pullShareTime: number = 0) => {
         wx.onShow((res: showRes) => {
             gameReShowCallBack(successCb, failCb, pullShareTime);
@@ -100,12 +109,4 @@ export namespace WeiXinSDK {
         return mDataMap;
     };
 
-    export const getLaunchOption = (): string2stringMap => {
-        const launchOption = wx.getLaunchOptionsSync();
-        Object.keys(launchOption.query).forEach((value: string) => {
-            Logger.debug("launchOption.query", value, launchOption.query[value]);
-        });
-
-        return launchOption.query;
-    };
 }

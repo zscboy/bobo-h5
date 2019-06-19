@@ -1,3 +1,4 @@
+import { WeiXinSDK } from "../chanelSdk/wxSdk/WeiXinSDkExports";
 import {
     CommonFunction,
     DataStore, Dialog, GameModuleLaunchArgs, LEnv, LobbyModuleInterface, Logger
@@ -24,12 +25,28 @@ export class LobbyView extends cc.Component {
     private msgCenter: LMsgCenter;
 
     private onMessageFunc: Function;
+    private wxShowCallBackFunction: (res: showRes) => void;
 
     public onMessage(data: ByteBuffer): void {
         Logger.debug("LobbyView.onMessage");
         const diamondBody = proto.lobby.MsgUpdateUserDiamond.decode(data);
         const diamond = diamondBody.diamond;
         this.updateDiamond(diamond);
+    }
+
+    protected start(): void {
+        if (cc.sys.platform === cc.sys.WECHAT_GAME) {
+            //TODO : 目前只有微信 先用这个判断 后面要提取出来判断各种平台
+            const query = WeiXinSDK.getLaunchOption();
+            const rKey = "roomNumber";
+            const roomNumber = query[rKey];
+            if (roomNumber !== undefined && roomNumber !== null) {
+                this.lm.requetJoinRoom(roomNumber);
+            }
+            this.wxShowCallBackFunction = <(res: showRes) => void>this.wxShowCallBack.bind(this);
+
+            wx.onShow(this.wxShowCallBackFunction);
+        }
     }
 
     protected async onLoad(): Promise<void> {
@@ -62,12 +79,24 @@ export class LobbyView extends cc.Component {
         this.lm.eventTarget.off("checkRoomInfo", this.checkRoomInfo);
 
         this.msgCenter.destory();
+
+        if (cc.sys.platform === cc.sys.WECHAT_GAME) {
+            wx.offShow(this.wxShowCallBack);
+        }
     }
 
     private updateDiamond(diamond: Long): void {
         this.diamondText.text = `${diamond}`;
     }
 
+    private wxShowCallBack(res: showRes): void {
+        const rKey = "roomNumber";
+        const roomNumber = res.query[rKey];
+        if (roomNumber !== undefined && roomNumber !== null) {
+            // Logger.debug("wxShowCallBack : ", this);
+            this.lm.requetJoinRoom(roomNumber);
+        }
+    }
     private initView(): void {
         const friendBtn = this.view.getChild("n1");
         friendBtn.onClick(this.onFriendClick, this);

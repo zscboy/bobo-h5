@@ -18,11 +18,12 @@ export class JoinRoom extends cc.Component {
     private hintText: fgui.GTextField;
 
     private roomNumber: string = "";
+    private lm: LobbyModuleInterface;
 
     protected onLoad(): void {
         this.eventTarget = new cc.EventTarget();
-        const lm = <LobbyModuleInterface>this.getComponent("LobbyModule");
-        const loader = lm.loader;
+        this.lm = <LobbyModuleInterface>this.getComponent("LobbyModule");
+        const loader = this.lm.loader;
         loader.fguiAddPackage("lobby/fui_join_room/lobby_join_room");
         const view = fgui.UIPackage.createObject("lobby_join_room", "joinRoom").asCom;
         this.view = view;
@@ -138,7 +139,7 @@ export class JoinRoom extends cc.Component {
                     // proto 解码登录结果
                     const requestRoomInfoRsp = proto.lobby.MsgRequestRoomInfoRsp.decode(data);
                     if (requestRoomInfoRsp.result === proto.lobby.MsgError.ErrSuccess) {
-                        this.enterGame(requestRoomInfoRsp.roomInfo);
+                        this.lm.enterGame(requestRoomInfoRsp.roomInfo);
                     } else {
                         const errorString = LobbyError.getErrorString(requestRoomInfoRsp.result);
                         Dialog.showDialog(errorString);
@@ -156,20 +157,20 @@ export class JoinRoom extends cc.Component {
         });
     }
 
-    private enterGame(roomInfo: proto.lobby.IRoomInfo): void {
-        this.win.hide();
-        this.win.dispose();
-        this.destroy();
+    // private enterGame(roomInfo: proto.lobby.IRoomInfo): void {
+    //     this.win.hide();
+    //     this.win.dispose();
+    //     this.destroy();
 
-        const myRoomInfo = {
-            roomID: roomInfo.roomID,
-            roomNumber: roomInfo.roomNumber,
-            config: roomInfo.config,
-            gameServerID: roomInfo.gameServerID
-        };
-        const lm = <LobbyModuleInterface>this.getComponent("LobbyModule");
-        lm.enterGame(myRoomInfo);
+    //     const myRoomInfo = {
+    //         roomID: roomInfo.roomID,
+    //         roomNumber: roomInfo.roomNumber,
+    //         config: roomInfo.config,
+    //         gameServerID: roomInfo.gameServerID
+    //     };
+    //     const lm = <LobbyModuleInterface>this.getComponent("LobbyModule");
+    //     lm.enterGame(myRoomInfo);
 
-    }
+    // }
 
 }

@@ -1,6 +1,7 @@
 
 import { RoomHost } from "../lobby/interface/LInterfaceExports";
 import { Logger, RoomInfo, SoundMgr, UserInfo } from "../lobby/lcore/LCoreExports";
+import { Share } from "../lobby/shareUtil/ShareExports";
 import { ChatData } from "../lobby/views/chat/ChatExports";
 import { GameOverResultView } from "./GameOverResultView";
 import { HandlerActionResultNotify } from "./handlers/HandlerActionResultNotify";
@@ -171,6 +172,14 @@ export class Room {
         this.host.sendBinary(buf);
     }
 
+    public onInviteButtonClick(): void {
+        Share.shareGame(
+            this.host.eventTarget,
+            Share.ShareSrcType.GameShare,
+            Share.ShareMediaType.Image,
+            Share.ShareDestType.Friend,
+            `roomNumber=${this.roomInfo.roomNumber}`);
+    }
     public onReturnLobbyBtnClick(): void {
 
         this.sendMsg(proto.mahjong.MessageCode.OP2Lobby);

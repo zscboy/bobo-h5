@@ -40,11 +40,13 @@ export class LobbyView extends cc.Component {
             const query = WeiXinSDK.getLaunchOption();
             const rKey = "roomNumber";
             const roomNumber = query[rKey];
+            // 点别人的邀请链接 第一次进游戏 走这里
             if (roomNumber !== undefined && roomNumber !== null) {
                 this.lm.requetJoinRoom(roomNumber);
             }
-            this.wxShowCallBackFunction = <(res: showRes) => void>this.wxShowCallBack.bind(this);
 
+            this.wxShowCallBackFunction = <(res: showRes) => void>this.wxShowCallBack.bind(this);
+            // 点别人的邀请链接 原来就在游戏内 走这里
             wx.onShow(this.wxShowCallBackFunction);
         }
     }

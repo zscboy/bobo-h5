@@ -148,7 +148,6 @@ export class RoomManageView extends cc.Component {
         }
 
         Logger.debug("clubRequest url = ", url);
-
         HTTP.hGet(this.eventTarget, url, (xhr: XMLHttpRequest, err: string) => {
 
             cb(xhr, err);

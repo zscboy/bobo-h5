@@ -550,9 +550,13 @@ export class ClubView extends cc.Component {
             joinBtn.getController("gray").selectedIndex = 1;
         }
 
+        const isManager = this.isManager();
         obj.offClick(undefined, undefined);
-        obj.onClick(this.onRoomItemClick, this);
-        obj.data = roomInfo;
+
+        if (isManager) {
+            obj.onClick(this.onRoomItemClick, this);
+            obj.data = roomInfo;
+        }
 
         this.setIcon(roomInfo, obj);
     }
@@ -718,6 +722,12 @@ export class ClubView extends cc.Component {
 
     private updateUIByClubManager(): void {
 
+        const isManager = this.isManager();
+
+        this.setOperationBtnVisible(isManager);
+    }
+
+    private isManager(): boolean {
         const userId = DataStore.getString("userID", "");
         const clubOwnerId = this.selectedClub.creatorUserID;
         const managers = this.selectedClub.managers;
@@ -734,7 +744,8 @@ export class ClubView extends cc.Component {
             isManager = true;
         }
 
-        this.setOperationBtnVisible(isManager);
+        return isManager;
+
     }
 
     private updateClubInfo(clubRsp: proto.club.MsgClubInfo): void {

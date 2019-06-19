@@ -1,6 +1,5 @@
 import { CommonFunction, DataStore, HTTP, LEnv, Logger } from "../../../lcore/LCoreExports";
 import { proto } from "../../../proto/protoLobby";
-import { ClubViewInterface } from "../ClubModuleInterface";
 import { ClubRequestError } from "../ClubRequestError";
 
 const { ccclass } = cc._decorator;
@@ -19,15 +18,12 @@ export class AppointManagerView extends cc.Component {
 
     private managers: proto.club.IMsgClubMemberInfo[];
 
-    private clubView: ClubViewInterface;
-
     private membersWithoutManager: proto.club.IMsgClubMemberInfo[];
 
     private managerList: fgui.GList;
     private memberList: fgui.GList;
 
-    public show(clubView: ClubViewInterface, clubInfo: proto.club.IMsgClubInfo): void {
-        this.clubView = clubView;
+    public show(clubInfo: proto.club.IMsgClubInfo): void {
         this.clubInfo = clubInfo;
         this.win.show();
         this.loadClubMgrs();
@@ -249,14 +245,14 @@ export class AppointManagerView extends cc.Component {
             const data = <Uint8Array>xhr.response;
             const msgClubReply = proto.club.MsgClubReply.decode(data);
 
-            if (msgClubReply.replyCode === proto.club.ClubReplyCode.RCError) {
+            if (msgClubReply.replyCode === proto.club.ClubReplyCode.RCOperation) {
+                const rspMember = proto.club.MsgClubMemberInfo.decode(msgClubReply.content);
+                this.changeManager(rspMember, member);
+            } else if (msgClubReply.replyCode === proto.club.ClubReplyCode.RCError) {
                 const msgCubOperGenericReply = proto.club.MsgCubOperGenericReply.decode(msgClubReply.content);
-                if (msgCubOperGenericReply.errorCode === proto.club.ClubOperError.CERR_OK) {
-                    this.changeManager(member, role);
-                } else {
+                if (msgCubOperGenericReply.errorCode !== proto.club.ClubOperError.CERR_OK) {
                     ClubRequestError.showErrMsg(msgCubOperGenericReply.errorCode);
                 }
-
             }
 
         };
@@ -264,9 +260,12 @@ export class AppointManagerView extends cc.Component {
         this.clubRequest(url, cb);
     }
 
-    private changeManager(member: proto.club.IMsgClubMemberInfo, role: proto.club.ClubRoleType): void {
+    private changeManager(member: proto.club.IMsgClubMemberInfo, oldMember: proto.club.IMsgClubMemberInfo): void {
         //
-        if (role === proto.club.ClubRoleType.CRoleTypeMgr) {
+
+        this.saveMember(member, oldMember);
+
+        if (oldMember.role === proto.club.ClubRoleType.CRoleTypeMgr) {
             this.clubInfo.managers.push(member.userID);
             this.view.getController("view").selectedIndex = 0;
             this.loadClubMgrs();
@@ -277,12 +276,18 @@ export class AppointManagerView extends cc.Component {
             this.removeManager(member);
         }
 
-        this.saveClubInfo();
     }
 
-    private saveClubInfo(): void {
-        //
-        this.clubView.saveClubInfo(this.clubInfo);
+    /**
+     * 只覆盖属性，对象不变
+     * @param member 返回来的新对象
+     */
+    private saveMember(member: proto.club.IMsgClubMemberInfo, oldMember: proto.club.IMsgClubMemberInfo): void {
+        oldMember.allowCreateRoom = member.allowCreateRoom;
+        oldMember.displayInfo = member.displayInfo;
+        oldMember.online = member.online;
+        oldMember.role = member.role;
+        oldMember.userID = member.userID;
     }
 
     /**

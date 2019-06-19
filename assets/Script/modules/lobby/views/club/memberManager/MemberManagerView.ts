@@ -1,6 +1,5 @@
-import { DataStore, Dialog, HTTP, LEnv, Logger } from "../../../lcore/LCoreExports";
+import { CommonFunction, DataStore, Dialog, HTTP, LEnv, Logger } from "../../../lcore/LCoreExports";
 import { proto } from "../../../proto/protoLobby";
-import { ClubViewInterface } from "../ClubModuleInterface";
 import { ClubRequestError } from "../ClubRequestError";
 import { MemberOperationDialog } from "./MemberOperationDialog";
 const { ccclass } = cc._decorator;
@@ -15,8 +14,6 @@ export class MemberManagerView extends cc.Component {
     private win: fgui.Window;
     private eventTarget: cc.EventTarget;
 
-    private clubView: ClubViewInterface;
-
     private clubInfo: proto.club.IMsgClubInfo;
 
     private members: proto.club.IMsgClubMemberInfo[];
@@ -28,23 +25,16 @@ export class MemberManagerView extends cc.Component {
     private memberList: fgui.GList;
     private memberApplyList: fgui.GList;
     private memberDeleteList: fgui.GList;
-
     private memberListBtn: fgui.GButton;
     private applyListBtn: fgui.GButton;
     private deleteMemberBtn: fgui.GButton;
-
-    public saveClubInfo(clubInfo: proto.club.IMsgClubInfo): void {
-
-        this.clubView.saveClubInfo(clubInfo);
-    }
 
     public delMember(member: proto.club.IMsgClubMemberInfo): void {
 
         this.deleteMember(member, 0);
     }
 
-    public setClubInfo(clubView: ClubViewInterface, clubInfo: proto.club.IMsgClubInfo): void {
-        this.clubView = clubView;
+    public setClubInfo(clubInfo: proto.club.IMsgClubInfo): void {
         this.clubInfo = clubInfo;
 
         this.updateUIByClubManager();
@@ -54,6 +44,7 @@ export class MemberManagerView extends cc.Component {
         this.win.show();
 
     }
+
     protected onLoad(): void {
 
         this.eventTarget = new cc.EventTarget();
@@ -150,6 +141,9 @@ export class MemberManagerView extends cc.Component {
         const name = obj.asCom.getChild("name");
         const id = obj.asCom.getChild("id");
 
+        const loader = obj.asCom.getChild("loader").asLoader;
+        CommonFunction.setHead(loader, member.displayInfo.headIconURL);
+
         if (member !== undefined) {
             id.text = `ID : ${member.userID}`;
             const nick = member.displayInfo.nick === "" ? member.userID : member.displayInfo.nick;
@@ -216,6 +210,9 @@ export class MemberManagerView extends cc.Component {
         const id = obj.asCom.getChild("id");
         const deleteBtn = obj.asCom.getChild("deleteBtn");
 
+        const loader = obj.asCom.getChild("loader").asLoader;
+        CommonFunction.setHead(loader, member.displayInfo.headIconURL);
+
         if (member !== undefined) {
             id.text = `ID : ${member.userID}`;
             const nick = member.displayInfo.nick === "" ? member.userID : member.displayInfo.nick;
@@ -257,6 +254,9 @@ export class MemberManagerView extends cc.Component {
         const name = obj.asCom.getChild("name");
         const rejectBtn = obj.asCom.getChild("rejectBtn").asButton;
         const agreeBtn = obj.asCom.getChild("agreeBtn").asButton;
+
+        const loader = obj.asCom.getChild("loader").asLoader;
+        CommonFunction.setHead(loader, event.displayInfo1.headIconURL);
         if (event !== undefined) {
 
             const nick = event.displayInfo1.nick === "" ? event.userID1 : event.displayInfo1.nick;

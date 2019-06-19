@@ -76,6 +76,18 @@ exports.proto = require("protobuf").newBuilder({})['import']({
                             "type": "bool",
                             "name": "online",
                             "id": 3
+                        },
+                        {
+                            "rule": "optional",
+                            "type": "int32",
+                            "name": "role",
+                            "id": 4
+                        },
+                        {
+                            "rule": "optional",
+                            "type": "bool",
+                            "name": "allowCreateRoom",
+                            "id": 5
                         }
                     ]
                 },

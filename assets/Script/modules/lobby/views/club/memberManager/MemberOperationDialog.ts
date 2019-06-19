@@ -1,4 +1,4 @@
-import { CommonFunction, DataStore, HTTP, LEnv, Logger } from "../../../lcore/LCoreExports";
+import { CommonFunction, DataStore, Dialog, HTTP, LEnv, Logger } from "../../../lcore/LCoreExports";
 import { proto } from "../../../proto/protoLobby";
 import { ClubViewInterface } from "../ClubModuleInterface";
 import { ClubRequestError } from "../ClubRequestError";
@@ -26,13 +26,13 @@ export class MemberOperationDialog extends cc.Component {
         const memberOperationDialog = fgui.UIPackage.createObject("lobby_club", "memberOperationDialog").asCom;
         this.view = memberOperationDialog;
 
-        this.initView(member, clubInfo);
+        this.initView();
         fgui.GRoot.inst.showPopup(this.view);
         this.view.setPosition(255, 180);
 
     }
 
-    private initView(member: proto.club.IMsgClubMemberInfo, clubInfo: proto.club.IMsgClubInfo): void {
+    private initView(): void {
 
         this.eventTarget = new cc.EventTarget();
         const revokeBtn = this.view.getChild("revokeBtn").asButton;
@@ -50,32 +50,47 @@ export class MemberOperationDialog extends cc.Component {
         const cancelAuthBtn = this.view.getChild("cancelAuthBtn").asButton;
         cancelAuthBtn.onClick(this.onCancelAuthBtnClick, this);
 
-        const memberLevelCtrl = this.view.getController("memberLevel");
-        const isAuthCtrl = this.view.getController("isAuth");
-        // 0 是群主 1 是 管理员，2 是群员
-        memberLevelCtrl.selectedIndex = 1;
-        // 0 是已经授权，1是未授权
-        isAuthCtrl.selectedIndex = 1;
-
         const nameText = this.view.getChild("name").asTextField;
         const idText = this.view.getChild("id").asTextField;
 
-        nameText.text = member.displayInfo.nick === "" ? `${member.userID}` : member.displayInfo.nick;
-        idText.text = `ID : ${member.userID}`;
+        nameText.text = this.member.displayInfo.nick === "" ? `${this.member.userID}` : this.member.displayInfo.nick;
+        idText.text = `ID : ${this.member.userID}`;
 
         const loader = this.view.getChild("loader").asLoader;
-        CommonFunction.setHead(loader, member.displayInfo.headIconURL);
+        CommonFunction.setHead(loader, this.member.displayInfo.headIconURL);
 
-        const managers = clubInfo.managers;
-        let isManager = false;
-        for (const managerId of managers) {
-            if (managerId === member.userID) {
-                isManager = true;
-            }
+        this.updateController();
+
+    }
+
+    private updateController(): void {
+
+        const isManager = this.member.role === proto.club.ClubRoleType.CRoleTypeMgr;
+
+        const memberLevelCtrl = this.view.getController("memberLevel");
+        const isAuthCtrl = this.view.getController("isAuth");
+        // // 0 是群主 1 是 管理员，2 是群员
+        // memberLevelCtrl.selectedIndex = 1;
+        // // 0 是已经授权，1是未授权
+        // isAuthCtrl.selectedIndex = 1;
+        const authorize2CreateRoomBtn = this.view.getChild("authorize2CreateRoomBtn").asButton;
+        const cancelAuthBtn = this.view.getChild("cancelAuthBtn").asButton;
+        if (isManager) {
+            authorize2CreateRoomBtn.grayed = true;
+            authorize2CreateRoomBtn._touchDisabled = true;
+
+            cancelAuthBtn.grayed = true;
+            cancelAuthBtn._touchDisabled = true;
+        } else {
+            authorize2CreateRoomBtn.grayed = false;
+            authorize2CreateRoomBtn._touchDisabled = false;
+
+            cancelAuthBtn.grayed = false;
+            cancelAuthBtn._touchDisabled = false;
         }
 
         memberLevelCtrl.selectedIndex = isManager ? 1 : 2;
-
+        isAuthCtrl.selectedIndex = isManager ? 0 : (this.member.allowCreateRoom ? 0 : 1);
     }
 
     private onRevokeBtnClick(): void {
@@ -85,13 +100,7 @@ export class MemberOperationDialog extends cc.Component {
 
     private onUp2ManagerBtnBtnClick(): void {
 
-        const managers = this.clubInfo.managers;
-        let isManager = false;
-        for (const managerId of managers) {
-            if (managerId === this.member.userID) {
-                isManager = true;
-            }
-        }
+        const isManager = this.member.role === proto.club.ClubRoleType.CRoleTypeMgr;
 
         const role = isManager ? proto.club.ClubRoleType.CRoleTypeMember : proto.club.ClubRoleType.CRoleTypeMgr;
         this.changeManagerRequest(this.member, role);
@@ -99,28 +108,73 @@ export class MemberOperationDialog extends cc.Component {
 
     private onAuthorize2CreateRoomBtnClick(): void {
 
-        //this.memberView.authCreateRoom(this.member);
+        this.createRoomAuthority(true);
     }
 
     private onDelMemberBtnClick(): void {
+        const member = this.member;
+        const nick = member.displayInfo.nick === "" ? member.userID : member.displayInfo.nick;
+        Dialog.showDialog(`是否删除 ${nick} ?`, () => {
 
-        this.memberView.delMember(this.member);
+            this.memberView.delMember(this.member);
+            this.destroy();
+            // tslint:disable-next-line:align
+        }, () => {
+            //
+        });
     }
 
     private onCancelAuthBtnClick(): void {
 
-        //this.memberView.cancelAuth(this.member);
+        this.createRoomAuthority(false);
+    }
+
+    private createRoomAuthority(authority: boolean): void {
+
+        const result: string = authority === true ? "yes" : "no";
+        const tk = DataStore.getString("token", "");
+        const baseUrl = `${LEnv.rootURL}${LEnv.allowMemberCreateRoom}?&`;
+        const params = `tk=${tk}&clubID=${this.clubInfo.baseInfo.clubID}&memberID=${this.member.userID}&allowCreateRoom=${result}`;
+        const url = `${baseUrl}${params}`;
+
+        const cb = (xhr: XMLHttpRequest, err: string) => {
+
+            const data = <Uint8Array>xhr.response;
+            const msgClubReply = proto.club.MsgClubReply.decode(data);
+            if (msgClubReply.replyCode === proto.club.ClubReplyCode.RCOperation) {
+                const rspMember = proto.club.MsgClubMemberInfo.decode(msgClubReply.content);
+                this.changeAuthority(rspMember);
+            } else if (msgClubReply.replyCode === proto.club.ClubReplyCode.RCError) {
+                const msgCubOperGenericReply = proto.club.MsgCubOperGenericReply.decode(msgClubReply.content);
+                if (msgCubOperGenericReply.errorCode !== proto.club.ClubOperError.CERR_OK) {
+                    ClubRequestError.showErrMsg(msgCubOperGenericReply.errorCode);
+                }
+            }
+
+        };
+
+        this.clubRequest(url, cb);
+    }
+
+    private changeAuthority(member: proto.club.IMsgClubMemberInfo): void {
+
+        this.saveMember(member);
+        this.updateController();
+    }
+    /**
+     * 只覆盖属性，对象不变
+     * @param member 返回来的新对象
+     */
+    private saveMember(member: proto.club.IMsgClubMemberInfo): void {
+        this.member.allowCreateRoom = member.allowCreateRoom;
+        this.member.displayInfo = member.displayInfo;
+        this.member.online = member.online;
+        this.member.role = member.role;
+        this.member.userID = member.userID;
     }
 
     private changeManagerRequest(member: proto.club.IMsgClubMemberInfo, role: proto.club.ClubRoleType): void {
-        // // 俱乐部角色定义
-        // enum ClubRoleType
-        // {
-        //     CRoleTypeNone = 0; // 无效角色
-        //     CRoleTypeMember = 1; // 成员
-        //     CRoleTypeCreator = 2; // 创建者
-        //     CRoleTypeMgr = 3; // 管理者
-        // }
+
         const tk = DataStore.getString("token", "");
         const baseUrl = `${LEnv.rootURL}${LEnv.changeRole}?&`;
         const params = `tk=${tk}&clubID=${this.clubInfo.baseInfo.clubID}&memberID=${member.userID}&role=${role}`;
@@ -131,17 +185,16 @@ export class MemberOperationDialog extends cc.Component {
             const data = <Uint8Array>xhr.response;
             const msgClubReply = proto.club.MsgClubReply.decode(data);
 
-            if (msgClubReply.replyCode === proto.club.ClubReplyCode.RCError) {
+            if (msgClubReply.replyCode === proto.club.ClubReplyCode.RCOperation) {
+                const rspMember = proto.club.MsgClubMemberInfo.decode(msgClubReply.content);
+                this.changeManager(rspMember, role);
+            } else if (msgClubReply.replyCode === proto.club.ClubReplyCode.RCError) {
                 const msgCubOperGenericReply = proto.club.MsgCubOperGenericReply.decode(msgClubReply.content);
-                if (msgCubOperGenericReply.errorCode === proto.club.ClubOperError.CERR_OK) {
-                    this.changeManager(member, role);
-                } else {
+                if (msgCubOperGenericReply.errorCode !== proto.club.ClubOperError.CERR_OK) {
                     ClubRequestError.showErrMsg(msgCubOperGenericReply.errorCode);
                 }
-
             }
 
-            //this.loadRecord();
         };
 
         this.clubRequest(url, cb);
@@ -149,25 +202,16 @@ export class MemberOperationDialog extends cc.Component {
 
     private changeManager(member: proto.club.IMsgClubMemberInfo, role: proto.club.ClubRoleType): void {
 
-        const memberLevelCtrl = this.view.getController("memberLevel");
-
         if (role === proto.club.ClubRoleType.CRoleTypeMgr) {
             this.clubInfo.managers.push(member.userID);
-            memberLevelCtrl.selectedIndex = 1;
         } else {
             const index = this.clubInfo.managers.indexOf(member.userID);
             this.clubInfo.managers.splice(index, 1);
-            memberLevelCtrl.selectedIndex = 2;
         }
 
-        this.saveClubInfo();
+        this.saveMember(member);
+        this.updateController();
     }
-
-    private saveClubInfo(): void {
-
-        this.memberView.saveClubInfo(this.clubInfo);
-    }
-
     /**
      * 网络请求
      * @param url 链接

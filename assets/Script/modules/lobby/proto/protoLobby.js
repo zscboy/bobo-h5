@@ -193,33 +193,27 @@ exports.proto = require("protobuf").newBuilder({})['import']({
                         },
                         {
                             "rule": "optional",
-                            "type": "int32",
-                            "name": "createRoomOption",
+                            "type": "string",
+                            "name": "createRoomOptions",
                             "id": 10
                         },
                         {
                             "rule": "optional",
                             "type": "int32",
-                            "name": "payRoomOption",
-                            "id": 11
-                        },
-                        {
-                            "rule": "optional",
-                            "type": "int32",
-                            "name": "createTime",
-                            "id": 12
-                        },
-                        {
-                            "rule": "optional",
-                            "type": "int32",
                             "name": "memberCount",
-                            "id": 13
+                            "id": 11
                         },
                         {
                             "rule": "repeated",
                             "type": "string",
                             "name": "managers",
-                            "id": 14
+                            "id": 12
+                        },
+                        {
+                            "rule": "optional",
+                            "type": "int32",
+                            "name": "createTime",
+                            "id": 13
                         }
                     ]
                 },
@@ -588,6 +582,18 @@ exports.proto = require("protobuf").newBuilder({})['import']({
                             "id": 3
                         }
                     ]
+                },
+                {
+                    "name": "MsgClubSetRoomOptions",
+                    "syntax": "proto2",
+                    "fields": [
+                        {
+                            "rule": "required",
+                            "type": "string",
+                            "name": "options",
+                            "id": 1
+                        }
+                    ]
                 }
             ],
             "enums": [
@@ -836,6 +842,18 @@ exports.proto = require("protobuf").newBuilder({})['import']({
                         {
                             "name": "CNotify_Change_Member_Role",
                             "id": 1
+                        },
+                        {
+                            "name": "CNotify_Allow_Member_Create_Room",
+                            "id": 2
+                        },
+                        {
+                            "name": "CNotify_New_Member_Apply",
+                            "id": 3
+                        },
+                        {
+                            "name": "CNotify_Member_Join_Approval",
+                            "id": 4
                         }
                     ]
                 }

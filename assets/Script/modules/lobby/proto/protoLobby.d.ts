@@ -69,6 +69,9 @@ export namespace proto {
 		enum ClubNotifyType {
 			CNotify_None = 0,
 			CNotify_Change_Member_Role = 1,
+			CNotify_Allow_Member_Create_Room = 2,
+			CNotify_New_Member_Apply = 3,
+			CNotify_Member_Join_Approval = 4,
 		}
 
 		interface IMsgClubReply {
@@ -158,11 +161,10 @@ export namespace proto {
 			maxMember?: number;
 			joinForbit?: boolean;
 			hasUnReadEvents?: boolean;
-			createRoomOption?: number;
-			payRoomOption?: number;
-			createTime?: number;
+			createRoomOptions?: string;
 			memberCount?: number;
 			managers?: string[];
+			createTime?: number;
 		}
 
 		class MsgClubInfo implements IMsgClubInfo {
@@ -175,11 +177,10 @@ export namespace proto {
 			public maxMember: number;
 			public joinForbit: boolean;
 			public hasUnReadEvents: boolean;
-			public createRoomOption: number;
-			public payRoomOption: number;
-			public createTime: number;
+			public createRoomOptions: string;
 			public memberCount: number;
 			public managers: string[];
+			public createTime: number;
 			constructor(properties?: club.IMsgClubInfo);
 			public static encode(message: MsgClubInfo): ByteBuffer;
 			public static decode(reader: Uint8Array|ByteBuffer): MsgClubInfo;
@@ -403,6 +404,17 @@ export namespace proto {
 			constructor(properties?: club.IMsgClubNotify);
 			public static encode(message: MsgClubNotify): ByteBuffer;
 			public static decode(reader: Uint8Array|ByteBuffer): MsgClubNotify;
+		}
+
+		interface IMsgClubSetRoomOptions {
+			options: string;
+		}
+
+		class MsgClubSetRoomOptions implements IMsgClubSetRoomOptions {
+			public options: string;
+			constructor(properties?: club.IMsgClubSetRoomOptions);
+			public static encode(message: MsgClubSetRoomOptions): ByteBuffer;
+			public static decode(reader: Uint8Array|ByteBuffer): MsgClubSetRoomOptions;
 		}
 
 	}

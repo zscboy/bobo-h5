@@ -107,9 +107,9 @@ export class EmailView extends cc.Component {
         //默认选择第一个
         if (this.emails.length >= 1) {
             this.emailList.selectedIndex = 0;
-
+            const obj = this.emailList.getChildAt(0);
             const email = this.emails[0];
-            this.selectEmail(email, 0);
+            this.selectEmail(email, obj);
         }
 
     }
@@ -172,7 +172,7 @@ export class EmailView extends cc.Component {
         const btn = obj.asCom.getChild("spaceBtn");
 
         btn.onClick(() => {
-            this.selectEmail(email, index);
+            this.selectEmail(email, obj);
             // tslint:disable-next-line:align
         }, this);
 
@@ -213,7 +213,7 @@ export class EmailView extends cc.Component {
      * @param email 邮件
      * @param index 邮件index
      */
-    private selectEmail(email: proto.lobby.IMsgMail, index: number): void {
+    private selectEmail(email: proto.lobby.IMsgMail, obj: fgui.GObject): void {
         this.emailContent.text = email.content;
         this.emailTitle.text = email.title;
 
@@ -226,7 +226,7 @@ export class EmailView extends cc.Component {
         }
 
         if (email.isRead === false) {
-            this.setRead(email, index);
+            this.setRead(email, obj);
         }
     }
 
@@ -240,7 +240,7 @@ export class EmailView extends cc.Component {
      * @param email 邮件
      * @param listIndex 邮件处于列表index
      */
-    private setRead(email: proto.lobby.IMsgMail, listIndex: number): void {
+    private setRead(email: proto.lobby.IMsgMail, obj: fgui.GObject): void {
 
         const tk = DataStore.getString("token", "");
         const setReadEmailUrl = `${LEnv.rootURL}${LEnv.setMailRead}?&tk=${tk}&mailID=${email.id}`;
@@ -258,7 +258,7 @@ export class EmailView extends cc.Component {
                 if (errMsg === null) {
 
                     email.isRead = true;
-                    const obj = this.emailList.getChildAt(listIndex);
+                    //const obj = this.emailList.getChildAt(listIndex);
                     const readController = obj.asCom.getController("c1");
                     readController.selectedIndex = 1;
                 }

@@ -77,7 +77,7 @@ export class LobbyView extends cc.Component {
 
     protected onDestroy(): void {
         this.lm.eventTarget.off(`${proto.lobby.MessageCode.OPUpdateDiamond}`, this.onMessageFunc);
-
+        this.lm.eventTarget.off(`${proto.lobby.MessageCode.OPMail}`, this.updateEmailRedPoint);
         this.lm.eventTarget.off("checkRoomInfo", this.checkRoomInfo);
 
         this.msgCenter.destory();
@@ -85,6 +85,13 @@ export class LobbyView extends cc.Component {
         if (cc.sys.platform === cc.sys.WECHAT_GAME) {
             wx.offShow(this.wxShowCallBack);
         }
+    }
+
+    private updateEmailRedPoint(): void {
+        //
+        const emailBtn = this.view.getChild("n9").asCom;
+        const redPoint = emailBtn.getChild("redPoint");
+        redPoint.visible = true;
     }
 
     private updateDiamond(diamond: Long): void {
@@ -136,6 +143,8 @@ export class LobbyView extends cc.Component {
         bg.setPosition(x, y);
 
         this.onMessageFunc = this.lm.eventTarget.on(`${proto.lobby.MessageCode.OPUpdateDiamond}`, this.onMessage, this);
+
+        this.lm.eventTarget.on(`${proto.lobby.MessageCode.OPMail}`, this.updateEmailRedPoint, this);
 
         this.lm.eventTarget.on(`checkRoomInfo`, this.checkRoomInfo, this);
 
@@ -198,6 +207,9 @@ export class LobbyView extends cc.Component {
     }
 
     private openEmailView(): void {
+        const emailBtn = this.view.getChild("n9").asCom;
+        const redPoint = emailBtn.getChild("redPoint");
+        redPoint.visible = false;
         this.addComponent(EmailView);
     }
 

@@ -422,9 +422,6 @@ export class RoomA {
         this.roomView.showRoomNumber();
     }
     public onUpdateStatus(state: number): void {
-        if (state === proto.pokerface.RoomState.SRoomPlaying) {
-            this.stopBgSound();
-        }
         this.roomView.onUpdateStatus(state);
     }
     public switchBg(index: number): void {

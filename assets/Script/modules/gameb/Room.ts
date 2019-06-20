@@ -496,9 +496,6 @@ export class Room {
         this.roomView.showOrHideReadyButton(isShow);
     }
     public onUpdateStatus(state: number): void {
-        if (state === proto.mahjong.RoomState.SRoomPlaying) {
-            this.stopBgSound();
-        }
         this.roomView.onUpdateStatus(state);
     }
     public switchBg(index: number): void {

@@ -26,7 +26,9 @@ export class RoomSettingView extends cc.Component {
             this.initView(isOwner);
         }
         fgui.GRoot.inst.showPopup(this.view);
-        this.view.setPosition(0, 0);
+        const x = cc.winSize.width / 2 - (cc.winSize.height * 1136 / 640 / 2);
+        this.view.setPosition(x, 0);
+        // this.view.setPosition(0, 0);
     }
 
     protected onLoad(): void {

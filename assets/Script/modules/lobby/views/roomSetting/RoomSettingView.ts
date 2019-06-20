@@ -19,14 +19,15 @@ export class RoomSettingView extends cc.Component {
 
     public showView(room: RoomInterface, loader: GResLoader, isOwner: boolean): void {
         this.room = room;
-        if (this.view === null || this.view === undefined) {
+        if (this.view === undefined || this.view === null) {
             // this.room = room;
             loader.fguiAddPackage("lobby/fui_room_other_view/room_other_view");
             this.view = fgui.UIPackage.createObject("room_other_view", "setting").asCom;
             this.initView(isOwner);
         }
         fgui.GRoot.inst.showPopup(this.view);
-        const x = cc.winSize.width / 2 - (cc.winSize.height * 1136 / 640 / 2);
+
+        const x = cc.winSize.width / 2 - (cc.winSize.height * 1136 / 640 / 2) + (1136 - 480);
         this.view.setPosition(x, 0);
         // this.view.setPosition(0, 0);
     }
@@ -47,8 +48,8 @@ export class RoomSettingView extends cc.Component {
 
     private initView(isOwner: boolean): void {
 
-        const bg = this.view.getChild("bg");
-        bg.onClick(this.onCloseClick, this);
+        // const bg = this.view.getChild("bg");
+        // bg.onClick(this.onCloseClick, this);
 
         const closeBtn = this.view.getChild("closeBtn");
         closeBtn.onClick(this.onCloseClick, this);

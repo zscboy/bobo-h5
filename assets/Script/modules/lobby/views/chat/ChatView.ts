@@ -78,9 +78,7 @@ export class ChatView extends cc.Component {
         this.msgCallBack = msgCallBack;
         if (this.view === undefined || this.view === null) {
             loader.fguiAddPackage("lobby/fui_chat/lobby_chat");
-            const view = fgui.UIPackage.createObject("lobby_chat", "chat").asCom;
-
-            this.view = view;
+            this.view = fgui.UIPackage.createObject("lobby_chat", "chat").asCom;
 
             this.initView();
             this.testLists();

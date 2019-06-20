@@ -1,11 +1,6 @@
 
-import { Logger } from "../lobby/lcore/LCoreExports";
+import { Enum, Logger } from "../lobby/lcore/LCoreExports";
 import { proto } from "./proto/protoGame";
-
-const ROOM_TYPE = {
-    DaFeng: 1,
-    ZhanJiang: 21
-};
 
 // 大丰麻将proto
 const miniWinTypeDF = proto.dfmahjong.MiniWinType;
@@ -63,50 +58,45 @@ const DF_GREAT_WIN_TYPE: { [key: number]: string } = {
 
 //游戏小胡类型
 const GAME_MINI_WIN_TYPE: { [key: number]: { [key: number]: string } } = {
-    [ROOM_TYPE.DaFeng]: DF_MINI_WIN_TYPE
+    [Enum.GAME_TYPE.DAFENG]: DF_MINI_WIN_TYPE
 };
 //游戏大胡类型
 const GAME_GREAT_WIN_TYPE: { [key: number]: { [key: number]: string } } = {
-    [ROOM_TYPE.DaFeng]: DF_GREAT_WIN_TYPE,
-    [ROOM_TYPE.ZhanJiang]: ZJ_GREAT_WIN_TYPE
+    [Enum.GAME_TYPE.DAFENG]: DF_GREAT_WIN_TYPE,
+    [Enum.GAME_TYPE.ZHANJIANG]: ZJ_GREAT_WIN_TYPE
 };
 
 //specialScore 得分类型
 const SPECIAL_SCORE: { [key: number]: string } = {
-    [ROOM_TYPE.DaFeng]: "墩子分+",
-    [ROOM_TYPE.ZhanJiang]: "中马数"
+    [Enum.GAME_TYPE.DAFENG]: "墩子分+",
+    [Enum.GAME_TYPE.ZHANJIANG]: "中马数"
 };
 //isContinuousBanker 得分类型
 const IS_CONTINUOUS_BANKER: { [key: number]: string } = {
-    [ROOM_TYPE.DaFeng]: "连庄x"
+    [Enum.GAME_TYPE.DAFENG]: "连庄x"
 };
 //fakeWinScore 得分类型
 const FAKE_WIN_SCORE: { [key: number]: string } = {
-    [ROOM_TYPE.DaFeng]: "包牌",
-    [ROOM_TYPE.ZhanJiang]: "杠分"
+    [Enum.GAME_TYPE.DAFENG]: "包牌",
+    [Enum.GAME_TYPE.ZHANJIANG]: "杠分"
 };
 //fakeList 得分类型
 const FAKE_LIST: { [key: number]: string } = {
-    [ROOM_TYPE.DaFeng]: "报听"
+    [Enum.GAME_TYPE.DAFENG]: "报听"
 };
 //fakeList 是否显示出来
 const FAKE_LIST_BOOLEAN: { [key: number]: boolean } = {
-    [ROOM_TYPE.ZhanJiang]: true
+    [Enum.GAME_TYPE.ZHANJIANG]: true
 };
 //大胡附加得分 trimGreatWinPoints
 const TRIM_GREAT_WIN_POINTS: { [key: number]: string } = {
-    [ROOM_TYPE.DaFeng]: "辣子数 +"
+    [Enum.GAME_TYPE.DAFENG]: "辣子数 +"
 };
 //大胡附加得分 baseWinScore
 const BASE_WIN_SCORE: { [key: number]: string } = {
-    [ROOM_TYPE.DaFeng]: "基本分"
+    [Enum.GAME_TYPE.DAFENG]: "基本分"
 };
 
-//游戏名字
-const GAME_NAME: { [key: number]: string } = {
-    [ROOM_TYPE.DaFeng]: "大丰麻将",
-    [ROOM_TYPE.ZhanJiang]: "湛江麻将"
-};
 /**
  *  游戏差异类
  */
@@ -230,19 +220,19 @@ export namespace GameRules {
     };
     //是否有花牌
     export const haveFlower = (gameType: number): boolean => {
-        return gameType === ROOM_TYPE.DaFeng;
+        return gameType === Enum.GAME_TYPE.DAFENG;
     };
     //是否有家家庄
     export const haveJiaJiaZhuang = (gameType: number): boolean => {
-        return gameType === ROOM_TYPE.DaFeng;
+        return gameType === Enum.GAME_TYPE.DAFENG;
     };
     //是否有风圈
     export const haveRoundMask = (gameType: number): boolean => {
-        return gameType === ROOM_TYPE.DaFeng;
+        return gameType === Enum.GAME_TYPE.DAFENG;
     };
 
     //获取游戏名字
     export const gameName = (gameType: number): string => {
-        return GAME_NAME[gameType];
+        return Enum.GAME_NAME[gameType];
     };
 }

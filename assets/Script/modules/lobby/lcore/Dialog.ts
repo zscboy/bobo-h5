@@ -19,6 +19,8 @@ export class Dialog {
 
     public packageLoaded: boolean = false;
 
+    public prompts: fgui.GComponent[] = [];
+
     private constructor(loader: GResLoader) {
         this.loader = loader;
     }
@@ -44,9 +46,20 @@ export class Dialog {
         const trans = p.getTransition("t1");
         trans.play(() => {
             p.dispose();
+            const index = Dialog.inst.prompts.indexOf(p);
+            Dialog.inst.prompts.splice(index, 1);
         });
 
+        Dialog.inst.prompts.push(p);
         fgui.GRoot.inst.addChild(p);
+    }
+
+    public static hidePrompt = (): void => {
+        if (Dialog.inst.prompts.length > 0) {
+            for (const p of Dialog.inst.prompts) {
+                p.dispose();
+            }
+        }
     }
 
     public static showDialog = (msg: string, yesCb: Function = null, noCB: Function = null): void => {

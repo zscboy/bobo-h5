@@ -98,6 +98,8 @@ export class LobbyModule extends cc.Component implements LobbyModuleInterface {
     }
     public enterGame(roomInfo: proto.lobby.IRoomInfo): void {
 
+        Dialog.hidePrompt();
+
         // 发消息給俱乐部页面，让俱乐部界面隐藏
         this.eventTarget.emit("enterGameEvent");
 

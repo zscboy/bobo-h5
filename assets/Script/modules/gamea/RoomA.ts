@@ -76,7 +76,6 @@ export class RoomA {
     public msgDisbandNotify: proto.pokerface.MsgDisbandNotify;
     public handNum: number;
     public readonly roomType: number;
-    private soundNum: number;
     public constructor(myUser: UserInfo, roomInfo: RoomInfo, host: RoomHost, rePlay?: ReplayA) {
         this.myUser = myUser;
         this.host = host;
@@ -422,9 +421,6 @@ export class RoomA {
         this.roomView.showRoomNumber();
     }
     public onUpdateStatus(state: number): void {
-        if (state === proto.pokerface.RoomState.SRoomPlaying) {
-            this.stopBgSound();
-        }
         this.roomView.onUpdateStatus(state);
     }
     public switchBg(index: number): void {
@@ -462,12 +458,9 @@ export class RoomA {
 
     //播放背景音乐
     private playBgSound(): void {
-        SoundMgr.playEffectAudio("gamea/game_matchBg", true, <(num: number) => void>this.bgSound.bind(this));
-    }
-    private bgSound(num: number): void {
-        this.soundNum = num;
+        SoundMgr.playMusicAudio("gamea/game_matchBg", true);
     }
     private stopBgSound(): void {
-        SoundMgr.stopEffect(this.soundNum);
+        SoundMgr.stopMusic();
     }
 }

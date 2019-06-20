@@ -76,33 +76,25 @@ export class ChatView extends cc.Component {
 
     public show(loader: GResLoader, msgCallBack: Function): void {
         this.msgCallBack = msgCallBack;
-        if (this.view !== null) {
-            fgui.GRoot.inst.showPopup(this.view);
-            const size = cc.view.getVisibleSize();
-            this.view.setPosition(size.width - 500, 0);
+        if (this.view === undefined || this.view === null) {
+            loader.fguiAddPackage("lobby/fui_chat/lobby_chat");
+            this.view = fgui.UIPackage.createObject("lobby_chat", "chat").asCom;
 
-            return;
+            this.initView();
+            this.testLists();
+            this.userID = DataStore.getString("userID", "");
+
+            this.lobbyModule = <LobbyModuleInterface>this.node.getParent().getComponent("LobbyModule");
+            if (this.lobbyModule !== null) {
+                this.onMessageFunc = this.lobbyModule.eventTarget.on(`${proto.lobby.MessageCode.OPChat}`, this.onMessage, this);
+            }
         }
-        loader.fguiAddPackage("lobby/fui_chat/lobby_chat");
-        const view = fgui.UIPackage.createObject("lobby_chat", "chat").asCom;
-
-        this.view = view;
-
-        this.initView();
-        this.testLists();
-
         fgui.GRoot.inst.showPopup(this.view);
 
-        const windowSize = cc.view.getVisibleSize();
-        this.view.setPosition(windowSize.width - 500, 0);
-
-        this.userID = DataStore.getString("userID", "");
-
-        this.lobbyModule = <LobbyModuleInterface>this.node.getParent().getComponent("LobbyModule");
-        if (this.lobbyModule !== null) {
-            this.onMessageFunc = this.lobbyModule.eventTarget.on(`${proto.lobby.MessageCode.OPChat}`, this.onMessage, this);
-        }
-
+        const x = cc.winSize.width / 2 - (cc.winSize.height * 1136 / 640 / 2) + (1136 - 500);
+        this.view.setPosition(x, 0);
+        // const windowSize = cc.view.getVisibleSize();
+        // this.view.setPosition(windowSize.width - 500, 0);
     }
 
     protected onMessage(data: ByteBuffer): void {

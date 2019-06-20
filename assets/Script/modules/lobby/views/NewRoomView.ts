@@ -169,7 +169,7 @@ export class NewRoomView extends cc.Component {
         const tk = DataStore.getString("token", "");
         let createRoomURL: string = "";
 
-        if (this.club !== null && this.club !== "") {
+        if (this.club !== undefined && this.club !== null && this.club !== "") {
             createRoomURL = `${LEnv.rootURL}${LEnv.createClubRoom}?&tk=${tk}&clubID=${this.club.baseInfo.clubID}`;
         } else {
             createRoomURL = `${LEnv.rootURL}${LEnv.createRoom}?&tk=${tk}`;

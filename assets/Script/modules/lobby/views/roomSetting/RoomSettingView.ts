@@ -1,5 +1,5 @@
 
-import { Dialog, GResLoader, Logger } from "../../lcore/LCoreExports";
+import { Dialog, GResLoader } from "../../lcore/LCoreExports";
 
 export interface RoomInterface {
     switchBg(agree: number): void;
@@ -74,20 +74,24 @@ export class RoomSettingView extends cc.Component {
         arrowBtn.onClick(this.onArrowBtnClick, this);
 
         const soundSlider = this.view.getChild("soundSlider").asSlider;
+        const me = cc.audioEngine.getEffectsVolume();
+        soundSlider.value = me * 100;
         soundSlider.on(fgui.Event.STATUS_CHANGED, this.onSoundSliderChanged, this);
 
         const musicSlider = this.view.getChild("musicSlider").asSlider;
+        const mv = cc.audioEngine.getMusicVolume();
+        musicSlider.value = mv * 100;
         musicSlider.on(fgui.Event.STATUS_CHANGED, this.onMusicSliderChanged, this);
     }
 
     private onMusicSliderChanged(slider: fgui.GSlider): void {
-        //
-        Logger.debug("onMusicSliderChanged slider = ", slider.value);
+        // Logger.debug("onMusicSliderChanged slider = ", slider.value
+        cc.audioEngine.setMusicVolume(slider.value / 100);
     }
 
     private onSoundSliderChanged(slider: fgui.GSlider): void {
-        //
-        Logger.debug("onSoundSliderChanged slider = ", slider.value);
+        // Logger.debug("onSoundSliderChanged slider = ", slider.value);
+        cc.audioEngine.setEffectsVolume(slider.value / 100);
     }
 
     private onExitBtnClick(): void {

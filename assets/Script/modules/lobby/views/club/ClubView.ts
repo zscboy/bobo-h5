@@ -1,4 +1,4 @@
-import { CommonFunction, DataStore, Dialog, HTTP, LEnv, LobbyModuleInterface, Logger } from "../../lcore/LCoreExports";
+import { CommonFunction, DataStore, Dialog, HTTP, LEnv, LobbyModuleInterface, Logger, NewRoomViewPath } from "../../lcore/LCoreExports";
 import { proto } from "../../proto/protoLobby";
 import { LobbyError } from "../LobbyError";
 import { NewRoomView } from "../NewRoomView";
@@ -10,6 +10,7 @@ import { CreateClubView } from "./CreateClubView";
 import { FilterGameView } from "./FilterGameView";
 import { JoinClubView } from "./JoinClubView";
 import { MemberManagerView } from "./memberManager/MemberManagerView";
+import { QuicklyCreateRoomView } from "./quicklyCreateRoom/QuicklyCreateRoomView";
 import { RoomManageView } from "./roomManage/RoomManageView";
 import { SettingPopupView } from "./settingPopup/SettingPopupView";
 
@@ -381,6 +382,11 @@ export class ClubView extends cc.Component {
 
     private onQuicklyCreateRoomClick(): void {
         //
+        // if (this.selectedClub.xxx === null || this.selectedClub.xxx === "") {
+        this.showQuickCreateRoomView();
+        // } else {
+        //this.quickCreateRoom();
+        // }
     }
 
     private onTipsBtnClick(): void {
@@ -390,7 +396,7 @@ export class ClubView extends cc.Component {
     private onCreateRoomBtnClick(): void {
 
         const view = this.addComponent(NewRoomView);
-        view.saveClubId(this.selectedClub.baseInfo.clubID);
+        view.showView(NewRoomViewPath.Form_Club, this.selectedClub);
 
     }
 
@@ -431,6 +437,16 @@ export class ClubView extends cc.Component {
         }
 
     }
+
+    private showQuickCreateRoomView(): void {
+        //
+        const view = this.addComponent(QuicklyCreateRoomView);
+        view.show(this.selectedClub);
+    }
+
+    // private quickCreateRoom(): void {
+    //     //
+    // }
 
     private refreshClubInfo(data: ByteBuffer): void {
         if (data !== null) {

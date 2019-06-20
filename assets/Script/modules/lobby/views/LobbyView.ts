@@ -1,7 +1,7 @@
 import { WeiXinSDK } from "../chanelSdk/wxSdk/WeiXinSDkExports";
 import {
     CommonFunction,
-    DataStore, Dialog, GameModuleLaunchArgs, LEnv, LobbyModuleInterface, Logger
+    DataStore, Dialog, GameModuleLaunchArgs, LEnv, LobbyModuleInterface, Logger, NewRoomViewPath
 } from "../lcore/LCoreExports";
 import { LMsgCenter } from "../LMsgCenter";
 import { proto } from "../proto/protoLobby";
@@ -219,7 +219,8 @@ export class LobbyView extends cc.Component {
     }
 
     private onCreateRoom(): void {
-        this.addComponent(NewRoomView);
+        const newRoomView = this.addComponent(NewRoomView);
+        newRoomView.showView(NewRoomViewPath.Normal);
     }
 
     private onReturnGameBtnClick(): void {

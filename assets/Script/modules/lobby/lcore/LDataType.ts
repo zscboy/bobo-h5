@@ -72,3 +72,9 @@ export interface GameModuleInterface extends cc.Component {
     resLoader: GResLoader;
     launch(args: GameModuleLaunchArgs): void;
 }
+
+export enum NewRoomViewPath {
+    Normal = 0,
+    Form_Club,
+    Form_Club_Setting
+}

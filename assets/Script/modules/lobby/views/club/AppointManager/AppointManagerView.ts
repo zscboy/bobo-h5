@@ -41,7 +41,6 @@ export class AppointManagerView extends cc.Component {
         win.modal = true;
 
         this.win = win;
-
         this.initView();
     }
 

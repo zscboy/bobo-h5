@@ -1,4 +1,4 @@
-import { DataStore, Dialog, HTTP, LEnv, LobbyModuleInterface, Logger } from "../lcore/LCoreExports";
+import { DataStore, Dialog, HTTP, LEnv, LobbyModuleInterface, Logger, NewRoomViewPath } from "../lcore/LCoreExports";
 import { proto } from "../proto/protoLobby";
 import { DFRuleView, RunFastRuleView, ZJMJRuleView } from "../ruleviews/RuleViewsExports";
 import { LobbyError } from "./LobbyError";
@@ -14,11 +14,19 @@ interface RuleView {
     getRules: Function;
 }
 
+interface QuicklyCreateViewInterface {
+    saveConfig: Function;
+}
+
 /**
- * LoginView 登录界面
+ * NewRoomView 创建房间界面
  */
 @ccclass
 export class NewRoomView extends cc.Component {
+
+    public forReview: boolean = false;
+    public itemsJSON: { [key: string]: boolean | number };
+
     private view: fgui.GComponent;
     private win: fgui.Window;
 
@@ -27,14 +35,22 @@ export class NewRoomView extends cc.Component {
     private ruleViews: { [key: string]: RuleView } = {};
     private priceCfgs: { [key: string]: object };
 
-    private clubId: string = null;
+    private club: proto.club.IMsgClubInfo;
+
+    private path: NewRoomViewPath = NewRoomViewPath.Normal;
+
+    private quicklyCreateView: QuicklyCreateViewInterface;
 
     public getView(): fgui.GComponent {
         return this.view;
     }
 
-    public saveClubId(clubId: string): void {
-        this.clubId = clubId;
+    public showView(path: NewRoomViewPath, club?: proto.club.IMsgClubInfo, quicklyCreateView?: QuicklyCreateViewInterface): void {
+        this.path = path;
+        this.club = club;
+        this.quicklyCreateView = quicklyCreateView;
+        this.initView();
+        this.win.show();
     }
 
     public updatePrice(price: number): void {
@@ -59,9 +75,6 @@ export class NewRoomView extends cc.Component {
         win.modal = true;
 
         this.win = win;
-
-        this.initView();
-        this.win.show();
     }
 
     protected onDestroy(): void {
@@ -71,7 +84,6 @@ export class NewRoomView extends cc.Component {
         });
 
         this.eventTarget.emit("destroy");
-
         this.win.hide();
         this.win.dispose();
     }
@@ -89,12 +101,28 @@ export class NewRoomView extends cc.Component {
         list.on(fgui.Event.CLICK_ITEM, this.onListItemClicked, this);
 
         const createRoomBtn = this.view.getChild("createRoomButton");
-        if (createRoomBtn !== null) {
-            createRoomBtn.onClick(this.onCreateRoomBtnClick, this);
+        createRoomBtn.onClick(this.onCreateRoomBtnClick, this);
+
+        const saveConfigBtn = this.view.getChild("saveConfigBtn");
+        saveConfigBtn.onClick(this.onSaveConfigBtnClick, this);
+
+        const funcController = this.view.getController("func");
+
+        switch (this.path) {
+            case NewRoomViewPath.Normal:
+            case NewRoomViewPath.Form_Club:
+                funcController.selectedIndex = 0;
+                break;
+
+            case NewRoomViewPath.Form_Club_Setting:
+                funcController.selectedIndex = 1;
+                break;
+
+            default:
+
         }
 
         this.selectItem("btnZJMJ");
-
         this.loadRoomPrice();
     }
 
@@ -103,17 +131,37 @@ export class NewRoomView extends cc.Component {
         this.selectItem(name);
     }
 
-    private onCreateRoomBtnClick(): void {
+    private onSaveConfigBtnClick(): void {
+        //
         const list = this.view.getChild("gamelist").asList;
         const index = list.selectedIndex;
         const item = list.getChildAt(index);
         const name = item.packageItem.name;
         const ruleView = this.ruleViews[name];
+        if (ruleView !== undefined) {
+            const rules: string = <string>ruleView.getRules();
+            this.goSave(rules);
+        }
+    }
 
+    private onCreateRoomBtnClick(): void {
+
+        const list = this.view.getChild("gamelist").asList;
+        const index = list.selectedIndex;
+        const item = list.getChildAt(index);
+        const name = item.packageItem.name;
+        const ruleView = this.ruleViews[name];
         if (ruleView !== undefined) {
             const rules: string = <string>ruleView.getRules();
             this.createRoom(rules);
         }
+
+    }
+
+    private goSave(ruleJson: string): void {
+        //
+        this.quicklyCreateView.saveConfig(ruleJson);
+        this.destroy();
     }
 
     private createRoom(ruleJson: string): void {
@@ -121,8 +169,8 @@ export class NewRoomView extends cc.Component {
         const tk = DataStore.getString("token", "");
         let createRoomURL: string = "";
 
-        if (this.clubId !== null && this.clubId !== "") {
-            createRoomURL = `${LEnv.rootURL}${LEnv.createClubRoom}?&tk=${tk}&clubID=${this.clubId}`;
+        if (this.club !== null && this.club !== "") {
+            createRoomURL = `${LEnv.rootURL}${LEnv.createClubRoom}?&tk=${tk}&clubID=${this.club.baseInfo.clubID}`;
         } else {
             createRoomURL = `${LEnv.rootURL}${LEnv.createRoom}?&tk=${tk}`;
         }
@@ -180,6 +228,13 @@ export class NewRoomView extends cc.Component {
             const rv = this.ruleViews[k];
             rv.hide();
         });
+
+        if (this.path === NewRoomViewPath.Form_Club_Setting) {
+            this.forReview = true;
+            const roomConfigJSON = <{ [key: string]: boolean | number }>JSON.parse(this.club.baseInfo.clubID);
+            this.itemsJSON = roomConfigJSON;
+
+        }
 
         if (ruleView === undefined) {
             switch (name) {

@@ -1,4 +1,4 @@
-import { DataStore, Logger } from "../../../lcore/LCoreExports";
+import { DataStore } from "../../../lcore/LCoreExports";
 import { proto } from "../../../proto/protoLobby";
 import { ClubViewInterface } from "../ClubModuleInterface";
 import { DisbandClubView } from "./DisbandClubView";
@@ -28,6 +28,10 @@ export class SettingPopupView extends cc.Component {
 
     public quitClub(): void {
         this.clubView.quitClub();
+    }
+
+    public showQuicklyCreateView(): void {
+        this.clubView.showQuicklyCreateView();
     }
 
     public show(clubView: ClubViewInterface, clubInfo: proto.club.IMsgClubInfo): void {
@@ -88,7 +92,8 @@ export class SettingPopupView extends cc.Component {
 
     private onQuickSettingClick(): void {
 
-        Logger.debug(`onQuickSettingClick------------`);
+        this.showQuicklyCreateView();
+        fgui.GRoot.inst.hidePopup();
     }
 
     private onQuitClubClick(): void {

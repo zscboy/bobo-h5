@@ -25,7 +25,7 @@ interface QuicklyCreateViewInterface {
 export class NewRoomView extends cc.Component {
 
     public forReview: boolean = false;
-    public itemsJSON: { [key: string]: boolean | number };
+    public itemsJSON: { [key: string]: boolean | number } = {};
 
     private view: fgui.GComponent;
     private win: fgui.Window;
@@ -231,8 +231,11 @@ export class NewRoomView extends cc.Component {
 
         if (this.path === NewRoomViewPath.Form_Club_Setting) {
             this.forReview = true;
-            const roomConfigJSON = <{ [key: string]: boolean | number }>JSON.parse(this.club.baseInfo.clubID);
-            this.itemsJSON = roomConfigJSON;
+
+            if (this.club.createRoomOptions !== null) {
+                const roomConfigJSON = <{ [key: string]: boolean | number }>JSON.parse(this.club.createRoomOptions);
+                this.itemsJSON = roomConfigJSON;
+            }
 
         }
 

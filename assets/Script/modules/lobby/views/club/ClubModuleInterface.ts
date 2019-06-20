@@ -9,6 +9,8 @@ export interface ClubViewInterface {
     quitClub?: Function;
     addClub?: Function;
     delMember?: Function;
+
+    showQuicklyCreateView?: Function;
     loadClubRooms?: Function;
 
 }

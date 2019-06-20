@@ -56,6 +56,13 @@ export class ClubView extends cc.Component {
     private lobbyModule: LobbyModuleInterface;
 
     /**
+     * showQuicklyCreateView
+     */
+    public showQuicklyCreateView(): void {
+        this.showQuickCreateRoomView();
+    }
+
+    /**
      * 选择筛选的房间类型
      * @param selectRoomType RoomType
      */
@@ -381,12 +388,20 @@ export class ClubView extends cc.Component {
     }
 
     private onQuicklyCreateRoomClick(): void {
-        //
-        // if (this.selectedClub.xxx === null || this.selectedClub.xxx === "") {
-        this.showQuickCreateRoomView();
-        // } else {
-        //this.quickCreateRoom();
-        // }
+
+        if (this.selectedClub.createRoomOptions !== null && this.selectedClub.createRoomOptions !== "") {
+
+            const roomInfoData = DataStore.getString("RoomInfoData");
+
+            if (roomInfoData !== undefined && roomInfoData !== null && roomInfoData !== "") {
+                Dialog.prompt("已经在房间内");
+            } else {
+                this.quickCreateRoom();
+            }
+
+        } else {
+            Dialog.prompt("还未设置一键组局配置");
+        }
     }
 
     private onTipsBtnClick(): void {
@@ -444,9 +459,62 @@ export class ClubView extends cc.Component {
         view.show(this.selectedClub);
     }
 
-    // private quickCreateRoom(): void {
-    //     //
-    // }
+    private quickCreateRoom(): void {
+        //
+        const ruleJson = this.selectedClub.createRoomOptions;
+        Logger.debug("ClubView.quickCreateRoom, ruleJson:", ruleJson);
+        const tk = DataStore.getString("token", "");
+
+        const createRoomURL = `${LEnv.rootURL}${LEnv.createClubRoom}?&tk=${tk}&clubID=${this.selectedClub.baseInfo.clubID}`;
+
+        Logger.trace("createRoom, createRoomURL:", createRoomURL);
+        const createRoomReq = new proto.lobby.MsgCreateRoomReq();
+        createRoomReq.config = ruleJson;
+
+        const body = proto.lobby.MsgCreateRoomReq.encode(createRoomReq).toArrayBuffer();
+
+        HTTP.hPost(
+            this.eventTarget,
+            createRoomURL,
+            (xhr: XMLHttpRequest, err: string) => {
+                let errMsg = null;
+                if (err !== null) {
+                    errMsg = `创建房间错误，错误码:${err}`;
+                } else {
+                    errMsg = HTTP.hError(xhr);
+                    if (errMsg === null) {
+                        const data = <Uint8Array>xhr.response;
+                        // proto 解码登录结果
+                        const msgCreateRoomRsp = proto.lobby.MsgCreateRoomRsp.decode(data);
+                        const lm = <LobbyModuleInterface>this.getComponent("LobbyModule");
+                        Logger.debug("msgCreateRoomRsp:", msgCreateRoomRsp);
+                        if (msgCreateRoomRsp.result === proto.lobby.MsgError.ErrSuccess) {
+
+                            lm.enterGame(msgCreateRoomRsp.roomInfo);
+                        } else if (msgCreateRoomRsp.result === proto.lobby.MsgError.ErrUserInOtherRoom) {
+
+                            lm.enterGame(msgCreateRoomRsp.roomInfo);
+                        } else {
+                            Logger.error("Create room error:, code:", msgCreateRoomRsp.result);
+                            const errorString = LobbyError.getErrorString(msgCreateRoomRsp.result);
+                            Dialog.showDialog(errorString);
+
+                        }
+                    }
+                }
+
+                if (errMsg !== null) {
+                    Logger.debug("NewRoomView.createRoom failed:", errMsg);
+                    // 显示错误对话框
+                    Dialog.showDialog(errMsg, () => {
+                        //
+                    });
+                }
+            },
+            "arraybuffer",
+            body);
+
+    }
 
     private refreshClubInfo(data: ByteBuffer): void {
         if (data !== null) {

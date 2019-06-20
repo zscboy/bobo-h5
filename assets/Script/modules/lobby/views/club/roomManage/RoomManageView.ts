@@ -78,7 +78,7 @@ export class RoomManageView extends cc.Component {
     }
 
     private updatePlayerList(): void {
-        if (this.roomInfo !== undefined && this.roomInfo !== null) {
+        if (this.roomInfo !== undefined && this.roomInfo !== null && this.roomInfo.users !== null) {
             this.playerList.numItems = this.roomInfo.users.length;
         }
     }

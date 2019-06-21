@@ -24,27 +24,7 @@ export class GameSubRecordView extends cc.Component {
         this.replayRoom = replayRoom;
         const replayPlayerInfos = replayRoom.players;
 
-        let text = "未知麻将";
-        const roomType = replayRoom.recordRoomType;
-        switch (roomType) {
-            case 1:
-                text = "大丰麻将";
-                break;
-            case 3:
-                text = "东台麻将";
-                break;
-            case 8:
-                text = "关张";
-                break;
-            case 9:
-                text = "7王523";
-                break;
-            case 11:
-                text = "斗地主";
-                break;
-
-            default:
-        }
+        const text = this.getGameName(replayRoom.recordRoomType);
 
         const rountText = `${replayRoom.records.length} 局`;
         const gameName = this.view.asCom.getChild("gameName");
@@ -68,6 +48,8 @@ export class GameSubRecordView extends cc.Component {
         let userID;
 
         let player: proto.lobby.IMsgReplayPlayerInfo;
+
+        this.hidePlayerView(this.view);
 
         for (let i = 0; i < replayPlayerInfos.length; i++) {
 
@@ -153,6 +135,37 @@ export class GameSubRecordView extends cc.Component {
         }
     }
 
+    private hidePlayerView(obj: fgui.GObject): void {
+        for (let i = 1; i < 5; i++) {
+            obj.asCom.getChild(`owner${i}`).visible = false;
+        }
+    }
+
+    private getGameName(roomType: number): string {
+
+        let text = "未知麻将";
+        switch (roomType) {
+            case 1:
+                text = "大丰麻将";
+                break;
+            case 3:
+                text = "东台麻将";
+                break;
+            case 8:
+                text = "关张";
+                break;
+            case 9:
+                text = "7王523";
+                break;
+            case 11:
+                text = "斗地主";
+                break;
+
+            default:
+        }
+
+        return text;
+    }
     private renderListItem(index: number, obj: fgui.GObject): void {
 
         const record = this.replayRoom.records[index];
@@ -164,12 +177,7 @@ export class GameSubRecordView extends cc.Component {
         roundText.text = `${roundIndexStr}`;
 
         const dateText = obj.asCom.getChild("time");
-
-        const date = new Date(record.startTime * 1000);
-        const hour = date.getHours() < 10 ? `0${date.getHours()} ` : `${date.getHours()} `;
-        const minute = date.getMinutes() < 10 ? `0${date.getMinutes()} ` : `${date.getMinutes()} `;
-        const second = date.getSeconds() < 10 ? `0${date.getSeconds()} ` : `${date.getSeconds()} `;
-        dateText.text = `${hour}: ${minute}:${second} `;
+        dateText.text = this.getTimeFormat(record.startTime);
 
         let label;
 
@@ -191,6 +199,16 @@ export class GameSubRecordView extends cc.Component {
         playBtn.offClick(this.onPlayBtnClick, this);
         playBtn.onClick(this.onPlayBtnClick, this);
         playBtn.data = record.recordUUID;
+    }
+
+    private getTimeFormat(timeStamp: number): string {
+        const date = new Date(timeStamp * 1000);
+
+        const hour = date.getHours() < 10 ? `0${date.getHours()} ` : `${date.getHours()} `;
+        const minute = date.getMinutes() < 10 ? `0${date.getMinutes()} ` : `${date.getMinutes()} `;
+        const second = date.getSeconds() < 10 ? `0${date.getSeconds()} ` : `${date.getSeconds()} `;
+
+        return `${hour}: ${minute}:${second} `;
     }
 
     private onPlayBtnClick(ev: fgui.Event): void {

@@ -1,4 +1,4 @@
-import { DataStore, Dialog, HTTP, LEnv, LobbyModuleInterface, Logger } from "../lcore/LCoreExports";
+import { CommonFunction, DataStore, Dialog, HTTP, LEnv, LobbyModuleInterface, Logger } from "../lcore/LCoreExports";
 import { proto } from "../proto/protoLobby";
 import { GameSubRecordView } from "./GameSubRecordView";
 
@@ -85,27 +85,7 @@ export class GameRecordView extends cc.Component {
         obj.onClick(this.goSubRecordView, this);
         obj.data = index;
 
-        let text = "未知麻将";
-        const roomType = replayRoom.recordRoomType;
-        switch (roomType) {
-            case 1:
-                text = "大丰麻将";
-                break;
-            case 3:
-                text = "东台麻将";
-                break;
-            case 8:
-                text = "关张";
-                break;
-            case 9:
-                text = "7王523";
-                break;
-            case 11:
-                text = "斗地主";
-                break;
-
-            default:
-        }
+        const text = this.getGameName(replayRoom.recordRoomType);
 
         const rountText = `${replayRoom.records.length} 局`;
         const gameName = obj.asCom.getChild("gameName");
@@ -116,13 +96,7 @@ export class GameRecordView extends cc.Component {
 
         const dateText = obj.asCom.getChild("time");
 
-        const date = new Date(replayRoom.startTime * 1000);
-        const month = date.getMonth() < 9 ? `0${date.getMonth() + 1} ` : `${date.getMonth() + 1} `;
-        const day = date.getDay() < 10 ? `0${date.getDay()} ` : `${date.getDay()} `;
-        const hour = date.getHours() < 10 ? `0${date.getHours()} ` : `${date.getHours()} `;
-        const minute = date.getMinutes() < 10 ? `0${date.getMinutes()} ` : `${date.getMinutes()} `;
-
-        dateText.text = `${date.getFullYear()} /${month}/${day} ${hour}: ${minute} `;
+        dateText.text = this.getTimeFormat(replayRoom.startTime);
 
         let nameText;
         let playerScoreText;
@@ -132,8 +106,14 @@ export class GameRecordView extends cc.Component {
 
         // const ownerUserID = replayRoom.ownerUserID;
 
+        this.initItemView(obj);
+
         for (let i = 0; i < replayRoom.players.length; i++) {
             const player = replayRoom.players[i];
+            this.setItemView(obj, i + 1);
+
+            const loader = obj.asCom.getChild(`loader${i + 1}`).asLoader;
+            CommonFunction.setHead(loader, player.headIconURI);
 
             nameText = obj.asCom.getChild(`playerName${i + 1}`);
 
@@ -142,7 +122,7 @@ export class GameRecordView extends cc.Component {
 
             playerScoreText = obj.asCom.getChild(`playerScore${i + 1}`);
             if (player.totalScore > 0) {
-                playerScoreText.text = `${+player.totalScore}`;
+                playerScoreText.text = `+${player.totalScore}`;
                 playerScoreText.asTextField.color = new cc.Color().fromHEX("#D52012");
             } else {
                 playerScoreText.text = `${player.totalScore}`;
@@ -167,6 +147,62 @@ export class GameRecordView extends cc.Component {
 
         if (finalWinnerImg !== undefined) {
             finalWinnerImg.visible = true;
+        }
+    }
+
+    private getTimeFormat(timeStamp: number): string {
+        const date = new Date(timeStamp * 1000);
+        const month = date.getMonth() < 9 ? `0${date.getMonth() + 1} ` : `${date.getMonth() + 1} `;
+        const day = date.getDay() < 10 ? `0${date.getDay()} ` : `${date.getDay()} `;
+        const hour = date.getHours() < 10 ? `0${date.getHours()} ` : `${date.getHours()} `;
+        const minute = date.getMinutes() < 10 ? `0${date.getMinutes()} ` : `${date.getMinutes()} `;
+
+        return `${date.getFullYear()} /${month}/${day} ${hour}: ${minute} `;
+    }
+
+    private getGameName(roomType: number): string {
+
+        let text = "未知麻将";
+        switch (roomType) {
+            case 1:
+                text = "大丰麻将";
+                break;
+            case 3:
+                text = "东台麻将";
+                break;
+            case 8:
+                text = "关张";
+                break;
+            case 9:
+                text = "7王523";
+                break;
+            case 11:
+                text = "斗地主";
+                break;
+
+            default:
+        }
+
+        return text;
+    }
+
+    private setItemView(obj: fgui.GObject, i: number): void {
+        obj.asCom.getChild(`bg${i}`).visible = true;
+        obj.asCom.getChild(`loader${i}`).visible = true;
+        obj.asCom.getChild(`iconFrame${i}`).visible = true;
+        obj.asCom.getChild(`playerName${i}`).visible = true;
+        obj.asCom.getChild(`playerScore${i}`).visible = true;
+    }
+
+    private initItemView(obj: fgui.GObject): void {
+        for (let i = 1; i < 5; i++) {
+            obj.asCom.getChild(`bg${i}`).visible = false;
+            obj.asCom.getChild(`loader${i}`).visible = false;
+            obj.asCom.getChild(`iconFrame${i}`).visible = false;
+            obj.asCom.getChild(`owner${i}`).visible = false;
+            obj.asCom.getChild(`winner${i}`).visible = false;
+            obj.asCom.getChild(`playerName${i}`).visible = false;
+            obj.asCom.getChild(`playerScore${i}`).visible = false;
         }
     }
 

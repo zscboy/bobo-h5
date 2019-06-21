@@ -24,7 +24,7 @@ export class LoginView extends cc.Component {
     public showLoginView(): void {
         const lm = <LobbyModuleInterface>this.getComponent("LobbyModule");
         const loader = lm.loader;
-        loader.fguiAddPackage("Lauch/fui_login/lobby_login");
+        loader.fguiAddPackage("launch/fui_login/lobby_login");
         const view = fgui.UIPackage.createObject("lobby_login", "login").asCom;
 
         const x = cc.winSize.width / 2 - (cc.winSize.height * 1136 / 640 / 2);

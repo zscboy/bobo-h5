@@ -281,7 +281,7 @@ export class EmailView extends cc.Component {
     }
 
     private onTakeBtnClick(): void {
-        if (this.selectedEmail.attachments !== undefined || this.selectedEmail.attachments !== null) {
+        if (this.selectedEmail.attachments !== undefined && this.selectedEmail.attachments !== null) {
 
             if (this.selectedEmail.attachments.isReceive === false) {
                 this.takeAttachment(this.selectedEmail);

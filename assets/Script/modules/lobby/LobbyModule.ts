@@ -210,8 +210,8 @@ export class LobbyModule extends cc.Component implements LobbyModuleInterface {
         Dialog.initDialogs(this.loader);
 
         //优先加载login资源，用于显示loading
-        this.loader.loadResDir("Lauch", (error) => {
-            Logger.debug(`Lauch load, error:${error}`);
+        this.loader.loadResDir("launch", (error) => {
+            Logger.debug(`launch load, error:${error}`);
             if (error == null) {
                 this.loginView = this.addComponent(LoginView);
                 this.loadLobbyRes();

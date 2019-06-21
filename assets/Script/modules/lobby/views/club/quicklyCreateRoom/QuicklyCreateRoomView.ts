@@ -1,6 +1,7 @@
 import { DataStore, HTTP, LEnv, Logger, NewRoomViewPath } from "../../../lcore/LCoreExports";
 import { proto } from "../../../proto/protoLobby";
 import { NewRoomView } from "../../NewRoomView";
+import { RoomRuleString } from "./RoomRuleString";
 
 const { ccclass } = cc._decorator;
 
@@ -95,53 +96,8 @@ export class QuicklyCreateRoomView extends cc.Component {
     }
 
     private getRoomConfig(): string {
-        let cfg = ``;
 
-        try {
-            const config = <{ [key: string]: boolean | number }>JSON.parse(this.clubInfo.createRoomOptions);
-
-            const roomType = <number>config[`roomType`];
-            const name = ` 游戏  :  ${this.getGameName(roomType)}\r\n`;
-            cfg = cfg + name;
-
-            const playerNumAcquired: number = <number>config[`playerNumAcquired`];
-            const playerCount = ` 人数  :  ${playerNumAcquired}人\r\n`;
-            cfg = cfg + playerCount;
-
-        } catch (e) {
-            Logger.error(e);
-        }
-
-        return cfg;
-    }
-
-    private getGameName(roomType: number): string {
-        let name = ``;
-        switch (roomType) {
-            case 1:
-                name = "大丰麻将";
-                break;
-            case 3:
-                name = "东台麻将";
-                break;
-            case 8:
-                name = "关张";
-                break;
-            case 9:
-                name = "7王523";
-                break;
-            case 11:
-                name = "斗地主";
-                break;
-
-            case 21:
-                name = "湛江麻将";
-                break;
-
-            default:
-        }
-
-        return name;
+        return RoomRuleString.getRoomRuleStr(this.clubInfo.createRoomOptions);
     }
 
     private updateView(): void {
@@ -153,8 +109,8 @@ export class QuicklyCreateRoomView extends cc.Component {
         }
 
         const cfgStr = this.getRoomConfig();
-        const gameConfigText = this.view.getChild("text3");
 
+        const gameConfigText = this.view.getChild("textComponent").asCom.getChild("text");
         gameConfigText.text = cfgStr;
 
     }

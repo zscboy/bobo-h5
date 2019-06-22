@@ -122,6 +122,7 @@ export class RoomManageView extends cc.Component {
                 if (msgLoadRoomListRsp.result === proto.lobby.MsgError.ErrSuccess) {
 
                     this.clubView.loadClubRooms();
+                    this.clubView.disBandRoomNotify(this.roomInfo.roomID);
                     this.destroy();
                 } else {
                     const error = LobbyError.getErrorString(msgLoadRoomListRsp.result);

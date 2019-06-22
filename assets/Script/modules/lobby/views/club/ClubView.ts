@@ -11,6 +11,7 @@ import { FilterGameView } from "./FilterGameView";
 import { JoinClubView } from "./JoinClubView";
 import { MemberManagerView } from "./memberManager/MemberManagerView";
 import { QuicklyCreateRoomView } from "./quicklyCreateRoom/QuicklyCreateRoomView";
+import { RoomRuleString } from "./quicklyCreateRoom/RoomRuleString";
 import { RoomManageView } from "./roomManage/RoomManageView";
 import { SettingPopupView } from "./settingPopup/SettingPopupView";
 
@@ -162,6 +163,24 @@ export class ClubView extends cc.Component {
         };
 
         this.clubRequest(url, cb);
+    }
+
+    public disBandRoomNotify(roomId: string): void {
+        const roomInfoData = DataStore.getString("RoomInfoData");
+
+        if (roomInfoData !== undefined && roomInfoData !== null && roomInfoData !== "") {
+
+            try {
+                const config = <{ [key: string]: string }>JSON.parse(roomInfoData);
+
+                if (config.roomID === roomId) {
+                    DataStore.setItem("RoomInfoData", "");
+                }
+
+            } catch (error) {
+                //
+            }
+        }
     }
 
     protected onDestroy(): void {
@@ -320,7 +339,8 @@ export class ClubView extends cc.Component {
 
         // 提示按钮
         const tipsBtn = this.clubPage.asCom.getChild("tipsBtn");
-        tipsBtn.onClick(this.onTipsBtnClick, this);
+        tipsBtn.on(fgui.Event.TOUCH_BEGIN, this.onTipsBtnTouchBegin, this);
+        tipsBtn.on(fgui.Event.TOUCH_END, this.onTipsBtnTouchEnd, this);
 
         // 创建房间按钮
         const createRoomBtn = this.clubPage.asCom.getChild("createRoomBtn");
@@ -346,6 +366,8 @@ export class ClubView extends cc.Component {
             };
             const data = { data: `${this.selectedClub.baseInfo.clubNumber}`, success: cb };
             wx.setClipboardData(data);
+        } else {
+            Dialog.prompt("运行环境不是微信平台");
         }
     }
 
@@ -358,6 +380,8 @@ export class ClubView extends cc.Component {
                 imageUrl: ``,
                 query: ``
             });
+        } else {
+            Dialog.prompt("运行环境不是微信平台");
         }
     }
 
@@ -404,8 +428,34 @@ export class ClubView extends cc.Component {
         }
     }
 
-    private onTipsBtnClick(): void {
+    private onTipsBtnTouchBegin(): void {
         //
+
+        const options = this.selectedClub.createRoomOptions;
+        if (options !== undefined && options !== null) {
+            const str = RoomRuleString.getRoomRuleStr(options);
+
+            const view = this.clubPage.asCom.getChild("ruleText");
+            const gameConfigText = view.asCom.getChild("text");
+            const bg = view.asCom.getChild("bg");
+
+            const originY = view.y;
+            const originH = view.height;
+
+            gameConfigText.text = str;
+            const h = gameConfigText.height;
+            bg.height = h;
+            view.height = h;
+
+            const newY = originY - (h - originH);
+            view.y = newY;
+            view.visible = true;
+        }
+    }
+
+    private onTipsBtnTouchEnd(): void {
+        //
+        this.clubPage.asCom.getChild("ruleText").visible = false;
     }
 
     private onCreateRoomBtnClick(): void {

@@ -13,6 +13,8 @@ export interface ClubViewInterface {
     showQuicklyCreateView?: Function;
     loadClubRooms?: Function;
 
+    disBandRoomNotify?: Function;
+
 }
 
 export enum RoomType {

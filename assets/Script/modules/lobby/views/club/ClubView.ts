@@ -175,6 +175,8 @@ export class ClubView extends cc.Component {
 
                 if (config.roomID === roomId) {
                     DataStore.setItem("RoomInfoData", "");
+                    const lm = <LobbyModuleInterface>this.getComponent("LobbyModule");
+                    lm.eventTarget.emit(`checkRoomInfo`);
                 }
 
             } catch (error) {

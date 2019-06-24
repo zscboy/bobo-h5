@@ -22,9 +22,9 @@ export class GameSubRecordView extends cc.Component {
 
         const text = this.getGameName(replayRoom.recordRoomType);
 
-        const rountText = `${replayRoom.records.length} 局`;
+        const roundText = `${replayRoom.records.length} 局`;
         const gameName = this.view.asCom.getChild("gameName");
-        gameName.text = `${text} ${rountText}`;
+        gameName.text = `${text} ${roundText}`;
 
         const roomNumber = this.view.asCom.getChild("roomNumber");
         roomNumber.text = `${replayRoom.roomNumber} ${"号 房间"}`;

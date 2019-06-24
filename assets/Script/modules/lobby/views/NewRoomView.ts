@@ -68,6 +68,8 @@ export class NewRoomView extends cc.Component {
         const loader = lm.loader;
         loader.fguiAddPackage("lobby/fui_create_room/lobby_create_room");
         const view = fgui.UIPackage.createObject("lobby_create_room", "createRoom").asCom;
+        const x = cc.winSize.width / 2 - (cc.winSize.height * 1136 / 640 / 2);
+        view.setPosition(x, view.y);
         this.view = view;
 
         const win = new fgui.Window();

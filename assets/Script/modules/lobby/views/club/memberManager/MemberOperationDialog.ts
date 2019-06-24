@@ -25,10 +25,12 @@ export class MemberOperationDialog extends cc.Component {
 
         const memberOperationDialog = fgui.UIPackage.createObject("lobby_club", "memberOperationDialog").asCom;
         this.view = memberOperationDialog;
+        const x = cc.winSize.width / 2 - (cc.winSize.height * 1136 / 640 / 2);
+        this.view.setPosition(x, this.view.y);
 
         this.initView();
         fgui.GRoot.inst.showPopup(this.view);
-        this.view.setPosition(255, 180);
+        //this.view.setPosition(255, 180);
 
     }
 

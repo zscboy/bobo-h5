@@ -20,6 +20,8 @@ export class UserInfoView extends cc.Component {
         loader.fguiAddPackage("lobby/fui_user_info/lobby_user_info");
 
         const view = fgui.UIPackage.createObject("lobby_user_info", "userInfoView").asCom;
+        const x = cc.winSize.width / 2 - (cc.winSize.height * 1136 / 640 / 2);
+        view.setPosition(x, view.y);
         this.view = view;
 
         const win = new fgui.Window();

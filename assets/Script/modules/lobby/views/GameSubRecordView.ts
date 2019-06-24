@@ -1,10 +1,6 @@
 import { DataStore, Dialog, GameModuleLaunchArgs, HTTP, LEnv, LobbyModuleInterface, Logger } from "../lcore/LCoreExports";
 import { proto } from "../proto/protoLobby";
 
-// interface GameRecordInterface {
-//     destoryMySelf: Function;
-
-// }
 /**
  * 战绩界面
  */
@@ -253,7 +249,6 @@ export class GameSubRecordView extends cc.Component {
         const tk = DataStore.getString("token", "");
         const loadGameRecordUrl = `${LEnv.rootURL}${LEnv.lrprecord}?&rt=1&tk=${tk}&rid=${recordID}`;
         Logger.debug("loadRecord loadGameRecordUrl:", loadGameRecordUrl);
-        // Dialog.showDialog("正在加载战绩......");
 
         HTTP.hGet(this.eventTarget, loadGameRecordUrl, (xhr: XMLHttpRequest, err: string) => {
 

@@ -32,7 +32,7 @@ export class RoomManageView extends cc.Component {
     }
 
     protected onLoad(): void {
-        //
+
         this.eventTarget = new cc.EventTarget();
 
         const view = fgui.UIPackage.createObject("lobby_club", "roomManageView").asCom;
@@ -61,7 +61,6 @@ export class RoomManageView extends cc.Component {
     }
 
     private initView(): void {
-        //
 
         const closeBtn = this.view.getChild("closeBtn");
         closeBtn.onClick(this.onCloseClick, this);
@@ -86,7 +85,7 @@ export class RoomManageView extends cc.Component {
     }
 
     private renderPlayerListItem(index: number, item: fgui.GObject): void {
-        //
+
         const user = this.roomInfo.users[index];
 
         const nameText = item.asCom.getChild("name").asTextField;
@@ -102,7 +101,6 @@ export class RoomManageView extends cc.Component {
     }
 
     private onDisbandRoomBtnClick(): void {
-        //
 
         Dialog.showDialog("确定解散房间吗", () => {
             this.disbandRoom();

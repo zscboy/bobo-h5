@@ -16,8 +16,6 @@ export class SettingPopupView extends cc.Component {
 
     private clubInfo: proto.club.IMsgClubInfo;
 
-    // 、private clubInfo: proto.club.IMsgClubInfo;
-
     public disbandClub(): void {
         this.clubView.disbandClub();
     }

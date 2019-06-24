@@ -24,13 +24,12 @@ export class QuicklyCreateRoomView extends cc.Component {
     }
 
     public saveConfig(ruleJson: string): void {
-        //
         Logger.debug("saveConfig ruleJson = ", ruleJson);
         this.setConfig(ruleJson);
     }
 
     protected onLoad(): void {
-        //
+
         this.eventTarget = new cc.EventTarget();
 
         const view = fgui.UIPackage.createObject("lobby_club", "quicklyCreateRoom").asCom;
@@ -57,7 +56,6 @@ export class QuicklyCreateRoomView extends cc.Component {
     }
 
     private initView(): void {
-        //
 
         const closeBtn = this.view.getChild("closeBtn");
         closeBtn.onClick(this.onCloseClick, this);

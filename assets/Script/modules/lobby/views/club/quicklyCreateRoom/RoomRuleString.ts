@@ -171,13 +171,13 @@ export namespace RoomRuleString {
     };
 
     const getBaseRules = (roomType: number, key: string, value: number): string => {
-        //
+
         return baseRules[roomType][key][value];
 
     };
 
     const getRule = (key: string, value: boolean): string => {
-        //
+
         let str = ``;
 
         if (value === true) {
@@ -195,7 +195,6 @@ export namespace RoomRuleString {
         const config = <{ [key: string]: boolean | number }>JSON.parse(roomConfig);
 
         try {
-            //
             const roomType = <number>config[`roomType`];
 
             for (const key of baseRuleKeys) {

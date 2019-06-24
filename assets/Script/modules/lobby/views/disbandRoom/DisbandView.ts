@@ -79,7 +79,6 @@ export class DisbandView extends cc.Component {
 
     public updateView(): void {
         const msgDisbandNotify = this.msgDisbandNotify;
-        //
         Logger.debug("msgDisbandNotify = ", msgDisbandNotify);
 
         //先更新所有文字信息，例如谁同意，谁拒绝之类
@@ -324,7 +323,6 @@ export class DisbandView extends cc.Component {
     }
 
     private getPlayerByChairID(chairID: number): DisBandPlayerInfo {
-        //
 
         let playerInfo = null;
 

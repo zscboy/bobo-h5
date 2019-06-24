@@ -106,8 +106,6 @@ export class GameRecordView extends cc.Component {
         let winnerSore = 0;
         let finalWinnerImg;
 
-        // const ownerUserID = replayRoom.ownerUserID;
-
         this.initItemView(obj);
 
         for (let i = 0; i < replayRoom.players.length; i++) {
@@ -212,7 +210,6 @@ export class GameRecordView extends cc.Component {
         const tk = DataStore.getString("token", "");
         const loadGameRecordUrl = `${LEnv.rootURL}${LEnv.lrproom}?&rt=1&tk=${tk}`;
         Logger.debug("loadGameRecord loadGameRecordUrl:", loadGameRecordUrl);
-        // Dialog.showDialog("正在加载战绩......");
 
         HTTP.hGet(this.eventTarget, loadGameRecordUrl, (xhr: XMLHttpRequest, err: string) => {
 

@@ -1,5 +1,6 @@
 import { CommonFunction, DataStore, Dialog, HTTP, LEnv, LobbyModuleInterface, Logger, NewRoomViewPath } from "../../lcore/LCoreExports";
 import { proto } from "../../proto/protoLobby";
+// import { Share } from "../../shareUtil/ShareExports";
 import { LobbyError } from "../LobbyError";
 import { NewRoomView } from "../NewRoomView";
 import { ApplyRecordView } from "./ApplyRecordView";
@@ -23,8 +24,12 @@ const { ccclass } = cc._decorator;
 @ccclass
 export class ClubView extends cc.Component {
 
+    private readonly ENTER_GAME_EVENT: string = "enterGameEvent";
+    private readonly ON_CLUB_VIEW_SHOW: string = "onClubViewShow";
+
     // 茶馆主界面节点
     private view: fgui.GComponent;
+
     private win: fgui.Window;
     private eventTarget: cc.EventTarget;
     //内容节点，包括 茶馆页面 和 非茶馆页面
@@ -188,8 +193,8 @@ export class ClubView extends cc.Component {
     protected onDestroy(): void {
 
         if (this.lobbyModule !== null) {
-            this.lobbyModule.eventTarget.off("onClubViewShow", this.onClubViewShow);
-            this.lobbyModule.eventTarget.off("enterGameEvent", this.hide);
+            this.lobbyModule.eventTarget.off(this.ON_CLUB_VIEW_SHOW, this.onClubViewShow);
+            this.lobbyModule.eventTarget.off(this.ENTER_GAME_EVENT, this.hide);
             this.lobbyModule.eventTarget.off(`${proto.lobby.MessageCode.OPClubNotify}`, this.refreshClubInfo, this);
         }
 
@@ -248,8 +253,8 @@ export class ClubView extends cc.Component {
 
         this.lobbyModule = <LobbyModuleInterface>this.getComponent("LobbyModule");
         if (this.lobbyModule !== null) {
-            this.lobbyModule.eventTarget.on(`onClubViewShow`, this.onClubViewShow, this);
-            this.lobbyModule.eventTarget.on(`enterGameEvent`, this.hide, this);
+            this.lobbyModule.eventTarget.on(this.ON_CLUB_VIEW_SHOW, this.onClubViewShow, this);
+            this.lobbyModule.eventTarget.on(this.ENTER_GAME_EVENT, this.hide, this);
             this.lobbyModule.eventTarget.on(`${proto.lobby.MessageCode.OPClubNotify}`, this.refreshClubInfo, this);
         }
 
@@ -384,6 +389,13 @@ export class ClubView extends cc.Component {
                 imageUrl: ``,
                 query: ``
             });
+
+            // Share.shareGame(
+            //     this.eventTarget,
+            //     Share.ShareSrcType.GameShare,
+            //     Share.ShareMediaType.Image,
+            //     Share.ShareDestType.Friend,
+            //     `roomNumber=${this.roomInfo.roomNumber}`);
         } else {
             Dialog.prompt("运行环境不是微信平台");
         }

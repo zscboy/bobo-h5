@@ -45,6 +45,7 @@ export class HandResultViewA extends cc.Component {
         const loader = room.getRoomHost().loader;
         loader.fguiAddPackage("gamea/runfast");
         const viewObj = fgui.UIPackage.createObject("runfast", "hand_result").asCom;
+        viewObj.x = cc.winSize.width / 2 - (cc.winSize.height * 1136 / 640 / 2);
         this.unityViewNode = viewObj;
         const win = new fgui.Window();
         win.contentPane = viewObj;

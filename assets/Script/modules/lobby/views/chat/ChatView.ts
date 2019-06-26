@@ -74,7 +74,7 @@ export class ChatView extends cc.Component {
     private msgCallBack: Function;
     private msgList: { [key: number]: ChatData };
 
-    public show(loader: GResLoader, msgCallBack: Function): void {
+    public show(loader: GResLoader, msgCallBack: Function, width: number): void {
         this.msgCallBack = msgCallBack;
         if (this.view === undefined || this.view === null) {
             loader.fguiAddPackage("lobby/fui_chat/lobby_chat");
@@ -91,10 +91,10 @@ export class ChatView extends cc.Component {
         }
         fgui.GRoot.inst.showPopup(this.view);
 
-        const x = cc.winSize.width / 2 - (cc.winSize.height * 1136 / 640 / 2) + (1136 - 500);
+        //const x = cc.winSize.width / 2 - (cc.winSize.height * 1136 / 640 / 2) + (1136 - 500);
+        const x = width - 500;
         this.view.setPosition(x, 0);
-        // const windowSize = cc.view.getVisibleSize();
-        // this.view.setPosition(windowSize.width - 500, 0);
+
     }
 
     protected onMessage(data: ByteBuffer): void {

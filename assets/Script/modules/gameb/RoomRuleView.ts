@@ -44,7 +44,8 @@ export class RoomRuleView extends cc.Component {
         if (this.view !== null) {
             // this.room = room;
             fgui.GRoot.inst.showPopup(this.view);
-            this.view.setPosition(0, 0);
+            const x = cc.winSize.width / 2 - (cc.winSize.height * 1136 / 640 / 2);
+            this.view.setPosition(x, this.view.y);
         }
 
     }

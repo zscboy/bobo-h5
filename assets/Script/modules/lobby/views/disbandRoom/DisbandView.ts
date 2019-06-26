@@ -62,6 +62,7 @@ export class DisbandView extends cc.Component {
         if (this.view === null || this.view === undefined) {
             loader.fguiAddPackage("lobby/fui_room_other_view/room_other_view");
             const view = fgui.UIPackage.createObject("room_other_view", "disband_room").asCom;
+            view.x = cc.winSize.width / 2 - (cc.winSize.height * 1136 / 640 / 2);
             this.view = view;
             const win = new fgui.Window();
             win.contentPane = view;

@@ -331,7 +331,9 @@ export class RoomView {
         const settingView = this.component.addComponent(RoomSettingView);
 
         const isOwner = this.room.ownerID === this.room.getMyPlayerInfo().userID;
-        settingView.showView(this.room, this.room.getRoomHost().getLobbyModuleLoader(), isOwner);
+        const bg = this.unityViewNode.getChild("blueBg");
+
+        settingView.showView(this.room, this.room.getRoomHost().getLobbyModuleLoader(), isOwner, bg.width);
     }
 
     /**
@@ -348,8 +350,10 @@ export class RoomView {
             chatView = this.component.addComponent(ChatView);
         }
 
+        const bg = this.unityViewNode.getChild("blueBg");
+
         const callBack: Function = <Function>this.room.showMsg.bind(this.room);
-        chatView.show(load, callBack);
+        chatView.show(load, callBack, bg.width);
     }
     /**
      * 初始化

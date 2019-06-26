@@ -683,8 +683,10 @@ export class PlayerView {
         obj.grayed = false;
     }
 
-    public getUserInfoPos(): fgui.GObject {
-        return this.userInfoPos;
+    public getUserInfoPos(): cc.Vec2 {
+
+        return this.viewUnityNode.node.
+            convertToNodeSpaceAR(this.userInfoPos.parent.node.convertToWorldSpaceAR(new cc.Vec2(this.userInfoPos.x, this.userInfoPos.y)));
     }
 
     //显示聊天消息

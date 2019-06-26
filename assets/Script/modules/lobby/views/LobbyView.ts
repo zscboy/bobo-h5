@@ -63,12 +63,13 @@ export class LobbyView extends cc.Component {
         loader.fguiAddPackage("lobby/fui_bg/lobby_bg_package");
 
         const view = fgui.UIPackage.createObject("lobby_main", "Main").asCom;
-
         fgui.GRoot.inst.addChild(view);
         const x = cc.winSize.width / 2 - (cc.winSize.height * 1136 / 640 / 2);
         view.setPosition(x, view.y);
-
         this.view = view;
+
+        const bg = view.getChild("n21");
+        CommonFunction.setBgFullScreen(bg);
 
         this.initView();
 

@@ -60,10 +60,13 @@ export class PlayerViewA {
     private roomHost: RoomHost;
     private msgTimerCB: Function;
 
+    private viewUnityNode: fgui.GComponent;
+
     public constructor(viewUnityNode: fgui.GComponent, viewChairID: number, room: RoomInterfaceA) {
         this.room = room;
         this.viewChairID = viewChairID;
         this.roomHost = this.room.getRoomHost();
+        this.viewUnityNode = viewUnityNode;
 
         //这里需要把player的chairID转换为游戏视图中的chairID，这是因为，无论当前玩家本人
         //的chair ID是多少，他都是居于正中下方，左手是上家，右手是下家，正中上方是对家
@@ -346,8 +349,10 @@ export class PlayerViewA {
         obj.grayed = false;
     }
 
-    public getUserInfoPos(): fgui.GObject {
-        return this.userInfoPos;
+    public getUserInfoPos(): cc.Vec2 {
+
+        return this.viewUnityNode.node.
+            convertToNodeSpaceAR(this.userInfoPos.parent.node.convertToWorldSpaceAR(new cc.Vec2(this.userInfoPos.x, this.userInfoPos.y)));
     }
 
     //显示聊天消息

@@ -1,7 +1,7 @@
 import {
-    AnimationMgr, DataStore, Dialog, GameModuleInterface,
-    GameModuleLaunchArgs, GResLoader, LEnv,
-    LobbyModuleInterface, Logger, MsgQueue, MsgType, RoomInfo, UserInfo, WS
+    AnimationMgr, CommonFunction, DataStore, Dialog,
+    GameModuleInterface, GameModuleLaunchArgs, GResLoader,
+    LEnv, LobbyModuleInterface, Logger, MsgQueue, MsgType, RoomInfo, UserInfo, WS
 } from "../lobby/lcore/LCoreExports";
 import { proto } from "./proto/protoGameA";
 import { ReplayA } from "./ReplayA";
@@ -71,6 +71,10 @@ export class GameModuleA extends cc.Component implements GameModuleInterface {
         const x = cc.winSize.width / 2 - (cc.winSize.height * 1136 / 640 / 2);
         view.setPosition(x, view.y);
         this.view = view;
+
+        const bg = view.getChild("blueBg");
+        bg.setPosition(-x, 0);
+        CommonFunction.setBgFullScreen(bg);
 
         this.mAnimationMgr = new AnimationMgr(this.lm.loader);
 

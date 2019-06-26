@@ -812,7 +812,7 @@ export class Player {
         // const pos = { x = this.playerView.userInfoPos.x, y = this.playerView.userInfoPos.y }
         // playerInfoView.showUserInfoView(this.playerInfo, pos, this.isMe() == false, this.host)
 
-        const pos = new cc.Vec2(this.playerView.getUserInfoPos().x, this.playerView.getUserInfoPos().y);
+        const pos = this.playerView.getUserInfoPos();
         // const pos = new cc.Vec2(0, 0);
         // const playerInfoString = JSON.stringify(this.playerInfo);
         // playerInfoView.showUserInfoView(self.playerInfo, pos, self:isMe() == false)

@@ -34,8 +34,7 @@ export class AppointManagerView extends cc.Component {
         this.eventTarget = new cc.EventTarget();
 
         const view = fgui.UIPackage.createObject("lobby_club", "appointManager").asCom;
-        const x = cc.winSize.width / 2 - (cc.winSize.height * 1136 / 640 / 2);
-        view.setPosition(x, view.y);
+        CommonFunction.setViewInCenter(view);
         this.view = view;
 
         const win = new fgui.Window();

@@ -68,10 +68,14 @@ export class GameModuleA extends cc.Component implements GameModuleInterface {
 
         const view = fgui.UIPackage.createObject("runfast", "desk").asCom;
         fgui.GRoot.inst.addChild(view);
-        const x = cc.winSize.width / 2 - (cc.winSize.height * 1136 / 640 / 2);
-        view.setPosition(x, view.y);
+        let x = CommonFunction.setBaseViewInCenter(view);
         this.view = view;
 
+        const newIPhone = DataStore.getString("newIPhone");
+        if (newIPhone === "1") {
+            // i phone x 的黑边为  CommonFunction.IOS_ADAPTER_WIDTH
+            x = x - CommonFunction.IOS_ADAPTER_WIDTH;
+        }
         const bg = view.getChild("blueBg");
         bg.setPosition(-x, 0);
         CommonFunction.setBgFullScreen(bg);

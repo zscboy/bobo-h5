@@ -64,12 +64,28 @@ export class LobbyView extends cc.Component {
 
         const view = fgui.UIPackage.createObject("lobby_main", "Main").asCom;
         fgui.GRoot.inst.addChild(view);
-        const x = cc.winSize.width / 2 - (cc.winSize.height * 1136 / 640 / 2);
-        view.setPosition(x, view.y);
+
+        let x = CommonFunction.setBaseViewInCenter(view);
         this.view = view;
 
-        const bg = view.getChild("n21");
+        const newIPhone = DataStore.getString("newIPhone");
+        if (newIPhone === "1") {
+            // i phone x 的黑边为 CommonFunction.IOS_ADAPTER_WIDTH
+            x = x - CommonFunction.IOS_ADAPTER_WIDTH;
+        }
+        const bg = this.view.getChild('n21');
+        bg.setPosition(-x, 0);
         CommonFunction.setBgFullScreen(bg);
+
+        // const gRootNode = fgui.GRoot.inst.node;
+        // const viewNode = view.node;
+        // const bgNode = bg.node;
+        // Logger.debug(`onload  cc.winSize.width = ${cc.winSize.width}`)
+        // Logger.debug(`onload  fgui.GRoot.inst.node.position = ${gRootNode.position},
+        // width = ${ gRootNode.width } height = ${ gRootNode.height } `)
+        // Logger.debug(`onload  view.node.pos.position = ${ viewNode.position },
+        // width = ${ viewNode.width } height = ${ viewNode.height } `)
+        // Logger.debug(`onload  bg.node.position = ${ bgNode.position }, width = ${ bgNode.width } height = ${ bgNode.height } `)
 
         this.initView();
 
@@ -77,8 +93,8 @@ export class LobbyView extends cc.Component {
     }
 
     protected onDestroy(): void {
-        this.lm.eventTarget.off(`${proto.lobby.MessageCode.OPUpdateDiamond}`, this.onMessageFunc);
-        this.lm.eventTarget.off(`${proto.lobby.MessageCode.OPMail}`, this.updateEmailRedPoint);
+        this.lm.eventTarget.off(`${proto.lobby.MessageCode.OPUpdateDiamond} `, this.onMessageFunc);
+        this.lm.eventTarget.off(`${proto.lobby.MessageCode.OPMail} `, this.updateEmailRedPoint);
         this.lm.eventTarget.off("checkRoomInfo", this.checkRoomInfo);
 
         this.msgCenter.destory();
@@ -96,7 +112,7 @@ export class LobbyView extends cc.Component {
     }
 
     private updateDiamond(diamond: Long): void {
-        this.diamondText.text = `${diamond}`;
+        this.diamondText.text = `${diamond} `;
     }
 
     private wxShowCallBack(res: showRes): void {
@@ -137,15 +153,15 @@ export class LobbyView extends cc.Component {
         this.initInfoView(userInfo);
         userInfo.onClick(this.openUserInfoView, this);
 
-        const bg = this.view.getChild('n21');
-        bg.setSize(cc.winSize.width, cc.winSize.width * 640 / 1136);
-        const y = -(cc.winSize.width * 640 / 1136 - cc.winSize.height) / 2;
-        const x = (cc.winSize.height * 1136 / 640 / 2) - cc.winSize.width / 2;
-        bg.setPosition(x, y);
+        // const bg = this.view.getChild('n21');
+        // bg.setSize(cc.winSize.width, cc.winSize.width * 640 / 1136);
+        // const y = -(cc.winSize.width * 640 / 1136 - cc.winSize.height) / 2;
+        // const x = (cc.winSize.height * 1136 / 640 / 2) - cc.winSize.width / 2;
+        // bg.setPosition(x, y);
 
-        this.onMessageFunc = this.lm.eventTarget.on(`${proto.lobby.MessageCode.OPUpdateDiamond}`, this.onMessage, this);
+        this.onMessageFunc = this.lm.eventTarget.on(`${proto.lobby.MessageCode.OPUpdateDiamond} `, this.onMessage, this);
 
-        this.lm.eventTarget.on(`${proto.lobby.MessageCode.OPMail}`, this.updateEmailRedPoint, this);
+        this.lm.eventTarget.on(`${proto.lobby.MessageCode.OPMail} `, this.updateEmailRedPoint, this);
 
         this.lm.eventTarget.on(`checkRoomInfo`, this.checkRoomInfo, this);
 
@@ -155,7 +171,7 @@ export class LobbyView extends cc.Component {
 
     private async startWebSocket(): Promise<void> {
         const tk = DataStore.getString("token", "");
-        const webSocketURL = `${LEnv.lobbyWebsocket}?&tk=${tk}`;
+        const webSocketURL = `${LEnv.lobbyWebsocket}?& tk=${tk} `;
 
         this.msgCenter = new LMsgCenter(webSocketURL, this, this.lm);
         await this.msgCenter.start();
@@ -271,7 +287,7 @@ export class LobbyView extends cc.Component {
         const headImgUrl = DataStore.getString("headImgUrl");
         CommonFunction.setHead(iconLoader, headImgUrl, +gender);
 
-        idLab.text = `ID: ${DataStore.getString("userID")}`;
+        idLab.text = `ID: ${DataStore.getString("userID")} `;
         const diamondNode = this.view.getChild("diamondNode").asCom;
         const diamondText = diamondNode.getChild("diamond");
         this.diamondText = diamondText;

@@ -1,4 +1,4 @@
-import { DataStore, Dialog, HTTP, LEnv, LobbyModuleInterface, Logger, NewRoomViewPath } from "../lcore/LCoreExports";
+import { CommonFunction, DataStore, Dialog, HTTP, LEnv, LobbyModuleInterface, Logger, NewRoomViewPath } from "../lcore/LCoreExports";
 import { proto } from "../proto/protoLobby";
 import { DFRuleView, RunFastRuleView, ZJMJRuleView } from "../ruleviews/RuleViewsExports";
 import { LobbyError } from "./LobbyError";
@@ -68,8 +68,7 @@ export class NewRoomView extends cc.Component {
         const loader = lm.loader;
         loader.fguiAddPackage("lobby/fui_create_room/lobby_create_room");
         const view = fgui.UIPackage.createObject("lobby_create_room", "createRoom").asCom;
-        const x = cc.winSize.width / 2 - (cc.winSize.height * 1136 / 640 / 2);
-        view.setPosition(x, view.y);
+        CommonFunction.setViewInCenter(view);
         this.view = view;
 
         const win = new fgui.Window();

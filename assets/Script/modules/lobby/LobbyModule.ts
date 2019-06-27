@@ -203,6 +203,23 @@ export class LobbyModule extends cc.Component implements LobbyModuleInterface {
         );
     }
 
+    protected onLoad(): void {
+
+        // 默认值
+        DataStore.setItem("newIPhone", "1");
+        if (cc.sys.platform === cc.sys.WECHAT_GAME) {
+            wx.getSystemInfo({
+                success: (res) => {
+                    Logger.debug("wx.getSystemInfo res = ", res);
+                    if (res.model === 'iPhone X') {
+                        DataStore.setItem("newIPhone", "1");
+                    }
+                }
+            });
+        }
+
+    }
+
     protected start(): void {
         this.loader = new GResLoaderImpl("lobby");
         this.eventTarget = new cc.EventTarget();

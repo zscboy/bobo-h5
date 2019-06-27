@@ -1,4 +1,4 @@
-import { Dialog } from "../../../lcore/LCoreExports";
+import { CommonFunction, Dialog } from "../../../lcore/LCoreExports";
 import { ClubViewInterface } from "../ClubModuleInterface";
 
 /**
@@ -23,8 +23,7 @@ export class ModifyClubName extends cc.Component {
     protected onLoad(): void {
         this.eventTarget = new cc.EventTarget();
         const view = fgui.UIPackage.createObject("lobby_club", "modifyClubNameCom").asCom;
-        const x = cc.winSize.width / 2 - (cc.winSize.height * 1136 / 640 / 2);
-        view.setPosition(x, view.y);
+        CommonFunction.setViewInCenter(view);
         this.view = view;
 
         const win = new fgui.Window();

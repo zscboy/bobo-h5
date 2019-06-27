@@ -31,6 +31,7 @@ export class RoomSettingView extends cc.Component {
         const x = width - 480;
         this.view.setPosition(x, 0);
         // this.view.setPosition(0, 0);
+
     }
 
     protected onLoad(): void {

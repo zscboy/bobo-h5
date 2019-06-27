@@ -1,5 +1,5 @@
 
-import { LobbyModuleInterface, Logger } from "../lcore/LCoreExports";
+import { CommonFunction, LobbyModuleInterface, Logger } from "../lcore/LCoreExports";
 const { ccclass } = cc._decorator;
 
 /**
@@ -24,8 +24,7 @@ export class JoinRoom extends cc.Component {
         const loader = this.lm.loader;
         loader.fguiAddPackage("lobby/fui_join_room/lobby_join_room");
         const view = fgui.UIPackage.createObject("lobby_join_room", "joinRoom").asCom;
-        const x = cc.winSize.width / 2 - (cc.winSize.height * 1136 / 640 / 2);
-        view.setPosition(x, view.y);
+        CommonFunction.setViewInCenter(view);
         this.view = view;
 
         const win = new fgui.Window();

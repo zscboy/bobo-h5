@@ -1,3 +1,4 @@
+import { CommonFunction } from "../lobby/lcore/LCoreExports";
 import { DFRuleView, ZJMJRuleView } from "../lobby/ruleviews/RuleViewsExports";
 
 /**
@@ -44,8 +45,7 @@ export class RoomRuleViewA extends cc.Component {
         if (this.view !== null) {
             // this.room = room;
             fgui.GRoot.inst.showPopup(this.view);
-            const x = cc.winSize.width / 2 - (cc.winSize.height * 1136 / 640 / 2);
-            this.view.setPosition(x, this.view.y);
+            CommonFunction.setViewInCenter(this.view);
         }
 
     }

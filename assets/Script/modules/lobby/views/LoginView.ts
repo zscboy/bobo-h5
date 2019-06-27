@@ -1,5 +1,5 @@
 import { WeiXinSDK } from "../chanelSdk/wxSdk/WeiXinSDkExports";
-import { DataStore, Dialog, HTTP, LEnv, LobbyModuleInterface, Logger } from "../lcore/LCoreExports";
+import { CommonFunction, DataStore, Dialog, HTTP, LEnv, LobbyModuleInterface, Logger } from "../lcore/LCoreExports";
 import { proto } from "../proto/protoLobby";
 import { LobbyView } from "./LobbyView";
 
@@ -27,8 +27,16 @@ export class LoginView extends cc.Component {
         loader.fguiAddPackage("launch/fui_login/lobby_login");
         const view = fgui.UIPackage.createObject("lobby_login", "login").asCom;
 
-        const x = cc.winSize.width / 2 - (cc.winSize.height * 1136 / 640 / 2);
-        view.setPosition(x, view.y);
+        let x = CommonFunction.setBaseViewInCenter(view);
+
+        const newIPhone = DataStore.getString("newIPhone");
+        if (newIPhone === "1") {
+            // i phone x 的黑边为 CommonFunction.IOS_ADAPTER_WIDTH
+            x = x - CommonFunction.IOS_ADAPTER_WIDTH;
+        }
+        const bg = view.getChild('n1');
+        bg.setPosition(-x, 0);
+        CommonFunction.setBgFullScreen(bg);
 
         const win = new fgui.Window();
         win.contentPane = view;
@@ -85,11 +93,11 @@ export class LoginView extends cc.Component {
 
         this.weixinButton.onClick(this.onWeixinBtnClick, this);
 
-        const bg = this.viewNode.getChild('n1');
-        bg.setSize(cc.winSize.width, cc.winSize.width * 640 / 1136);
-        const y = -(cc.winSize.width * 640 / 1136 - cc.winSize.height) / 2;
-        const x = (cc.winSize.height * 1136 / 640 / 2) - cc.winSize.width / 2;
-        bg.setPosition(x, y);
+        // const bg = this.viewNode.getChild('n1');
+        // bg.setSize(cc.winSize.width, cc.winSize.width * 640 / 1136);
+        // const y = -(cc.winSize.width * 640 / 1136 - cc.winSize.height) / 2;
+        // const x = (cc.winSize.height * 1136 / 640 / 2) - cc.winSize.width / 2;
+        // bg.setPosition(x, y);
 
         // local progress = progressView.new(this)
         // progressView: updateView(this)

@@ -92,6 +92,7 @@ export class ChatView extends cc.Component {
         fgui.GRoot.inst.showPopup(this.view);
 
         //const x = cc.winSize.width / 2 - (cc.winSize.height * 1136 / 640 / 2) + (1136 - 500);
+
         const x = width - 500;
         this.view.setPosition(x, 0);
 

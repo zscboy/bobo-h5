@@ -211,8 +211,7 @@ export class ClubView extends cc.Component {
         loader.fguiAddPackage("lobby/fui_club/lobby_club");
 
         const view = fgui.UIPackage.createObject("lobby_club", "clubView").asCom;
-        const x = cc.winSize.width / 2 - (cc.winSize.height * 1136 / 640 / 2);
-        view.setPosition(x, view.y);
+        CommonFunction.setViewInCenter(view);
         this.view = view;
 
         const win = new fgui.Window();

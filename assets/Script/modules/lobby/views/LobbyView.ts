@@ -80,12 +80,12 @@ export class LobbyView extends cc.Component {
         // const gRootNode = fgui.GRoot.inst.node;
         // const viewNode = view.node;
         // const bgNode = bg.node;
-        // Logger.debug(`onload  cc.winSize.width = ${cc.winSize.width}`)
+        // Logger.debug(`onload  cc.winSize.width = ${cc.winSize.width}`);
         // Logger.debug(`onload  fgui.GRoot.inst.node.position = ${gRootNode.position},
-        // width = ${ gRootNode.width } height = ${ gRootNode.height } `)
-        // Logger.debug(`onload  view.node.pos.position = ${ viewNode.position },
-        // width = ${ viewNode.width } height = ${ viewNode.height } `)
-        // Logger.debug(`onload  bg.node.position = ${ bgNode.position }, width = ${ bgNode.width } height = ${ bgNode.height } `)
+        // width = ${ gRootNode.width} height = ${gRootNode.height} `);
+        // Logger.debug(`onload  view.node.pos.position = ${viewNode.position},
+        // width = ${ viewNode.width} height = ${viewNode.height} `);
+        // Logger.debug(`onload  bg.node.position = ${bgNode.position}, width = ${bgNode.width} height = ${bgNode.height} `);
 
         this.initView();
 

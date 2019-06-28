@@ -417,7 +417,8 @@ export class ClubView extends cc.Component {
     private onAllBtnClick(): void {
         //
         const filterGameView = this.addComponent(FilterGameView);
-        filterGameView.show(this, this.selectRoomType);
+        const viewNode = this.view.node;
+        filterGameView.show(this, this.selectRoomType, viewNode.x);
     }
 
     private onRefreshBtnClick(): void {
@@ -604,7 +605,9 @@ export class ClubView extends cc.Component {
     private onManagerBtnClick(): void {
 
         const popupView = this.addComponent(SettingPopupView);
-        popupView.show(this, this.selectedClub);
+
+        const viewNode = this.view.node;
+        popupView.show(this, this.selectedClub, viewNode.x);
     }
 
     private onMemberSettingBtnClick(): void {

@@ -32,7 +32,7 @@ export class SettingPopupView extends cc.Component {
         this.clubView.showQuicklyCreateView();
     }
 
-    public show(clubView: ClubViewInterface, clubInfo: proto.club.IMsgClubInfo): void {
+    public show(clubView: ClubViewInterface, clubInfo: proto.club.IMsgClubInfo, offset: number): void {
         this.clubView = clubView;
         this.clubInfo = clubInfo;
         const settingPopupView = fgui.UIPackage.createObject("lobby_club", "settingPopup").asCom;
@@ -40,7 +40,7 @@ export class SettingPopupView extends cc.Component {
 
         this.initView();
         fgui.GRoot.inst.showPopup(this.view);
-        this.view.setPosition(949, 106);
+        this.view.setPosition(offset + 949, 106);
 
     }
 

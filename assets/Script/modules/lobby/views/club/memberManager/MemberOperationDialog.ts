@@ -29,7 +29,6 @@ export class MemberOperationDialog extends cc.Component {
 
         this.initView();
         fgui.GRoot.inst.showPopup(this.view);
-        //this.view.setPosition(255, 180);
 
     }
 

@@ -1,4 +1,4 @@
-import { Dialog, Logger } from "../lobby/lcore/LCoreExports";
+import { CommonFunction, DataStore, Dialog, KeyConstants, Logger } from "../lobby/lcore/LCoreExports";
 import { ChatView } from "../lobby/views/chat/ChatExports";
 import { DisBandPlayerInfo, DisbandView } from "../lobby/views/disbandRoom/DisbandViewExports";
 import { RoomSettingView } from "../lobby/views/roomSetting/RoomSettingViewExports";
@@ -333,7 +333,14 @@ export class RoomView {
         const isOwner = this.room.ownerID === this.room.getMyPlayerInfo().userID;
         const bg = this.unityViewNode.getChild("blueBg");
 
-        settingView.showView(this.room, this.room.getRoomHost().getLobbyModuleLoader(), isOwner, bg.width);
+        let width = bg.width;
+
+        const newIPhone = DataStore.getString(KeyConstants.ADAPTIVE_PHONE_KEY);
+        if (newIPhone === "1") {
+            // i phone x 的黑边为 IOS_ADAPTER_WIDTH
+            width = width + CommonFunction.IOS_ADAPTER_WIDTH;
+        }
+        settingView.showView(this.room, this.room.getRoomHost().getLobbyModuleLoader(), isOwner, width);
     }
 
     /**
@@ -352,8 +359,16 @@ export class RoomView {
 
         const bg = this.unityViewNode.getChild("blueBg");
 
+        let width = bg.width;
+
+        const newIPhone = DataStore.getString(KeyConstants.ADAPTIVE_PHONE_KEY);
+        if (newIPhone === "1") {
+            // i phone x 的黑边为 IOS_ADAPTER_WIDTH
+            width = width + CommonFunction.IOS_ADAPTER_WIDTH;
+        }
+
         const callBack: Function = <Function>this.room.showMsg.bind(this.room);
-        chatView.show(load, callBack, bg.width);
+        chatView.show(load, callBack, width);
     }
     /**
      * 初始化

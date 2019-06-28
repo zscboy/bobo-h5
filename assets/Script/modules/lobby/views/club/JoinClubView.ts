@@ -1,4 +1,4 @@
-import { CommonFunction, DataStore, Dialog, HTTP, LEnv, Logger } from "../../lcore/LCoreExports";
+import { CommonFunction, DataStore, Dialog, HTTP, KeyConstants, LEnv, Logger } from "../../lcore/LCoreExports";
 import { proto } from "../../proto/protoLobby";
 import { ClubRequestError } from "./ClubRequestError";
 
@@ -152,7 +152,7 @@ export class JoinClubView extends cc.Component {
 
     private requestJoinClub(clubNumber: string): void {
 
-        const tk = DataStore.getString("token", "");
+        const tk = DataStore.getString(KeyConstants.TOKEN, "");
         const url = `${LEnv.rootURL}${LEnv.joinClub}?&tk=${tk}&clubNumber=${clubNumber}`;
 
         const cb = (xhr: XMLHttpRequest, err: string) => {

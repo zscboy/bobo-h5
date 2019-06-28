@@ -1,7 +1,7 @@
 import { WeiXinSDK } from "../chanelSdk/wxSdk/WeiXinSDkExports";
 import {
     CommonFunction,
-    DataStore, Dialog, GameModuleLaunchArgs, LEnv, LobbyModuleInterface, Logger, NewRoomViewPath
+    DataStore, Dialog, GameModuleLaunchArgs, KeyConstants, LEnv, LobbyModuleInterface, Logger, NewRoomViewPath
 } from "../lcore/LCoreExports";
 import { LMsgCenter } from "../LMsgCenter";
 import { proto } from "../proto/protoLobby";
@@ -68,7 +68,7 @@ export class LobbyView extends cc.Component {
         let x = CommonFunction.setBaseViewInCenter(view);
         this.view = view;
 
-        const newIPhone = DataStore.getString("newIPhone");
+        const newIPhone = DataStore.getString(KeyConstants.ADAPTIVE_PHONE_KEY);
         if (newIPhone === "1") {
             // i phone x 的黑边为 CommonFunction.IOS_ADAPTER_WIDTH
             x = x - CommonFunction.IOS_ADAPTER_WIDTH;
@@ -170,7 +170,7 @@ export class LobbyView extends cc.Component {
     }
 
     private async startWebSocket(): Promise<void> {
-        const tk = DataStore.getString("token", "");
+        const tk = DataStore.getString(KeyConstants.TOKEN, "");
         const webSocketURL = `${LEnv.lobbyWebsocket}?& tk=${tk} `;
 
         this.msgCenter = new LMsgCenter(webSocketURL, this, this.lm);
@@ -241,7 +241,7 @@ export class LobbyView extends cc.Component {
     }
 
     private onReturnGameBtnClick(): void {
-        const jsonStr = DataStore.getString("RoomInfoData");
+        const jsonStr = DataStore.getString(KeyConstants.ROOM_INFO_DATA);
         Logger.debug("jsonStr:", jsonStr);
         if (jsonStr !== "") {
             try {
@@ -257,7 +257,7 @@ export class LobbyView extends cc.Component {
             } catch (e) {
                 Logger.error("parse config error:", e);
                 // 如果解析不了，则清理数据
-                DataStore.setItem("RoomInfoData", "");
+                DataStore.setItem(KeyConstants.ROOM_INFO_DATA, "");
             }
         }
     }
@@ -271,27 +271,27 @@ export class LobbyView extends cc.Component {
         const nameLab = userInfo.getChild("name");
         const idLab = userInfo.getChild("id");
 
-        if (DataStore.hasKey("nickName")) {
-            const name = DataStore.getString("nickName");
+        if (DataStore.hasKey(KeyConstants.NICK_NAME)) {
+            const name = DataStore.getString(KeyConstants.NICK_NAME);
 
             if (name.length < 1) {
                 nameLab.text = "默认用户名字";
             } else {
-                nameLab.text = DataStore.getString("userID");
+                nameLab.text = DataStore.getString(KeyConstants.USER_ID);
             }
 
         }
 
-        const gender = +DataStore.getString("sex");
+        const gender = +DataStore.getString(KeyConstants.SEX);
         const iconLoader = userInfo.getChild("loader").asLoader;
-        const headImgUrl = DataStore.getString("headImgUrl");
+        const headImgUrl = DataStore.getString(KeyConstants.HEAL_IMG_URL);
         CommonFunction.setHead(iconLoader, headImgUrl, +gender);
 
-        idLab.text = `ID: ${DataStore.getString("userID")} `;
+        idLab.text = `ID: ${DataStore.getString(KeyConstants.USER_ID)} `;
         const diamondNode = this.view.getChild("diamondNode").asCom;
-        const diamondText = diamondNode.getChild("diamond");
+        const diamondText = diamondNode.getChild(KeyConstants.DIAMOND);
         this.diamondText = diamondText;
-        this.diamondText.text = DataStore.getString("diamond");
+        this.diamondText.text = DataStore.getString(KeyConstants.DIAMOND);
 
         const addDiamond = diamondNode.getChild("addDiamond");
         addDiamond.onClick(this.goShop, this);
@@ -309,7 +309,7 @@ export class LobbyView extends cc.Component {
 
     private checkRoomInfo(): void {
         //
-        const jsonStr = DataStore.getString("RoomInfoData");
+        const jsonStr = DataStore.getString(KeyConstants.ROOM_INFO_DATA);
         Logger.debug("checkRoomInfo jsonStr:", jsonStr);
         if (jsonStr !== "") {
             this.view.getController("inRoom").selectedIndex = 1;

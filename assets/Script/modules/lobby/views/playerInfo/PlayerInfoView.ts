@@ -1,4 +1,4 @@
-import { CommonFunction, GResLoader, LobbyModuleInterface, Logger } from "../../lcore/LCoreExports";
+import { CommonFunction, GResLoader, KeyConstants, LobbyModuleInterface, Logger } from "../../lcore/LCoreExports";
 import { proto } from "../../proto/protoLobby";
 
 interface PropData {
@@ -102,7 +102,7 @@ export class PlayerInfoView extends cc.Component {
         this.numberText = this.view.getChild("number").asTextField;
         this.xinNumText = this.view.getChild("xinNum").asTextField;
         this.zuanNumText = this.view.getChild("zuanNum").asTextField;
-        this.sexImage = this.view.getChild("sex").asLoader;
+        this.sexImage = this.view.getChild(KeyConstants.SEX).asLoader;
         const head = this.view.getChild("head").asCom;
         this.headLoader = head.getChild("n0").asLoader;
         //  button

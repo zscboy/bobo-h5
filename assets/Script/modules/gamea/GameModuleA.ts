@@ -1,7 +1,7 @@
 import {
     AnimationMgr, CommonFunction, DataStore, Dialog,
     GameModuleInterface, GameModuleLaunchArgs, GResLoader,
-    LEnv, LobbyModuleInterface, Logger, MsgQueue, MsgType, RoomInfo, UserInfo, WS
+    KeyConstants, LEnv, LobbyModuleInterface, Logger, MsgQueue, MsgType, RoomInfo, UserInfo, WS
 } from "../lobby/lcore/LCoreExports";
 import { proto } from "./proto/protoGameA";
 import { ReplayA } from "./ReplayA";
@@ -71,7 +71,7 @@ export class GameModuleA extends cc.Component implements GameModuleInterface {
         let x = CommonFunction.setBaseViewInCenter(view);
         this.view = view;
 
-        const newIPhone = DataStore.getString("newIPhone");
+        const newIPhone = DataStore.getString(KeyConstants.ADAPTIVE_PHONE_KEY);
         if (newIPhone === "1") {
             // i phone x 的黑边为  CommonFunction.IOS_ADAPTER_WIDTH
             x = x - CommonFunction.IOS_ADAPTER_WIDTH;
@@ -138,7 +138,7 @@ export class GameModuleA extends cc.Component implements GameModuleInterface {
 
         // 测试用
         const host = LEnv.gameHost;
-        const tk = DataStore.getString("token", "");
+        const tk = DataStore.getString(KeyConstants.TOKEN, "");
         let url;
         const rID = roomInfo.roomID;
         const uID = myUser.userID;

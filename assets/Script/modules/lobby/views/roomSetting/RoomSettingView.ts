@@ -1,4 +1,4 @@
-import { DataStore, Dialog, GResLoader } from "../../lcore/LCoreExports";
+import { DataStore, Dialog, GResLoader, KeyConstants } from "../../lcore/LCoreExports";
 
 export interface RoomInterface {
     switchBg(agree: number): void;
@@ -76,8 +76,8 @@ export class RoomSettingView extends cc.Component {
         const arrowBtn = this.view.getChild("arrowBtn");
         arrowBtn.onClick(this.onArrowBtnClick, this);
 
-        let soundVolume = DataStore.getString("soundVolume");
-        let musicVolume = DataStore.getString("musicVolume");
+        let soundVolume = DataStore.getString(KeyConstants.SOUND_VOLUME);
+        let musicVolume = DataStore.getString(KeyConstants.MUSIC_VOLUME);
 
         this.soundSlider = this.view.getChild("soundSlider").asSlider;
         if (soundVolume === "") {
@@ -97,8 +97,8 @@ export class RoomSettingView extends cc.Component {
         this.view.on(fgui.Event.UNDISPLAY, this.saveData, this);
     }
     private saveData(): void {
-        DataStore.setItem("soundVolume", this.soundSlider.value.toString());
-        DataStore.setItem("musicVolume", this.musicSlider.value.toString());
+        DataStore.setItem(KeyConstants.SOUND_VOLUME, this.soundSlider.value.toString());
+        DataStore.setItem(KeyConstants.MUSIC_VOLUME, this.musicSlider.value.toString());
     }
     private onMusicSliderChanged(slider: fgui.GSlider): void {
         // Logger.debug("onMusicSliderChanged slider = ", slider.value

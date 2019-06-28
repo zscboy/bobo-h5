@@ -1,4 +1,7 @@
-import { CommonFunction, DataStore, Dialog, HTTP, LEnv, LobbyModuleInterface, Logger, NewRoomViewPath } from "../../lcore/LCoreExports";
+import {
+    CommonFunction, DataStore, Dialog, HTTP, KeyConstants, LEnv,
+    LobbyModuleInterface, Logger, NewRoomViewPath
+} from "../../lcore/LCoreExports";
 import { proto } from "../../proto/protoLobby";
 // import { Share } from "../../shareUtil/ShareExports";
 import { LobbyError } from "../LobbyError";
@@ -83,7 +86,7 @@ export class ClubView extends cc.Component {
      */
     public disbandClub(): void {
 
-        const tk = DataStore.getString("token", "");
+        const tk = DataStore.getString(KeyConstants.TOKEN, "");
         const url = `${LEnv.rootURL}${LEnv.deleteClub}?&tk=${tk}&clubID=${this.selectedClub.baseInfo.clubID}`;
 
         const cb = (xhr: XMLHttpRequest, err: string) => {
@@ -98,7 +101,7 @@ export class ClubView extends cc.Component {
      */
     public modifyClubName(name: string): void {
 
-        const tk = DataStore.getString("token", "");
+        const tk = DataStore.getString(KeyConstants.TOKEN, "");
         const url = `${LEnv.rootURL}${LEnv.renameClub}?&tk=${tk}&clubID=${this.selectedClub.baseInfo.clubID}&clname=${name}`;
 
         const cb = (xhr: XMLHttpRequest, err: string) => {
@@ -122,7 +125,7 @@ export class ClubView extends cc.Component {
      * 退出茶馆
      */
     public quitClub(): void {
-        const tk = DataStore.getString("token", "");
+        const tk = DataStore.getString(KeyConstants.TOKEN, "");
         const url = `${LEnv.rootURL}${LEnv.quitClub}?&tk=${tk}&clubID=${this.selectedClub.baseInfo.clubID}`;
 
         const cb = (xhr: XMLHttpRequest, err: string) => {
@@ -145,7 +148,7 @@ export class ClubView extends cc.Component {
     }
 
     public loadClubRooms(): void {
-        const tk = DataStore.getString("token", "");
+        const tk = DataStore.getString(KeyConstants.TOKEN, "");
         const url = `${LEnv.rootURL}${LEnv.loadClubRooms}?&tk=${tk}&clubID=${this.selectedClub.baseInfo.clubID}`;
 
         const cb = (xhr: XMLHttpRequest, err: string) => {
@@ -171,7 +174,7 @@ export class ClubView extends cc.Component {
     }
 
     public disBandRoomNotify(roomId: string): void {
-        const roomInfoData = DataStore.getString("RoomInfoData");
+        const roomInfoData = DataStore.getString(KeyConstants.ROOM_INFO_DATA);
 
         if (roomInfoData !== undefined && roomInfoData !== null && roomInfoData !== "") {
 
@@ -179,7 +182,7 @@ export class ClubView extends cc.Component {
                 const config = <{ [key: string]: string }>JSON.parse(roomInfoData);
 
                 if (config.roomID === roomId) {
-                    DataStore.setItem("RoomInfoData", "");
+                    DataStore.setItem(KeyConstants.ROOM_INFO_DATA, "");
                     const lm = <LobbyModuleInterface>this.getComponent("LobbyModule");
                     lm.eventTarget.emit(`checkRoomInfo`);
                 }
@@ -232,7 +235,7 @@ export class ClubView extends cc.Component {
         this.noClubPage = this.content.getChild("noClubPage").asCom;
 
         const diamondText = this.view.getChild("diamondText");
-        diamondText.text = DataStore.getString("diamond");
+        diamondText.text = DataStore.getString(KeyConstants.DIAMOND);
 
         this.initClickListener();
 
@@ -430,7 +433,7 @@ export class ClubView extends cc.Component {
 
         if (this.selectedClub.createRoomOptions !== null && this.selectedClub.createRoomOptions !== "") {
 
-            const roomInfoData = DataStore.getString("RoomInfoData");
+            const roomInfoData = DataStore.getString(KeyConstants.ROOM_INFO_DATA);
 
             if (roomInfoData !== undefined && roomInfoData !== null && roomInfoData !== "") {
                 Dialog.prompt("已经在房间内");
@@ -493,7 +496,7 @@ export class ClubView extends cc.Component {
 
     private onReturn2GameBtnClick(): void {
         //
-        const jsonStr = DataStore.getString("RoomInfoData");
+        const jsonStr = DataStore.getString(KeyConstants.ROOM_INFO_DATA);
         if (jsonStr !== "") {
             try {
                 const config = <{ [key: string]: string }>JSON.parse(jsonStr);
@@ -512,7 +515,7 @@ export class ClubView extends cc.Component {
             } catch (e) {
                 Logger.error("parse config error:", e);
                 // 如果解析不了，则清理数据
-                DataStore.setItem("RoomInfoData", "");
+                DataStore.setItem(KeyConstants.ROOM_INFO_DATA, "");
             }
         }
 
@@ -528,7 +531,7 @@ export class ClubView extends cc.Component {
         //
         const ruleJson = this.selectedClub.createRoomOptions;
         Logger.debug("ClubView.quickCreateRoom, ruleJson:", ruleJson);
-        const tk = DataStore.getString("token", "");
+        const tk = DataStore.getString(KeyConstants.TOKEN, "");
 
         const createRoomURL = `${LEnv.rootURL}${LEnv.createClubRoom}?&tk=${tk}&clubID=${this.selectedClub.baseInfo.clubID}`;
 
@@ -867,7 +870,7 @@ export class ClubView extends cc.Component {
     }
 
     private isManager(): boolean {
-        const userId = DataStore.getString("userID", "");
+        const userId = DataStore.getString(KeyConstants.USER_ID, "");
         const clubOwnerId = this.selectedClub.creatorUserID;
         const managers = this.selectedClub.managers;
         let isManager = false;
@@ -905,7 +908,7 @@ export class ClubView extends cc.Component {
     }
 
     private loadAllClub(): void {
-        const tk = DataStore.getString("token", "");
+        const tk = DataStore.getString(KeyConstants.TOKEN, "");
         const url = `${LEnv.rootURL}${LEnv.loadMyClubs}?&tk=${tk}`;
 
         const cb = (xhr: XMLHttpRequest, err: string) => {
@@ -927,7 +930,7 @@ export class ClubView extends cc.Component {
     }
 
     private loadClub(clubID: string): void {
-        const tk = DataStore.getString("token", "");
+        const tk = DataStore.getString(KeyConstants.TOKEN, "");
         const url = `${LEnv.rootURL}${LEnv.loadClub}?&tk=${tk}&clubID=${clubID}`;
 
         const cb = (xhr: XMLHttpRequest, err: string) => {
@@ -953,7 +956,7 @@ export class ClubView extends cc.Component {
 
         this.allRoomInfos = [];
 
-        const roomInfoData = DataStore.getString("RoomInfoData");
+        const roomInfoData = DataStore.getString(KeyConstants.ROOM_INFO_DATA);
 
         if (roomInfoData !== undefined && roomInfoData !== null && roomInfoData !== "") {
             this.clubPage.asCom.getController("isInRoom").selectedIndex = 1;

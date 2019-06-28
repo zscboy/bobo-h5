@@ -1,5 +1,5 @@
 import { WeiXinSDK } from "../chanelSdk/wxSdk/WeiXinSDkExports";
-import { CommonFunction, DataStore, Dialog, HTTP, LEnv, LobbyModuleInterface, Logger } from "../lcore/LCoreExports";
+import { CommonFunction, DataStore, Dialog, HTTP, KeyConstants, LEnv, LobbyModuleInterface, Logger } from "../lcore/LCoreExports";
 import { proto } from "../proto/protoLobby";
 import { LobbyView } from "./LobbyView";
 
@@ -29,7 +29,7 @@ export class LoginView extends cc.Component {
 
         let x = CommonFunction.setBaseViewInCenter(view);
 
-        const newIPhone = DataStore.getString("newIPhone");
+        const newIPhone = DataStore.getString(KeyConstants.ADAPTIVE_PHONE_KEY);
         if (newIPhone === "1") {
             // i phone x 的黑边为 CommonFunction.IOS_ADAPTER_WIDTH
             x = x - CommonFunction.IOS_ADAPTER_WIDTH;
@@ -126,7 +126,7 @@ export class LoginView extends cc.Component {
 
     public quicklyLogin(): void {
         // 快速登录
-        const account = DataStore.getString("account", "");
+        const account = DataStore.getString(KeyConstants.ACCOUNT, "");
         const quicklyLoginURL = `${LEnv.rootURL}${LEnv.quicklyLogin}?&account=${account}`;
 
         Logger.trace("quicklyLogin, quicklyLoginURL:", quicklyLoginURL);
@@ -165,9 +165,9 @@ export class LoginView extends cc.Component {
 
     public saveWxLoginReply(wxLoginReply: proto.lobby.MsgLoginReply): void {
 
-        DataStore.setItem("token", wxLoginReply.token);
+        DataStore.setItem(KeyConstants.TOKEN, wxLoginReply.token);
         const roomInfo = wxLoginReply.lastRoomInfo;
-        DataStore.setItem("RoomInfoData", "");
+        DataStore.setItem(KeyConstants.ROOM_INFO_DATA, "");
         if (roomInfo !== undefined && roomInfo !== null) {
             const roomInfoData = {
                 roomID: roomInfo.roomID,
@@ -177,27 +177,27 @@ export class LoginView extends cc.Component {
             };
 
             const roomInfoDataStr = JSON.stringify(roomInfoData);
-            DataStore.setItem("RoomInfoData", roomInfoDataStr);
+            DataStore.setItem(KeyConstants.ROOM_INFO_DATA, roomInfoDataStr);
         }
 
         const userInfo = wxLoginReply.userInfo;
-        DataStore.setItem("userID", userInfo.userID);
-        DataStore.setItem("nickName", userInfo.nickName);
+        DataStore.setItem(KeyConstants.USER_ID, userInfo.userID);
+        DataStore.setItem(KeyConstants.NICK_NAME, userInfo.nickName);
         DataStore.setItem("gender", userInfo.gender);
         DataStore.setItem("province", userInfo.province);
         DataStore.setItem("city", userInfo.city);
-        DataStore.setItem("diamond", userInfo.diamond);
+        DataStore.setItem(KeyConstants.DIAMOND, userInfo.diamond);
         DataStore.setItem("country", userInfo.country);
-        DataStore.setItem("headImgUrl", userInfo.headImgUrl);
+        DataStore.setItem(KeyConstants.HEAL_IMG_URL, userInfo.headImgUrl);
         DataStore.setItem("phone", userInfo.phone);
     }
 
     public saveQuicklyLoginReply(quicklyLoginReply: proto.lobby.MsgQuicklyLoginReply): void {
-        DataStore.setItem("account", quicklyLoginReply.account);
-        DataStore.setItem("token", quicklyLoginReply.token);
+        DataStore.setItem(KeyConstants.ACCOUNT, quicklyLoginReply.account);
+        DataStore.setItem(KeyConstants.TOKEN, quicklyLoginReply.token);
 
         const roomInfo = quicklyLoginReply.lastRoomInfo;
-        DataStore.setItem("RoomInfoData", "");
+        DataStore.setItem(KeyConstants.ROOM_INFO_DATA, "");
         if (roomInfo !== undefined && roomInfo !== null) {
             const roomInfoData = {
                 roomID: roomInfo.roomID,
@@ -207,18 +207,18 @@ export class LoginView extends cc.Component {
             };
 
             const roomInfoDataStr = JSON.stringify(roomInfoData);
-            DataStore.setItem("RoomInfoData", roomInfoDataStr);
+            DataStore.setItem(KeyConstants.ROOM_INFO_DATA, roomInfoDataStr);
         }
 
         const userInfo = quicklyLoginReply.userInfo;
-        DataStore.setItem("userID", userInfo.userID);
-        DataStore.setItem("nickName", userInfo.nickName);
+        DataStore.setItem(KeyConstants.USER_ID, userInfo.userID);
+        DataStore.setItem(KeyConstants.NICK_NAME, userInfo.nickName);
         DataStore.setItem("gender", userInfo.gender);
         DataStore.setItem("province", userInfo.province);
         DataStore.setItem("city", userInfo.city);
-        DataStore.setItem("diamond", userInfo.diamond);
+        DataStore.setItem(KeyConstants.DIAMOND, userInfo.diamond);
         DataStore.setItem("country", userInfo.country);
-        DataStore.setItem("headImgUrl", userInfo.headImgUrl);
+        DataStore.setItem(KeyConstants.HEAL_IMG_URL, userInfo.headImgUrl);
         DataStore.setItem("phone", userInfo.phone);
     }
 

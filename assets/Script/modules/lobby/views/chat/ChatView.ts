@@ -1,4 +1,4 @@
-import { DataStore, Dialog, GResLoader, HTTP, LEnv, LobbyModuleInterface, Logger } from "../../lcore/LCoreExports";
+import { DataStore, Dialog, GResLoader, HTTP, KeyConstants, LEnv, LobbyModuleInterface, Logger } from "../../lcore/LCoreExports";
 import { proto } from "../../proto/protoLobby";
 // tslint:disable-next-line:no-require-imports
 import bytebuffer = require("../../protobufjs/bytebuffer");
@@ -82,7 +82,7 @@ export class ChatView extends cc.Component {
 
             this.initView();
             this.testLists();
-            this.userID = DataStore.getString("userID", "");
+            this.userID = DataStore.getString(KeyConstants.USER_ID, "");
 
             this.lobbyModule = <LobbyModuleInterface>this.node.getParent().getComponent("LobbyModule");
             if (this.lobbyModule !== null) {
@@ -208,8 +208,8 @@ export class ChatView extends cc.Component {
     }
 
     private sendMsg(msg: string, dataType: proto.lobby.ChatDataType): void {
-        const tk = DataStore.getString("token", "");
-        const nickName = DataStore.getString("nickName", "");
+        const tk = DataStore.getString(KeyConstants.TOKEN, "");
+        const nickName = DataStore.getString(KeyConstants.NICK_NAME, "");
         const url = `${LEnv.rootURL}${LEnv.chat}?tk=${tk}`;
         const data = {
             msg: msg,

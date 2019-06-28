@@ -1,4 +1,7 @@
-import { CommonFunction, DataStore, Dialog, HTTP, LEnv, LobbyModuleInterface, Logger, NewRoomViewPath } from "../lcore/LCoreExports";
+import {
+    CommonFunction, DataStore, Dialog, HTTP, KeyConstants,
+    LEnv, LobbyModuleInterface, Logger, NewRoomViewPath
+} from "../lcore/LCoreExports";
 import { proto } from "../proto/protoLobby";
 import { DFRuleView, RunFastRuleView, ZJMJRuleView } from "../ruleviews/RuleViewsExports";
 import { LobbyError } from "./LobbyError";
@@ -167,7 +170,7 @@ export class NewRoomView extends cc.Component {
 
     private createRoom(ruleJson: string): void {
         Logger.debug("NewRoomView.createRoom, ruleJson:", ruleJson);
-        const tk = DataStore.getString("token", "");
+        const tk = DataStore.getString(KeyConstants.TOKEN, "");
         let createRoomURL: string = "";
 
         if (this.club !== undefined && this.club !== null && this.club !== "") {
@@ -293,7 +296,7 @@ export class NewRoomView extends cc.Component {
     }
 
     private loadRoomPrice(): void {
-        const tk = DataStore.getString("token", "");
+        const tk = DataStore.getString(KeyConstants.TOKEN, "");
         const loadRoomPriceCfgsURL = `${LEnv.rootURL}${LEnv.loadRoomPriceCfgs}?&tk=${tk}`;
         HTTP.hGet(
             this.eventTarget,

@@ -1,4 +1,4 @@
-import { CommonFunction, DataStore, HTTP, LEnv, Logger } from "../../../lcore/LCoreExports";
+import { CommonFunction, DataStore, HTTP, KeyConstants, LEnv, Logger } from "../../../lcore/LCoreExports";
 import { proto } from "../../../proto/protoLobby";
 import { ClubRequestError } from "../ClubRequestError";
 
@@ -120,7 +120,7 @@ export class AppointManagerView extends cc.Component {
 
     private loadClubMgrs(): void {
         //
-        const tk = DataStore.getString("token", "");
+        const tk = DataStore.getString(KeyConstants.TOKEN, "");
         const loadRecordUrl = `${LEnv.rootURL}${LEnv.loadClubMgrs}?&tk=${tk}&clubID=${this.clubInfo.baseInfo.clubID}`;
 
         const cb = (xhr: XMLHttpRequest, err: string) => {
@@ -209,7 +209,7 @@ export class AppointManagerView extends cc.Component {
 
     private loadMember(): void {
         //
-        const tk = DataStore.getString("token", "");
+        const tk = DataStore.getString(KeyConstants.TOKEN, "");
         const loadMemberUrl = `${LEnv.rootURL}${LEnv.loadClubMembers}?&tk=${tk}&clubID=${this.clubInfo.baseInfo.clubID} `;
 
         const cb = (xhr: XMLHttpRequest, err: string) => {
@@ -235,7 +235,7 @@ export class AppointManagerView extends cc.Component {
 
     private changeManagerRequest(member: proto.club.IMsgClubMemberInfo, role: proto.club.ClubRoleType): void {
 
-        const tk = DataStore.getString("token", "");
+        const tk = DataStore.getString(KeyConstants.TOKEN, "");
         const baseUrl = `${LEnv.rootURL}${LEnv.changeRole}?&`;
         const params = `tk=${tk}&clubID=${this.clubInfo.baseInfo.clubID}&memberID=${member.userID}&role=${role}`;
         const url = `${baseUrl}${params}`;

@@ -1,4 +1,4 @@
-import { CommonFunction, DataStore, HTTP, LEnv, Logger, NewRoomViewPath } from "../../../lcore/LCoreExports";
+import { CommonFunction, DataStore, HTTP, KeyConstants, LEnv, Logger, NewRoomViewPath } from "../../../lcore/LCoreExports";
 import { proto } from "../../../proto/protoLobby";
 import { NewRoomView } from "../../NewRoomView";
 import { RoomRuleString } from "./RoomRuleString";
@@ -73,7 +73,7 @@ export class QuicklyCreateRoomView extends cc.Component {
     }
 
     private setConfig(ruleJson: string): void {
-        const tk = DataStore.getString("token", "");
+        const tk = DataStore.getString(KeyConstants.TOKEN, "");
         const url = `${LEnv.rootURL}${LEnv.setRoomOptions}?&tk=${tk}&clubID=${this.clubInfo.baseInfo.clubID}&options=${ruleJson}`;
 
         const cb = (xhr: XMLHttpRequest, err: string) => {

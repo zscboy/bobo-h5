@@ -1,7 +1,7 @@
 import {
     AnimationMgr, CommonFunction, DataStore, Dialog,
     GameModuleInterface, GameModuleLaunchArgs, GResLoader,
-    LEnv, LobbyModuleInterface, Logger, MsgQueue, MsgType, RoomInfo, UserInfo, WS
+    KeyConstants, LEnv, LobbyModuleInterface, Logger, MsgQueue, MsgType, RoomInfo, UserInfo, WS
 } from "../lobby/lcore/LCoreExports";
 import { proto } from "./proto/protoGame";
 import { Replay } from "./Replay";
@@ -71,7 +71,7 @@ export class GameModule extends cc.Component implements GameModuleInterface {
         let x = CommonFunction.setBaseViewInCenter(view);
         this.view = view;
 
-        const newIPhone = DataStore.getString("newIPhone");
+        const newIPhone = DataStore.getString(KeyConstants.ADAPTIVE_PHONE_KEY);
         if (newIPhone === "1") {
             // i phone x 的黑边为  CommonFunction.IOS_ADAPTER_WIDTH
             x = x - CommonFunction.IOS_ADAPTER_WIDTH;
@@ -141,7 +141,7 @@ export class GameModule extends cc.Component implements GameModuleInterface {
 
         // 测试用
         const host = LEnv.gameHost;
-        const tk = DataStore.getString("token", "");
+        const tk = DataStore.getString(KeyConstants.TOKEN, "");
         let url;
         const rID = roomInfo.roomID;
         const uID = myUser.userID;
@@ -273,14 +273,14 @@ export class GameModule extends cc.Component implements GameModuleInterface {
             // 进入房间错误提示
             Logger.debug(" server return enter mRoom ~= 0");
             //  进入房间错误清除保留的房间信息
-            DataStore.setItem("RoomInfoData", "");
+            DataStore.setItem(KeyConstants.ROOM_INFO_DATA, "");
             await this.showEnterRoomError(enterRoomResult.status);
 
             return;
         }
 
         //  进入房间错误清除保留的房间信息
-        DataStore.setItem("RoomInfoData", "");
+        DataStore.setItem(KeyConstants.ROOM_INFO_DATA, "");
         await this.pumpMsg();
         Logger.debug("doEnterRoom leave---");
     }

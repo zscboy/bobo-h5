@@ -1,4 +1,5 @@
 import { DataStore } from "./DataStore";
+import { KeyConstants } from "./KeyConstants";
 
 /**
  * 公共函数类
@@ -44,7 +45,7 @@ export namespace CommonFunction {
     export const setBaseViewInCenter = (view: fgui.GObject): number => {
         //
         let x = cc.winSize.width / 2 - (cc.winSize.height * 1136 / 640 / 2);
-        const newIPhone = DataStore.getString("newIPhone");
+        const newIPhone = DataStore.getString(KeyConstants.ADAPTIVE_PHONE_KEY);
         if (newIPhone === "1") {
             // i phone x 的黑边为 IOS_ADAPTER_WIDTH
             x = (cc.winSize.width - IOS_ADAPTER_WIDTH) / 2 - (cc.winSize.height * 1136 / 640 / 2) + IOS_ADAPTER_WIDTH;
@@ -94,7 +95,7 @@ export namespace CommonFunction {
         const realWidth = node.width * srcScaleForShowAll;
         const realHeight = node.height * srcScaleForShowAll;
 
-        const newIPhone = DataStore.getString("newIPhone");
+        const newIPhone = DataStore.getString(KeyConstants.ADAPTIVE_PHONE_KEY);
         //Logger.debug("DataStore.getString newIPhone = ", newIPhone)
         let offset = 0;
         if (newIPhone === "1") {

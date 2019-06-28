@@ -125,7 +125,7 @@ export class JoinRoom extends cc.Component {
     }
 
     // private requetJoinRoom(roomNumber: string): void {
-    //     const tk = DataStore.getString("token", "");
+    //     const tk = DataStore.getString(KeyConstants.TOKEN, "");
     //     const joinRoomURL = `${LEnv.rootURL}${LEnv.requestRoomInfo}?&tk=${tk}&roomNumber=${roomNumber}`;
 
     //     Logger.trace("joinRoomURL, joinRoomURL:", joinRoomURL);

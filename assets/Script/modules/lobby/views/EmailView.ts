@@ -1,4 +1,4 @@
-import { CommonFunction, DataStore, Dialog, HTTP, LEnv, LobbyModuleInterface, Logger } from "../lcore/LCoreExports";
+import { CommonFunction, DataStore, Dialog, HTTP, KeyConstants, LEnv, LobbyModuleInterface, Logger } from "../lcore/LCoreExports";
 import { proto } from "../proto/protoLobby";
 
 /**
@@ -185,7 +185,7 @@ export class EmailView extends cc.Component {
      * 拉取邮件
      */
     private loadEmail(): void {
-        const tk = DataStore.getString("token", "");
+        const tk = DataStore.getString(KeyConstants.TOKEN, "");
         const url = `${LEnv.rootURL}${LEnv.loadMails}?&rt=1&tk=${tk}`;
         const cb = (xhr: XMLHttpRequest, err: string) => {
 
@@ -254,7 +254,7 @@ export class EmailView extends cc.Component {
      */
     private setRead(email: proto.lobby.IMsgMail, obj: fgui.GObject): void {
 
-        const tk = DataStore.getString("token", "");
+        const tk = DataStore.getString(KeyConstants.TOKEN, "");
         const setReadEmailUrl = `${LEnv.rootURL}${LEnv.setMailRead}?&tk=${tk}&mailID=${email.id}`;
 
         const cb = (xhr: XMLHttpRequest, err: string) => {
@@ -298,7 +298,7 @@ export class EmailView extends cc.Component {
      * @param email 邮件
      */
     private takeAttachment(email: proto.lobby.IMsgMail): void {
-        const tk = DataStore.getString("token", "");
+        const tk = DataStore.getString(KeyConstants.TOKEN, "");
         const setReadEmailUrl = `${LEnv.rootURL}${LEnv.receiveAttachment}?&tk=${tk}&mailID=${email.id}`;
 
         const cb = (xhr: XMLHttpRequest, err: string) => {

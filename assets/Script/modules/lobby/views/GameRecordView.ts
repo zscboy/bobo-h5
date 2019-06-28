@@ -1,4 +1,4 @@
-import { CommonFunction, DataStore, Dialog, HTTP, LEnv, LobbyModuleInterface, Logger } from "../lcore/LCoreExports";
+import { CommonFunction, DataStore, Dialog, HTTP, KeyConstants, LEnv, LobbyModuleInterface, Logger } from "../lcore/LCoreExports";
 import { proto } from "../proto/protoLobby";
 import { GameSubRecordView } from "./GameSubRecordView";
 
@@ -206,7 +206,7 @@ export class GameRecordView extends cc.Component {
     }
 
     private loadGameRecord(): void {
-        const tk = DataStore.getString("token", "");
+        const tk = DataStore.getString(KeyConstants.TOKEN, "");
         const loadGameRecordUrl = `${LEnv.rootURL}${LEnv.lrproom}?&rt=1&tk=${tk}`;
         Logger.debug("loadGameRecord loadGameRecordUrl:", loadGameRecordUrl);
 

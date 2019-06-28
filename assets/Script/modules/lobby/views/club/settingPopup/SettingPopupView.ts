@@ -1,4 +1,4 @@
-import { DataStore } from "../../../lcore/LCoreExports";
+import { DataStore, KeyConstants } from "../../../lcore/LCoreExports";
 import { proto } from "../../../proto/protoLobby";
 import { ClubViewInterface } from "../ClubModuleInterface";
 import { DisbandClubView } from "./DisbandClubView";
@@ -70,7 +70,7 @@ export class SettingPopupView extends cc.Component {
     }
 
     private isOwner(): boolean {
-        const userId = DataStore.getString("userID", "");
+        const userId = DataStore.getString(KeyConstants.USER_ID, "");
         const clubOwnerId = this.clubInfo.creatorUserID;
 
         return userId === clubOwnerId ? true : false;

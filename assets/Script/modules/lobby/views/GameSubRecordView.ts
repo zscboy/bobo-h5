@@ -1,4 +1,7 @@
-import { CommonFunction, DataStore, Dialog, GameModuleLaunchArgs, HTTP, LEnv, LobbyModuleInterface, Logger } from "../lcore/LCoreExports";
+import {
+    CommonFunction, DataStore, Dialog, GameModuleLaunchArgs,
+    HTTP, KeyConstants, LEnv, LobbyModuleInterface, Logger
+} from "../lcore/LCoreExports";
 import { proto } from "../proto/protoLobby";
 
 /**
@@ -229,7 +232,7 @@ export class GameSubRecordView extends cc.Component {
         this.win.hide();
         //this.destroy();
 
-        const myUserID = DataStore.getString("userID", "");
+        const myUserID = DataStore.getString(KeyConstants.USER_ID, "");
         const myUser = { userID: myUserID };
 
         const params: GameModuleLaunchArgs = {
@@ -245,7 +248,7 @@ export class GameSubRecordView extends cc.Component {
     }
 
     private loadRecord(recordID: string): void {
-        const tk = DataStore.getString("token", "");
+        const tk = DataStore.getString(KeyConstants.TOKEN, "");
         const loadGameRecordUrl = `${LEnv.rootURL}${LEnv.lrprecord}?&rt=1&tk=${tk}&rid=${recordID}`;
         Logger.debug("loadRecord loadGameRecordUrl:", loadGameRecordUrl);
 

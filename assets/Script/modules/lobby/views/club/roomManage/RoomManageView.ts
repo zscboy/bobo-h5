@@ -1,4 +1,4 @@
-import { CommonFunction, DataStore, Dialog, HTTP, LEnv, Logger } from "../../../lcore/LCoreExports";
+import { CommonFunction, DataStore, Dialog, HTTP, KeyConstants, LEnv, Logger } from "../../../lcore/LCoreExports";
 import { proto } from "../../../proto/protoLobby";
 import { LobbyError } from "../../LobbyError";
 import { ClubViewInterface } from "../ClubModuleInterface";
@@ -110,7 +110,7 @@ export class RoomManageView extends cc.Component {
     }
 
     private disbandRoom(): void {
-        const tk = DataStore.getString("token", "");
+        const tk = DataStore.getString(KeyConstants.TOKEN, "");
         const url = `${LEnv.rootURL}${LEnv.deleteClubRoom}?&tk=${tk}&clubID=${this.clubId}&roomID=${this.roomInfo.roomID}`;
 
         const cb = (xhr: XMLHttpRequest, err: string) => {

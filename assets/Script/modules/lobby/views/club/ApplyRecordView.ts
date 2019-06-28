@@ -1,4 +1,4 @@
-import { CommonFunction, DataStore, HTTP, LEnv, Logger } from "../../lcore/LCoreExports";
+import { CommonFunction, DataStore, HTTP, KeyConstants, LEnv, Logger } from "../../lcore/LCoreExports";
 import { proto } from "../../proto/protoLobby";
 import { ClubRequestError } from "./ClubRequestError";
 
@@ -114,7 +114,7 @@ export class ApplyRecordView extends cc.Component {
 
     private loadMyRecord(): void {
 
-        const tk = DataStore.getString("token", "");
+        const tk = DataStore.getString(KeyConstants.TOKEN, "");
         const url = `${LEnv.rootURL}${LEnv.loadMyApplyEvent}?&tk=${tk}`;
 
         const cb = (xhr: XMLHttpRequest, err: string) => {

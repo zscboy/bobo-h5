@@ -1,7 +1,7 @@
 import { WeiXinSDK } from "../chanelSdk/wxSdk/WeiXinSDkExports";
 import {
     CommonFunction,
-    DataStore, Dialog, GameModuleLaunchArgs, KeyConstants, LEnv, LobbyModuleInterface, Logger, NewRoomViewPath
+    DataStore, KeyConstants, LEnv, LobbyModuleInterface, Logger, NewRoomViewPath
 } from "../lcore/LCoreExports";
 import { LMsgCenter } from "../LMsgCenter";
 import { proto } from "../proto/protoLobby";
@@ -57,10 +57,10 @@ export class LobbyView extends cc.Component {
         this.lm = lm;
         const loader = lm.loader;
 
-        loader.fguiAddPackage("lobby/fui/lobby_main");
-
         // 加载共用背景包
         loader.fguiAddPackage("lobby/fui_bg/lobby_bg_package");
+
+        loader.fguiAddPackage("lobby/fui/lobby_main");
 
         const view = fgui.UIPackage.createObject("lobby_main", "Main").asCom;
         fgui.GRoot.inst.addChild(view);
@@ -73,7 +73,7 @@ export class LobbyView extends cc.Component {
             // i phone x 的黑边为 CommonFunction.IOS_ADAPTER_WIDTH
             x = x - CommonFunction.IOS_ADAPTER_WIDTH;
         }
-        const bg = this.view.getChild('n21');
+        const bg = this.view.getChild('bg');
         bg.setPosition(-x, 0);
         CommonFunction.setBgFullScreen(bg);
 
@@ -106,7 +106,7 @@ export class LobbyView extends cc.Component {
 
     private updateEmailRedPoint(): void {
         //
-        const emailBtn = this.view.getChild("n9").asCom;
+        const emailBtn = this.view.getChild("emailBtn").asCom;
         const redPoint = emailBtn.getChild("redPoint");
         redPoint.visible = true;
     }
@@ -124,36 +124,42 @@ export class LobbyView extends cc.Component {
         }
     }
     private initView(): void {
-        const friendBtn = this.view.getChild("n1");
-        friendBtn.onClick(this.onFriendClick, this);
+        const clubBtn = this.view.getChild("clubBtn");
+        clubBtn.onClick(this.onFriendClick, this);
 
-        const createBtn = this.view.getChild("n4");
-        createBtn.onClick(this.onCreateClick, this);
+        const btnZJ = this.view.getChild("btnZJ");
+        btnZJ.onClick(this.openRecordView, this);
 
-        const coinBtn = this.view.getChild("n5");
-        coinBtn.onClick(this.onCoinClick, this);
-
-        //--const listView = this.view.getChild("n29")
-        const dfTestBtn = this.view.getChild("n8");
-        dfTestBtn.onClick(this.openRecordView, this);
-
-        const emailBtn = this.view.getChild("n9");
+        const emailBtn = this.view.getChild("emailBtn");
         emailBtn.onClick(this.openEmailView, this);
 
-        const joinRoomBtn = this.view.getChild("n12");
+        const joinRoomBtn = this.view.getChild("joinRoomBtn");
         joinRoomBtn.onClick(this.onJoinRoom, this);
 
         const createRoom = this.view.getChild("createRoom");
         createRoom.onClick(this.onCreateRoom, this);
 
+        const settingBtn = this.view.getChild("settingBtn");
+        settingBtn.onClick(this.onSettingBtnClick, this);
+
         const returnGameBtn = this.view.getChild("returnGameBtn");
         returnGameBtn.onClick(this.onReturnGameBtnClick, this);
 
-        const userInfo = this.view.getChild("userInfo").asCom;
-        this.initInfoView(userInfo);
-        userInfo.onClick(this.openUserInfoView, this);
+        const activeBtn = this.view.getChild("activeBtn");
+        activeBtn.onClick(this.onActiveBtnClick, this);
 
-        // const bg = this.view.getChild('n21');
+        const hezuoBtn = this.view.getChild("hezuoBtn");
+        hezuoBtn.onClick(this.onHZBtnClick, this);
+
+        const shareBtn = this.view.getChild("shareBtn");
+        shareBtn.onClick(this.onShareBtnClick, this);
+
+        const icon = this.view.getChild("loader");
+        icon.onClick(this.openUserInfoView, this);
+
+        this.initInfoView();
+
+        // const bg = this.view.getChild('bg');
         // bg.setSize(cc.winSize.width, cc.winSize.width * 640 / 1136);
         // const y = -(cc.winSize.width * 640 / 1136 - cc.winSize.height) / 2;
         // const x = (cc.winSize.height * 1136 / 640 / 2) - cc.winSize.width / 2;
@@ -181,42 +187,58 @@ export class LobbyView extends cc.Component {
 
     }
 
-    private onCreateClick(): void {
-        // TODO:
-        const myUser = { userID: "6" };
-        const roomConfigObj = {
-            roomType: 21
-        };
-
-        const roomInfo = {
-            roomID: "monkey-room",
-            roomNumber: "monkey-room",
-            config: JSON.stringify(roomConfigObj),
-            gameServerID: "uuid"
-        };
-
-        const params: GameModuleLaunchArgs = {
-            jsonString: "",
-            userInfo: myUser,
-            roomInfo: roomInfo,
-            record: null
-        };
-
-        //this.enterGame(roomInfo);
-
-        this.lm.switchToGame(params, "gameb");
+    private onSettingBtnClick(): void {
+        //
     }
 
-    private onCoinClick(): void {
-        // TODO:
-        Dialog.showWaiting();
-
-        this.scheduleOnce(
-            () => {
-                Dialog.hideWaiting();
-            },
-            5);
+    private onActiveBtnClick(): void {
+        //
     }
+
+    private onHZBtnClick(): void {
+        //
+    }
+
+    private onShareBtnClick(): void {
+        //
+    }
+
+    // private onCreateClick(): void {
+    //     // TODO:
+    //     const myUser = { userID: "6" };
+    //     const roomConfigObj = {
+    //         roomType: 21
+    //     };
+
+    //     const roomInfo = {
+    //         roomID: "monkey-room",
+    //         roomNumber: "monkey-room",
+    //         config: JSON.stringify(roomConfigObj),
+    //         gameServerID: "uuid"
+    //     };
+
+    //     const params: GameModuleLaunchArgs = {
+    //         jsonString: "",
+    //         userInfo: myUser,
+    //         roomInfo: roomInfo,
+    //         record: null
+    //     };
+
+    //     //this.enterGame(roomInfo);
+
+    //     this.lm.switchToGame(params, "gameb");
+    // }
+
+    // private onCoinClick(): void {
+    //     // TODO:
+    //     Dialog.showWaiting();
+
+    //     this.scheduleOnce(
+    //         () => {
+    //             Dialog.hideWaiting();
+    //         },
+    //         5);
+    // }
 
     private openRecordView(): void {
         // TODO:
@@ -224,7 +246,7 @@ export class LobbyView extends cc.Component {
     }
 
     private openEmailView(): void {
-        const emailBtn = this.view.getChild("n9").asCom;
+        const emailBtn = this.view.getChild("emailBtn").asCom;
         const redPoint = emailBtn.getChild("redPoint");
         redPoint.visible = false;
         this.addComponent(EmailView);
@@ -267,9 +289,8 @@ export class LobbyView extends cc.Component {
         this.addComponent(UserInfoView);
     }
 
-    private initInfoView(userInfo: fgui.GComponent): void {
-        const nameLab = userInfo.getChild("name");
-        const idLab = userInfo.getChild("id");
+    private initInfoView(): void {
+        const nameLab = this.view.getChild("name");
 
         if (DataStore.hasKey(KeyConstants.NICK_NAME)) {
             const name = DataStore.getString(KeyConstants.NICK_NAME);
@@ -283,27 +304,19 @@ export class LobbyView extends cc.Component {
         }
 
         const gender = +DataStore.getString(KeyConstants.SEX);
-        const iconLoader = userInfo.getChild("loader").asLoader;
+        const iconLoader = this.view.getChild("loader").asLoader;
         const headImgUrl = DataStore.getString(KeyConstants.HEAL_IMG_URL);
         CommonFunction.setHead(iconLoader, headImgUrl, +gender);
 
-        idLab.text = `ID: ${DataStore.getString(KeyConstants.USER_ID)} `;
-        const diamondNode = this.view.getChild("diamondNode").asCom;
-        const diamondText = diamondNode.getChild(KeyConstants.DIAMOND);
+        const diamondText = this.view.getChild("diamond");
         this.diamondText = diamondText;
         this.diamondText.text = DataStore.getString(KeyConstants.DIAMOND);
 
-        const addDiamond = diamondNode.getChild("addDiamond");
+        const addDiamond = this.view.getChild("addDiamond");
         addDiamond.onClick(this.goShop, this);
-
-        this.registerDiamondChange();
     }
 
     private goShop(): void {
-        // TODO:
-    }
-
-    private registerDiamondChange(): void {
         // TODO:
     }
 

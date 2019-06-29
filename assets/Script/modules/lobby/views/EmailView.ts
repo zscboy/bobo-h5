@@ -27,6 +27,8 @@ export class EmailView extends cc.Component {
 
     private lobbyModule: LobbyModuleInterface;
 
+    private takeBtn: fgui.GButton;
+
     protected onMessage(data: ByteBuffer): void {
         Logger.debug("EmailView.onMessage");
 
@@ -77,8 +79,10 @@ export class EmailView extends cc.Component {
             backBtn.onClick(this.onCloseClick, this);
         }
 
-        const takeBtn = this.view.getChild("takeBtn");
-        takeBtn.onClick(this.onTakeBtnClick, this);
+        const takeBtn = this.view.getChild("takeBtn").asButton;
+        this.takeBtn = takeBtn;
+        this.takeBtn.visible = false;
+        this.takeBtn.onClick(this.onTakeBtnClick, this);
 
         this.emailContent = this.view.getChild("textComponent").asCom.getChild("text");
         this.emailTitle = this.view.getChild("title");
@@ -240,8 +244,10 @@ export class EmailView extends cc.Component {
     // 附件个数，现在暂时为1
     private updateAttachmentsView(): void {
         if (this.selectedEmail.attachments !== undefined || this.selectedEmail.attachments !== null) {
+            this.takeBtn.visible = true;
             this.attachmentsList.numItems = 1;
         } else {
+            this.takeBtn.visible = false;
             this.attachmentsList.numItems = 0;
         }
 

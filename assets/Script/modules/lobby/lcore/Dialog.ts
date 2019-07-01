@@ -1,3 +1,4 @@
+import { CommonFunction } from "./CommonFunction";
 import { GResLoader } from "./LDataType";
 import { Logger } from "./Logger";
 
@@ -187,7 +188,8 @@ export class Dialog {
             win.modal = true;
             win.contentPane = view;
 
-            win.setPosition(0, 0);
+            // win.setPosition(cc.winSize.width / 2, cc.winSize.height / 2);
+            CommonFunction.setViewInCenter(win);
             Dialog.inst.progressBarWin = win;
             Dialog.inst.progressBarView = view;
 

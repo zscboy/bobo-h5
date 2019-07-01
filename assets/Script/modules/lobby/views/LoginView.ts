@@ -1,5 +1,5 @@
 import { WeiXinSDK } from "../chanelSdk/wxSdk/WeiXinSDkExports";
-import { DataStore, Dialog, HTTP, LEnv, LobbyModuleInterface, Logger } from "../lcore/LCoreExports";
+import { CommonFunction, DataStore, Dialog, HTTP, KeyConstants, LEnv, LobbyModuleInterface, Logger } from "../lcore/LCoreExports";
 import { proto } from "../proto/protoLobby";
 import { LobbyView } from "./LobbyView";
 
@@ -19,16 +19,27 @@ export class LoginView extends cc.Component {
 
     private eventTarget: cc.EventTarget;
 
+    private progressText: fgui.GTextField;
+
     private button: UserInfoButton = null;
 
     public showLoginView(): void {
         const lm = <LobbyModuleInterface>this.getComponent("LobbyModule");
         const loader = lm.loader;
+
         loader.fguiAddPackage("launch/fui_login/lobby_login");
         const view = fgui.UIPackage.createObject("lobby_login", "login").asCom;
 
-        const x = cc.winSize.width / 2 - (cc.winSize.height * 1136 / 640 / 2);
-        view.setPosition(x, view.y);
+        let x = CommonFunction.setBaseViewInCenter(view);
+
+        const newIPhone = DataStore.getString(KeyConstants.ADAPTIVE_PHONE_KEY);
+        if (newIPhone === "1") {
+            // i phone x 的黑边为 CommonFunction.IOS_ADAPTER_WIDTH
+            x = x - CommonFunction.IOS_ADAPTER_WIDTH;
+        }
+        const bg = view.getChild('n1');
+        bg.setPosition(-x, 0);
+        CommonFunction.setBgFullScreen(bg);
 
         const win = new fgui.Window();
         win.contentPane = view;
@@ -50,6 +61,12 @@ export class LoginView extends cc.Component {
 
     public updateProgressBar(progress: number): void {
         this.progressBar.value = progress * 100;
+        if (this.progressText !== undefined && this.progressText !== null) {
+
+            const text = progress * 100;
+            this.progressText.text = `正在加载${text.toFixed(0)}%`;
+        }
+
     }
 
     public initView(): void {
@@ -58,24 +75,32 @@ export class LoginView extends cc.Component {
         this.weixinButton = this.viewNode.getChild("n3");
         this.progressBar = this.viewNode.getChild("n4").asProgress;
 
+        const children = this.viewNode._children;
+
+        for (const child of children) {
+            Logger.debug(child.name);
+        }
+
+        this.progressText = this.viewNode.getChild("progressText").asTextField;
+
         const gameAdviceText = this.viewNode.getChild("gameAdvice");
         const text1 = this.viewNode.getChild("text1");
         const text2 = this.viewNode.getChild("text2");
-        const text3 = this.viewNode.getChild("text3");
-        const text4 = this.viewNode.getChild("text4");
-        const text5 = this.viewNode.getChild("text5");
-        const text6 = this.viewNode.getChild("text6");
+        // const text3 = this.viewNode.getChild("text3");
+        // const text4 = this.viewNode.getChild("text4");
+        // const text5 = this.viewNode.getChild("text5");
+        // const text6 = this.viewNode.getChild("text6");
 
         const versionName = this.viewNode.getChild("versionName");
         versionName.text = LEnv.VER_STR;
 
-        gameAdviceText.text = "抵制不良游戏，拒绝盗版游戏。注意自我保护，谨防受骗上当。适度游戏益脑，沉迷游戏伤身。合理安排时间，享受健康生活。";
-        text1.text = "出版单位：深圳市xxx科技有限公司";
-        text2.text = "审批文号：xxxxxxxxxxxx";
-        text3.text = "网络游戏出版物号：123456789";
-        text4.text = "游戏著作权人：深圳市xxx科技有限公司";
-        text5.text = "增值电信业务：46546546546";
-        text6.text = "粤网文：深圳市xxx科技有限公司";
+        gameAdviceText.text = "健康游戏忠告 : 抵制不良游戏,拒绝盗版游戏.注意自我保护,谨防受骗上当.适度游戏益脑,沉迷游戏伤身.合理安排时间，享受健康生活.";
+        text1.text = "著作权登记号：201925251515";
+        text2.text = "著作权人：深圳市xxx科技有限公司";
+        // text3.text = "著作权登记号：201925251515";
+        // text4.text = "著作权人：深圳市xxx科技有限公司";
+        // text5.text = "增值电信业务：46546546546";
+        // text6.text = "粤网文：深圳市xxx科技有限公司";
 
         this.loginBtn.visible = false;
         this.weixinButton.visible = false;
@@ -85,11 +110,11 @@ export class LoginView extends cc.Component {
 
         this.weixinButton.onClick(this.onWeixinBtnClick, this);
 
-        const bg = this.viewNode.getChild('n1');
-        bg.setSize(cc.winSize.width, cc.winSize.width * 640 / 1136);
-        const y = -(cc.winSize.width * 640 / 1136 - cc.winSize.height) / 2;
-        const x = (cc.winSize.height * 1136 / 640 / 2) - cc.winSize.width / 2;
-        bg.setPosition(x, y);
+        // const bg = this.viewNode.getChild('n1');
+        // bg.setSize(cc.winSize.width, cc.winSize.width * 640 / 1136);
+        // const y = -(cc.winSize.width * 640 / 1136 - cc.winSize.height) / 2;
+        // const x = (cc.winSize.height * 1136 / 640 / 2) - cc.winSize.width / 2;
+        // bg.setPosition(x, y);
 
         // local progress = progressView.new(this)
         // progressView: updateView(this)
@@ -98,6 +123,7 @@ export class LoginView extends cc.Component {
 
     public updateCompleted(): void {
         this.progressBar.visible = false;
+        this.progressText.visible = false;
         this.weixinButton.visible = true;
         this.loginBtn.visible = true;
     }
@@ -118,7 +144,7 @@ export class LoginView extends cc.Component {
 
     public quicklyLogin(): void {
         // 快速登录
-        const account = DataStore.getString("account", "");
+        const account = DataStore.getString(KeyConstants.ACCOUNT, "");
         const quicklyLoginURL = `${LEnv.rootURL}${LEnv.quicklyLogin}?&account=${account}`;
 
         Logger.trace("quicklyLogin, quicklyLoginURL:", quicklyLoginURL);
@@ -157,9 +183,9 @@ export class LoginView extends cc.Component {
 
     public saveWxLoginReply(wxLoginReply: proto.lobby.MsgLoginReply): void {
 
-        DataStore.setItem("token", wxLoginReply.token);
+        DataStore.setItem(KeyConstants.TOKEN, wxLoginReply.token);
         const roomInfo = wxLoginReply.lastRoomInfo;
-        DataStore.setItem("RoomInfoData", "");
+        DataStore.setItem(KeyConstants.ROOM_INFO_DATA, "");
         if (roomInfo !== undefined && roomInfo !== null) {
             const roomInfoData = {
                 roomID: roomInfo.roomID,
@@ -169,27 +195,27 @@ export class LoginView extends cc.Component {
             };
 
             const roomInfoDataStr = JSON.stringify(roomInfoData);
-            DataStore.setItem("RoomInfoData", roomInfoDataStr);
+            DataStore.setItem(KeyConstants.ROOM_INFO_DATA, roomInfoDataStr);
         }
 
         const userInfo = wxLoginReply.userInfo;
-        DataStore.setItem("userID", userInfo.userID);
-        DataStore.setItem("nickName", userInfo.nickName);
+        DataStore.setItem(KeyConstants.USER_ID, userInfo.userID);
+        DataStore.setItem(KeyConstants.NICK_NAME, userInfo.nickName);
         DataStore.setItem("gender", userInfo.gender);
         DataStore.setItem("province", userInfo.province);
         DataStore.setItem("city", userInfo.city);
-        DataStore.setItem("diamond", userInfo.diamond);
+        DataStore.setItem(KeyConstants.DIAMOND, userInfo.diamond);
         DataStore.setItem("country", userInfo.country);
-        DataStore.setItem("headImgUrl", userInfo.headImgUrl);
+        DataStore.setItem(KeyConstants.HEAL_IMG_URL, userInfo.headImgUrl);
         DataStore.setItem("phone", userInfo.phone);
     }
 
     public saveQuicklyLoginReply(quicklyLoginReply: proto.lobby.MsgQuicklyLoginReply): void {
-        DataStore.setItem("account", quicklyLoginReply.account);
-        DataStore.setItem("token", quicklyLoginReply.token);
+        DataStore.setItem(KeyConstants.ACCOUNT, quicklyLoginReply.account);
+        DataStore.setItem(KeyConstants.TOKEN, quicklyLoginReply.token);
 
         const roomInfo = quicklyLoginReply.lastRoomInfo;
-        DataStore.setItem("RoomInfoData", "");
+        DataStore.setItem(KeyConstants.ROOM_INFO_DATA, "");
         if (roomInfo !== undefined && roomInfo !== null) {
             const roomInfoData = {
                 roomID: roomInfo.roomID,
@@ -199,18 +225,18 @@ export class LoginView extends cc.Component {
             };
 
             const roomInfoDataStr = JSON.stringify(roomInfoData);
-            DataStore.setItem("RoomInfoData", roomInfoDataStr);
+            DataStore.setItem(KeyConstants.ROOM_INFO_DATA, roomInfoDataStr);
         }
 
         const userInfo = quicklyLoginReply.userInfo;
-        DataStore.setItem("userID", userInfo.userID);
-        DataStore.setItem("nickName", userInfo.nickName);
+        DataStore.setItem(KeyConstants.USER_ID, userInfo.userID);
+        DataStore.setItem(KeyConstants.NICK_NAME, userInfo.nickName);
         DataStore.setItem("gender", userInfo.gender);
         DataStore.setItem("province", userInfo.province);
         DataStore.setItem("city", userInfo.city);
-        DataStore.setItem("diamond", userInfo.diamond);
+        DataStore.setItem(KeyConstants.DIAMOND, userInfo.diamond);
         DataStore.setItem("country", userInfo.country);
-        DataStore.setItem("headImgUrl", userInfo.headImgUrl);
+        DataStore.setItem(KeyConstants.HEAL_IMG_URL, userInfo.headImgUrl);
         DataStore.setItem("phone", userInfo.phone);
     }
 

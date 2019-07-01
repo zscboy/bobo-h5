@@ -1,4 +1,4 @@
-import { DataStore, Dialog, HTTP, LEnv, LobbyModuleInterface, Logger } from "../lcore/LCoreExports";
+import { CommonFunction, DataStore, Dialog, HTTP, KeyConstants, LEnv, LobbyModuleInterface, Logger } from "../lcore/LCoreExports";
 import { proto } from "../proto/protoLobby";
 
 /**
@@ -27,6 +27,8 @@ export class EmailView extends cc.Component {
 
     private lobbyModule: LobbyModuleInterface;
 
+    private takeBtn: fgui.GButton;
+
     protected onMessage(data: ByteBuffer): void {
         Logger.debug("EmailView.onMessage");
 
@@ -41,6 +43,7 @@ export class EmailView extends cc.Component {
         loader.fguiAddPackage("lobby/fui_email/lobby_email");
 
         const view = fgui.UIPackage.createObject("lobby_email", "emailView").asCom;
+        CommonFunction.setViewInCenter(view);
         this.view = view;
 
         const win = new fgui.Window();
@@ -76,6 +79,11 @@ export class EmailView extends cc.Component {
             backBtn.onClick(this.onCloseClick, this);
         }
 
+        const takeBtn = this.view.getChild("takeBtn").asButton;
+        this.takeBtn = takeBtn;
+        this.takeBtn.visible = false;
+        this.takeBtn.onClick(this.onTakeBtnClick, this);
+
         this.emailContent = this.view.getChild("textComponent").asCom.getChild("text");
         this.emailTitle = this.view.getChild("title");
 
@@ -84,7 +92,6 @@ export class EmailView extends cc.Component {
         this.attachmentsList.itemRenderer = (index: number, item: fgui.GObject) => {
             this.renderAttachmentListItem(index, item);
         };
-        this.attachmentsList.setVirtual();
 
         //邮件列表
         this.emailList = this.view.getChild("mailList").asList;
@@ -136,15 +143,15 @@ export class EmailView extends cc.Component {
             readController.selectedIndex = 1;
         }
         //  会有多个点击事件,先取消
-        obj.offClick(undefined, undefined);
+        //obj.offClick(undefined, undefined);
 
-        obj.onClick(() => {
-            if (attachment.isReceive === false) {
+        // obj.onClick(() => {
+        //     if (attachment.isReceive === false) {
 
-                this.takeAttachment(email);
-            }
-            // tslint:disable-next-line:align
-        }, this);
+        //         this.takeAttachment(email);
+        //     }
+        //     // tslint:disable-next-line:align
+        // }, this);
     }
 
     /**
@@ -182,7 +189,7 @@ export class EmailView extends cc.Component {
      * 拉取邮件
      */
     private loadEmail(): void {
-        const tk = DataStore.getString("token", "");
+        const tk = DataStore.getString(KeyConstants.TOKEN, "");
         const url = `${LEnv.rootURL}${LEnv.loadMails}?&rt=1&tk=${tk}`;
         const cb = (xhr: XMLHttpRequest, err: string) => {
 
@@ -221,8 +228,12 @@ export class EmailView extends cc.Component {
         const selectedEmail = email;
         this.selectedEmail = selectedEmail;
 
+        const hasAttachmentCtrl = this.view.getController("hasAttachment");
         if (selectedEmail !== null && selectedEmail.attachments !== null) {
             this.updateAttachmentsView();
+            hasAttachmentCtrl.selectedIndex = 0;
+        } else {
+            hasAttachmentCtrl.selectedIndex = 1;
         }
 
         if (email.isRead === false) {
@@ -232,7 +243,14 @@ export class EmailView extends cc.Component {
 
     // 附件个数，现在暂时为1
     private updateAttachmentsView(): void {
-        this.attachmentsList.numItems = 1;
+        if (this.selectedEmail.attachments !== undefined || this.selectedEmail.attachments !== null) {
+            this.takeBtn.visible = true;
+            this.attachmentsList.numItems = 1;
+        } else {
+            this.takeBtn.visible = false;
+            this.attachmentsList.numItems = 0;
+        }
+
     }
 
     /**
@@ -242,7 +260,7 @@ export class EmailView extends cc.Component {
      */
     private setRead(email: proto.lobby.IMsgMail, obj: fgui.GObject): void {
 
-        const tk = DataStore.getString("token", "");
+        const tk = DataStore.getString(KeyConstants.TOKEN, "");
         const setReadEmailUrl = `${LEnv.rootURL}${LEnv.setMailRead}?&tk=${tk}&mailID=${email.id}`;
 
         const cb = (xhr: XMLHttpRequest, err: string) => {
@@ -269,12 +287,24 @@ export class EmailView extends cc.Component {
 
     }
 
+    private onTakeBtnClick(): void {
+        if (this.selectedEmail.attachments !== undefined && this.selectedEmail.attachments !== null) {
+
+            if (this.selectedEmail.attachments.isReceive === false) {
+                this.takeAttachment(this.selectedEmail);
+            } else {
+                Dialog.prompt("附件已领取");
+            }
+
+        }
+    }
+
     /**
      *  领取邮件的附件
      * @param email 邮件
      */
     private takeAttachment(email: proto.lobby.IMsgMail): void {
-        const tk = DataStore.getString("token", "");
+        const tk = DataStore.getString(KeyConstants.TOKEN, "");
         const setReadEmailUrl = `${LEnv.rootURL}${LEnv.receiveAttachment}?&tk=${tk}&mailID=${email.id}`;
 
         const cb = (xhr: XMLHttpRequest, err: string) => {

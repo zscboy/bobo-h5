@@ -1,10 +1,9 @@
-import { DataStore, Dialog, GameModuleLaunchArgs, HTTP, LEnv, LobbyModuleInterface, Logger } from "../lcore/LCoreExports";
+import {
+    CommonFunction, DataStore, Dialog, GameModuleLaunchArgs,
+    HTTP, KeyConstants, LEnv, LobbyModuleInterface, Logger
+} from "../lcore/LCoreExports";
 import { proto } from "../proto/protoLobby";
 
-// interface GameRecordInterface {
-//     destoryMySelf: Function;
-
-// }
 /**
  * 战绩界面
  */
@@ -24,31 +23,11 @@ export class GameSubRecordView extends cc.Component {
         this.replayRoom = replayRoom;
         const replayPlayerInfos = replayRoom.players;
 
-        let text = "未知麻将";
-        const roomType = replayRoom.recordRoomType;
-        switch (roomType) {
-            case 1:
-                text = "大丰麻将";
-                break;
-            case 3:
-                text = "东台麻将";
-                break;
-            case 8:
-                text = "关张";
-                break;
-            case 9:
-                text = "7王523";
-                break;
-            case 11:
-                text = "斗地主";
-                break;
+        const text = this.getGameName(replayRoom.recordRoomType);
 
-            default:
-        }
-
-        const rountText = `${replayRoom.records.length} 局`;
+        const roundText = `${replayRoom.records.length} 局`;
         const gameName = this.view.asCom.getChild("gameName");
-        gameName.text = `${text} ${rountText}`;
+        gameName.text = `${text} ${roundText}`;
 
         const roomNumber = this.view.asCom.getChild("roomNumber");
         roomNumber.text = `${replayRoom.roomNumber} ${"号 房间"}`;
@@ -68,6 +47,8 @@ export class GameSubRecordView extends cc.Component {
         let userID;
 
         let player: proto.lobby.IMsgReplayPlayerInfo;
+
+        this.hidePlayerView(this.view);
 
         for (let i = 0; i < replayPlayerInfos.length; i++) {
 
@@ -96,6 +77,7 @@ export class GameSubRecordView extends cc.Component {
         loader.fguiAddPackage("lobby/fui_game_record/lobby_game_record");
 
         const view = fgui.UIPackage.createObject("lobby_game_record", "subRecordView").asCom;
+        CommonFunction.setViewInCenter(view);
         this.view = view;
 
         const win = new fgui.Window();
@@ -153,6 +135,37 @@ export class GameSubRecordView extends cc.Component {
         }
     }
 
+    private hidePlayerView(obj: fgui.GObject): void {
+        for (let i = 1; i < 5; i++) {
+            obj.asCom.getChild(`owner${i}`).visible = false;
+        }
+    }
+
+    private getGameName(roomType: number): string {
+
+        let text = "未知麻将";
+        switch (roomType) {
+            case 1:
+                text = "大丰麻将";
+                break;
+            case 3:
+                text = "东台麻将";
+                break;
+            case 8:
+                text = "关张";
+                break;
+            case 9:
+                text = "7王523";
+                break;
+            case 11:
+                text = "斗地主";
+                break;
+
+            default:
+        }
+
+        return text;
+    }
     private renderListItem(index: number, obj: fgui.GObject): void {
 
         const record = this.replayRoom.records[index];
@@ -164,12 +177,7 @@ export class GameSubRecordView extends cc.Component {
         roundText.text = `${roundIndexStr}`;
 
         const dateText = obj.asCom.getChild("time");
-
-        const date = new Date(record.startTime * 1000);
-        const hour = date.getHours() < 10 ? `0${date.getHours()} ` : `${date.getHours()} `;
-        const minute = date.getMinutes() < 10 ? `0${date.getMinutes()} ` : `${date.getMinutes()} `;
-        const second = date.getSeconds() < 10 ? `0${date.getSeconds()} ` : `${date.getSeconds()} `;
-        dateText.text = `${hour}: ${minute}:${second} `;
+        dateText.text = this.getTimeFormat(record.startTime);
 
         let label;
 
@@ -193,6 +201,16 @@ export class GameSubRecordView extends cc.Component {
         playBtn.data = record.recordUUID;
     }
 
+    private getTimeFormat(timeStamp: number): string {
+        const date = new Date(timeStamp * 1000);
+
+        const hour = date.getHours() < 10 ? `0${date.getHours()} ` : `${date.getHours()} `;
+        const minute = date.getMinutes() < 10 ? `0${date.getMinutes()} ` : `${date.getMinutes()} `;
+        const second = date.getSeconds() < 10 ? `0${date.getSeconds()} ` : `${date.getSeconds()} `;
+
+        return `${hour}: ${minute}:${second} `;
+    }
+
     private onPlayBtnClick(ev: fgui.Event): void {
         const recordID = <string>ev.initiator.data;
         this.loadRecord(recordID);
@@ -214,7 +232,7 @@ export class GameSubRecordView extends cc.Component {
         this.win.hide();
         //this.destroy();
 
-        const myUserID = DataStore.getString("userID", "");
+        const myUserID = DataStore.getString(KeyConstants.USER_ID, "");
         const myUser = { userID: myUserID };
 
         const params: GameModuleLaunchArgs = {
@@ -230,10 +248,9 @@ export class GameSubRecordView extends cc.Component {
     }
 
     private loadRecord(recordID: string): void {
-        const tk = DataStore.getString("token", "");
+        const tk = DataStore.getString(KeyConstants.TOKEN, "");
         const loadGameRecordUrl = `${LEnv.rootURL}${LEnv.lrprecord}?&rt=1&tk=${tk}&rid=${recordID}`;
         Logger.debug("loadRecord loadGameRecordUrl:", loadGameRecordUrl);
-        // Dialog.showDialog("正在加载战绩......");
 
         HTTP.hGet(this.eventTarget, loadGameRecordUrl, (xhr: XMLHttpRequest, err: string) => {
 

@@ -1,4 +1,4 @@
-import { DataStore, Dialog, HTTP, LEnv, Logger } from "../../lcore/LCoreExports";
+import { DataStore, Dialog, HTTP, KeyConstants, LEnv, Logger } from "../../lcore/LCoreExports";
 import { proto } from "../../proto/protoLobby";
 import { ClubViewInterface } from "./ClubModuleInterface";
 import { ClubRequestError } from "./ClubRequestError";
@@ -94,7 +94,7 @@ export class CreateClubView extends cc.Component {
     }
 
     private createClub(clubName: string): void {
-        const tk = DataStore.getString("token", "");
+        const tk = DataStore.getString(KeyConstants.TOKEN, "");
         const url = `${LEnv.rootURL}${LEnv.createClub}?&tk=${tk}&&clname=${clubName}`;
 
         const cb = (xhr: XMLHttpRequest, err: string) => {

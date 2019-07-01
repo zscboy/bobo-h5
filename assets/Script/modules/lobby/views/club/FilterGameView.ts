@@ -9,15 +9,18 @@ export class FilterGameView extends cc.Component {
 
     private clubView: ClubViewInterface;
 
-    public show(clubView: ClubViewInterface, selectRoomType: RoomType): void {
+    public show(clubView: ClubViewInterface, selectRoomType: RoomType, offset: number): void {
         this.clubView = clubView;
 
         const settingPopupView = fgui.UIPackage.createObject("lobby_club", "filterPopup").asCom;
         this.view = settingPopupView;
 
         this.initView(selectRoomType);
+
         fgui.GRoot.inst.showPopup(this.view);
-        this.view.setPosition(199, 266);
+
+        const x = offset + 199;
+        this.view.setPosition(x, 266);
 
     }
 

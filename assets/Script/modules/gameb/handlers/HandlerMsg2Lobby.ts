@@ -1,4 +1,4 @@
-import { DataStore } from "../../lobby/lcore/LCoreExports";
+import { DataStore, KeyConstants } from "../../lobby/lcore/LCoreExports";
 import { RoomInterface } from "../RoomInterface";
 
 /**
@@ -19,7 +19,7 @@ export namespace HandlerMsg2Lobby {
 
         const roomInfoDataStr = JSON.stringify(roomInfoData);
 
-        DataStore.setItem("RoomInfoData", roomInfoDataStr);
+        DataStore.setItem(KeyConstants.ROOM_INFO_DATA, roomInfoDataStr);
         room.quit();
     };
 }

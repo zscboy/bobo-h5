@@ -1,4 +1,4 @@
-import { CommonFunction, DataStore, Dialog, HTTP, LEnv, Logger } from "../../../lcore/LCoreExports";
+import { CommonFunction, DataStore, Dialog, HTTP, KeyConstants, LEnv, Logger } from "../../../lcore/LCoreExports";
 import { proto } from "../../../proto/protoLobby";
 import { LobbyError } from "../../LobbyError";
 import { ClubViewInterface } from "../ClubModuleInterface";
@@ -32,10 +32,11 @@ export class RoomManageView extends cc.Component {
     }
 
     protected onLoad(): void {
-        //
+
         this.eventTarget = new cc.EventTarget();
 
         const view = fgui.UIPackage.createObject("lobby_club", "roomManageView").asCom;
+        CommonFunction.setViewInCenter(view);
         this.view = view;
 
         const win = new fgui.Window();
@@ -59,7 +60,6 @@ export class RoomManageView extends cc.Component {
     }
 
     private initView(): void {
-        //
 
         const closeBtn = this.view.getChild("closeBtn");
         closeBtn.onClick(this.onCloseClick, this);
@@ -84,7 +84,7 @@ export class RoomManageView extends cc.Component {
     }
 
     private renderPlayerListItem(index: number, item: fgui.GObject): void {
-        //
+
         const user = this.roomInfo.users[index];
 
         const nameText = item.asCom.getChild("name").asTextField;
@@ -100,7 +100,6 @@ export class RoomManageView extends cc.Component {
     }
 
     private onDisbandRoomBtnClick(): void {
-        //
 
         Dialog.showDialog("确定解散房间吗", () => {
             this.disbandRoom();
@@ -111,7 +110,7 @@ export class RoomManageView extends cc.Component {
     }
 
     private disbandRoom(): void {
-        const tk = DataStore.getString("token", "");
+        const tk = DataStore.getString(KeyConstants.TOKEN, "");
         const url = `${LEnv.rootURL}${LEnv.deleteClubRoom}?&tk=${tk}&clubID=${this.clubId}&roomID=${this.roomInfo.roomID}`;
 
         const cb = (xhr: XMLHttpRequest, err: string) => {
@@ -122,6 +121,7 @@ export class RoomManageView extends cc.Component {
                 if (msgLoadRoomListRsp.result === proto.lobby.MsgError.ErrSuccess) {
 
                     this.clubView.loadClubRooms();
+                    this.clubView.disBandRoomNotify(this.roomInfo.roomID);
                     this.destroy();
                 } else {
                     const error = LobbyError.getErrorString(msgLoadRoomListRsp.result);

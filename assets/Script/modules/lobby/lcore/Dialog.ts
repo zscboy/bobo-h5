@@ -42,7 +42,7 @@ export class Dialog {
         const p = fgui.UIPackage.createObject("lobby_dialog", "prompt").asCom;
         const label = p.getChild("text");
         label.text = msg;
-        p.setPosition(1136 / 2, 640 / 2);
+        p.setPosition(cc.winSize.width / 2, cc.winSize.height / 2);
         const trans = p.getTransition("t1");
         trans.play(() => {
             p.dispose();
@@ -75,7 +75,7 @@ export class Dialog {
             win.modal = true;
             win.contentPane = view;
 
-            win.setPosition(1136 / 2, 640 / 2);
+            win.setPosition(cc.winSize.width / 2, cc.winSize.height / 2);
             Dialog.inst.dlgView = view;
             Dialog.inst.dlgWin = win;
         }
@@ -165,7 +165,7 @@ export class Dialog {
             win.modal = true;
             win.contentPane = view;
 
-            win.setPosition(1136 / 2, 640 / 2);
+            win.setPosition(cc.winSize.width / 2, cc.winSize.height / 2);
             Dialog.inst.waitWin = win;
         }
 

@@ -1,4 +1,4 @@
-import { CommonFunction, GResLoader, LobbyModuleInterface, Logger } from "../../lcore/LCoreExports";
+import { CommonFunction, GResLoader, KeyConstants, LobbyModuleInterface, Logger } from "../../lcore/LCoreExports";
 import { proto } from "../../proto/protoLobby";
 
 interface PropData {
@@ -76,8 +76,12 @@ export class PlayerInfoView extends cc.Component {
 
         this.updateView();
 
+        // 当背景拉长时，fgui.GRoot.inst的高宽，和设计的不一样，因此需要偏移
+        const offset = (fgui.GRoot.inst.width - 1136) / 2;
+        const x = pos.x + offset;
+
         fgui.GRoot.inst.showPopup(this.view);
-        this.view.setPosition(pos.x, pos.y);
+        this.view.setPosition(x, pos.y);
     }
 
     protected onDestroy(): void {
@@ -98,7 +102,7 @@ export class PlayerInfoView extends cc.Component {
         this.numberText = this.view.getChild("number").asTextField;
         this.xinNumText = this.view.getChild("xinNum").asTextField;
         this.zuanNumText = this.view.getChild("zuanNum").asTextField;
-        this.sexImage = this.view.getChild("sex").asLoader;
+        this.sexImage = this.view.getChild(KeyConstants.SEX).asLoader;
         const head = this.view.getChild("head").asCom;
         this.headLoader = head.getChild("n0").asLoader;
         //  button

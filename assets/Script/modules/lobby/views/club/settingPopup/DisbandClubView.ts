@@ -1,3 +1,4 @@
+import { CommonFunction } from "../../../lcore/LCoreExports";
 import { ClubViewInterface } from "../ClubModuleInterface";
 
 /**
@@ -22,6 +23,7 @@ export class DisbandClubView extends cc.Component {
 
         this.eventTarget = new cc.EventTarget();
         const view = fgui.UIPackage.createObject("lobby_club", "disbandClubCom").asCom;
+        CommonFunction.setViewInCenter(view);
         this.view = view;
 
         const win = new fgui.Window();

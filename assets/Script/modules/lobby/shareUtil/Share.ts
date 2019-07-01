@@ -1,5 +1,5 @@
 import { WeiXinSDK } from "../chanelSdk/wxSdk/WeiXinSDkExports";
-import { DataStore, Dialog, HTTP, LEnv, Logger } from "../lcore/LCoreExports";
+import { DataStore, Dialog, HTTP, KeyConstants, LEnv, Logger } from "../lcore/LCoreExports";
 import { proto } from "../proto/protoLobby";
 
 /**
@@ -46,7 +46,7 @@ export namespace Share {
         shareType: ShareDestType,
         customParam?: string) => {
 
-        const token = DataStore.getString("token", '');
+        const token = DataStore.getString(KeyConstants.TOKEN, '');
         const wxShareInfoURL = `${LEnv.rootURL}${LEnv.wxShareInfo}?tk=${token}&sence=${sence}&mediaType=${media}&shareType=${shareType}`;
 
         Logger.trace("wxShareInfoURL:", wxShareInfoURL);

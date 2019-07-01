@@ -1,5 +1,5 @@
 
-import { LobbyModuleInterface, Logger } from "../lcore/LCoreExports";
+import { CommonFunction, LobbyModuleInterface, Logger } from "../lcore/LCoreExports";
 const { ccclass } = cc._decorator;
 
 /**
@@ -24,6 +24,7 @@ export class JoinRoom extends cc.Component {
         const loader = this.lm.loader;
         loader.fguiAddPackage("lobby/fui_join_room/lobby_join_room");
         const view = fgui.UIPackage.createObject("lobby_join_room", "joinRoom").asCom;
+        CommonFunction.setViewInCenter(view);
         this.view = view;
 
         const win = new fgui.Window();
@@ -124,7 +125,7 @@ export class JoinRoom extends cc.Component {
     }
 
     // private requetJoinRoom(roomNumber: string): void {
-    //     const tk = DataStore.getString("token", "");
+    //     const tk = DataStore.getString(KeyConstants.TOKEN, "");
     //     const joinRoomURL = `${LEnv.rootURL}${LEnv.requestRoomInfo}?&tk=${tk}&roomNumber=${roomNumber}`;
 
     //     Logger.trace("joinRoomURL, joinRoomURL:", joinRoomURL);

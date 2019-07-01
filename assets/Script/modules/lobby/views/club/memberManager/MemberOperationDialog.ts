@@ -1,4 +1,4 @@
-import { CommonFunction, DataStore, Dialog, HTTP, LEnv, Logger } from "../../../lcore/LCoreExports";
+import { CommonFunction, DataStore, Dialog, HTTP, KeyConstants, LEnv, Logger } from "../../../lcore/LCoreExports";
 import { proto } from "../../../proto/protoLobby";
 import { ClubViewInterface } from "../ClubModuleInterface";
 import { ClubRequestError } from "../ClubRequestError";
@@ -25,10 +25,10 @@ export class MemberOperationDialog extends cc.Component {
 
         const memberOperationDialog = fgui.UIPackage.createObject("lobby_club", "memberOperationDialog").asCom;
         this.view = memberOperationDialog;
+        CommonFunction.setViewInCenter(this.view);
 
         this.initView();
         fgui.GRoot.inst.showPopup(this.view);
-        this.view.setPosition(255, 180);
 
     }
 
@@ -132,7 +132,7 @@ export class MemberOperationDialog extends cc.Component {
     private createRoomAuthority(authority: boolean): void {
 
         const result: string = authority === true ? "yes" : "no";
-        const tk = DataStore.getString("token", "");
+        const tk = DataStore.getString(KeyConstants.TOKEN, "");
         const baseUrl = `${LEnv.rootURL}${LEnv.allowMemberCreateRoom}?&`;
         const params = `tk=${tk}&clubID=${this.clubInfo.baseInfo.clubID}&memberID=${this.member.userID}&allowCreateRoom=${result}`;
         const url = `${baseUrl}${params}`;
@@ -175,7 +175,7 @@ export class MemberOperationDialog extends cc.Component {
 
     private changeManagerRequest(member: proto.club.IMsgClubMemberInfo, role: proto.club.ClubRoleType): void {
 
-        const tk = DataStore.getString("token", "");
+        const tk = DataStore.getString(KeyConstants.TOKEN, "");
         const baseUrl = `${LEnv.rootURL}${LEnv.changeRole}?&`;
         const params = `tk=${tk}&clubID=${this.clubInfo.baseInfo.clubID}&memberID=${member.userID}&role=${role}`;
         const url = `${baseUrl}${params}`;

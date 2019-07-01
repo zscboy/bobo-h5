@@ -1,7 +1,7 @@
 import {
-    AnimationMgr, DataStore, Dialog, GameModuleInterface,
-    GameModuleLaunchArgs, GResLoader, LEnv,
-    LobbyModuleInterface, Logger, MsgQueue, MsgType, RoomInfo, UserInfo, WS
+    AnimationMgr, CommonFunction, DataStore, Dialog,
+    GameModuleInterface, GameModuleLaunchArgs, GResLoader,
+    KeyConstants, LEnv, LobbyModuleInterface, Logger, MsgQueue, MsgType, RoomInfo, UserInfo, WS
 } from "../lobby/lcore/LCoreExports";
 import { proto } from "./proto/protoGame";
 import { Replay } from "./Replay";
@@ -68,9 +68,20 @@ export class GameModule extends cc.Component implements GameModuleInterface {
 
         const view = fgui.UIPackage.createObject("dafeng", "desk").asCom;
         fgui.GRoot.inst.addChild(view);
-        const x = cc.winSize.width / 2 - (cc.winSize.height * 1136 / 640 / 2);
-        view.setPosition(x, view.y);
+        let x = CommonFunction.setBaseViewInCenter(view);
         this.view = view;
+
+        const newIPhone = DataStore.getString(KeyConstants.ADAPTIVE_PHONE_KEY);
+        if (newIPhone === "1") {
+            // i phone x 的黑边为  CommonFunction.IOS_ADAPTER_WIDTH
+            x = x - CommonFunction.IOS_ADAPTER_WIDTH;
+        }
+        let bg = view.getChild("blueBg");
+        bg.setPosition(-x, 0);
+        CommonFunction.setBgFullScreen(bg);
+        bg = view.getChild("classBg");
+        bg.setPosition(-x, 0);
+        CommonFunction.setBgFullScreen(bg);
 
         this.mAnimationMgr = new AnimationMgr(this.lm.loader);
 
@@ -130,7 +141,7 @@ export class GameModule extends cc.Component implements GameModuleInterface {
 
         // 测试用
         const host = LEnv.gameHost;
-        const tk = DataStore.getString("token", "");
+        const tk = DataStore.getString(KeyConstants.TOKEN, "");
         let url;
         const rID = roomInfo.roomID;
         const uID = myUser.userID;
@@ -262,14 +273,14 @@ export class GameModule extends cc.Component implements GameModuleInterface {
             // 进入房间错误提示
             Logger.debug(" server return enter mRoom ~= 0");
             //  进入房间错误清除保留的房间信息
-            DataStore.setItem("RoomInfoData", "");
+            DataStore.setItem(KeyConstants.ROOM_INFO_DATA, "");
             await this.showEnterRoomError(enterRoomResult.status);
 
             return;
         }
 
         //  进入房间错误清除保留的房间信息
-        DataStore.setItem("RoomInfoData", "");
+        DataStore.setItem(KeyConstants.ROOM_INFO_DATA, "");
         await this.pumpMsg();
         Logger.debug("doEnterRoom leave---");
     }

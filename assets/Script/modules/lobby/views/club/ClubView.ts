@@ -1,5 +1,9 @@
-import { CommonFunction, DataStore, Dialog, HTTP, LEnv, LobbyModuleInterface, Logger, NewRoomViewPath } from "../../lcore/LCoreExports";
+import {
+    CommonFunction, DataStore, Dialog, HTTP, KeyConstants, LEnv,
+    LobbyModuleInterface, Logger, NewRoomViewPath
+} from "../../lcore/LCoreExports";
 import { proto } from "../../proto/protoLobby";
+// import { Share } from "../../shareUtil/ShareExports";
 import { LobbyError } from "../LobbyError";
 import { NewRoomView } from "../NewRoomView";
 import { ApplyRecordView } from "./ApplyRecordView";
@@ -11,6 +15,7 @@ import { FilterGameView } from "./FilterGameView";
 import { JoinClubView } from "./JoinClubView";
 import { MemberManagerView } from "./memberManager/MemberManagerView";
 import { QuicklyCreateRoomView } from "./quicklyCreateRoom/QuicklyCreateRoomView";
+import { RoomRuleString } from "./quicklyCreateRoom/RoomRuleString";
 import { RoomManageView } from "./roomManage/RoomManageView";
 import { SettingPopupView } from "./settingPopup/SettingPopupView";
 
@@ -22,8 +27,12 @@ const { ccclass } = cc._decorator;
 @ccclass
 export class ClubView extends cc.Component {
 
+    private readonly ENTER_GAME_EVENT: string = "enterGameEvent";
+    private readonly ON_CLUB_VIEW_SHOW: string = "onClubViewShow";
+
     // 茶馆主界面节点
     private view: fgui.GComponent;
+
     private win: fgui.Window;
     private eventTarget: cc.EventTarget;
     //内容节点，包括 茶馆页面 和 非茶馆页面
@@ -77,7 +86,7 @@ export class ClubView extends cc.Component {
      */
     public disbandClub(): void {
 
-        const tk = DataStore.getString("token", "");
+        const tk = DataStore.getString(KeyConstants.TOKEN, "");
         const url = `${LEnv.rootURL}${LEnv.deleteClub}?&tk=${tk}&clubID=${this.selectedClub.baseInfo.clubID}`;
 
         const cb = (xhr: XMLHttpRequest, err: string) => {
@@ -92,7 +101,7 @@ export class ClubView extends cc.Component {
      */
     public modifyClubName(name: string): void {
 
-        const tk = DataStore.getString("token", "");
+        const tk = DataStore.getString(KeyConstants.TOKEN, "");
         const url = `${LEnv.rootURL}${LEnv.renameClub}?&tk=${tk}&clubID=${this.selectedClub.baseInfo.clubID}&clname=${name}`;
 
         const cb = (xhr: XMLHttpRequest, err: string) => {
@@ -116,7 +125,7 @@ export class ClubView extends cc.Component {
      * 退出茶馆
      */
     public quitClub(): void {
-        const tk = DataStore.getString("token", "");
+        const tk = DataStore.getString(KeyConstants.TOKEN, "");
         const url = `${LEnv.rootURL}${LEnv.quitClub}?&tk=${tk}&clubID=${this.selectedClub.baseInfo.clubID}`;
 
         const cb = (xhr: XMLHttpRequest, err: string) => {
@@ -139,7 +148,7 @@ export class ClubView extends cc.Component {
     }
 
     public loadClubRooms(): void {
-        const tk = DataStore.getString("token", "");
+        const tk = DataStore.getString(KeyConstants.TOKEN, "");
         const url = `${LEnv.rootURL}${LEnv.loadClubRooms}?&tk=${tk}&clubID=${this.selectedClub.baseInfo.clubID}`;
 
         const cb = (xhr: XMLHttpRequest, err: string) => {
@@ -164,11 +173,31 @@ export class ClubView extends cc.Component {
         this.clubRequest(url, cb);
     }
 
+    public disBandRoomNotify(roomId: string): void {
+        const roomInfoData = DataStore.getString(KeyConstants.ROOM_INFO_DATA);
+
+        if (roomInfoData !== undefined && roomInfoData !== null && roomInfoData !== "") {
+
+            try {
+                const config = <{ [key: string]: string }>JSON.parse(roomInfoData);
+
+                if (config.roomID === roomId) {
+                    DataStore.setItem(KeyConstants.ROOM_INFO_DATA, "");
+                    const lm = <LobbyModuleInterface>this.getComponent("LobbyModule");
+                    lm.eventTarget.emit(`checkRoomInfo`);
+                }
+
+            } catch (error) {
+                //
+            }
+        }
+    }
+
     protected onDestroy(): void {
 
         if (this.lobbyModule !== null) {
-            this.lobbyModule.eventTarget.off("onClubViewShow", this.onClubViewShow);
-            this.lobbyModule.eventTarget.off("enterGameEvent", this.hide);
+            this.lobbyModule.eventTarget.off(this.ON_CLUB_VIEW_SHOW, this.onClubViewShow);
+            this.lobbyModule.eventTarget.off(this.ENTER_GAME_EVENT, this.hide);
             this.lobbyModule.eventTarget.off(`${proto.lobby.MessageCode.OPClubNotify}`, this.refreshClubInfo, this);
         }
 
@@ -185,6 +214,7 @@ export class ClubView extends cc.Component {
         loader.fguiAddPackage("lobby/fui_club/lobby_club");
 
         const view = fgui.UIPackage.createObject("lobby_club", "clubView").asCom;
+        CommonFunction.setViewInCenter(view);
         this.view = view;
 
         const win = new fgui.Window();
@@ -205,7 +235,7 @@ export class ClubView extends cc.Component {
         this.noClubPage = this.content.getChild("noClubPage").asCom;
 
         const diamondText = this.view.getChild("diamondText");
-        diamondText.text = DataStore.getString("diamond");
+        diamondText.text = DataStore.getString(KeyConstants.DIAMOND);
 
         this.initClickListener();
 
@@ -225,8 +255,8 @@ export class ClubView extends cc.Component {
 
         this.lobbyModule = <LobbyModuleInterface>this.getComponent("LobbyModule");
         if (this.lobbyModule !== null) {
-            this.lobbyModule.eventTarget.on(`onClubViewShow`, this.onClubViewShow, this);
-            this.lobbyModule.eventTarget.on(`enterGameEvent`, this.hide, this);
+            this.lobbyModule.eventTarget.on(this.ON_CLUB_VIEW_SHOW, this.onClubViewShow, this);
+            this.lobbyModule.eventTarget.on(this.ENTER_GAME_EVENT, this.hide, this);
             this.lobbyModule.eventTarget.on(`${proto.lobby.MessageCode.OPClubNotify}`, this.refreshClubInfo, this);
         }
 
@@ -320,7 +350,8 @@ export class ClubView extends cc.Component {
 
         // 提示按钮
         const tipsBtn = this.clubPage.asCom.getChild("tipsBtn");
-        tipsBtn.onClick(this.onTipsBtnClick, this);
+        tipsBtn.on(fgui.Event.TOUCH_BEGIN, this.onTipsBtnTouchBegin, this);
+        tipsBtn.on(fgui.Event.TOUCH_END, this.onTipsBtnTouchEnd, this);
 
         // 创建房间按钮
         const createRoomBtn = this.clubPage.asCom.getChild("createRoomBtn");
@@ -346,6 +377,8 @@ export class ClubView extends cc.Component {
             };
             const data = { data: `${this.selectedClub.baseInfo.clubNumber}`, success: cb };
             wx.setClipboardData(data);
+        } else {
+            Dialog.prompt("运行环境不是微信平台");
         }
     }
 
@@ -358,6 +391,15 @@ export class ClubView extends cc.Component {
                 imageUrl: ``,
                 query: ``
             });
+
+            // Share.shareGame(
+            //     this.eventTarget,
+            //     Share.ShareSrcType.GameShare,
+            //     Share.ShareMediaType.Image,
+            //     Share.ShareDestType.Friend,
+            //     `roomNumber=${this.roomInfo.roomNumber}`);
+        } else {
+            Dialog.prompt("运行环境不是微信平台");
         }
     }
 
@@ -375,7 +417,8 @@ export class ClubView extends cc.Component {
     private onAllBtnClick(): void {
         //
         const filterGameView = this.addComponent(FilterGameView);
-        filterGameView.show(this, this.selectRoomType);
+        const viewNode = this.view.node;
+        filterGameView.show(this, this.selectRoomType, viewNode.x);
     }
 
     private onRefreshBtnClick(): void {
@@ -391,7 +434,7 @@ export class ClubView extends cc.Component {
 
         if (this.selectedClub.createRoomOptions !== null && this.selectedClub.createRoomOptions !== "") {
 
-            const roomInfoData = DataStore.getString("RoomInfoData");
+            const roomInfoData = DataStore.getString(KeyConstants.ROOM_INFO_DATA);
 
             if (roomInfoData !== undefined && roomInfoData !== null && roomInfoData !== "") {
                 Dialog.prompt("已经在房间内");
@@ -404,8 +447,34 @@ export class ClubView extends cc.Component {
         }
     }
 
-    private onTipsBtnClick(): void {
+    private onTipsBtnTouchBegin(): void {
         //
+
+        const options = this.selectedClub.createRoomOptions;
+        if (options !== undefined && options !== null) {
+            const str = RoomRuleString.getRoomRuleStr(options);
+
+            const view = this.clubPage.asCom.getChild("ruleText");
+            const gameConfigText = view.asCom.getChild("text");
+            const bg = view.asCom.getChild("bg");
+
+            const originY = view.y;
+            const originH = view.height;
+
+            gameConfigText.text = str;
+            const h = gameConfigText.height;
+            bg.height = h;
+            view.height = h;
+
+            const newY = originY - (h - originH);
+            view.y = newY;
+            view.visible = true;
+        }
+    }
+
+    private onTipsBtnTouchEnd(): void {
+        //
+        this.clubPage.asCom.getChild("ruleText").visible = false;
     }
 
     private onCreateRoomBtnClick(): void {
@@ -428,7 +497,7 @@ export class ClubView extends cc.Component {
 
     private onReturn2GameBtnClick(): void {
         //
-        const jsonStr = DataStore.getString("RoomInfoData");
+        const jsonStr = DataStore.getString(KeyConstants.ROOM_INFO_DATA);
         if (jsonStr !== "") {
             try {
                 const config = <{ [key: string]: string }>JSON.parse(jsonStr);
@@ -447,7 +516,7 @@ export class ClubView extends cc.Component {
             } catch (e) {
                 Logger.error("parse config error:", e);
                 // 如果解析不了，则清理数据
-                DataStore.setItem("RoomInfoData", "");
+                DataStore.setItem(KeyConstants.ROOM_INFO_DATA, "");
             }
         }
 
@@ -463,7 +532,7 @@ export class ClubView extends cc.Component {
         //
         const ruleJson = this.selectedClub.createRoomOptions;
         Logger.debug("ClubView.quickCreateRoom, ruleJson:", ruleJson);
-        const tk = DataStore.getString("token", "");
+        const tk = DataStore.getString(KeyConstants.TOKEN, "");
 
         const createRoomURL = `${LEnv.rootURL}${LEnv.createClubRoom}?&tk=${tk}&clubID=${this.selectedClub.baseInfo.clubID}`;
 
@@ -536,7 +605,9 @@ export class ClubView extends cc.Component {
     private onManagerBtnClick(): void {
 
         const popupView = this.addComponent(SettingPopupView);
-        popupView.show(this, this.selectedClub);
+
+        const viewNode = this.view.node;
+        popupView.show(this, this.selectedClub, viewNode.x);
     }
 
     private onMemberSettingBtnClick(): void {
@@ -802,7 +873,7 @@ export class ClubView extends cc.Component {
     }
 
     private isManager(): boolean {
-        const userId = DataStore.getString("userID", "");
+        const userId = DataStore.getString(KeyConstants.USER_ID, "");
         const clubOwnerId = this.selectedClub.creatorUserID;
         const managers = this.selectedClub.managers;
         let isManager = false;
@@ -840,7 +911,7 @@ export class ClubView extends cc.Component {
     }
 
     private loadAllClub(): void {
-        const tk = DataStore.getString("token", "");
+        const tk = DataStore.getString(KeyConstants.TOKEN, "");
         const url = `${LEnv.rootURL}${LEnv.loadMyClubs}?&tk=${tk}`;
 
         const cb = (xhr: XMLHttpRequest, err: string) => {
@@ -862,7 +933,7 @@ export class ClubView extends cc.Component {
     }
 
     private loadClub(clubID: string): void {
-        const tk = DataStore.getString("token", "");
+        const tk = DataStore.getString(KeyConstants.TOKEN, "");
         const url = `${LEnv.rootURL}${LEnv.loadClub}?&tk=${tk}&clubID=${clubID}`;
 
         const cb = (xhr: XMLHttpRequest, err: string) => {
@@ -888,7 +959,7 @@ export class ClubView extends cc.Component {
 
         this.allRoomInfos = [];
 
-        const roomInfoData = DataStore.getString("RoomInfoData");
+        const roomInfoData = DataStore.getString(KeyConstants.ROOM_INFO_DATA);
 
         if (roomInfoData !== undefined && roomInfoData !== null && roomInfoData !== "") {
             this.clubPage.asCom.getController("isInRoom").selectedIndex = 1;

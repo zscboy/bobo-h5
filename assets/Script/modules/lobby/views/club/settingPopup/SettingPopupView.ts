@@ -1,4 +1,4 @@
-import { DataStore } from "../../../lcore/LCoreExports";
+import { DataStore, KeyConstants } from "../../../lcore/LCoreExports";
 import { proto } from "../../../proto/protoLobby";
 import { ClubViewInterface } from "../ClubModuleInterface";
 import { DisbandClubView } from "./DisbandClubView";
@@ -16,8 +16,6 @@ export class SettingPopupView extends cc.Component {
 
     private clubInfo: proto.club.IMsgClubInfo;
 
-    // 、private clubInfo: proto.club.IMsgClubInfo;
-
     public disbandClub(): void {
         this.clubView.disbandClub();
     }
@@ -34,7 +32,7 @@ export class SettingPopupView extends cc.Component {
         this.clubView.showQuicklyCreateView();
     }
 
-    public show(clubView: ClubViewInterface, clubInfo: proto.club.IMsgClubInfo): void {
+    public show(clubView: ClubViewInterface, clubInfo: proto.club.IMsgClubInfo, offset: number): void {
         this.clubView = clubView;
         this.clubInfo = clubInfo;
         const settingPopupView = fgui.UIPackage.createObject("lobby_club", "settingPopup").asCom;
@@ -42,7 +40,7 @@ export class SettingPopupView extends cc.Component {
 
         this.initView();
         fgui.GRoot.inst.showPopup(this.view);
-        this.view.setPosition(949, 106);
+        this.view.setPosition(offset + 949, 106);
 
     }
 
@@ -72,7 +70,7 @@ export class SettingPopupView extends cc.Component {
     }
 
     private isOwner(): boolean {
-        const userId = DataStore.getString("userID", "");
+        const userId = DataStore.getString(KeyConstants.USER_ID, "");
         const clubOwnerId = this.clubInfo.creatorUserID;
 
         return userId === clubOwnerId ? true : false;

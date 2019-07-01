@@ -1,4 +1,7 @@
-import { DataStore, Dialog, HTTP, LEnv, LobbyModuleInterface, Logger, NewRoomViewPath } from "../lcore/LCoreExports";
+import {
+    CommonFunction, DataStore, Dialog, HTTP, KeyConstants,
+    LEnv, LobbyModuleInterface, Logger, NewRoomViewPath
+} from "../lcore/LCoreExports";
 import { proto } from "../proto/protoLobby";
 import { DFRuleView, RunFastRuleView, ZJMJRuleView } from "../ruleviews/RuleViewsExports";
 import { LobbyError } from "./LobbyError";
@@ -68,6 +71,7 @@ export class NewRoomView extends cc.Component {
         const loader = lm.loader;
         loader.fguiAddPackage("lobby/fui_create_room/lobby_create_room");
         const view = fgui.UIPackage.createObject("lobby_create_room", "createRoom").asCom;
+        CommonFunction.setViewInCenter(view);
         this.view = view;
 
         const win = new fgui.Window();
@@ -166,7 +170,7 @@ export class NewRoomView extends cc.Component {
 
     private createRoom(ruleJson: string): void {
         Logger.debug("NewRoomView.createRoom, ruleJson:", ruleJson);
-        const tk = DataStore.getString("token", "");
+        const tk = DataStore.getString(KeyConstants.TOKEN, "");
         let createRoomURL: string = "";
 
         if (this.club !== undefined && this.club !== null && this.club !== "") {
@@ -292,7 +296,7 @@ export class NewRoomView extends cc.Component {
     }
 
     private loadRoomPrice(): void {
-        const tk = DataStore.getString("token", "");
+        const tk = DataStore.getString(KeyConstants.TOKEN, "");
         const loadRoomPriceCfgsURL = `${LEnv.rootURL}${LEnv.loadRoomPriceCfgs}?&tk=${tk}`;
         HTTP.hGet(
             this.eventTarget,

@@ -1,4 +1,4 @@
-import { CommonFunction, DataStore, Dialog, HTTP, LEnv, Logger } from "../../../lcore/LCoreExports";
+import { CommonFunction, DataStore, Dialog, HTTP, KeyConstants, LEnv, Logger } from "../../../lcore/LCoreExports";
 import { proto } from "../../../proto/protoLobby";
 import { ClubRequestError } from "../ClubRequestError";
 import { MemberOperationDialog } from "./MemberOperationDialog";
@@ -50,6 +50,7 @@ export class MemberManagerView extends cc.Component {
         this.eventTarget = new cc.EventTarget();
 
         const view = fgui.UIPackage.createObject("lobby_club", "memberManager").asCom;
+        CommonFunction.setViewInCenter(view);
         this.view = view;
 
         const win = new fgui.Window();
@@ -152,7 +153,7 @@ export class MemberManagerView extends cc.Component {
         }
 
         const isMe = this.isMe(member.userID);
-        const userId = DataStore.getString("userID", "");
+        const userId = DataStore.getString(KeyConstants.USER_ID, "");
         const clubOwnerId = this.clubInfo.creatorUserID;
         const isOwner = userId === clubOwnerId ? true : false;
 
@@ -168,7 +169,7 @@ export class MemberManagerView extends cc.Component {
 
     }
     private isManagerIncludeOwner(): boolean {
-        const userId = DataStore.getString("userID", "");
+        const userId = DataStore.getString(KeyConstants.USER_ID, "");
         const clubOwnerId = this.clubInfo.creatorUserID;
         const managers = this.clubInfo.managers;
         let isManager = false;
@@ -188,7 +189,7 @@ export class MemberManagerView extends cc.Component {
     }
 
     private isMe(memberUserId: string): boolean {
-        const userId = DataStore.getString("userID", "");
+        const userId = DataStore.getString(KeyConstants.USER_ID, "");
 
         return memberUserId === userId ? true : false;
     }
@@ -365,7 +366,7 @@ export class MemberManagerView extends cc.Component {
 
     private deleteMember(member: proto.club.IMsgClubMemberInfo, listIndex: number): void {
 
-        const tk = DataStore.getString("token", "");
+        const tk = DataStore.getString(KeyConstants.TOKEN, "");
         const baseUrl = `${LEnv.rootURL}${LEnv.kickOut}?&`;
         const params = `tk=${tk}&clubID=${this.clubInfo.baseInfo.clubID}&memberID=${member.userID}`;
         const url = `${baseUrl}${params}`;
@@ -393,7 +394,7 @@ export class MemberManagerView extends cc.Component {
     private joinApproval(event: proto.club.IMsgClubEvent, agree: boolean): void {
 
         const result = agree === true ? "yes" : "no";
-        const tk = DataStore.getString("token", "");
+        const tk = DataStore.getString(KeyConstants.TOKEN, "");
 
         const baseUrl = `${LEnv.rootURL}${LEnv.joinApproval}?&`;
         const params = `tk=${tk}&clubID=${this.clubInfo.baseInfo.clubID}&applicantID=${event.userID1}&agree=${result}&eID=${event.Id}`;
@@ -420,7 +421,7 @@ export class MemberManagerView extends cc.Component {
 
     private loadMember(updateListIndex: number): void {
 
-        const tk = DataStore.getString("token", "");
+        const tk = DataStore.getString(KeyConstants.TOKEN, "");
         const loadMemberUrl = `${LEnv.rootURL}${LEnv.loadClubMembers}?&tk=${tk}&clubID=${this.clubInfo.baseInfo.clubID} `;
 
         const cb = (xhr: XMLHttpRequest, err: string) => {
@@ -452,7 +453,7 @@ export class MemberManagerView extends cc.Component {
 
     private loadRecord(): void {
 
-        const tk = DataStore.getString("token", "");
+        const tk = DataStore.getString(KeyConstants.TOKEN, "");
         const loadRecordUrl = `${LEnv.rootURL}${LEnv.loadClubEvents}?&tk=${tk}&clubID=${this.clubInfo.baseInfo.clubID}&cursor=${0} `;
 
         const cb = (xhr: XMLHttpRequest, err: string) => {

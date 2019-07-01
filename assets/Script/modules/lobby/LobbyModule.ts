@@ -6,7 +6,7 @@ import { GameModuleA } from "../gamea/GamebExportsA";
 import { GameModule } from "../gameb/GamebExports";
 import { GResLoaderImpl } from "./GResLoaderImpl";
 import { Dialog } from "./lcore/Dialog";
-import { DataStore, HTTP, LEnv } from "./lcore/LCoreExports";
+import { DataStore, HTTP, KeyConstants, LEnv } from "./lcore/LCoreExports";
 import { GameModuleInterface, GameModuleLaunchArgs, LobbyModuleInterface } from "./lcore/LDataType";
 import { Logger } from "./lcore/Logger";
 import { proto } from "./proto/protoLobby";
@@ -19,6 +19,7 @@ import { LoginView } from "./views/LoginView";
 @ccclass
 export class LobbyModule extends cc.Component implements LobbyModuleInterface {
     public loader: GResLoaderImpl;
+
     public eventTarget: cc.EventTarget;
     // 用于挂载子游戏模块的节点，在离开子游戏模块并回到大厅后销毁
     private gameNode: cc.Node;
@@ -26,6 +27,8 @@ export class LobbyModule extends cc.Component implements LobbyModuleInterface {
     private view: fgui.GObject;
 
     private loginView: LoginView;
+
+    private readonly adaptivePhones: string[] = ["iPhone X", "iPhone XS", "iPhone XR", "iPhone XS Max"];
 
     public cleanupGRoot(): void {
         const children = fgui.GRoot.inst._children;
@@ -63,7 +66,7 @@ export class LobbyModule extends cc.Component implements LobbyModuleInterface {
     }
 
     public requetJoinRoom(roomNumber: string): void {
-        const tk = DataStore.getString("token", "");
+        const tk = DataStore.getString(KeyConstants.TOKEN, "");
         const joinRoomURL = `${LEnv.rootURL}${LEnv.requestRoomInfo}?&tk=${tk}&roomNumber=${roomNumber}`;
 
         Logger.trace("joinRoomURL, joinRoomURL:", joinRoomURL);
@@ -103,7 +106,7 @@ export class LobbyModule extends cc.Component implements LobbyModuleInterface {
         // 发消息給俱乐部页面，让俱乐部界面隐藏
         this.eventTarget.emit("enterGameEvent");
 
-        const myUserID = DataStore.getString("userID", "");
+        const myUserID = DataStore.getString(KeyConstants.USER_ID, "");
         const myUser = { userID: myUserID };
         const myRoomInfo = {
             roomID: roomInfo.roomID,
@@ -201,6 +204,24 @@ export class LobbyModule extends cc.Component implements LobbyModuleInterface {
                 Dialog.updateProgress(progress);
             }
         );
+    }
+
+    protected onLoad(): void {
+
+        // 默认值
+        DataStore.setItem(KeyConstants.ADAPTIVE_PHONE_KEY, "0");
+        if (cc.sys.platform === cc.sys.WECHAT_GAME) {
+            wx.getSystemInfo({
+                success: (res) => {
+                    Logger.debug("wx.getSystemInfo res = ", res);
+                    const model = res.model;
+                    if (this.adaptivePhones.indexOf(model) !== -1) {
+                        DataStore.setItem(KeyConstants.ADAPTIVE_PHONE_KEY, "1");
+                    }
+                }
+            });
+        }
+
     }
 
     protected start(): void {

@@ -177,7 +177,7 @@ export class LobbyView extends cc.Component {
 
     private async startWebSocket(): Promise<void> {
         const tk = DataStore.getString(KeyConstants.TOKEN, "");
-        const webSocketURL = `${LEnv.lobbyWebsocket}?& tk=${tk} `;
+        const webSocketURL = `${LEnv.lobbyWebsocket}?&tk=${tk}`;
 
         this.msgCenter = new LMsgCenter(webSocketURL, this, this.lm);
         await this.msgCenter.start();

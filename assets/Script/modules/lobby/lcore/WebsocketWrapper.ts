@@ -14,6 +14,15 @@ export interface WebsocketHost {
     pingPacketProvider: Function;
 }
 
+declare var WebSocket: {
+    prototype: WebSocket;
+    readonly CLOSED: number;
+    readonly CLOSING: number;
+    readonly CONNECTING: number;
+    readonly OPEN: number;
+    new(url: string, protocols?: string | string[], caFilePath?: string): WebSocket;
+};
+
 /**
  * websocket 封装
  */
@@ -31,8 +40,16 @@ export class WebsocketWrapper {
     private pingPacketProvider: Function;
 
     public constructor(host: WebsocketHost, url: string) {
-        const ws = new WebSocket(url);
-        this.ws = ws;
+        if (cc.sys.isNative && cc.sys.os === cc.sys.OS_ANDROID && cc.sys.platform !== cc.sys.OPPO_GAME) {
+            const cerPath = cc.url.raw("resources/certificate/cacert.pem");
+            this.ws = new WebSocket(url, [], cerPath);
+        } else {
+            this.ws = new WebSocket(url);
+        }
+
+        // const ws = new WebSocket(url, [], cerPath);
+        // this.ws = ws;
+        const ws = this.ws;
         this.rtts = 0;
         this.rttsCount = 0;
 
@@ -60,14 +77,14 @@ export class WebsocketWrapper {
 
         ws.onclose = (ev: CloseEvent) => {
             die();
-            Logger.debug("ws close:", ev);
+            Logger.debug("ws close:", JSON.stringify(ev));
 
             this.onEnd(this);
         };
 
         ws.onerror = (ev: Event) => {
             die();
-            Logger.debug("ws error:", ev);
+            Logger.debug("ws error:", JSON.stringify(ev));
         };
 
         ws.onmessage = (ev: MessageEvent) => {
@@ -75,7 +92,7 @@ export class WebsocketWrapper {
         };
 
         ws.onopen = (ev: Event) => {
-            Logger.debug("ws onopen:", ev);
+            Logger.debug("ws onopen:", JSON.stringify(ev));
 
             if (hasPing) {
                 // 启动ping

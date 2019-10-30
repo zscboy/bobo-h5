@@ -9,8 +9,8 @@ export namespace LEnv {
     export const updateDownload = "http://localhost:8080"; // tslint:disable-line:no-http-string
     export const gameWebsocketMonkey = "/game/{0}/ws/monkey";
     export const gameWebsocketPlay = "/game/{0}/ws/play";
-    export const rootURL = "https://dfh5-develop.qianz.com"; // tslint:disable-line:no-http-string
-    export const gameHost = "wss://dfh5-develop.qianz.com"; // tslint:disable-line:no-http-string
+    export const rootURL = "https://www.llwant.com"; // tslint:disable-line:no-http-string
+    export const gameHost = "wss://www.llwant.com"; // tslint:disable-line:no-http-string
     export const quicklyLogin = "/lobby/uuid/quicklyLogin";
     export const accountLogin = "/lobby/uuid/accountLogin";
     export const wxLogin = "/lobby/uuid/wxLogin";
@@ -18,7 +18,7 @@ export namespace LEnv {
     export const wxShareInfo = '/lobby/uuid/getShareInfo';
     export const register = "/lobby/uuid/register";
     export const chat = "/lobby/uuid/chat";
-    export const lobbyWebsocket = "wss://dfh5-develop.qianz.com/lobby/uuid/ws";
+    export const lobbyWebsocket = "wss://www.llwant.com/lobby/uuid/ws";
 
     // -- 创建房间
     export const createRoom = "/lobby/uuid/createRoom";

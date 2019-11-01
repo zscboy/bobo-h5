@@ -13,6 +13,26 @@ import { proto } from "./proto/protoLobby";
 import { LobbyError } from "./views/LobbyError";
 import { LoginView } from "./views/LoginView";
 
+enum AuthRespErrCode {
+    // ErrOk = 0,
+    // ErrComm = -1
+    ERR_OK = 0,
+    ERR_COMM = -1,
+    ERR_USER_CANCEL = -2,
+    ERR_SENT_FAILED = -3,
+    ERR_AUTH_DENIED = -4,
+    ERR_UNSUPPORT = -5,
+    ERR_BAN = -6
+}
+
+class AuthResp {
+    public errCode: number;
+    public errStr: string;
+    public transaction: string;
+    public openId: string;
+    public code: string;
+}
+
 /**
  * hello
  */
@@ -222,6 +242,13 @@ export class LobbyModule extends cc.Component implements LobbyModuleInterface {
             });
         }
 
+        // 注册java回调
+        if (cc.sys.isNative && cc.sys.os === cc.sys.OS_ANDROID) {
+            cc.NativeJsFun = (resp: string) => {
+                this.onJavaCallback(resp);
+            };
+        }
+
     }
 
     protected start(): void {
@@ -263,4 +290,46 @@ export class LobbyModule extends cc.Component implements LobbyModuleInterface {
         this.loginView.updateCompleted();
     }
 
+    private getAuthRespErrString(code: number): string {
+        switch (code) {
+            case AuthRespErrCode.ERR_COMM:
+                return "ERR_COMM";
+            case AuthRespErrCode.ERR_USER_CANCEL:
+                return "用户取消";
+            case AuthRespErrCode.ERR_SENT_FAILED:
+                return "发送请求失败";
+            case AuthRespErrCode.ERR_AUTH_DENIED:
+                return "用户拒绝";
+            case AuthRespErrCode.ERR_UNSUPPORT:
+                return "不支持错误";
+            case AuthRespErrCode.ERR_BAN:
+                return "ERR_BAN";
+            default:
+                return "Unkonw error";
+        }
+    }
+    private onJavaCallback(json: string): void {
+        Logger.debug("llwant, LobbyModule.onJavaCallback:", json);
+        if (json === "") {
+            return;
+        }
+
+        const authResp = <AuthResp>JSON.parse(json);
+        if (authResp === null) {
+            Logger.debug("llwant, LobbyModule.onJavaCallback, authResp === null");
+
+            return;
+        }
+
+        if (authResp.errCode !== AuthRespErrCode.ERR_OK) {
+            Dialog.showDialog(this.getAuthRespErrString(authResp.errCode));
+
+            return;
+        }
+
+        if (authResp.code) {
+            // 请求服务器登录
+            this.eventTarget.emit("onRequestCode", authResp.code);
+        }
+    }
 }

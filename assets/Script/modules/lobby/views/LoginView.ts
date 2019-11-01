@@ -27,6 +27,8 @@ export class LoginView extends cc.Component {
         const lm = <LobbyModuleInterface>this.getComponent("LobbyModule");
         const loader = lm.loader;
 
+        lm.eventTarget.on("onRequestCode", this.onNativeWxLogin, this);
+
         loader.fguiAddPackage("launch/fui_login/lobby_login");
         const view = fgui.UIPackage.createObject("lobby_login", "login").asCom;
 
@@ -143,6 +145,11 @@ export class LoginView extends cc.Component {
         if (cc.sys.platform !== cc.sys.WECHAT_GAME) {
             Logger.debug('not wx env');
         }
+
+        if (cc.sys.isNative && cc.sys.os === cc.sys.OS_ANDROID) {
+            jsb.reflection.callStaticMethod("org/cocos2dx/javascript/AppActivity", "wxLogin", "()V");
+        }
+
     }
 
     public quicklyLogin(): void {
@@ -383,5 +390,44 @@ export class LoginView extends cc.Component {
                 "arraybuffer",
                 body);
         }
+    }
+
+    private onNativeWxLogin(code: string): void {
+        const wxLoginUrl = `${LEnv.rootURL}${LEnv.nativeWxLogin}${code}`;
+        Logger.debug('wxloginUrl', wxLoginUrl);
+        HTTP.hGet(
+            this.eventTarget,
+            wxLoginUrl,
+            (xhr: XMLHttpRequest, err: string) => {
+                let errMsg = null;
+                if (err !== null) {
+                    errMsg = `登录错误，错误码:${err}`;
+                } else {
+                    errMsg = HTTP.hError(xhr);
+                    if (errMsg === null) {
+                        const data = <Uint8Array>xhr.response;
+                        // proto 解码登录结果
+                        const wxLoginReply = proto.lobby.MsgLoginReply.decode(data);
+                        if (wxLoginReply.result === 0) {
+                            Logger.debug("wx login ok, switch to lobbyview");
+                            this.saveWxLoginReply(wxLoginReply);
+                            this.showLobbyView();
+                        } else {
+                            // TODO: show error msg
+                            Logger.debug("wx login error, errCode:", wxLoginReply.result);
+                            this.showLoginErrMsg(wxLoginReply.result);
+                        }
+                    }
+                }
+
+                if (errMsg !== null) {
+                    Logger.debug("wx login failed:", errMsg);
+                    // 显示错误对话框
+                    Dialog.showDialog(errMsg, () => {
+                        //
+                    });
+                }
+            },
+            "arraybuffer");
     }
 }

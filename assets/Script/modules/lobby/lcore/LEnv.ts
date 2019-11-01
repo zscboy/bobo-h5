@@ -14,7 +14,7 @@ export namespace LEnv {
     export const quicklyLogin = "/lobby/uuid/quicklyLogin";
     export const accountLogin = "/lobby/uuid/accountLogin";
     export const wxLogin = "/lobby/uuid/wxLogin";
-
+    export const nativeWxLogin = "/lobby/uuid/nativeWxLogin?code=";
     export const wxShareInfo = '/lobby/uuid/getShareInfo';
     export const register = "/lobby/uuid/register";
     export const chat = "/lobby/uuid/chat";

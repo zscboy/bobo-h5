@@ -73,7 +73,7 @@ export class RoomView {
     public showOrHideReadyButton(isShow: boolean): void {
         this.readyButton.visible = isShow;
         this.returnLobbyBtn.visible = isShow;
-        if (cc.sys.platform === cc.sys.WECHAT_GAME) {
+        if (cc.sys.platform === cc.sys.WECHAT_GAME || (cc.sys.isNative && cc.sys.os === cc.sys.OS_ANDROID)) {
             this.inviteButton.visible = isShow;
         }
     }

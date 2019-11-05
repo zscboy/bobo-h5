@@ -59,7 +59,7 @@ export namespace HTTP {
         };
 
         // 设置服务器响应类型
-        let timeout = 5000; // 默认5秒超时
+        let timeout = 50000; // 默认5秒超时
         if (options.timeout !== undefined) {
             timeout = options.timeout;
         }

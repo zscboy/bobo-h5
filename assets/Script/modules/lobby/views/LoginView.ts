@@ -376,6 +376,8 @@ export class LoginView extends cc.Component {
                                 Logger.debug("wx login error, errCode:", wxLoginReply.result);
                                 this.showLoginErrMsg(wxLoginReply.result);
                             }
+
+                            return;
                         }
                     }
 
@@ -417,6 +419,8 @@ export class LoginView extends cc.Component {
                             Logger.debug("wx login error, errCode:", wxLoginReply.result);
                             this.showLoginErrMsg(wxLoginReply.result);
                         }
+
+                        return;
                     }
                 }
 
@@ -427,7 +431,6 @@ export class LoginView extends cc.Component {
                         //
                     });
                 }
-            },
-            "arraybuffer");
+            });
     }
 }

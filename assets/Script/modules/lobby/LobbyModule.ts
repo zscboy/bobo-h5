@@ -11,6 +11,7 @@ import { GameModuleInterface, GameModuleLaunchArgs, LobbyModuleInterface } from 
 import { Logger } from "./lcore/Logger";
 import { proto } from "./proto/protoLobby";
 import { LobbyError } from "./views/LobbyError";
+import { LobbyView } from "./views/LobbyView";
 import { LoginView } from "./views/LoginView";
 
 enum AuthRespErrCode {
@@ -41,6 +42,7 @@ export class LobbyModule extends cc.Component implements LobbyModuleInterface {
     public loader: GResLoaderImpl;
 
     public eventTarget: cc.EventTarget;
+
     // 用于挂载子游戏模块的节点，在离开子游戏模块并回到大厅后销毁
     private gameNode: cc.Node;
     private gameLoader: GResLoaderImpl;
@@ -247,6 +249,10 @@ export class LobbyModule extends cc.Component implements LobbyModuleInterface {
             cc.NativeJsFun = (resp: string) => {
                 this.onJavaCallback(resp);
             };
+
+            cc.CallFromShare = (resp: string) => {
+                this.onCallFromShare(resp);
+            };
         }
 
     }
@@ -332,4 +338,34 @@ export class LobbyModule extends cc.Component implements LobbyModuleInterface {
             this.eventTarget.emit("onRequestCode", authResp.code);
         }
     }
+
+    private onCallFromShare(params: string): void {
+        Logger.debug("llwant, LobbyModule.onCallFromShare:", params);
+        const roomType = this.getUrlParameter("roomType", params);
+        const roomNumber = this.getUrlParameter("roomNumber", params);
+
+        if (roomType !== "" && roomNumber !== "") {
+            const lobbyView = this.getComponent(LobbyView);
+            if (lobbyView !== undefined && lobbyView !== null) {
+                this.eventTarget.emit("onCallFromShare", +roomType, roomNumber);
+            }
+
+            Logger.debug(`roomType:${roomType}, roomNumber:${roomNumber}`);
+        }
+    }
+
+    private getUrlParameter(param: string, queryString: string): string {
+        const sURLVariables = queryString.split('&');
+        const length = sURLVariables.length;
+        for (let i = 0; i < length; i++) {
+            const sParameterName = sURLVariables[i].split('=');
+
+            if (sParameterName[0] === param) {
+                return sParameterName[1] === undefined ? "" : decodeURIComponent(sParameterName[1]);
+            }
+        }
+
+        return "";
+    }
+
 }

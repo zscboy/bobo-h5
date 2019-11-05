@@ -175,12 +175,23 @@ export class Room {
     }
 
     public onInviteButtonClick(): void {
-        Share.shareGame(
-            this.host.eventTarget,
-            Share.ShareSrcType.GameShare,
-            Share.ShareMediaType.Image,
-            Share.ShareDestType.Friend,
-            `roomNumber=${this.roomInfo.roomNumber}`);
+        if (cc.sys.platform === cc.sys.WECHAT_GAME) {
+            // 微信小游戏分享
+            Share.shareGame(
+                this.host.eventTarget,
+                Share.ShareSrcType.GameShare,
+                Share.ShareMediaType.Image,
+                Share.ShareDestType.Friend,
+                `roomNumber=${this.roomInfo.roomNumber}`);
+        } else if (cc.sys.isNative && cc.sys.os === cc.sys.OS_ANDROID) {
+            // android app 微信分享
+            const title = "湛江麻将";
+            const content = `点击连接，立即来搓麻将, 房号:${this.roomInfo.roomNumber}`;
+            // tslint:disable-next-line:no-http-string
+            const url = `http://llwant1.qianz.com/test/?roomType=${this.roomType}&roomNumber=${this.roomInfo.roomNumber}`;
+            Share.shareWebPage(title, content, url);
+        }
+
     }
     public onReturnLobbyBtnClick(): void {
 

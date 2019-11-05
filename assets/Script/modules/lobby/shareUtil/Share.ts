@@ -88,4 +88,16 @@ export namespace Share {
             }
         });
     };
+
+    export const shareWebPage = (title: string, description: string, url: string) => {
+        if (cc.sys.isNative && cc.sys.os === cc.sys.OS_ANDROID) {
+            jsb.reflection.callStaticMethod(
+                "org/cocos2dx/javascript/AppActivity",
+                "shareWebPage",
+                "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V",
+                title,
+                description,
+                url);
+        }
+    };
 }

@@ -5,6 +5,7 @@ import {
 } from "../lcore/LCoreExports";
 import { LMsgCenter } from "../LMsgCenter";
 import { proto } from "../proto/protoLobby";
+import { Share } from "../shareUtil/ShareExports";
 import { ClubView } from "./club/ClubView";
 import { EmailView } from "./EmailView";
 import { GameRecordView } from "./GameRecordView";
@@ -87,6 +88,8 @@ export class LobbyView extends cc.Component {
         // width = ${ viewNode.width} height = ${viewNode.height} `);
         // Logger.debug(`onload  bg.node.position = ${bgNode.position}, width = ${bgNode.width} height = ${bgNode.height} `);
 
+        this.lm.eventTarget.on("onCallFromShare", this.onCallFromShare, this);
+
         this.initView();
 
         await this.startWebSocket();
@@ -96,6 +99,7 @@ export class LobbyView extends cc.Component {
         this.lm.eventTarget.off(`${proto.lobby.MessageCode.OPUpdateDiamond} `, this.onMessageFunc);
         this.lm.eventTarget.off(`${proto.lobby.MessageCode.OPMail} `, this.updateEmailRedPoint);
         this.lm.eventTarget.off("checkRoomInfo", this.checkRoomInfo);
+        this.lm.eventTarget.on("onCallFromShare", this.onCallFromShare);
 
         this.msgCenter.destory();
 
@@ -123,6 +127,23 @@ export class LobbyView extends cc.Component {
             this.lm.requetJoinRoom(roomNumber);
         }
     }
+
+    // android app 从分享打开app
+    private onCallFromShare(roomType: number, roomNumber: string): void {
+        Logger.debug(`llwant, LobbyView.onCallFromShare, roomType:${roomType}, roomNumber:${roomType}`);
+        //
+        const jsonStr = DataStore.getString(KeyConstants.ROOM_INFO_DATA);
+        if (jsonStr !== "") {
+            Logger.debug("llwant, jsonStr:", jsonStr);
+
+            return;
+        }
+
+        if (roomType !== undefined && roomNumber !== undefined) {
+            this.lm.requetJoinRoom(roomNumber);
+        }
+    }
+
     private initView(): void {
         const clubBtn = this.view.getChild("clubBtn");
         clubBtn.onClick(this.onFriendClick, this);
@@ -173,6 +194,20 @@ export class LobbyView extends cc.Component {
 
         this.checkRoomInfo();
 
+        if (cc.sys.isNative && cc.sys.os === cc.sys.OS_ANDROID) {
+            // 检查是否是分享进来的
+            const roomNumber = jsb.reflection.callStaticMethod(
+                "org/cocos2dx/javascript/AppActivity",
+                "getShareRoomNumber",
+                "()Ljava/lang/String;");
+
+            Logger.debug("llwant, LobbyView.onLoad, roomNumber:", roomNumber);
+
+            if (roomNumber !== undefined && roomNumber !== "") {
+                this.lm.requetJoinRoom(roomNumber);
+            }
+
+        }
     }
 
     private async startWebSocket(): Promise<void> {
@@ -200,7 +235,13 @@ export class LobbyView extends cc.Component {
     }
 
     private onShareBtnClick(): void {
-        //
+        if (cc.sys.isNative && cc.sys.os === cc.sys.OS_ANDROID) {
+            const title = "湛江麻将";
+            const content = "点击连接，立即来搓麻将!";
+            // tslint:disable-next-line:no-http-string
+            const url = "http://llwant1.qianz.com/test/?roomType=&roomNumber=";
+            Share.shareWebPage(title, content, url);
+        }
     }
 
     // private onCreateClick(): void {
